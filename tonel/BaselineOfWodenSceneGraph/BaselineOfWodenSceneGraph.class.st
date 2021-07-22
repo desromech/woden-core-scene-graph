@@ -9,12 +9,17 @@ BaselineOfWodenSceneGraph >> baseline: spec [
     <baseline>
 	spec for: #'common' do: [
 		spec
-			package: #'WodenSceneGraph-Core';
+			baseline: #'AbstractGPU' with: [ spec repository: 'github://ronsaldo/abstract-gpu' ];
+			baseline: #'WodenMath' with: [ spec repository: 'github://ronsaldo/woden-core-math' ];
+		
+			package: #'WodenSceneGraph-Core' with: [
+				spec requires: #( #'WodenMath' ).				
+			];
 			package: #'WodenSceneGraph-Core-Tests' with: [
 				spec requires: #( #'WodenSceneGraph-Core' ).
 			];
 			package: #'WodenSceneGraph-AbstractGPU' with: [
-				spec requires: #( #'WodenSceneGraph-AbstractGPU' ).
+				spec requires: #( #'WodenSceneGraph-Core' #'AbstractGPU').
 			]
 	].
 
