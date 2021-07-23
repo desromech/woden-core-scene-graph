@@ -14,6 +14,11 @@ Class {
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
+{ #category : #adding }
+WDScene >> add: aNode [
+	normalLayer add: aNode
+]
+
 { #category : #accessing }
 WDScene >> backgroundLayer [
 
@@ -53,4 +58,14 @@ WDScene >> normalLayer [
 { #category : #accessing }
 WDScene >> parent [
 	^ nil
+]
+
+{ #category : #adding }
+WDScene >> remove: aNode [
+	normalLayer remove: aNode
+]
+
+{ #category : #accessing }
+WDScene >> scene [
+	^ self
 ]

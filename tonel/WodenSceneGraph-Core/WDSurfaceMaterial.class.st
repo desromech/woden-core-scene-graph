@@ -1,10 +1,13 @@
+"
+I am a material that can be applied to polygonal surfaces.
+"
 Class {
 	#name : #WDSurfaceMaterial,
 	#superclass : #WDMaterial,
 	#instVars : [
+		'alphaMode',
 		'doubleSided',
-		'alphaCutoff',
-		'translucent'
+		'alphaCutoff'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -22,6 +25,17 @@ WDSurfaceMaterial >> alphaCutoff: anObject [
 ]
 
 { #category : #accessing }
+WDSurfaceMaterial >> alphaMode [
+
+	^ alphaMode
+]
+
+{ #category : #accessing }
+WDSurfaceMaterial >> alphaMode: aModeName [
+	alphaMode := aModeName asSymbol
+]
+
+{ #category : #accessing }
 WDSurfaceMaterial >> doubleSided [
 
 	^ doubleSided
@@ -33,14 +47,25 @@ WDSurfaceMaterial >> doubleSided: anObject [
 	doubleSided := anObject
 ]
 
-{ #category : #accessing }
-WDSurfaceMaterial >> translucent [
-
-	^ translucent
+{ #category : #testing }
+WDSurfaceMaterial >> hasAlphaBlending [
+	^ alphaMode == #BLEND
 ]
 
-{ #category : #accessing }
-WDSurfaceMaterial >> translucent: anObject [
+{ #category : #testing }
+WDSurfaceMaterial >> hasAlphaMasking [
+	^ alphaMode == #MASK
+]
 
-	translucent := anObject
+{ #category : #initialization }
+WDSurfaceMaterial >> initialize [
+	super initialize.
+	alphaMode := #OPAQUE.
+	alphaCutoff := 0.5.
+	doubleSided := false.
+]
+
+{ #category : #testing }
+WDSurfaceMaterial >> isOpaque [
+	^ alphaMode == #OPAQUE
 ]

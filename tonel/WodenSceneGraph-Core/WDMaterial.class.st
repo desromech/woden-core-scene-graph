@@ -1,3 +1,6 @@
+"
+I am the description of how an object is renderer, akin to the material of a solid object.
+"
 Class {
 	#name : #WDMaterial,
 	#superclass : #Object,

@@ -17,11 +17,6 @@ WDSceneElement >> children [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
-WDSceneElement >> components [
-	^ #()
-]
-
 { #category : #testing }
 WDSceneElement >> isBackgroundSceneLayer [
 	^ false
@@ -55,4 +50,14 @@ WDSceneElement >> isSceneNode [
 { #category : #accessing }
 WDSceneElement >> parent [
 	self subclassResponsibility
+]
+
+{ #category : #accessing }
+WDSceneElement >> scene [
+	^ nil
+]
+
+{ #category : #accessing }
+WDSceneElement >> sceneLayer [
+	^ nil
 ]

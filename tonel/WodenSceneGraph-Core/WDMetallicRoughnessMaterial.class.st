@@ -1,11 +1,16 @@
+"
+I am a material that uses the metallic-roughness PBR lighting model.
+
+My parameters are taken from the gltf 2.0 spec for model formats.
+"
 Class {
 	#name : #WDMetallicRoughnessMaterial,
 	#superclass : #WDSurfaceMaterial,
 	#instVars : [
 		'baseColorFactor',
 		'baseColorTexture',
-		'emissionFactor',
-		'emissionTexture',
+		'emissiveFactor',
+		'emissiveTexture',
 		'normalTexture',
 		'occlusionFactor',
 		'occlusionTexture',
@@ -41,27 +46,38 @@ WDMetallicRoughnessMaterial >> baseColorTexture: anObject [
 ]
 
 { #category : #accessing }
-WDMetallicRoughnessMaterial >> emissionFactor [
+WDMetallicRoughnessMaterial >> emissiveFactor [
 
-	^ emissionFactor
+	^ emissiveFactor
 ]
 
 { #category : #accessing }
-WDMetallicRoughnessMaterial >> emissionFactor: anObject [
+WDMetallicRoughnessMaterial >> emissiveFactor: anObject [
 
-	emissionFactor := anObject
+	emissiveFactor := anObject
 ]
 
 { #category : #accessing }
-WDMetallicRoughnessMaterial >> emissionTexture [
+WDMetallicRoughnessMaterial >> emissiveTexture [
 
-	^ emissionTexture
+	^ emissiveTexture
 ]
 
 { #category : #accessing }
-WDMetallicRoughnessMaterial >> emissionTexture: anObject [
+WDMetallicRoughnessMaterial >> emissiveTexture: anObject [
 
-	emissionTexture := anObject
+	emissiveTexture := anObject
+]
+
+{ #category : #initialization }
+WDMetallicRoughnessMaterial >> initialize [
+	super initialize.
+	
+	emissiveFactor := Vector3 zeros.
+	baseColorFactor := Vector4 ones.
+	occlusionFactor := 1.0.
+	roughnessFactor := 1.0.
+	metallicFactor := 1.0.
 ]
 
 { #category : #accessing }

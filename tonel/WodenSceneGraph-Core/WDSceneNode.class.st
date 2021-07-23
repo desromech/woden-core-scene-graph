@@ -5,37 +5,19 @@ Each one of these components is further instantiated into a flat non-hierarchica
 "
 Class {
 	#name : #WDSceneNode,
-	#superclass : #WDSceneElement,
+	#superclass : #WDSceneTreeElement,
 	#instVars : [
-		'parent',
-		'children',
-		'components'
+		'renderables',
+		'transform'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
-{ #category : #accessing }
-WDSceneNode >> children [
-
-	^ children
-]
-
-{ #category : #accessing }
-WDSceneNode >> children: anObject [
-
-	children := anObject
-]
-
-{ #category : #accessing }
-WDSceneNode >> components [
-
-	^ components
-]
-
-{ #category : #accessing }
-WDSceneNode >> components: anObject [
-
-	components := anObject
+{ #category : #initialization }
+WDSceneNode >> initialize [
+	super initialize.
+	renderables := #().
+	transform := DecomposedTransform3D new.
 ]
 
 { #category : #testing }
@@ -43,14 +25,30 @@ WDSceneNode >> isSceneNode [
 	^ true
 ]
 
-{ #category : #accessing }
-WDSceneNode >> parent [
-
-	^ parent
+{ #category : #removing }
+WDSceneNode >> removeFromScene [
+	parent ifNotNil: [ parent remove: self ]
 ]
 
 { #category : #accessing }
-WDSceneNode >> parent: anObject [
+WDSceneNode >> renderables [
 
-	parent := anObject
+	^ renderables
+]
+
+{ #category : #accessing }
+WDSceneNode >> renderables: anObject [
+
+	renderables := anObject
+]
+
+{ #category : #accessing }
+WDSceneNode >> transform [
+
+	^ transform copy
+]
+
+{ #category : #accessing }
+WDSceneNode >> transform: aTransform [
+	transform := aTransform asDecomposedTransform3D
 ]

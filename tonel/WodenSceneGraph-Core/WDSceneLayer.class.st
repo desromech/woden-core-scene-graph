@@ -3,11 +3,7 @@ I represent a different camera plane in a scene.
 "
 Class {
 	#name : #WDSceneLayer,
-	#superclass : #WDSceneElement,
-	#instVars : [
-		'scene',
-		'nodes'
-	],
+	#superclass : #WDSceneTreeElement,
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
@@ -21,20 +17,9 @@ WDSceneLayer class >> isAbstract [
 	^ self == WDSceneLayer
 ]
 
-{ #category : #accessing }
-WDSceneLayer >> children [
-	^ nodes
-]
-
-{ #category : #initialization }
-WDSceneLayer >> initialize [
-	super initialize.
-	nodes := OrderedCollection new.
-]
-
 { #category : #initialization }
 WDSceneLayer >> initializeWithScene: aScene [
-	scene := aScene.
+	parent := aScene.
 	self initialize.
 ]
 
@@ -44,16 +29,11 @@ WDSceneLayer >> isSceneLayer [
 ]
 
 { #category : #accessing }
-WDSceneLayer >> nodes [
-	^ nodes
-]
-
-{ #category : #accessing }
-WDSceneLayer >> parent [
-	^ scene
-]
-
-{ #category : #accessing }
 WDSceneLayer >> scene [
-	^ scene
+	^ parent
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneLayer >> sceneLayer [
+	^ self
 ]

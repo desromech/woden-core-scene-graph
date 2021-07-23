@@ -1,3 +1,8 @@
+"
+I am a material that has a flat coloring (i.e. no lighting).
+
+My parameters are taken from the gltf 2.0 spec for model formats.
+"
 Class {
 	#name : #WDUnlitMaterial,
 	#superclass : #WDSurfaceMaterial,
@@ -30,4 +35,11 @@ WDUnlitMaterial >> colorTexture [
 WDUnlitMaterial >> colorTexture: anObject [
 
 	colorTexture := anObject
+]
+
+{ #category : #initialization }
+WDUnlitMaterial >> initialize [
+	super initialize.
+	
+	colorFactor := Vector4 ones.
 ]
