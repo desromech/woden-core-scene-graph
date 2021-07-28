@@ -4,7 +4,7 @@ A WDUnlitMaterialTest is a test class for testing the behavior of WDUnlitMateria
 Class {
 	#name : #WDUnlitMaterialTest,
 	#superclass : #TestCase,
-	#category : #'WodenSceneGraph-Tests'
+	#category : #'WodenSceneGraph-Core-Tests'
 }
 
 { #category : #tests }

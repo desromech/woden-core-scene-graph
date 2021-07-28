@@ -20,7 +20,7 @@ BaselineOfWodenSceneGraph >> baseline: spec [
 			package: #'WodenSceneGraph-Core' with: [
 				spec requires: #( #'WodenMath' #'FormSceneGraph').				
 			];
-			package: #'WodenSceneGraph-Tests' with: [
+			package: #'WodenSceneGraph-Core-Tests' with: [
 				spec requires: #( #'WodenSceneGraph-Core' ).
 			];
 			package: #'WodenSceneGraph-AbstractGPU' with: [
