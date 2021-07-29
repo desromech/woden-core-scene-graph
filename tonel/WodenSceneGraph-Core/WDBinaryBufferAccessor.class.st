@@ -135,7 +135,6 @@ WDBinaryBufferAccessor >> type [
 ]
 
 { #category : #accessing }
-WDBinaryBufferAccessor >> type: anObject [
-
-	type := anObject
+WDBinaryBufferAccessor >> type: aWDBinaryBufferAccessorType [
+	type := aWDBinaryBufferAccessorType asBinaryBufferAccessorType
 ]

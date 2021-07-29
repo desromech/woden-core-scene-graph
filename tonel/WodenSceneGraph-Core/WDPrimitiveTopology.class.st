@@ -3,10 +3,7 @@ I represent a specific primitive topology.
 "
 Class {
 	#name : #WDPrimitiveTopology,
-	#superclass : #Object,
-	#classInstVars : [
-		'uniqueInstance'
-	],
+	#superclass : #WDAbstractEnumClass,
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
 
@@ -19,11 +16,6 @@ WDPrimitiveTopology class >> asPrimitiveTopology [
 { #category : #testing }
 WDPrimitiveTopology class >> isAbstract [
 	^ self == WDPrimitiveTopology
-]
-
-{ #category : #accessing }
-WDPrimitiveTopology class >> uniqueInstance [
-	^ uniqueInstance ifNil: [ uniqueInstance := self basicNew ]
 ]
 
 { #category : #converting }

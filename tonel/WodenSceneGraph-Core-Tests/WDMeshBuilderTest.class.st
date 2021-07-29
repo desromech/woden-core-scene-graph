@@ -19,7 +19,6 @@ WDMeshBuilderTest >> testEmpty [
 WDMeshBuilderTest >> testTriangle [
 	| builder mesh primitive |
 	builder := WDMeshBuilder new.
-	mesh := builder mesh.
 	
 	builder
 		beginTriangles;
@@ -35,6 +34,7 @@ WDMeshBuilderTest >> testTriangle [
 	self assert: builder normals size equals: 0.
 	self assert: builder texcoords size equals: 0.
 	
+	mesh := builder mesh.
 	self assert: mesh primitives size equals: 1.
 	primitive := mesh primitives first.
 
