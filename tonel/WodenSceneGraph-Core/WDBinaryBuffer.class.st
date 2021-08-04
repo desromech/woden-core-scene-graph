@@ -5,7 +5,7 @@ I have a direct correspondence to a gltf 2 model binary buffer.
 "
 Class {
 	#name : #WDBinaryBuffer,
-	#superclass : #Object,
+	#superclass : #WDRendererCacheableResource,
 	#instVars : [
 		'name',
 		'data'
