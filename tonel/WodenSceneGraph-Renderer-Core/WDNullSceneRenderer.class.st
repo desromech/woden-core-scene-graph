@@ -6,3 +6,8 @@ Class {
 	#superclass : #WDSceneRenderer,
 	#category : #'WodenSceneGraph-Renderer-Core-WodenSceneGraph-Renderer-Core'
 }
+
+{ #category : #rendering }
+WDNullSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
+	"Nothing is required here."
+]

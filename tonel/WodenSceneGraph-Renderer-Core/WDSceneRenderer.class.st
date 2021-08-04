@@ -16,3 +16,8 @@ WDSceneRenderer class >> isAbstract [
 WDSceneRenderer class >> isAvailable [
 	^ false
 ]
+
+{ #category : #rendering }
+WDSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
+	self subclassResponsibility
+]

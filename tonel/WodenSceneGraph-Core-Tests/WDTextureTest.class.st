@@ -71,3 +71,21 @@ WDTextureTest >> testForNormalMapForm [
 	self assert: texture miplevels equals: 5.
 	self assert: texture data equals: colorForm.
 ]
+
+{ #category : #tests }
+WDTextureTest >> testReadedColorBufferWithExtent [
+	| colorForm texture |
+	texture := WDTexture forReadedColorBufferWithExtent: 32@32.
+	self assert: texture dataKind isColorData.
+	self assert: texture format isB8G8R8A8UNormSRGB.
+	self assert: texture type is2DTextureType.
+	self assert: texture usageMode isReadedRenderTarget.
+	self assert: texture width equals: 32.
+	self assert: texture height equals: 32.
+	self assert: texture depth equals: 1.
+	self assert: texture layers equals: 1.
+	self assert: texture miplevels equals: 1.
+	self assert: texture data isForm.
+	self assert: texture data extent equals: 32@32.
+	self assert: texture data depth equals: 32.
+]

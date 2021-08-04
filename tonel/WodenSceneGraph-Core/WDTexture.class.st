@@ -58,6 +58,14 @@ WDTexture class >> forNormalMapForm: aForm [
 	^ self new setupForNormalMapForm: aForm; yourself
 ]
 
+{ #category : #'as yet unclassified' }
+WDTexture class >> forReadedColorBufferWithExtent: anExtent [
+	^ (self forColorForm: (Form extent: anExtent depth: 32))
+		usageMode: WDTextureUsageModeReadedRenderTarget;
+		miplevels: 1;
+		yourself
+]
+
 { #category : #accessing }
 WDTexture >> data [
 
