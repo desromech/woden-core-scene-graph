@@ -21,12 +21,12 @@ Class {
 	#category : #'WodenSceneGraph-Core-Texture'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #utility }
 WDTexture class >> computeMiplevelsForExtent: anExtent [
 	^ self computeMiplevelsForWidth: anExtent x height: anExtent y
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #utility }
 WDTexture class >> computeMiplevelsForWidth: width height: height [
 	| result currentWidth currentHeight |
 	width isPowerOfTwo ifFalse: [ ^ 1 ].
@@ -41,6 +41,21 @@ WDTexture class >> computeMiplevelsForWidth: width height: height [
 		currentHeight := currentHeight // 2 max: 1.
 	].
 	^ result
+]
+
+{ #category : #construction }
+WDTexture class >> forColorForm: aForm [
+	^ self new setupForColorForm: aForm; yourself
+]
+
+{ #category : #construction }
+WDTexture class >> forNonColorForm: aForm [
+	^ self new setupForNonColorForm: aForm; yourself
+]
+
+{ #category : #construction }
+WDTexture class >> forNormalMapForm: aForm [
+	^ self new setupForNormalMapForm: aForm; yourself
 ]
 
 { #category : #accessing }
@@ -62,9 +77,8 @@ WDTexture >> dataKind [
 ]
 
 { #category : #accessing }
-WDTexture >> dataKind: anObject [
-
-	dataKind := anObject
+WDTexture >> dataKind: aDataKind [
+	dataKind := aDataKind asTextureDataKind
 ]
 
 { #category : #accessing }
