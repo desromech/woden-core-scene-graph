@@ -8,13 +8,13 @@ Class {
 		'dataKind',
 		'type',
 		'format',
+		'usageMode',
 		'width',
 		'depth',
 		'height',
 		'layers',
 		'miplevels',
 		'data',
-		'isRenderTarget',
 		'sampleCount',
 		'sampleQuality'
 	],
@@ -122,7 +122,8 @@ WDTexture >> initialize [
 	self
 		dataKind: WDTextureDataKindColor;
 		type: WDTextureTypeUnknown;
-		format: WDTextureFormatUnknown.
+		format: WDTextureFormatUnknown;
+		usageMode: WDTextureUsageModeStaticSampled.
 	width := 0.
 	height := 0.
 	depth := 0.
@@ -130,19 +131,6 @@ WDTexture >> initialize [
 	miplevels := 0.
 	sampleCount := 1.
 	sampleQuality := 0.
-	isRenderTarget := false.
-]
-
-{ #category : #accessing }
-WDTexture >> isRenderTarget [
-
-	^ isRenderTarget
-]
-
-{ #category : #accessing }
-WDTexture >> isRenderTarget: anObject [
-
-	isRenderTarget := anObject
 ]
 
 { #category : #accessing }
@@ -240,6 +228,17 @@ WDTexture >> type [
 { #category : #accessing }
 WDTexture >> type: aTextureType [
 	type := aTextureType asTextureType
+]
+
+{ #category : #accessing }
+WDTexture >> usageMode [
+
+	^ usageMode
+]
+
+{ #category : #accessing }
+WDTexture >> usageMode: aTextureUsageMode [
+	usageMode := aTextureUsageMode asTextureUsageMode
 ]
 
 { #category : #accessing }

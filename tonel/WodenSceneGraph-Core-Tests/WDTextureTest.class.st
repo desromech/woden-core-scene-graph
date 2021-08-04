@@ -29,12 +29,12 @@ WDTextureTest >> testForColorForm [
 	self assert: texture dataKind isColorData.
 	self assert: texture format isB8G8R8A8UNormSRGB.
 	self assert: texture type is2DTextureType.
+	self assert: texture usageMode isStaticSampled.
 	self assert: texture width equals: 16.
 	self assert: texture height equals: 16.
 	self assert: texture depth equals: 1.
 	self assert: texture layers equals: 1.
 	self assert: texture miplevels equals: 5.
-	self deny: texture isRenderTarget.
 	self assert: texture data equals: colorForm.
 ]
 
@@ -46,12 +46,12 @@ WDTextureTest >> testForNonColorForm [
 	self assert: texture dataKind isNonColorData.
 	self assert: texture format isB8G8R8A8UNorm.
 	self assert: texture type is2DTextureType.
+	self assert: texture usageMode isStaticSampled.
 	self assert: texture width equals: 16.
 	self assert: texture height equals: 16.
 	self assert: texture depth equals: 1.
 	self assert: texture layers equals: 1.
 	self assert: texture miplevels equals: 5.
-	self deny: texture isRenderTarget.
 	self assert: texture data equals: colorForm.
 ]
 
@@ -63,11 +63,11 @@ WDTextureTest >> testForNormalMapForm [
 	self assert: texture dataKind isNormalMapData.
 	self assert: texture format isB8G8R8A8UNorm.
 	self assert: texture type is2DTextureType.
+	self assert: texture usageMode isStaticSampled.
 	self assert: texture width equals: 16.
 	self assert: texture height equals: 16.
 	self assert: texture depth equals: 1.
 	self assert: texture layers equals: 1.
 	self assert: texture miplevels equals: 5.
-	self deny: texture isRenderTarget.
 	self assert: texture data equals: colorForm.
 ]
