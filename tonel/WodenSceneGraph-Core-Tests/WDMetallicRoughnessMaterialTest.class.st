@@ -4,7 +4,7 @@ A WDMetallicRoughnessMaterialTest is a test class for testing the behavior of WD
 Class {
 	#name : #WDMetallicRoughnessMaterialTest,
 	#superclass : #TestCase,
-	#category : #'WodenSceneGraph-Core-Tests'
+	#category : #'WodenSceneGraph-Core-Tests-Material'
 }
 
 { #category : #tests }

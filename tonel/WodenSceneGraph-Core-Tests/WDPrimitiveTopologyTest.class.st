@@ -4,7 +4,7 @@ A WDPrimitiveTopologyTest is a test class for testing the behavior of WDPrimitiv
 Class {
 	#name : #WDPrimitiveTopologyTest,
 	#superclass : #TestCase,
-	#category : #'WodenSceneGraph-Core-Tests'
+	#category : #'WodenSceneGraph-Core-Tests-Renderable'
 }
 
 { #category : #tests }

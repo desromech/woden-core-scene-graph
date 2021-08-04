@@ -6,3 +6,8 @@ Class {
 	#superclass : #Object,
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
+
+{ #category : #adding }
+WDRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
+	self subclassResponsibility
+]

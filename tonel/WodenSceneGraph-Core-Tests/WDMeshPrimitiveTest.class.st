@@ -4,7 +4,7 @@ A WDMeshPrimitiveTest is a test class for testing the behavior of WDMeshPrimitiv
 Class {
 	#name : #WDMeshPrimitiveTest,
 	#superclass : #TestCase,
-	#category : #'WodenSceneGraph-Core-Tests'
+	#category : #'WodenSceneGraph-Core-Tests-Renderable'
 }
 
 { #category : #tests }

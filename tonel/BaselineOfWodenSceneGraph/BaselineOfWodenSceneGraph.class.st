@@ -23,8 +23,11 @@ BaselineOfWodenSceneGraph >> baseline: spec [
 			package: #'WodenSceneGraph-Core-Tests' with: [
 				spec requires: #( #'WodenSceneGraph-Core' ).
 			];
-			package: #'WodenSceneGraph-AbstractGPU' with: [
-				spec requires: #( #'WodenSceneGraph-Core' #'AbstractGPU').
+			package: #'WodenSceneGraph-Renderer-Core' with: [
+				spec requires: #( #'WodenSceneGraph-Core').
+			];
+			package: #'WodenSceneGraph-Renderer-AbstractGPU' with: [
+				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'AbstractGPU').
 			]
 	].
 

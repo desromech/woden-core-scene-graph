@@ -7,7 +7,6 @@ Class {
 	#instVars : [
 		'positions',
 		'colors',
-		'texcoords',
 		'normals',
 		'tangents4',
 		'boneIndices',
@@ -18,15 +17,37 @@ Class {
 		'vertexBinding',
 		'buffer',
 		'vertexBufferView',
-		'indexBufferView'
+		'indexBufferView',
+		'texcoords0',
+		'texcoords1'
 	],
 	#category : #'WodenSceneGraph-Core-RenderableBuilder'
 }
 
 { #category : #adding }
+WDMeshBuilder >> addCr: r g: g b: b a: a [
+	colors add: r; add: g; add: b; add: a.
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addNx: x y: y z: z [
+	normals add: x; add: y; add: z.
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addPx: x y: y z: z [
 	positions add: x; add: y; add: z.
 	vertexCount := vertexCount + 1.
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addT0u: u v: v [
+	texcoords0 add: u; add: v
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addT1u: u v: v [
+	texcoords1 add: u; add: v
 ]
 
 { #category : #adding }
@@ -60,12 +81,23 @@ WDMeshBuilder >> colors [
 	^ colors
 ]
 
+{ #category : #private }
+WDMeshBuilder >> computeBoundingBoxForPrimitive: builderPrimitive [
+	| box |
+	box := AABox empty.
+	builderPrimitive firstIndex to: builderPrimitive firstIndex + builderPrimitive indexCount - 1 do: [ :i |
+		box insertPoint: (self fetchPositionAt: (indices at: i + 1))
+	].
+
+	^ box
+]
+
 { #category : #accessing }
 WDMeshBuilder >> currentMaterial [
 	^ primitives ifEmpty: [ nil ] ifNotEmpty: [ primitives last material ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDMeshBuilder >> encodeBufferData [
 	| encoder encodedAttributes |
 	self assert: vertexCount > 0.
@@ -79,7 +111,8 @@ WDMeshBuilder >> encodeBufferData [
 	self
 		encodeWith: encoder float32Array: positions type: WDBinaryBufferAccessorVector3Type location: WDVertexBufferAttribute positionLocation into: encodedAttributes;
 		encodeWith: encoder float32Array: normals type: WDBinaryBufferAccessorVector3Type location: WDVertexBufferAttribute normalLocation into: encodedAttributes;
-		encodeWith: encoder float32Array: texcoords type: WDBinaryBufferAccessorVector2Type location: WDVertexBufferAttribute texcoordLocation into: encodedAttributes;
+		encodeWith: encoder float32Array: texcoords0 type: WDBinaryBufferAccessorVector2Type location: WDVertexBufferAttribute texcoord0Location into: encodedAttributes;
+		encodeWith: encoder float32Array: texcoords1 type: WDBinaryBufferAccessorVector2Type location: WDVertexBufferAttribute texcoord1Location into: encodedAttributes;
 		encodeWith: encoder float32Array: colors type: WDBinaryBufferAccessorVector4Type location: WDVertexBufferAttribute colorLocation into: encodedAttributes;
 		encodeWith: encoder float32Array: tangents4 type: WDBinaryBufferAccessorVector4Type location: WDVertexBufferAttribute tangent4Location into: encodedAttributes;
 		encodeWith: encoder float32Array: boneWeights type: WDBinaryBufferAccessorVector4Type location: WDVertexBufferAttribute boneWeightsLocation into: encodedAttributes;
@@ -107,7 +140,7 @@ WDMeshBuilder >> encodeBufferData [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDMeshBuilder >> encodeWith: encoder float32Array: array type: type location: location into: encodedAttributes [
 	| accessor |
 	array isEmpty ifTrue: [ ^ self ].
@@ -124,7 +157,7 @@ WDMeshBuilder >> encodeWith: encoder float32Array: array type: type location: lo
 		yourself)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDMeshBuilder >> encodeWith: encoder uint16Array: array type: type location: location into: encodedAttributes [
 	| accessor |
 	array isEmpty ifTrue: [ ^ self ].
@@ -140,17 +173,25 @@ WDMeshBuilder >> encodeWith: encoder uint16Array: array type: type location: loc
 		yourself)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDMeshBuilder >> encodedPrimitives [
 	^ (primitives collect: [ :each | WDMeshPrimitive new
 		topology: each topology;
 		material: each material;
 		vertexBinding: self vertexBinding;
 		indices: (self indexAccessorForPrimitive: each);
+		boundingBox: (self computeBoundingBoxForPrimitive: each);
 		yourself ]) asArray
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
+WDMeshBuilder >> fetchPositionAt: index [
+	| baseIndex |
+	baseIndex := index * 3.
+	^ Vector3 x: (positions at: baseIndex + 1) y: (positions at: baseIndex + 2) z: (positions at: baseIndex + 3)
+]
+
+{ #category : #private }
 WDMeshBuilder >> finishLastPrimitive [
 	| primitive |
 	primitives isEmpty ifTrue: [ ^ self ].
@@ -159,12 +200,12 @@ WDMeshBuilder >> finishLastPrimitive [
 	primitive indexCount: indices size - primitive firstIndex.
 ]
 
-{ #category : #'as yet unclassified' }
-WDMeshBuilder >> indexAccessorForPrimitive: builderPrimitives [
+{ #category : #private }
+WDMeshBuilder >> indexAccessorForPrimitive: builderPrimitive [
 	^ WDBinaryBufferAccessor new
 		bufferView: indexBufferView;
-		byteOffset: builderPrimitives firstIndex * indexBufferView byteStride;
-		count: builderPrimitives indexCount;
+		byteOffset: builderPrimitive firstIndex * indexBufferView byteStride;
+		count: builderPrimitive indexCount;
 		type: WDBinaryBufferAccessorScalarType;
 		componentType: (indexBufferView byteStride < 4
 			ifTrue: [ WDBinaryBufferAccessorUInt16ComponentType ]
@@ -183,7 +224,8 @@ WDMeshBuilder >> initialize [
 	super initialize.
 	positions := OrderedCollection new.
 	colors := OrderedCollection new.
-	texcoords := OrderedCollection new.
+	texcoords0 := OrderedCollection new.
+	texcoords1 := OrderedCollection new.
 	normals := OrderedCollection new.
 	tangents4 := OrderedCollection new.
 	boneIndices := OrderedCollection new.
@@ -199,7 +241,8 @@ WDMeshBuilder >> mesh [
 	self finishLastPrimitive.
 	
 	^ WDStaticMeshRenderable new
-		primitives: (self encodedPrimitives);
+		primitives: self encodedPrimitives;
+		computeBoundingBoxFromPrimitives;
 		yourself
 ]
 
@@ -225,7 +268,8 @@ WDMeshBuilder >> primitives [
 WDMeshBuilder >> reset [
 	positions removeAll.
 	colors removeAll.
-	texcoords removeAll.
+	texcoords0 removeAll.
+	texcoords1 removeAll.
 	normals removeAll.
 	indices removeAll.
 	primitives removeAll.
@@ -237,12 +281,17 @@ WDMeshBuilder >> reset [
 ]
 
 { #category : #accessing }
-WDMeshBuilder >> texcoords [
+WDMeshBuilder >> texcoords0 [
 
-	^ texcoords
+	^ texcoords0
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
+WDMeshBuilder >> texcoords1 [
+	^ texcoords1
+]
+
+{ #category : #private }
 WDMeshBuilder >> vertexBinding [
 	vertexBinding ifNil: [ self encodeBufferData ].
 	^ vertexBinding

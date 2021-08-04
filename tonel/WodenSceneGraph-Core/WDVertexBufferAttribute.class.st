@@ -15,8 +15,8 @@ Class {
 		'NormalLocation',
 		'PositionLocation',
 		'Tangent4Location',
-		'Texcoord2Location',
-		'TexcoordLocation'
+		'Texcoord0Location',
+		'Texcoord1Location'
 	],
 	#category : #'WodenSceneGraph-Core-Resources'
 }
@@ -41,8 +41,8 @@ WDVertexBufferAttribute class >> initialize [
 	PositionLocation := 0.
 	ColorLocation := 1.
 	NormalLocation := 2.
-	TexcoordLocation := 3.
-	Texcoord2Location := 4.
+	Texcoord0Location := 3.
+	Texcoord1Location := 4.
 	BoneIndicesLocation := 5.
 	BoneWeightsLocation := 6.
 	Tangent4Location := 7.
@@ -65,13 +65,13 @@ WDVertexBufferAttribute class >> tangent4Location [
 ]
 
 { #category : #'vertex attribute locations' }
-WDVertexBufferAttribute class >> texcoord2Location [
-	^ Texcoord2Location
+WDVertexBufferAttribute class >> texcoord0Location [
+	^ Texcoord0Location
 ]
 
 { #category : #'vertex attribute locations' }
-WDVertexBufferAttribute class >> texcoordLocation [
-	^ TexcoordLocation
+WDVertexBufferAttribute class >> texcoord1Location [
+	^ Texcoord1Location
 ]
 
 { #category : #accessing }

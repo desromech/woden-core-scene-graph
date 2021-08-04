@@ -5,15 +5,33 @@ I have direct correspondence with a gltf 2 mesh primitive.
 "
 Class {
 	#name : #WDMeshPrimitive,
-	#superclass : #Object,
+	#superclass : #WDRenderable,
 	#instVars : [
 		'material',
 		'vertexBinding',
 		'indices',
-		'topology'
+		'topology',
+		'boundingBox'
 	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
+
+{ #category : #adding }
+WDMeshPrimitive >> addToRenderingScene: renderingScene withObjectState: anObjectState [
+	renderingScene addMeshPrimitive: self withMaterial: material objectState: anObjectState
+]
+
+{ #category : #accessing }
+WDMeshPrimitive >> boundingBox [
+
+	^ boundingBox
+]
+
+{ #category : #accessing }
+WDMeshPrimitive >> boundingBox: anObject [
+
+	boundingBox := anObject
+]
 
 { #category : #accessing }
 WDMeshPrimitive >> indices [

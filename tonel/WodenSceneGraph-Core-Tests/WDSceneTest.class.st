@@ -4,7 +4,7 @@ A WDSceneTest is a test class for testing the behavior of WDScene
 Class {
 	#name : #WDSceneTest,
 	#superclass : #TestCase,
-	#category : #'WodenSceneGraph-Core-Tests'
+	#category : #'WodenSceneGraph-Core-Tests-Scene'
 }
 
 { #category : #tests }
