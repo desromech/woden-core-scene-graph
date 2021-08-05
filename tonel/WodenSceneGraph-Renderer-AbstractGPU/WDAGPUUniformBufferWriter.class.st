@@ -13,6 +13,11 @@ Class {
 	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
 }
 
+{ #category : #converting }
+WDAGPUUniformBufferWriter class >> asWDAGPUUniformBufferWriter [
+	^ self uniqueInstance
+]
+
 { #category : #'field definition' }
 WDAGPUUniformBufferWriter class >> fieldsDesc [
 	self subclassResponsibility
@@ -88,6 +93,9 @@ WDAGPUUniformBufferWriter class >> initialize [
 		ivec2 (8 8)
 		ivec3 (12 16)
 		ivec4 (16 16)
+
+		bool (4 4)
+
 	)
 ]
 
@@ -106,14 +114,24 @@ WDAGPUUniformBufferWriter class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self basicNew ]
 ]
 
+{ #category : #converting }
+WDAGPUUniformBufferWriter >> asWDAGPUUniformBufferWriter [
+	^ self
+]
+
 { #category : #writing }
 WDAGPUUniformBufferWriter >> write: data onto: pointer at: offset [
 	self subclassResponsibility
 ]
 
 { #category : #writing }
+WDAGPUUniformBufferWriter >> writeBool: data onto: pointer at: offset [
+	pointer unsignedLongAt: offset + 1 put: data asBit
+]
+
+{ #category : #writing }
 WDAGPUUniformBufferWriter >> writeFloat: data onto: pointer at: offset [
-	self halt
+	pointer floatAt: offset + 1 put: data asFloat
 ]
 
 { #category : #writing }
@@ -122,6 +140,50 @@ WDAGPUUniformBufferWriter >> writeMat3: data onto: pointer at: offset [
 ]
 
 { #category : #writing }
-WDAGPUUniformBufferWriter >> writeMat4: data onto: pointer at: offset [
-	self halt
+WDAGPUUniformBufferWriter >> writeMat4: matrix onto: pointer at: offset [
+	pointer
+		floatAt: offset + 1 put: matrix m11 asFloat;
+		floatAt: offset + 5 put: matrix m21 asFloat;
+		floatAt: offset + 9 put: matrix m31 asFloat;
+		floatAt: offset + 13 put: matrix m41 asFloat;
+		
+		floatAt: offset + 17 put: matrix m12 asFloat;
+		floatAt: offset + 21 put: matrix m22 asFloat;
+		floatAt: offset + 25 put: matrix m32 asFloat;
+		floatAt: offset + 29 put: matrix m42 asFloat;
+
+		floatAt: offset + 33 put: matrix m13 asFloat;
+		floatAt: offset + 37 put: matrix m23 asFloat;
+		floatAt: offset + 41 put: matrix m33 asFloat;
+		floatAt: offset + 45 put: matrix m43 asFloat;
+
+		floatAt: offset + 49 put: matrix m14 asFloat;
+		floatAt: offset + 53 put: matrix m24 asFloat;
+		floatAt: offset + 57 put: matrix m34 asFloat;
+		floatAt: offset + 61 put: matrix m44 asFloat
+
+]
+
+{ #category : #writing }
+WDAGPUUniformBufferWriter >> writeVec2: data onto: pointer at: offset [
+	pointer
+		floatAt: offset + 1 put: data x asFloat;
+		floatAt: offset + 5 put: data y asFloat
+]
+
+{ #category : #writing }
+WDAGPUUniformBufferWriter >> writeVec3: data onto: pointer at: offset [
+	pointer
+		floatAt: offset + 1 put: data x asFloat;
+		floatAt: offset + 5 put: data y asFloat;
+		floatAt: offset + 9 put: data z asFloat
+]
+
+{ #category : #writing }
+WDAGPUUniformBufferWriter >> writeVec4: data onto: pointer at: offset [
+	pointer
+		floatAt: offset + 1 put: data x asFloat;
+		floatAt: offset + 5 put: data y asFloat;
+		floatAt: offset + 9 put: data z asFloat;
+		floatAt: offset + 13 put: data w asFloat
 ]

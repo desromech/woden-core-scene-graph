@@ -50,6 +50,30 @@ WDAGPUSceneRendererActiveFrameRenderer >> beginRecordingCommandsOn: aStateTracke
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindCameraState: cameraState [
+	stateTracker useShaderResources: (activeResourceDictionary at: cameraState ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateCameraState.
+		binding writeState: cameraState with: WDAGPUCameraStateUniformBufferWriter.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindObjectState: objectState [
+	stateTracker useShaderResources: (activeResourceDictionary at: objectState ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateObjectState.
+		binding writeState: objectState with: WDAGPUObjectStateUniformBufferWriter.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive: meshPrimitive [
 	| vertexBindingHandle |
 	vertexBindingHandle := self validVertexBindingFor: meshPrimitive vertexBinding.
@@ -109,6 +133,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderable: renderabl
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: renderingObject [
+	self bindObjectState: renderingObject objectState.
 	self recordCommandsForRenderable: renderingObject renderable
 ]
 
@@ -123,6 +148,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding.
+
+	self bindCameraState: renderingSceneState cameraState.
 		
 	renderingSceneState renderingObjects do: [ :each |
 		self recordCommandsForRenderingObject: each

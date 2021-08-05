@@ -1,3 +1,6 @@
+"
+I encapsulate the 3D renderer shader signature, and allocators for its different states.
+"
 Class {
 	#name : #WDAGPURendererShaderSignature,
 	#superclass : #Object,
@@ -5,7 +8,10 @@ Class {
 		'device',
 		'handle',
 		'sampler',
-		'samplersBinding'
+		'samplersBinding',
+		'cameraStateAllocator',
+		'objectStateAllocator',
+		'materialStateAllocator'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -18,7 +24,43 @@ WDAGPURendererShaderSignature class >> for: device [
 	^ self basicNew initializeWithDevice: device
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #utility }
+WDAGPURendererShaderSignature >> allocateCameraState [
+	| result |
+	result := cameraStateAllocator allocate.
+	result bindingHandle ifNil: [ 
+		result
+			bindingHandle: (handle createShaderResourceBinding: 1);
+			bindUniformBufferInSlot: 0.
+	].
+	^ result
+]
+
+{ #category : #utility }
+WDAGPURendererShaderSignature >> allocateMaterialState [
+	| result |
+	result := materialStateAllocator allocate.
+	result bindingHandle ifNil: [ 
+		result
+			bindingHandle: (handle createShaderResourceBinding: 4);
+			bindUniformBufferInSlot: 0.
+	].
+	^ result
+]
+
+{ #category : #utility }
+WDAGPURendererShaderSignature >> allocateObjectState [
+	| result |
+	result := objectStateAllocator allocate.
+	result bindingHandle ifNil: [ 
+		result
+			bindingHandle: (handle createShaderResourceBinding: 3);
+			bindUniformBufferInSlot: 0.
+	].
+	^ result
+]
+
+{ #category : #private }
 WDAGPURendererShaderSignature >> buildHandle [
 	handle := device createShaderSignatureBuilder
 		beginBindingBank: 1;
@@ -56,7 +98,7 @@ WDAGPURendererShaderSignature >> buildHandle [
 		build
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDAGPURendererShaderSignature >> buildSamplersBinding [
 	sampler := device createSampler: (AGPUSamplerDescription new
 		filter: AGPU_FILTER_MIN_LINEAR_MAG_LINEAR_MIPMAP_LINEAR;
@@ -82,6 +124,9 @@ WDAGPURendererShaderSignature >> initializeWithDevice: aDevice [
 	self
 		buildHandle;
 		buildSamplersBinding.
+	cameraStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUCameraStateUniformBufferWriter }.
+	objectStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUObjectStateUniformBufferWriter }.
+	materialStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: WDAGPUMaterialUniformBufferWriter allSubclasses.
 ]
 
 { #category : #accessing }

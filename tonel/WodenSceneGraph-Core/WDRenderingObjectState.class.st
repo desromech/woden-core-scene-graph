@@ -17,6 +17,11 @@ WDRenderingObjectState >> initialize [
 ]
 
 { #category : #accessing }
+WDRenderingObjectState >> inverseTransformationMatrix [
+	^ transformation inverseMatrix4
+]
+
+{ #category : #accessing }
 WDRenderingObjectState >> transformation [
 
 	^ transformation
@@ -26,4 +31,9 @@ WDRenderingObjectState >> transformation [
 WDRenderingObjectState >> transformation: anObject [
 
 	transformation := anObject
+]
+
+{ #category : #accessing }
+WDRenderingObjectState >> transformationMatrix [
+	^ transformation matrix4
 ]

@@ -199,6 +199,22 @@ WDAGPUSceneRendererResourceCache >> triangleVertexShaderSource [
 #version 450
 #line 5
 
+layout(set=1, binding=0, std140) uniform CameraStateBlock	
+{
+	mat4 transformationMatrix;
+	mat4 inverseTransformationMatrix;
+
+	mat4 projectionMatrix;
+	float currentTime;
+	float exposure;
+} CameraState;
+
+layout(set=3, binding=0, std140) uniform ObjectStateBlock
+{
+	mat4 transformationMatrix;
+	mat4 inverseTransformationMatrix;
+} ObjectState;
+
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec4 inColor;
 
@@ -207,7 +223,7 @@ layout(location = 0) out vec4 outColor;
 void main()
 {
 	outColor = inColor;
-	gl_Position = vec4(inPosition, 1.0);
+	gl_Position = CameraState.projectionMatrix * (CameraState.inverseTransformationMatrix * (ObjectState.transformationMatrix * vec4(inPosition, 1.0)));
 }
 '
 ]

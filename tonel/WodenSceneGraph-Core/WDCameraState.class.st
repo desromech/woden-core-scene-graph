@@ -9,10 +9,23 @@ Class {
 		'frustum',
 		'nearDistance',
 		'farDistance',
+		'currentTime',
 		'exposure'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
+
+{ #category : #accessing }
+WDCameraState >> currentTime [
+
+	^ currentTime
+]
+
+{ #category : #accessing }
+WDCameraState >> currentTime: anObject [
+
+	currentTime := anObject
+]
 
 { #category : #accessing }
 WDCameraState >> exposure [
@@ -55,6 +68,7 @@ WDCameraState >> initialize [
 	super initialize.
 	projectionMatrix := Matrix4x4 identity.
 	frustum := Frustum new.
+	currentTime := 0.0.
 	exposure := 1.0.
 ]
 
