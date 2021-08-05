@@ -79,7 +79,7 @@ WDTextureTest >> testReadedColorBufferWithExtent [
 	self assert: texture dataKind isColorData.
 	self assert: texture format isB8G8R8A8UNormSRGB.
 	self assert: texture type is2DTextureType.
-	self assert: texture usageMode isReadedRenderTarget.
+	self assert: texture usageMode isReadedColorAttachment.
 	self assert: texture width equals: 32.
 	self assert: texture height equals: 32.
 	self assert: texture depth equals: 1.

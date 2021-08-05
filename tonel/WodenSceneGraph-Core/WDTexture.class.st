@@ -5,18 +5,8 @@ Class {
 	#name : #WDTexture,
 	#superclass : #WDRendererCacheableResource,
 	#instVars : [
-		'dataKind',
-		'type',
-		'format',
-		'usageMode',
-		'width',
-		'depth',
-		'height',
-		'layers',
-		'miplevels',
-		'data',
-		'sampleCount',
-		'sampleQuality'
+		'description',
+		'data'
 	],
 	#category : #'WodenSceneGraph-Core-Texture'
 }
@@ -61,7 +51,7 @@ WDTexture class >> forNormalMapForm: aForm [
 { #category : #'as yet unclassified' }
 WDTexture class >> forReadedColorBufferWithExtent: anExtent [
 	^ (self forColorForm: (Form extent: anExtent depth: 32))
-		usageMode: WDTextureUsageModeReadedRenderTarget;
+		usageMode: WDTextureUsageModeReadedColorAttachment;
 		miplevels: 1;
 		yourself
 ]
@@ -80,113 +70,98 @@ WDTexture >> data: anObject [
 
 { #category : #accessing }
 WDTexture >> dataKind [
-
-	^ dataKind
+	^ description dataKind
 ]
 
 { #category : #accessing }
 WDTexture >> dataKind: aDataKind [
-	dataKind := aDataKind asTextureDataKind
+	description dataKind: aDataKind
 ]
 
 { #category : #accessing }
 WDTexture >> depth [
-
-	^ depth
+	^ description depth
 ]
 
 { #category : #accessing }
-WDTexture >> depth: anObject [
+WDTexture >> depth: anInteger [
+	description depth: anInteger
+]
 
-	depth := anObject
+{ #category : #accessing }
+WDTexture >> description [
+	^ description shallowCopy
+]
+
+{ #category : #accessing }
+WDTexture >> description: aDescription [
+	description := aDescription shallowCopy
 ]
 
 { #category : #accessing }
 WDTexture >> format [
-
-	^ format
+	^ description format
 ]
 
 { #category : #accessing }
 WDTexture >> format: aTextureFormat [
-	format := aTextureFormat asTextureFormat
+	description format: aTextureFormat
 ]
 
 { #category : #accessing }
 WDTexture >> height [
-
-	^ height
+	^ description height
 ]
 
 { #category : #accessing }
-WDTexture >> height: anObject [
-
-	height := anObject
+WDTexture >> height: anInteger [
+	description height: anInteger
 ]
 
 { #category : #initialization }
 WDTexture >> initialize [
 	super initialize.
-	self
-		dataKind: WDTextureDataKindColor;
-		type: WDTextureTypeUnknown;
-		format: WDTextureFormatUnknown;
-		usageMode: WDTextureUsageModeStaticSampled.
-	width := 0.
-	height := 0.
-	depth := 0.
-	layers := 0.
-	miplevels := 0.
-	sampleCount := 1.
-	sampleQuality := 0.
+	description := WDTextureDescription new.
 ]
 
 { #category : #accessing }
 WDTexture >> layers [
-
-	^ layers
+	^ description layers
 ]
 
 { #category : #accessing }
-WDTexture >> layers: anObject [
-
-	layers := anObject
+WDTexture >> layers: anInteger [
+	description layers: anInteger
 ]
 
 { #category : #accessing }
 WDTexture >> miplevels [
-
-	^ miplevels
+	^ description miplevels
 ]
 
 { #category : #accessing }
-WDTexture >> miplevels: anObject [
-
-	miplevels := anObject
+WDTexture >> miplevels: anInteger [
+	description miplevels: anInteger
 ]
 
 { #category : #accessing }
 WDTexture >> sampleCount [
-
-	^ sampleCount
+	^ description sampleCount
 ]
 
 { #category : #accessing }
-WDTexture >> sampleCount: anObject [
-
-	sampleCount := anObject
+WDTexture >> sampleCount: anInteger [
+	description sampleCount: anInteger
 ]
 
 { #category : #accessing }
 WDTexture >> sampleQuality [
-
-	^ sampleQuality
+	^ description sampleQuality
 ]
 
 { #category : #accessing }
-WDTexture >> sampleQuality: anObject [
-
-	sampleQuality := anObject
+WDTexture >> sampleQuality: anInteger [
+	description sampleQuality: anInteger
 ]
 
 { #category : #initialization }
@@ -229,34 +204,30 @@ WDTexture >> setupForNormalMapForm: aForm [
 
 { #category : #accessing }
 WDTexture >> type [
-
-	^ type
+	^ description type
 ]
 
 { #category : #accessing }
 WDTexture >> type: aTextureType [
-	type := aTextureType asTextureType
+	description type: aTextureType
 ]
 
 { #category : #accessing }
 WDTexture >> usageMode [
-
-	^ usageMode
+	^ description usageMode
 ]
 
 { #category : #accessing }
 WDTexture >> usageMode: aTextureUsageMode [
-	usageMode := aTextureUsageMode asTextureUsageMode
+	description usageMode: aTextureUsageMode
 ]
 
 { #category : #accessing }
 WDTexture >> width [
-
-	^ width
+	^ description width
 ]
 
 { #category : #accessing }
-WDTexture >> width: anObject [
-
-	width := anObject
+WDTexture >> width: anInteger [
+	description width: anInteger
 ]

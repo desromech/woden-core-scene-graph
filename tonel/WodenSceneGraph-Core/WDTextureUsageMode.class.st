@@ -18,17 +18,17 @@ WDTextureUsageMode >> asTextureUsageMode [
 ]
 
 { #category : #testing }
-WDTextureUsageMode >> isDeviceLocalRenderTarget [
+WDTextureUsageMode >> isDeviceLocalColorAttachment [
 	^ false
 ]
 
 { #category : #testing }
-WDTextureUsageMode >> isReadedRenderTarget [
+WDTextureUsageMode >> isReadedColorAttachment [
 	^ false
 ]
 
 { #category : #testing }
-WDTextureUsageMode >> isSampledRenderTarget [
+WDTextureUsageMode >> isSampledColorAttachment [
 	^ false
 ]
 

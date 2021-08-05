@@ -57,9 +57,19 @@ WDFramebuffer >> extent: anObject [
 	extent := anObject
 ]
 
+{ #category : #accessing }
+WDFramebuffer >> height [
+	^ extent y
+]
+
 { #category : #initialization }
 WDFramebuffer >> initialize [
 	super initialize.
 	extent := 0@0.
 	colorAttachments := #().
+]
+
+{ #category : #accessing }
+WDFramebuffer >> width [
+	^ extent x
 ]

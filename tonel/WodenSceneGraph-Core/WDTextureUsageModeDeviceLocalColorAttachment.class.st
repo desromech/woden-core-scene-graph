@@ -2,12 +2,12 @@
 I am usage mode for a texture that only resides on the device.
 "
 Class {
-	#name : #WDTextureUsageModeDeviceLocalRenderTarget,
+	#name : #WDTextureUsageModeDeviceLocalColorAttachment,
 	#superclass : #WDTextureUsageMode,
 	#category : #'WodenSceneGraph-Core-Texture'
 }
 
 { #category : #testing }
-WDTextureUsageModeDeviceLocalRenderTarget >> isDeviceLocalRenderTarget [
+WDTextureUsageModeDeviceLocalColorAttachment >> isDeviceLocalColorAttachment [
 	^ true
 ]
