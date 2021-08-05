@@ -3,7 +3,7 @@ I hold the data that is required for actually binding a set of vertex buffers fo
 "
 Class {
 	#name : #WDVertexBufferBinding,
-	#superclass : #Object,
+	#superclass : #WDRendererCacheableResource,
 	#instVars : [
 		'attributes',
 		'vertexCount'

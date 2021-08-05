@@ -27,6 +27,7 @@ WDRenderingSceneState >> addMeshPrimitive: meshPrimitive withMaterial: material 
 WDRenderingSceneState >> addMeshPrimitive: meshPrimitive withPriority: renderPriority objectState: anObjectState [
 	renderingObjects add: (WDRenderingSceneObject new
 		priority: renderPriority;
+		objectState: anObjectState;
 		renderable: meshPrimitive;
 		yourself)
 ]

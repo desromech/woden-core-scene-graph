@@ -33,6 +33,11 @@ WDMeshPrimitive >> boundingBox: anObject [
 	boundingBox := anObject
 ]
 
+{ #category : #'double dispatch' }
+WDMeshPrimitive >> emitRenderingCommandsWithRenderer: renderer [
+	renderer emitRenderingCommandsForMeshPrimitive: self
+]
+
 { #category : #accessing }
 WDMeshPrimitive >> indices [
 

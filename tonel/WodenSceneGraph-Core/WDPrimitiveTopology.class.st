@@ -39,11 +39,6 @@ WDPrimitiveTopology >> isPoints [
 ]
 
 { #category : #testing }
-WDPrimitiveTopology >> isTriangleFan [
-	^ false
-]
-
-{ #category : #testing }
 WDPrimitiveTopology >> isTriangleStrip [
 	^ false
 ]

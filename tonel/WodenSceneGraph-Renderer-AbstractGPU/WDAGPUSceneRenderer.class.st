@@ -72,7 +72,7 @@ WDAGPUSceneRenderer >> readbackTextureData: texture [
 
 { #category : #rendering }
 WDAGPUSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
-	WDAGPUSceneRendererActiveFrame new
+	WDAGPUSceneRendererActiveFrameRenderer new
 		renderer: self;
 		recordAndFlushCommandsOn: stateTracker queue: commandQueue with: [ :frame |
 			frame recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer.

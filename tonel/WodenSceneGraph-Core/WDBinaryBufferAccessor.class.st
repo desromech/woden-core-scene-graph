@@ -51,9 +51,8 @@ WDBinaryBufferAccessor >> componentType [
 ]
 
 { #category : #accessing }
-WDBinaryBufferAccessor >> componentType: anObject [
-
-	componentType := anObject
+WDBinaryBufferAccessor >> componentType: aWDBinaryAccessorComponentType [
+	componentType := aWDBinaryAccessorComponentType asBinaryBufferAccessorComponentType
 ]
 
 { #category : #accessing }

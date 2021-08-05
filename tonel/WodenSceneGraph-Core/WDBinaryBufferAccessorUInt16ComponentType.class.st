@@ -3,3 +3,8 @@ Class {
 	#superclass : #WDBinaryBufferAccessorComponentType,
 	#category : #'WodenSceneGraph-Core-Resources'
 }
+
+{ #category : #accessing }
+WDBinaryBufferAccessorUInt16ComponentType >> size [
+	^ 2
+]

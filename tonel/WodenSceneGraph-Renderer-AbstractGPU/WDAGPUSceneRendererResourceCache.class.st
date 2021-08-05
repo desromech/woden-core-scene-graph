@@ -11,9 +11,14 @@ Class {
 		'framebuffers',
 		'buffers',
 		'viewportOutputRenderPass',
-		'rendererShaderSignature'
+		'rendererShaderSignature',
+		'vertexBindings',
+		'vertexLayouts',
+		'triangleVertexShader',
+		'triangleFragmentShader'
 	],
 	#classVars : [
+		'AccessorTypeIntoTextureFormatMap',
 		'TextureFormatMap',
 		'TextureMainUsageModeMap',
 		'TextureTypeMap',
@@ -65,10 +70,56 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 		WDTextureUsageModeSampledColorAttachment uniqueInstance . AGPU_TEXTURE_USAGE_SAMPLED.
 		WDTextureUsageModeStaticSampled uniqueInstance . AGPU_TEXTURE_USAGE_SAMPLED.
 	}.
+	
+	AccessorTypeIntoTextureFormatMap := Dictionary newFromPairs: {
+		{ false . WDBinaryBufferAccessorScalarType uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32_FLOAT.
+		{ false . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32_FLOAT.
+		{ false . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_FLOAT.
+		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32A32_FLOAT.
 
+		{ true . WDBinaryBufferAccessorScalarType uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32_FLOAT.
+		{ true . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32_FLOAT.
+		{ true . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_FLOAT.
+		{ true . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32A32_FLOAT.
+
+		{ false . WDBinaryBufferAccessorScalarType uniqueInstance . WDBinaryBufferAccessorUInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32_UINT.
+		{ false . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorUInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32_UINT.
+		{ false . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorUInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_UINT.
+		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorUInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32A32_UINT.
+
+		{ false . WDBinaryBufferAccessorScalarType uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32_SINT.
+		{ false . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32_SINT.
+		{ false . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_SINT.
+		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32A32_SINT.
+	}.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> compileShader: sourceText type: shaderType [
+	| shaderCompiler |
+	shaderCompiler := device createOfflineShaderCompiler.
+^ [
+		shaderCompiler
+			setShaderSource: AGPU_SHADER_LANGUAGE_VGLSL stage: shaderType sourceText: sourceText sourceTextLength: sourceText size;
+			compileShader: AGPU_SHADER_LANGUAGE_DEVICE_SHADER options: '';
+			getResultAsShader
+		] on: AGPUError do: [ :e |
+			e errorCode = AGPU_COMPILATION_ERROR ifTrue: [
+				| logLength logBuffer compilationError |
+				logLength := shaderCompiler getCompilationLogLength.
+				logBuffer := ExternalAddress allocate: logLength + 1.
+				compilationError := [
+					shaderCompiler getCompilationLog: logLength + 1 buffer: logBuffer.
+					logBuffer readString.
+				] ensure: [ logBuffer free ].
+				self error: compilationError
+			] ifFalse: [
+				e pass
+			]
+		]
+]
+
+{ #category : #private }
 WDAGPUSceneRendererResourceCache >> convertTextureDescription: description [
 	^ AGPUTextureDescription new
 		type: (TextureTypeMap at: description type);
@@ -97,7 +148,12 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	textures := WeakKeyDictionary new.
 	framebuffers := WeakKeyDictionary new.
 	buffers := WeakKeyDictionary new.
-	rendererShaderSignature := WDAGPURendererShaderSignature for: device
+	vertexBindings := WeakKeyDictionary new.
+	rendererShaderSignature := WDAGPURendererShaderSignature for: device.
+	vertexLayouts := Dictionary new.
+	
+	triangleVertexShader := self compileShader: self triangleVertexShaderSource type: AGPU_VERTEX_SHADER.
+	triangleFragmentShader := self compileShader: self triangleFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 ]
 
 { #category : #accessing }
@@ -110,9 +166,80 @@ WDAGPUSceneRendererResourceCache >> textureUploader [
 	^ textureUploader
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> triangleFragmentShader [
+	^ triangleFragmentShader
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> triangleFragmentShaderSource [
+	^ '
+#version 450
+#line 5
+
+layout(location = 0) in vec4 inColor;
+
+layout(location = 0) out vec4 outColor;
+
+void main()
+{ 
+	outColor = inColor;
+}
+'
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> triangleVertexShader [
+	^ triangleVertexShader
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> triangleVertexShaderSource [
+	^ '
+#version 450
+#line 5
+
+layout(location = 0) in vec3 inPosition;
+layout(location = 1) in vec4 inColor;
+
+layout(location = 0) out vec4 outColor;
+
+void main()
+{
+	outColor = inColor;
+	gl_Position = vec4(inPosition, 1.0);
+}
+'
+]
+
 { #category : #handles }
 WDAGPUSceneRendererResourceCache >> validBufferHandleFor: aWDBinaryBuffer [
-	self halt
+	| cachedBuffer requiredCapacity |
+	cachedBuffer := textures at: aWDBinaryBuffer ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
+	cachedBuffer modificationCount == aWDBinaryBuffer modificationCount ifTrue: [ ^ cachedBuffer handle ].
+	
+	requiredCapacity := aWDBinaryBuffer data size.
+	(cachedBuffer description isNil or: [ cachedBuffer description < requiredCapacity ]) ifTrue: [
+		cachedBuffer handle: (device createBuffer: (AGPUBufferDescription new
+			size: requiredCapacity;
+			heap_type: AGPU_MEMORY_HEAP_TYPE_DEVICE_LOCAL;
+			usage_modes: (AGPU_ARRAY_BUFFER bitOr: AGPU_ELEMENT_ARRAY_BUFFER);
+			main_usage_mode: (AGPU_ARRAY_BUFFER bitOr: AGPU_ELEMENT_ARRAY_BUFFER);
+			stride: 0;
+			yourself		
+		) initial_data: aWDBinaryBuffer data).
+		cachedBuffer description: requiredCapacity
+	] ifFalse: [
+		cachedBuffer handle uploadBufferData: 0 size: requiredCapacity data: aWDBinaryBuffer data
+	].
+	
+	cachedBuffer modificationCount: aWDBinaryBuffer modificationCount.
+	^ cachedBuffer handle
+]
+
+{ #category : #handles }
+WDAGPUSceneRendererResourceCache >> validBufferHandleForAccessor: aWDBinaryBufferAccessor [
+	^ self validBufferHandleFor: aWDBinaryBufferAccessor bufferView buffer
 ]
 
 { #category : #handles }
@@ -192,12 +319,75 @@ WDAGPUSceneRendererResourceCache >> validTextureHandleFor: aWDTexture [
 
 	aWDTexture data ifNotNil: [ :dataToUpload |
 		aWDTexture usageMode isStaticSampled ifTrue: [ 
-			self halt.
+			dataToUpload uploadIntoWodenTexture: aWDTexture agpuHandle: cachedTexture handle withWodenSceneRendererResourceCache: self
 		]
 	].
 	
 	cachedTexture modificationCount: aWDTexture modificationCount.
 	^ cachedTexture handle
+]
+
+{ #category : #handles }
+WDAGPUSceneRendererResourceCache >> validVertexBindingFor: aWDVertexBufferBinding [
+	| cachedVertexBinding attributeBuffers offsets |
+	cachedVertexBinding := vertexBindings at: aWDVertexBufferBinding ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
+	cachedVertexBinding modificationCount == aWDVertexBufferBinding modificationCount ifTrue: [ ^ cachedVertexBinding handle ].
+	
+	attributeBuffers := aWDVertexBufferBinding attributes collect: [ :each | self validBufferHandleForAccessor: each accessor ].
+	
+	cachedVertexBinding handle ifNil: [
+		| layout |
+		layout := self validVertexLayoutForVertexBinding: aWDVertexBufferBinding.
+		cachedVertexBinding handle: {layout. device createVertexBinding: layout}.
+	].
+
+	offsets := ByteArray new: aWDVertexBufferBinding attributes size * 4.
+	aWDVertexBufferBinding attributes doWithIndex: [ :attribute :index |
+		| accessor |
+		accessor := attribute accessor.
+		offsets at: index*4 - 3 put: accessor byteOffset + accessor bufferView byteOffset
+	].
+
+	cachedVertexBinding handle second bindVertexBuffersWithOffsets: attributeBuffers size vertex_buffers: (AGPU packListOfReferences: attributeBuffers) offsets: offsets.
+	
+	cachedVertexBinding modificationCount: aWDVertexBufferBinding modificationCount.
+	^ cachedVertexBinding handle
+]
+
+{ #category : #handles }
+WDAGPUSceneRendererResourceCache >> validVertexLayoutForVertexBinding: vertexBinding [
+	| layoutDescriptors |
+	layoutDescriptors := vertexBinding attributes collectWithIndex: [ :each :index | self vertexLayoutDescriptorFor: each bufferIndex: index - 1].
+	^ vertexLayouts at: layoutDescriptors ifAbsentPut: [
+		| layoutSpec strides |
+		strides := ByteArray new: layoutDescriptors size * 4.
+		layoutSpec := ByteArray streamContents: [ :out |
+			layoutDescriptors doWithIndex: [ :each :index |
+				out nextPutAll: each asAGPUVertexAttribDescriptionData.
+				strides unsignedLongAt: index*4 - 3 put: each stride
+			]
+		].
+	
+		device createVertexLayout
+			addVertexAttributeBindings: layoutDescriptors size vertex_strides: strides attribute_count: layoutDescriptors size attributes: (AGPUVertexAttribDescription fromHandle: layoutSpec);
+			yourself
+	].
+
+]
+
+{ #category : #private }
+WDAGPUSceneRendererResourceCache >> vertexLayoutDescriptorFor: vertexBindingAttribute bufferIndex: bufferIndex [
+	| accessor format |
+	accessor := vertexBindingAttribute accessor.
+	format := AccessorTypeIntoTextureFormatMap at: {accessor normalized . accessor type . accessor componentType }.
+
+	^ WDAGPUVertexAttributeDescriptor new
+		format: format;
+		binding: vertexBindingAttribute location; 
+		stride: accessor type componentCount * accessor componentType size;
+		buffer: bufferIndex;
+		divisor: 0;
+		yourself
 ]
 
 { #category : #initialization }
@@ -212,7 +402,6 @@ WDAGPUSceneRendererResourceCache >> viewportOutputRenderPass [
 			format: AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB;
 			begin_action: AGPU_ATTACHMENT_CLEAR;
 			end_action: AGPU_ATTACHMENT_KEEP;
-			clear_value: Color blue asAGPUColor4f;
 			sample_count: 1;
 			sample_quality: 0.
 		renderpassDescription := AGPURenderpassDescription new.

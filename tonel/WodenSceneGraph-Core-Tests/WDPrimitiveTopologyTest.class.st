@@ -23,5 +23,4 @@ WDPrimitiveTopologyTest >> testTestingMethods [
 	self assert: WDPrimitiveTopologyLineStrip asPrimitiveTopology isLineStrip.
 	self assert: WDPrimitiveTopologyTriangles asPrimitiveTopology isTriangles.
 	self assert: WDPrimitiveTopologyTriangleStrip asPrimitiveTopology isTriangleStrip.
-	self assert: WDPrimitiveTopologyTriangleFan asPrimitiveTopology isTriangleFan.
 ]

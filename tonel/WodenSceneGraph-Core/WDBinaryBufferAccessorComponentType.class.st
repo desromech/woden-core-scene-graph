@@ -16,3 +16,8 @@ WDBinaryBufferAccessorComponentType class >> asBinaryBufferAccessorComponentType
 WDBinaryBufferAccessorComponentType >> asBinaryBufferAccessorComponentType [
 	^ self
 ]
+
+{ #category : #accessing }
+WDBinaryBufferAccessorComponentType >> size [
+	self subclassResponsibility
+]

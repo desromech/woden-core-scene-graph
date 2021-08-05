@@ -21,3 +21,8 @@ WDBinaryBufferAccessorType class >> isAbstract [
 WDBinaryBufferAccessorType >> asBinaryBufferAccessorType [
 	^ self
 ]
+
+{ #category : #'as yet unclassified' }
+WDBinaryBufferAccessorType >> componentCount [
+	^ self subclassResponsibility
+]

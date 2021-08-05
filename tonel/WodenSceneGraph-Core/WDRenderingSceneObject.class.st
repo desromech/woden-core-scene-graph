@@ -7,10 +7,23 @@ Class {
 	#instVars : [
 		'sortKey',
 		'priority',
+		'objectState',
 		'renderable'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
+
+{ #category : #accessing }
+WDRenderingSceneObject >> objectState [
+
+	^ objectState
+]
+
+{ #category : #accessing }
+WDRenderingSceneObject >> objectState: anObject [
+
+	objectState := anObject
+]
 
 { #category : #accessing }
 WDRenderingSceneObject >> priority [

@@ -11,3 +11,7 @@ Class {
 WDRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
 	self subclassResponsibility
 ]
+
+{ #category : #'double dispatch' }
+WDRenderable >> emitRenderingCommandsWithRenderer: renderer [
+]
