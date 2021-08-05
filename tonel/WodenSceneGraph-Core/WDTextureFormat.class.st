@@ -18,6 +18,16 @@ WDTextureFormat >> asTextureFormat [
 ]
 
 { #category : #testing }
+WDTextureFormat >> hasDepthComponent [
+	^ false
+]
+
+{ #category : #testing }
+WDTextureFormat >> hasStencilComponent [
+	^ false
+]
+
+{ #category : #testing }
 WDTextureFormat >> isB8G8R8A8UNorm [
 	^ false
 ]

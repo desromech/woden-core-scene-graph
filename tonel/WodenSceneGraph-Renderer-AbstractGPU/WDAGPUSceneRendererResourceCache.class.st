@@ -10,7 +10,8 @@ Class {
 		'textures',
 		'framebuffers',
 		'buffers',
-		'viewportOutputRenderPass'
+		'viewportOutputRenderPass',
+		'rendererShaderSignature'
 	],
 	#classVars : [
 		'TextureFormatMap',
@@ -21,7 +22,7 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU'
+	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
 }
 
 { #category : #'instance creation' }
@@ -96,6 +97,12 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	textures := WeakKeyDictionary new.
 	framebuffers := WeakKeyDictionary new.
 	buffers := WeakKeyDictionary new.
+	rendererShaderSignature := WDAGPURendererShaderSignature for: device
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> rendererShaderSignature [
+	^ rendererShaderSignature
 ]
 
 { #category : #accessing }
@@ -126,8 +133,30 @@ WDAGPUSceneRendererResourceCache >> validColorAttachmentTextureViewFor: aWDTextu
 ]
 
 { #category : #handles }
-WDAGPUSceneRendererResourceCache >> validDepthStencilAttachmentTextureViewFor: texture [
-	self halt
+WDAGPUSceneRendererResourceCache >> validDepthStencilAttachmentTextureViewFor: aWDTexture [
+	| textureHandle viewDescription range usageMode |
+	textureHandle := self validTextureHandleFor: aWDTexture.
+	
+	viewDescription := AGPUTextureViewDescription new.
+	textureHandle getFullViewDescription: viewDescription.
+	range := viewDescription subresource_range.
+	range
+		layer_count: 1;
+		level_count: 1.
+		
+	usageMode := 0.
+	aWDTexture format hasDepthComponent ifTrue: [ 
+		usageMode := usageMode bitOr: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT.
+	].
+
+	aWDTexture format hasStencilComponent ifTrue: [ 
+		usageMode := usageMode bitOr: AGPU_TEXTURE_USAGE_STENCIL_ATTACHMENT.
+	].
+
+	viewDescription
+		subresource_range: range;
+		usage_mode: usageMode.
+	^ textureHandle createView: viewDescription
 ]
 
 { #category : #handles }

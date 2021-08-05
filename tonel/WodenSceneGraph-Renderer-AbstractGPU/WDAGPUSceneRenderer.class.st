@@ -9,13 +9,12 @@ Class {
 		'commandQueue',
 		'stateTrackerCache',
 		'stateTracker',
-		'resourceCache',
-		'activeResources'
+		'resourceCache'
 	],
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU'
+	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
 }
 
 { #category : #'instance creation' }
@@ -72,30 +71,13 @@ WDAGPUSceneRenderer >> readbackTextureData: texture [
 ]
 
 { #category : #rendering }
-WDAGPUSceneRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
-	| framebufferHandle |
-	framebufferHandle := resourceCache validFramebufferFor: framebuffer.
-	stateTracker
-		beginRenderPass: resourceCache viewportOutputRenderPass framebuffer: framebufferHandle bundle_content: 0;
-		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
-		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height.
-		
-	stateTracker endRenderPass
-]
-
-{ #category : #rendering }
 WDAGPUSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
-	stateTracker beginRecordingCommands.
-	activeResources := OrderedCollection new.
-	[
-		self recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer.
-		
-	] ensure: [
-		stateTracker endRecordingAndFlushCommands.
-		commandQueue finishExecution.
-		activeResources := nil.
-	].
-
+	WDAGPUSceneRendererActiveFrame new
+		renderer: self;
+		recordAndFlushCommandsOn: stateTracker queue: commandQueue with: [ :frame |
+			frame recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer.
+		];
+		finishExecution.
 	self readbackFramebufferAttachmentsOf: framebuffer
 ]
 
