@@ -35,6 +35,33 @@ WDMeshBuilderTest >> testCube [
 ]
 
 { #category : #tests }
+WDMeshBuilderTest >> testCube2 [
+	| builder mesh primitive |
+	builder := WDMeshBuilder new.
+	
+	builder
+		addCubeWithWidth: 1 height: 1 depth: 1.
+		
+	self assert: builder vertexCount equals: 4*6.
+	self assert: builder positions size equals: 4*6*3.
+	self assert: builder colors size equals: 0.
+	self assert: builder normals size equals: 4*6*3.
+	self assert: builder texcoords0 size equals: 0.
+	self assert: builder indices size equals: 6*6.
+	
+	mesh := builder mesh.
+	self assert: mesh primitives size equals: 1.
+	primitive := mesh primitives first.
+
+	self assert: primitive vertexBinding vertexCount equals: 4*6.
+	
+	self assert: primitive topology isTriangles.
+	self assert: primitive indices count equals: 6*6.
+	self assert: primitive boundingBox equals: (AABox min: (Vector3 x: -1/2 y: -1/2 z: -1/2) max: (Vector3 x: 1/2 y: 1/2 z: 1/2)).
+	self assert: mesh boundingBox equals: (AABox min: (Vector3 x: -1/2 y: -1/2 z: -1/2) max: (Vector3 x: 1/2 y: 1/2 z: 1/2)).
+]
+
+{ #category : #tests }
 WDMeshBuilderTest >> testEmpty [
 	| builder mesh |
 	builder := WDMeshBuilder new.

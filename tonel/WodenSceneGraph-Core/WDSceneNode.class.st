@@ -8,6 +8,7 @@ Class {
 	#superclass : #WDSceneTreeElement,
 	#instVars : [
 		'renderables',
+		'lights',
 		'transform'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
@@ -17,12 +18,45 @@ Class {
 WDSceneNode >> initialize [
 	super initialize.
 	renderables := #().
+	lights := #().
 	transform := DecomposedTransform3D new.
 ]
 
 { #category : #testing }
 WDSceneNode >> isSceneNode [
 	^ true
+]
+
+{ #category : #accessing }
+WDSceneNode >> lights [
+
+	^ lights
+]
+
+{ #category : #accessing }
+WDSceneNode >> lights: anObject [
+
+	lights := anObject
+]
+
+{ #category : #accessing }
+WDSceneNode >> orientation [
+	^ transform orientation
+]
+
+{ #category : #accessing }
+WDSceneNode >> orientation: anOrientation [
+	transform orientation: anOrientation
+]
+
+{ #category : #accessing }
+WDSceneNode >> position [
+	^ transform translation
+]
+
+{ #category : #accessing }
+WDSceneNode >> position: aPosition [
+	transform translation: aPosition
 ]
 
 { #category : #removing }
@@ -40,6 +74,16 @@ WDSceneNode >> renderables [
 WDSceneNode >> renderables: anObject [
 
 	renderables := anObject
+]
+
+{ #category : #accessing }
+WDSceneNode >> scale [
+	^ transform scale
+]
+
+{ #category : #accessing }
+WDSceneNode >> scale: aScale [
+	transform scale: aScale
 ]
 
 { #category : #accessing }

@@ -89,6 +89,15 @@ WDMeshBuilder >> addCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z: maxZ [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addCubeWithWidth: width height: height depth: depth [
+	| halfWidth halfHeight halfDepth |
+	halfWidth := width / 2.
+	halfHeight := height / 2.
+	halfDepth := depth / 2.
+	self addCubeMinX: halfWidth negated y: halfHeight negated z: halfDepth negated maxX: halfWidth y: halfHeight z: halfDepth
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addNx: x y: y z: z [
 	normals add: x; add: y; add: z.
 ]
