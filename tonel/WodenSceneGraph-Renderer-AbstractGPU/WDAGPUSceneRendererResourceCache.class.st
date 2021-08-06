@@ -381,11 +381,11 @@ void main()
 	StageOutput.normal = transformNormalToView(inNormal);
 #	ifdef HAS_PER_VERTEX_TANGENT4
 	StageOutput.tangent = transformNormalToView(inTangent4.xyz);
-	StageOutput.bitangent = cross(outNormal, outTangent)*inTangent4.w;
+	StageOutput.bitangent = cross(StageOutput.normal, StageOutput.tangent)*inTangent4.w;
 #	else
 	vec3 upVector = vec3(0.0, 1.0, 0.0);
-	StageOutput.tangent = cross(upVector, outNormal);
-	StageOutput.bitangent = cross(outNormal, outTangent);
+	StageOutput.tangent = cross(upVector, StageOutput.normal);
+	StageOutput.bitangent = cross(StageOutput.normal, StageOutput.tangent);
 #	endif
 #else
 	StageOutput.normal = vec3(0.0, 0.0, 1.0);
@@ -709,7 +709,7 @@ WDAGPUSceneRendererResourceCache >> validVertexBindingFor: aWDVertexBufferBindin
 	aWDVertexBufferBinding attributes doWithIndex: [ :attribute :index |
 		| accessor |
 		accessor := attribute accessor.
-		offsets at: index*4 - 3 put: accessor byteOffset + accessor bufferView byteOffset
+		offsets unsignedLongAt: index*4 - 3 put: accessor byteOffset + accessor bufferView byteOffset
 	].
 
 	cachedVertexBinding handle second bindVertexBuffersWithOffsets: attributeBuffers size vertex_buffers: (AGPU packListOfReferences: attributeBuffers) offsets: offsets.

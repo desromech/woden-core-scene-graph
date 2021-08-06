@@ -295,7 +295,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> validFramebufferFor: aWDFramebuffer [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #handles }
 WDAGPUSceneRendererActiveFrameRenderer >> validTextureViewHandleFor: aWDTexture fallbackTextureWith: aBlock [
 	aWDTexture ifNil: [ 
 		^ aBlock value getOrCreateFullView

@@ -16,7 +16,6 @@ WDPrimitiveTopologyTest >> testTestingMethods [
 	self deny: base isLineStrip.
 	self deny: base isTriangles.
 	self deny: base isTriangleStrip.
-	self deny: base isTriangleFan.
 		
 	self assert: WDPrimitiveTopologyPoints asPrimitiveTopology isPoints.
 	self assert: WDPrimitiveTopologyLines asPrimitiveTopology isLines.

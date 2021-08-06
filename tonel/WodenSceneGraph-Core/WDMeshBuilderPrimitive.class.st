@@ -56,7 +56,6 @@ WDMeshBuilderPrimitive >> topology [
 ]
 
 { #category : #accessing }
-WDMeshBuilderPrimitive >> topology: anObject [
-
-	topology := anObject
+WDMeshBuilderPrimitive >> topology: aPrimitiveTopology [
+	topology := aPrimitiveTopology asPrimitiveTopology
 ]

@@ -19,7 +19,8 @@ Class {
 		'vertexBufferView',
 		'indexBufferView',
 		'texcoords0',
-		'texcoords1'
+		'texcoords1',
+		'baseVertex'
 	],
 	#category : #'WodenSceneGraph-Core-RenderableBuilder'
 }
@@ -27,6 +28,64 @@ Class {
 { #category : #adding }
 WDMeshBuilder >> addCr: r g: g b: b a: a [
 	colors add: r; add: g; add: b; add: a.
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z: maxZ [
+	self
+		"Left"
+		beginTriangles;
+		addPx: minX y: minY z: minZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addPx: minX y: maxY z: minZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addPx: minX y: maxY z: maxZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addPx: minX y: minY z: maxZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0;
+
+		"Right"
+		beginTriangles;
+		addPx: maxX y: minY z: minZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addPx: maxX y: maxY z: minZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addPx: maxX y: maxY z: maxZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addPx: maxX y: minY z: maxZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addTriangleI0: 0 i1: 1 i2: 2;
+		addTriangleI0: 2 i1: 3 i2: 0;
+
+		"Top"
+		beginTriangles;
+		addPx: minX y: maxY z: minZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: maxX y: maxY z: minZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: maxX y: maxY z: maxZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: minX y: maxY z: maxZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0;
+
+		"Bottom"
+		beginTriangles;
+		addPx: minX y: minY z: minZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addPx: maxX y: minY z: minZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addPx: maxX y: minY z: maxZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addPx: minX y: minY z: maxZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addTriangleI0: 0 i1: 1 i2: 2;
+		addTriangleI0: 2 i1: 3 i2: 0;
+
+		"Back"
+		beginTriangles;
+		addPx: minX y: minY z: minZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: maxX y: minY z: minZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: maxX y: maxY z: minZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: minX y: maxY z: minZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0;
+
+		"Front"
+		beginTriangles;
+		addPx: minX y: minY z: maxZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addPx: maxX y: minY z: maxZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addPx: maxX y: maxY z: maxZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addPx: minX y: maxY z: maxZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addTriangleI0: 0 i1: 1 i2: 2;
+		addTriangleI0: 2 i1: 3 i2: 0
 ]
 
 { #category : #adding }
@@ -52,7 +111,7 @@ WDMeshBuilder >> addT1u: u v: v [
 
 { #category : #adding }
 WDMeshBuilder >> addTriangleI0: i0 i1: i1 i2: i3 [
-	indices add: i0; add: i1; add: i3
+	indices add: i0 + baseVertex ; add: i1 + baseVertex; add: i3 + baseVertex
 ]
 
 { #category : #builder }
@@ -62,7 +121,17 @@ WDMeshBuilder >> beginPrimitiveWithTopology: topology [
 
 { #category : #builder }
 WDMeshBuilder >> beginPrimitiveWithTopology: topology material: material [
+	primitives isEmpty ifFalse: [ 
+		| lastPrimitive |
+		lastPrimitive := primitives last.
+		(lastPrimitive material == material and: [ lastPrimitive topology == topology asPrimitiveTopology ]) ifTrue: [
+			baseVertex := vertexCount.
+			^ self
+		].
+		self finishLastPrimitive
+	].
 
+	baseVertex := vertexCount.
 	primitives add: (WDMeshBuilderPrimitive new
 		material: material;
 		topology: topology;
@@ -277,6 +346,7 @@ WDMeshBuilder >> reset [
 	boneIndices removeAll.
 	boneWeights removeAll.
 	vertexCount := 0.
+	baseVertex := 0.
 
 ]
 
