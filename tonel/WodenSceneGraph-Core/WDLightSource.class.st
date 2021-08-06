@@ -16,6 +16,11 @@ WDLightSource class >> isAbstract [
 ]
 
 { #category : #converting }
+WDLightSource >> asLightStateWithTransform: renderingTransform [
+	self subclassResponsibility
+]
+
+{ #category : #converting }
 WDLightSource >> asSceneElement [
 	^ self asSceneNode
 ]

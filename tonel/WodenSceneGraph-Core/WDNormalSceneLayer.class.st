@@ -10,6 +10,11 @@ Class {
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
+{ #category : #converting }
+WDNormalSceneLayer >> adjustBaseCameraState: aBaseCameraState [
+	^ aBaseCameraState
+]
+
 { #category : #testing }
 WDNormalSceneLayer >> isNormalSceneLayer [
 	^ true

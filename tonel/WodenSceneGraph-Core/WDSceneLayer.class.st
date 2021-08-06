@@ -4,6 +4,9 @@ I represent a different camera plane in a scene.
 Class {
 	#name : #WDSceneLayer,
 	#superclass : #WDSceneTreeElement,
+	#instVars : [
+		'globalLightingState'
+	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
@@ -15,6 +18,48 @@ WDSceneLayer class >> for: aScene [
 { #category : #testing }
 WDSceneLayer class >> isAbstract [
 	^ self == WDSceneLayer
+]
+
+{ #category : #adding }
+WDSceneLayer >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
+	self shouldNotImplement
+]
+
+{ #category : #converting }
+WDSceneLayer >> adjustBaseCameraState: aBaseCameraState [
+	^ self subclassResponsibility
+]
+
+{ #category : #converting }
+WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
+	| adjustedCameraState result |
+	adjustedCameraState := self adjustBaseCameraState: baseCameraState.
+	result := WDRenderingSceneCameraLayer new.
+	result
+		globalLightingState: globalLightingState;
+		cameraState: adjustedCameraState.
+	self addChildrenRecursivelyIntoRenderingSceneCameraLayer: result parentGlobalTransform: ReversibleAffineTransform3D identity.
+	^ result
+]
+
+{ #category : #accessing }
+WDSceneLayer >> globalLightingState [
+
+	^ globalLightingState
+]
+
+{ #category : #accessing }
+WDSceneLayer >> globalLightingState: aWDGlobalLightingState [
+	self assert: aWDGlobalLightingState class == WDGlobalLightingState.
+	globalLightingState := aWDGlobalLightingState copy.
+]
+
+{ #category : #initialization }
+WDSceneLayer >> initialize [
+	super initialize.
+	globalLightingState := WDGlobalLightingState new
+		ambientLighting: (Vector3 withAll: 0.2);
+		yourself.
 ]
 
 { #category : #initialization }

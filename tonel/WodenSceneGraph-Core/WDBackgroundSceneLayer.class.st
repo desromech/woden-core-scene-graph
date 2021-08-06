@@ -9,6 +9,11 @@ Class {
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
+{ #category : #converting }
+WDBackgroundSceneLayer >> adjustBaseCameraState: aBaseCameraState [
+	^ aBaseCameraState asCameraStateForBackgroundLayer
+]
+
 { #category : #testing }
 WDBackgroundSceneLayer >> isBackgroundSceneLayer [
 	^ true

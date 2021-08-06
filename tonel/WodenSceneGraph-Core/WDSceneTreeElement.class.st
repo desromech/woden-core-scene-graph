@@ -16,6 +16,18 @@ WDSceneTreeElement >> add: anObject [
 	self addSceneElement: anObject asSceneElement
 ]
 
+{ #category : #'rendering scene generation' }
+WDSceneTreeElement >> addChildrenRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
+	children do: [ :each |
+		each addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform
+	]
+]
+
+{ #category : #adding }
+WDSceneTreeElement >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
+	self subclassResponsibility
+]
+
 { #category : #adding }
 WDSceneTreeElement >> addSceneElement: aNode [
 	self assert: aNode isWodenSceneElement.

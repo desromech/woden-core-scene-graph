@@ -15,6 +15,22 @@ Class {
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
 
+{ #category : #converting }
+WDCameraState >> asCameraStateForBackgroundLayer [
+	^ self copy
+		transformation: (transformation copy
+			translation: Vector3 zeros;
+			yourself);
+		yourself
+]
+
+{ #category : #converting }
+WDCameraState >> asCameraStateForForegroundLayer [
+	^ self copy
+		transformation: ReversibleAffineTransform3D identity;
+		yourself
+]
+
 { #category : #accessing }
 WDCameraState >> currentTime [
 

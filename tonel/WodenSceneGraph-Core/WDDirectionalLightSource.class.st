@@ -8,3 +8,11 @@ Class {
 	#superclass : #WDLightSource,
 	#category : #'WodenSceneGraph-Core-Lighting'
 }
+
+{ #category : #converting }
+WDDirectionalLightSource >> asLightStateWithTransform: renderingTransform [
+	^ WDLightState new
+		positionOrDirection: (Vector4 xyz: renderingTransform matrix thirdColumn w: 0.0);
+		intensity: intensity;
+		yourself.
+]

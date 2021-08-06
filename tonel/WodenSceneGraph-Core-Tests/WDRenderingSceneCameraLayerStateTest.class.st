@@ -29,7 +29,7 @@ WDRenderingSceneCameraLayerStateTest >> testAddRenderable [
 	renderable := self makeRenderable.
 	objectState := WDRenderingObjectState new.
 
-	renderingScene := WDRenderingSceneCameraLayerState new.
+	renderingScene := WDRenderingSceneCameraLayer new.
 	renderingScene renderingObjects isEmpty.
 	
 	renderingScene addRenderable: renderable withObjectState: objectState.

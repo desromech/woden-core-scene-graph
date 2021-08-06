@@ -5,7 +5,7 @@ I encapsulate a specific state for rendering a scene camera layer. I hold the fo
 - The camera state for the viewport.
 "
 Class {
-	#name : #WDRenderingSceneCameraLayerState,
+	#name : #WDRenderingSceneCameraLayer,
 	#superclass : #Object,
 	#instVars : [
 		'cameraState',
@@ -17,12 +17,12 @@ Class {
 }
 
 { #category : #adding }
-WDRenderingSceneCameraLayerState >> addLight: aLightState [
+WDRenderingSceneCameraLayer >> addLight: aLightState [
 	lights add: aLightState
 ]
 
 { #category : #adding }
-WDRenderingSceneCameraLayerState >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState [
+WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState [
 	self addMeshPrimitive: meshPrimitive
 		withPriority: (material ifNil: [ WDRenderPriority default ]
 			ifNotNil: [material renderPriority])
@@ -30,7 +30,7 @@ WDRenderingSceneCameraLayerState >> addMeshPrimitive: meshPrimitive withMaterial
 ]
 
 { #category : #adding }
-WDRenderingSceneCameraLayerState >> addMeshPrimitive: meshPrimitive withPriority: renderPriority objectState: anObjectState [
+WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority objectState: anObjectState [
 	renderingObjects add: (WDRenderingSceneObject new
 		priority: renderPriority;
 		objectState: anObjectState;
@@ -39,40 +39,40 @@ WDRenderingSceneCameraLayerState >> addMeshPrimitive: meshPrimitive withPriority
 ]
 
 { #category : #adding }
-WDRenderingSceneCameraLayerState >> addRenderable: renderable withObjectState: anObjectState [
+WDRenderingSceneCameraLayer >> addRenderable: renderable withObjectState: anObjectState [
 	renderable addToRenderingScene: self withObjectState: anObjectState
 ]
 
 { #category : #converting }
-WDRenderingSceneCameraLayerState >> asRenderingSceneState [
+WDRenderingSceneCameraLayer >> asRenderingScene [
 	^ WDRenderingScene new cameraLayers: { self }; yourself
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayerState >> cameraState [
+WDRenderingSceneCameraLayer >> cameraState [
 
 	^ cameraState
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayerState >> cameraState: anObject [
+WDRenderingSceneCameraLayer >> cameraState: anObject [
 
 	cameraState := anObject
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayerState >> globalLightingState [
+WDRenderingSceneCameraLayer >> globalLightingState [
 	^ globalLightingState
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayerState >> globalLightingState: anObject [
+WDRenderingSceneCameraLayer >> globalLightingState: anObject [
 
 	globalLightingState := anObject
 ]
 
 { #category : #initialization }
-WDRenderingSceneCameraLayerState >> initialize [
+WDRenderingSceneCameraLayer >> initialize [
 	super initialize.
 	cameraState := WDCameraState new.
 	globalLightingState := WDGlobalLightingState new.
@@ -81,7 +81,7 @@ WDRenderingSceneCameraLayerState >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-WDRenderingSceneCameraLayerState >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLights [
+WDRenderingSceneCameraLayer >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLights [
 	| viewMatrix |
 	viewMatrix := cameraState inverseTransformationMatrix.
 	^ WDLightingState new
@@ -93,7 +93,7 @@ WDRenderingSceneCameraLayerState >> lightingStateInViewSpaceWithMaxNumberOfLight
 ]
 
 { #category : #'as yet unclassified' }
-WDRenderingSceneCameraLayerState >> lightingStateWithMaxNumberOfLights: maxNumberOfLights [
+WDRenderingSceneCameraLayer >> lightingStateWithMaxNumberOfLights: maxNumberOfLights [
 	^ WDLightingState new
 		globalLightingState: globalLightingState;
 		lights: (lights first: (lights size min: maxNumberOfLights)) asArray;
@@ -101,12 +101,12 @@ WDRenderingSceneCameraLayerState >> lightingStateWithMaxNumberOfLights: maxNumbe
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayerState >> lights [
+WDRenderingSceneCameraLayer >> lights [
 
 	^ lights
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayerState >> renderingObjects [
+WDRenderingSceneCameraLayer >> renderingObjects [
 	^ renderingObjects
 ]

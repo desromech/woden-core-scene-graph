@@ -14,6 +14,33 @@ Class {
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
+{ #category : #adding }
+WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withTransform: renderingGlobalTransform [
+	renderables isEmpty ifFalse: [ 
+		| objectState |
+		objectState := WDRenderingObjectState new
+			transformation: renderingGlobalTransform;
+			yourself.
+		renderables do: [ :eachRenderable |
+			renderingSceneCameraLayer addRenderable: eachRenderable withObjectState: objectState
+		]
+	].
+
+	lights do: [ :eachLight |
+		renderingSceneCameraLayer addLight: (eachLight asLightStateWithTransform: renderingGlobalTransform)
+	].
+]
+
+{ #category : #adding }
+WDSceneNode >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
+	| renderingGlobalTransform |
+	renderingGlobalTransform := parentGlobalTransform transformTransform: transform asReversibleAffineTransform.
+	
+	self
+		addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withTransform: renderingGlobalTransform;
+		addChildrenRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: renderingGlobalTransform
+]
+
 { #category : #initialization }
 WDSceneNode >> initialize [
 	super initialize.

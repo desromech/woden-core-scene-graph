@@ -12,6 +12,15 @@ Class {
 	#category : #'WodenSceneGraph-Core-Lighting'
 }
 
+{ #category : #converting }
+WDSpotLightSource >> asLightStateWithTransform: renderingTransform [
+	^ (super asLightStateWithTransform: renderingTransform)
+		spotDirection: renderingTransform matrix thirdColumn;
+		innerSpotCosCutoff: innerCutoff degreeCos;
+		outerSpotCosCutoff: outerCutoff degreeCos;
+		yourself.
+]
+
 { #category : #initialization }
 WDSpotLightSource >> initialize [
 	super initialize.

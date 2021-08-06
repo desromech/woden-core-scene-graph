@@ -19,6 +19,19 @@ WDScene >> add: aNode [
 	normalLayer add: aNode
 ]
 
+{ #category : #converting }
+WDScene >> asRenderingSceneWithCameraState: baseCameraState [
+	^ WDRenderingScene new
+		cameraLayers: { 
+			backgroundLayer asRenderingSceneCameraLayerWithCameraState: baseCameraState.
+			normalLayer asRenderingSceneCameraLayerWithCameraState: baseCameraState.
+			foregroundLayer asRenderingSceneCameraLayerWithCameraState: baseCameraState.
+		};
+		yourself.
+		
+		 
+]
+
 { #category : #accessing }
 WDScene >> backgroundLayer [
 

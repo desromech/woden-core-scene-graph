@@ -12,6 +12,15 @@ Class {
 	#category : #'WodenSceneGraph-Core-Lighting'
 }
 
+{ #category : #converting }
+WDPointLightSource >> asLightStateWithTransform: renderingTransform [
+	^ WDLightState new
+		positionOrDirection: (Vector4 xyz: renderingTransform translation w: 1.0);
+		influenceRadius: influenceRadius;
+		intensity: intensity;
+		yourself.
+]
+
 { #category : #accessing }
 WDPointLightSource >> influenceRadius [
 
