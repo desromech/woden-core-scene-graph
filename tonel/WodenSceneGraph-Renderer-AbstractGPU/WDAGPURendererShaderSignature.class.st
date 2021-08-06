@@ -40,7 +40,7 @@ WDAGPURendererShaderSignature >> allocateCameraState [
 { #category : #utility }
 WDAGPURendererShaderSignature >> allocateLightingState [
 	| result |
-	result := materialStateAllocator allocate.
+	result := lightingStateAllocator allocate.
 	result bindingHandle ifNil: [ 
 		result
 			bindingHandle: (handle createShaderResourceBinding: 2);

@@ -17,6 +17,11 @@ Class {
 	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
 }
 
+{ #category : #testing }
+WDAGPUSceneRenderer class >> isAvailable [
+	^ true
+]
+
 { #category : #'instance creation' }
 WDAGPUSceneRenderer class >> new [
 	^ self withResourceCache: (WDAGPUSceneRendererResourceCache for: AGPU mainDevice)
