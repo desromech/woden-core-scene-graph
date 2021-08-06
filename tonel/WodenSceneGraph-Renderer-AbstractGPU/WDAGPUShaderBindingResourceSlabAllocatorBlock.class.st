@@ -1,3 +1,6 @@
+"
+I hold a uniform buffer block which is suballocated.
+"
 Class {
 	#name : #WDAGPUShaderBindingResourceSlabAllocatorBlock,
 	#superclass : #Object,

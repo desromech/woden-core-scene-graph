@@ -11,7 +11,8 @@ Class {
 		'samplersBinding',
 		'cameraStateAllocator',
 		'objectStateAllocator',
-		'materialStateAllocator'
+		'materialStateAllocator',
+		'lightingStateAllocator'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -31,6 +32,18 @@ WDAGPURendererShaderSignature >> allocateCameraState [
 	result bindingHandle ifNil: [ 
 		result
 			bindingHandle: (handle createShaderResourceBinding: 1);
+			bindUniformBufferInSlot: 0.
+	].
+	^ result
+]
+
+{ #category : #utility }
+WDAGPURendererShaderSignature >> allocateLightingState [
+	| result |
+	result := materialStateAllocator allocate.
+	result bindingHandle ifNil: [ 
+		result
+			bindingHandle: (handle createShaderResourceBinding: 2);
 			bindUniformBufferInSlot: 0.
 	].
 	^ result
@@ -125,8 +138,13 @@ WDAGPURendererShaderSignature >> initializeWithDevice: aDevice [
 		buildHandle;
 		buildSamplersBinding.
 	cameraStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUCameraStateUniformBufferWriter }.
+
+	lightingStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: {WDAGPULightingStateUniformBufferWriter}.
+
 	objectStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUObjectStateUniformBufferWriter }.
+
 	materialStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: WDAGPUMaterialUniformBufferWriter allSubclasses.
+	
 ]
 
 { #category : #accessing }

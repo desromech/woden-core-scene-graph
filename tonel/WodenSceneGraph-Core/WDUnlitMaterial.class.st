@@ -37,6 +37,11 @@ WDUnlitMaterial >> colorTexture: anObject [
 	colorTexture := anObject
 ]
 
+{ #category : #'double dispatch' }
+WDUnlitMaterial >> emitActivationCommandsOn: frameRenderer [
+	^ frameRenderer emitUnlitMaterialActivationCommands: self
+]
+
 { #category : #initialization }
 WDUnlitMaterial >> initialize [
 	super initialize.

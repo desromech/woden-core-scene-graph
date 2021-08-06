@@ -10,7 +10,8 @@ Class {
 	#instVars : [
 		'cameraState',
 		'renderingObjects',
-		'lights'
+		'lights',
+		'ambientLighting'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -38,6 +39,18 @@ WDRenderingSceneState >> addRenderable: renderable withObjectState: anObjectStat
 ]
 
 { #category : #accessing }
+WDRenderingSceneState >> ambientLighting [
+
+	^ ambientLighting
+]
+
+{ #category : #accessing }
+WDRenderingSceneState >> ambientLighting: anObject [
+
+	ambientLighting := anObject
+]
+
+{ #category : #accessing }
 WDRenderingSceneState >> cameraState [
 
 	^ cameraState
@@ -53,6 +66,7 @@ WDRenderingSceneState >> cameraState: anObject [
 WDRenderingSceneState >> initialize [
 	super initialize.
 	cameraState := WDCameraState new.
+	ambientLighting := Vector3 zeros.
 	lights := OrderedCollection new.
 	renderingObjects := OrderedCollection new.
 ]

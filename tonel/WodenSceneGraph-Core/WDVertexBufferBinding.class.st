@@ -6,7 +6,8 @@ Class {
 	#superclass : #WDRendererCacheableResource,
 	#instVars : [
 		'attributes',
-		'vertexCount'
+		'vertexCount',
+		'locationMask'
 	],
 	#category : #'WodenSceneGraph-Core-Resources'
 }
@@ -21,6 +22,17 @@ WDVertexBufferBinding >> attributes [
 WDVertexBufferBinding >> attributes: anObject [
 
 	attributes := anObject
+]
+
+{ #category : #accessing }
+WDVertexBufferBinding >> locationMask [
+	locationMask ifNil: [ 
+		locationMask := 0.
+		attributes do: [ :each |
+			locationMask := locationMask bitOr: (1 bitShift: each location)
+		]
+	].
+	^ locationMask
 ]
 
 { #category : #accessing }

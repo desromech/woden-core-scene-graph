@@ -1,3 +1,6 @@
+"
+I represent a single allocation from an uniform buffer.
+"
 Class {
 	#name : #WDAGPUShaderBindingResourceSlabAllocation,
 	#superclass : #Object,
@@ -13,7 +16,12 @@ Class {
 	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Allocator'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #binding }
+WDAGPUShaderBindingResourceSlabAllocation >> bindSampledTextureView: textureView inSlot: slotIndex [
+	bindingHandle bindSampledTextureView: slotIndex view: textureView
+]
+
+{ #category : #binding }
 WDAGPUShaderBindingResourceSlabAllocation >> bindUniformBufferInSlot: slotIndex [
 	bindingHandle bindUniformBufferRange: slotIndex uniform_buffer: block buffer offset: offset size: block elementSize
 ]

@@ -32,10 +32,10 @@ WDAGPUUniformBufferWriter class >> generateWriter [
 		out nextPutAll: 'write: data onto: pointer at: offset'.
 		
 		self fieldsDesc pairsDo: [ :fieldTypeDesc :fieldName |
-			| typeName arraySize typeDesc typeSize typeAlignment capitalizedTypeName |
+			| typeName arraySize typeDesc typeSize typeAlignment capitalizedTypeName writerName |
 			arraySize := 1.
 			fieldTypeDesc isArray ifTrue: [ 
-				typeName := fieldTypeDesc name.		
+				typeName := fieldTypeDesc first.		
 				arraySize := fieldTypeDesc second.
 			] ifFalse: [
 				typeName := fieldTypeDesc
@@ -43,16 +43,29 @@ WDAGPUUniformBufferWriter class >> generateWriter [
 		
 			capitalizedTypeName := typeName first asUppercase asString , typeName allButFirst.
 		
-			typeDesc := TypeNameMap at: typeName.
-			typeSize := typeDesc first.
-			typeAlignment := typeDesc second.
+			Smalltalk globals at: typeName ifPresent: [:cls |
+				typeSize := cls uniqueInstance instanceSize.
+				typeAlignment := cls uniqueInstance instanceAlignment.
+				capitalizedTypeName := 'Struct'.
+				writerName := typeName.
+			] ifAbsent: [ 
+				typeDesc := TypeNameMap at: typeName.
+				typeSize := typeDesc first.
+				typeAlignment := typeDesc second.
+			].
 
 			instanceSize := instanceSize alignedTo: typeAlignment.
 			out cr; tab;
-				nextPutAll: 'self write'; nextPutAll: capitalizedTypeName; nextPutAll: ': data '; nextPutAll: fieldName;
-				nextPutAll: ' onto: pointer at: offset'.
+				nextPutAll: 'self write'; nextPutAll: capitalizedTypeName; nextPutAll: ': data '; nextPutAll: fieldName.
+			writerName ifNotNil: [ 
+				out nextPutAll: ' writer: '; nextPutAll: writerName ; nextPutAll: ' uniqueInstance'
+			].
+			out nextPutAll: ' onto: pointer at: offset'.
 			instanceSize > 0 ifTrue: [ 
 				out nextPutAll: ' + ' ; print: instanceSize
+			].
+			arraySize > 1 ifTrue: [ 
+				out nextPutAll: ' count: '; print: arraySize
 			].
 			out nextPut: $..
 			
@@ -162,6 +175,23 @@ WDAGPUUniformBufferWriter >> writeMat4: matrix onto: pointer at: offset [
 		floatAt: offset + 57 put: matrix m34 asFloat;
 		floatAt: offset + 61 put: matrix m44 asFloat
 
+]
+
+{ #category : #writing }
+WDAGPUUniformBufferWriter >> writeStruct: data writer: structWriter onto: pointer at: offset count: count [
+	| currentOffset elementSize writeCount |
+	currentOffset := offset.
+	elementSize := structWriter instanceSize.
+	writeCount := data size min: count.
+	1 to: writeCount do: [ :i |
+		structWriter write: (data at: i) onto: pointer at: currentOffset.
+		currentOffset := currentOffset + elementSize
+	]
+]
+
+{ #category : #writing }
+WDAGPUUniformBufferWriter >> writeUint: data onto: pointer at: offset [
+	pointer unsignedLongAt: offset + 1 put: data asInteger
 ]
 
 { #category : #writing }

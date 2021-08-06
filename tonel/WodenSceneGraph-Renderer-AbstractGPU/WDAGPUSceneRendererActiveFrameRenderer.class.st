@@ -11,7 +11,9 @@ Class {
 		'activeResources',
 		'activeSlabResource',
 		'commandQueue',
-		'activeResourceDictionary'
+		'activeResourceDictionary',
+		'currentObjectVertexBinding',
+		'currentObjectPrimitiveTopology'
 	],
 	#classVars : [
 		'PrimitiveTopologyMap'
@@ -40,13 +42,31 @@ WDAGPUSceneRendererActiveFrameRenderer >> abortRecording [
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexBinding: vertexBinding primitiveTopology: primitiveTopology [
+	| validMaterial vertexBindingHandle |
+	validMaterial := material ifNil: [ renderer resourceCache defaultMaterial ].
+	
+	vertexBindingHandle := self validVertexBindingFor: vertexBinding.
+	stateTracker
+		setVertexLayout: vertexBindingHandle first;
+		useVertexBinding: vertexBindingHandle second;
+		setPrimitiveType: (PrimitiveTopologyMap at: primitiveTopology).
+	currentObjectVertexBinding := vertexBinding.
+	currentObjectPrimitiveTopology := primitiveTopology.
+
+	^ validMaterial emitActivationCommandsOn: self
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> beginRecordingCommandsOn: aStateTracker queue: aCommandQueue [
 	stateTracker := aStateTracker.
 	commandQueue := aCommandQueue.
 	activeResources := OrderedCollection new.
 	activeSlabResource := OrderedCollection new.
 	activeResourceDictionary := Dictionary new.
-	stateTracker beginRecordingCommands. 
+	stateTracker beginRecordingCommands.
+	self resetCurrentActiveState.
 ]
 
 { #category : #rendering }
@@ -55,6 +75,18 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindCameraState: cameraState [
 		| binding |
 		binding := renderer resourceCache rendererShaderSignature allocateCameraState.
 		binding writeState: cameraState with: WDAGPUCameraStateUniformBufferWriter.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindLightingState: lightingState [
+	stateTracker useShaderResources: (activeResourceDictionary at: lightingState ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateLightingState.
+		binding writeState: lightingState with: WDAGPULightingStateUniformBufferWriter.
 		activeSlabResource add: binding.
 		binding
 	]) bindingHandle.
@@ -74,15 +106,32 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindObjectState: objectState [
 ]
 
 { #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive: meshPrimitive [
-	| vertexBindingHandle |
-	vertexBindingHandle := self validVertexBindingFor: meshPrimitive vertexBinding.
+WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivationCommands: material [
+	| locationMask |
+	locationMask := currentObjectVertexBinding locationMask.
+	
 	stateTracker
-		setVertexLayout: vertexBindingHandle first;
-		useVertexBinding: vertexBindingHandle second;
-		setVertexStage: renderer resourceCache triangleVertexShader entryPoint: 'main';
-		setFragmentStage: renderer resourceCache triangleFragmentShader entryPoint: 'main';
-		setPrimitiveType: (PrimitiveTopologyMap at: meshPrimitive topology).
+		useShaderResources: (activeResourceDictionary at: material ifAbsentPut: [ 
+			| binding |
+			binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+			binding
+				writeState: material with: WDAGPUMetallicRoughnessMaterialUniformBufferWriter;
+				bindSampledTextureView: (self validTextureViewHandleFor: material baseColorTexture fallbackTextureWith: [renderer resourceCache whiteTexture2D]) inSlot: 1;
+				bindSampledTextureView: (self validTextureViewHandleFor: material emissiveTexture fallbackTextureWith: [renderer resourceCache transparentTexture2D]) inSlot: 2;
+				bindSampledTextureView: (self validTextureViewHandleFor: material normalTexture fallbackTextureWith: [renderer resourceCache neutralNormalTexture]) inSlot: 3;
+				bindSampledTextureView: (self validTextureViewHandleFor: material occlusionTexture fallbackTextureWith: [renderer resourceCache whiteTexture2D]) inSlot: 4;
+				bindSampledTextureView: (self validTextureViewHandleFor: material metallicRoughnessTexture fallbackTextureWith: [renderer resourceCache whiteTexture2D]) inSlot: 5.
+			activeSlabResource add: binding.
+			binding
+		]) bindingHandle;
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
+		setFragmentStage: renderer resourceCache forwardMetallicRoughnessFragmentShader entryPoint: 'main'.
+	^ true
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive: meshPrimitive [
+	(self activateMaterial: meshPrimitive material withVertexBinding: meshPrimitive vertexBinding primitiveTopology: meshPrimitive topology) ifFalse: [ ^ self ].
 		
 	meshPrimitive indices ifNil: [
 		stateTracker
@@ -95,6 +144,27 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive:
 			drawElements: indicesAccessor count instance_count: 1 first_index: 0 base_vertex: 0 base_instance: 0
 	].
 
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: material [
+	| locationMask |
+	locationMask := currentObjectVertexBinding locationMask.
+	
+	stateTracker
+		useShaderResources: (activeResourceDictionary at: material ifAbsentPut: [ 
+			| binding |
+			binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+			binding
+				writeState: material with: WDAGPUUnlitMaterialUniformBufferWriter;
+				bindSampledTextureView: (self validTextureViewHandleFor: material colorTexture fallbackTextureWith: [renderer resourceCache whiteTexture2D]) inSlot: 1.
+				
+			activeSlabResource add: binding.
+			binding
+		]) bindingHandle;
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
+		setFragmentStage: renderer resourceCache forwardUnlitFragmentShader entryPoint: 'main'.
+	^ true
 ]
 
 { #category : #rendering }
@@ -111,7 +181,26 @@ WDAGPUSceneRendererActiveFrameRenderer >> freeActiveResources [
 	].
 	activeResources := nil.
 	activeResourceDictionary := nil.
+	self resetCurrentActiveState
+]
 
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> makeLightingStateForRenderingSceneState: renderingSceneState [
+	^ WDLightingState new
+		ambientLighting: renderingSceneState ambientLighting;
+		lights: ((1 to: (renderingSceneState lights size min: 8)) collect: [:i |
+			| light |
+			light := renderingSceneState lights at: i.
+			WDAGPUForwardLightState new
+				positionOrDirection: Vector4 zeros;
+				intensity: 0.0;
+				spotDirection: Vector3 zeros;
+				innerSpotCosCutoff: -1.0;
+				outerSpotCosCutoff: -1.0;
+				influenceRadius: 1.0;
+				yourself.
+		]) asArray;
+		yourself
 ]
 
 { #category : #rendering }
@@ -149,7 +238,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding.
 
-	self bindCameraState: renderingSceneState cameraState.
+	self
+		bindCameraState: renderingSceneState cameraState;
+		bindLightingState: (self makeLightingStateForRenderingSceneState: renderingSceneState).
 		
 	renderingSceneState renderingObjects do: [ :each |
 		self recordCommandsForRenderingObject: each
@@ -171,6 +262,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderer: anObject [
 	renderer := anObject
 ]
 
+{ #category : #private }
+WDAGPUSceneRendererActiveFrameRenderer >> resetCurrentActiveState [
+	currentObjectVertexBinding := nil.
+	currentObjectPrimitiveTopology := nil.
+]
+
 { #category : #handles }
 WDAGPUSceneRendererActiveFrameRenderer >> validBufferHandleForAccessor: aWDBinaryBufferAccessor [
 	^ activeResourceDictionary at: aWDBinaryBufferAccessor ifAbsentPut: [
@@ -189,6 +286,15 @@ WDAGPUSceneRendererActiveFrameRenderer >> validFramebufferFor: aWDFramebuffer [
 		activeResources add: handle.
 		handle
 	]
+]
+
+{ #category : #'as yet unclassified' }
+WDAGPUSceneRendererActiveFrameRenderer >> validTextureViewHandleFor: aWDTexture fallbackTextureWith: aBlock [
+	aWDTexture ifNil: [ 
+		^ aBlock value getOrCreateFullView
+	].
+
+	self halt
 ]
 
 { #category : #handles }

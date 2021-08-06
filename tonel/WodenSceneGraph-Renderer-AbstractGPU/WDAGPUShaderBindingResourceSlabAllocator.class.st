@@ -1,3 +1,6 @@
+"
+I am a slab based allocator for shader resource uniform buffer binding.
+"
 Class {
 	#name : #WDAGPUShaderBindingResourceSlabAllocator,
 	#superclass : #Object,

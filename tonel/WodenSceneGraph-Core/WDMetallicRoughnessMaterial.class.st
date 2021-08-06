@@ -69,6 +69,11 @@ WDMetallicRoughnessMaterial >> emissiveTexture: anObject [
 	emissiveTexture := anObject
 ]
 
+{ #category : #'double dispatch' }
+WDMetallicRoughnessMaterial >> emitActivationCommandsOn: frameRenderer [
+	^ frameRenderer emitMetallicRoughnessMaterialActivationCommands: self
+]
+
 { #category : #initialization }
 WDMetallicRoughnessMaterial >> initialize [
 	super initialize.

@@ -6,3 +6,8 @@ Class {
 	#superclass : #Object,
 	#category : #'WodenSceneGraph-Core-Material'
 }
+
+{ #category : #'double dispatch' }
+WDMaterial >> emitActivationCommandsOn: frameRenderer [
+	^ false
+]
