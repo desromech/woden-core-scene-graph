@@ -106,6 +106,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindObjectState: objectState [
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState [
+	^ aCameraState shallowCopy
+		projectionMatrix: renderer resourceCache projectionNDCAdjustMatrix * aCameraState projectionMatrix;
+		yourself
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivationCommands: material [
 	| locationMask |
 	locationMask := currentObjectVertexBinding locationMask.
@@ -239,7 +246,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		useShaderResources: shaderSignature samplersBinding.
 
 	self
-		bindCameraState: renderingSceneState cameraState;
+		bindCameraState: (self convertedCameraState: renderingSceneState cameraState);
 		bindLightingState: (self makeLightingStateForRenderingSceneState: renderingSceneState).
 		
 	renderingSceneState renderingObjects do: [ :each |

@@ -20,7 +20,8 @@ Class {
 		'genericSurfaceMaterialVertexShaders',
 		'whiteTexture2D',
 		'transparentTexture2D',
-		'neutralNormalTexture'
+		'neutralNormalTexture',
+		'projectionNDCAdjustMatrix'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -427,6 +428,10 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	forwardMetallicRoughnessFragmentShader := self compileShader: self forwardMetallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	forwardUnlitFragmentShader := self compileShader: self forwardUnlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	defaultMaterial := WDMetallicRoughnessMaterial new.
+	projectionNDCAdjustMatrix :=
+		device hasTopLeftNdcOrigin ~~ 0
+			ifTrue: [ Matrix4x4 projectionInvertYMatrix ]
+			ifFalse: [ Matrix4x4 identity ]
 ]
 
 { #category : #'private shaders' }
@@ -492,6 +497,11 @@ layout(set=3, binding=0, std140) uniform ObjectStateBlock
 } ObjectState;
 
 '
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> projectionNDCAdjustMatrix [
+	^ projectionNDCAdjustMatrix
 ]
 
 { #category : #accessing }
