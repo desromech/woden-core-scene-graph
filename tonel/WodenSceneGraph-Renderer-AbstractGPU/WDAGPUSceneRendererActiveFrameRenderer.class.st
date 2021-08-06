@@ -239,16 +239,22 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setFrontFace: AGPU_COUNTER_CLOCKWISE;
 		yourself.
 
-	self
-		bindCameraState: (self convertedCameraState: renderingSceneState cameraState);
-		bindLightingState: (self makeLightingStateForRenderingSceneState: renderingSceneState).
-		
-	renderingSceneState renderingObjects do: [ :each |
-		self recordCommandsForRenderingObject: each
+	renderingSceneState cameraLayers do: [ :each |
+		self recordRenderingCommandsForCameraLayer: each
 	].
-	
 		
 	stateTracker endRenderPass
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsForCameraLayer: cameraLayerState [
+	self
+		bindCameraState: (self convertedCameraState: cameraLayerState cameraState);
+		bindLightingState: (self makeLightingStateForRenderingSceneState: cameraLayerState).
+		
+	cameraLayerState renderingObjects do: [ :each |
+		self recordCommandsForRenderingObject: each
+	].
 ]
 
 { #category : #accessing }

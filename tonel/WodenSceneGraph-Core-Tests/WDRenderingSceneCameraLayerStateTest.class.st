@@ -2,13 +2,13 @@
 A WDRenderingSceneStateTest is a test class for testing the behavior of WDRenderingSceneState
 "
 Class {
-	#name : #WDRenderingSceneStateTest,
+	#name : #WDRenderingSceneCameraLayerStateTest,
 	#superclass : #TestCase,
 	#category : #'WodenSceneGraph-Core-Tests-RenderingState'
 }
 
 { #category : #tests }
-WDRenderingSceneStateTest >> makeRenderable [
+WDRenderingSceneCameraLayerStateTest >> makeRenderable [
 	^ WDMeshBuilder new
 	beginTriangles;
 	addCr: 1 g: 0 b: 0 a: 1;
@@ -24,12 +24,12 @@ WDRenderingSceneStateTest >> makeRenderable [
 ]
 
 { #category : #tests }
-WDRenderingSceneStateTest >> testAddRenderable [
+WDRenderingSceneCameraLayerStateTest >> testAddRenderable [
 	| renderable objectState renderingScene renderingObject |
 	renderable := self makeRenderable.
 	objectState := WDRenderingObjectState new.
 
-	renderingScene := WDRenderingSceneState new.
+	renderingScene := WDRenderingSceneCameraLayerState new.
 	renderingScene renderingObjects isEmpty.
 	
 	renderingScene addRenderable: renderable withObjectState: objectState.

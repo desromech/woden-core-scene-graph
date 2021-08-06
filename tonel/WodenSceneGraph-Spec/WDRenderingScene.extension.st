@@ -1,7 +1,7 @@
-Extension { #name : #WDRenderingSceneState }
+Extension { #name : #WDRenderingScene }
 
 { #category : #'*WodenSceneGraph-Spec' }
-WDRenderingSceneState >> inspectionRendererOutput [
+WDRenderingScene >> inspectionRendererOutput [
 	<inspectorPresentationOrder: 0 title: 'Renderer Output'>
 	
 	^ WDSpRenderingSceneStatePresenter new 
