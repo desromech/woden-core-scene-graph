@@ -132,7 +132,10 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivatio
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache forwardMetallicRoughnessFragmentShader entryPoint: 'main'.
+		setFragmentStage: renderer resourceCache forwardMetallicRoughnessFragmentShader entryPoint: 'main';
+		setCullMode: (material doubleSided
+			ifTrue: [ AGPU_CULL_MODE_NONE ]
+			ifFalse: [ AGPU_CULL_MODE_BACK ]).
 	^ true
 ]
 
@@ -170,7 +173,10 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache forwardUnlitFragmentShader entryPoint: 'main'.
+		setFragmentStage: renderer resourceCache forwardUnlitFragmentShader entryPoint: 'main';
+		setCullMode: (material doubleSided
+			ifTrue: [ AGPU_CULL_MODE_NONE ]
+			ifFalse: [ AGPU_CULL_MODE_BACK ]).
 	^ true
 ]
 
@@ -193,21 +199,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> freeActiveResources [
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> makeLightingStateForRenderingSceneState: renderingSceneState [
-	^ WDLightingState new
-		ambientLighting: renderingSceneState ambientLighting;
-		lights: ((1 to: (renderingSceneState lights size min: 8)) collect: [:i |
-			| light |
-			light := renderingSceneState lights at: i.
-			WDAGPUForwardLightState new
-				positionOrDirection: Vector4 zeros;
-				intensity: 0.0;
-				spotDirection: Vector3 zeros;
-				innerSpotCosCutoff: -1.0;
-				outerSpotCosCutoff: -1.0;
-				influenceRadius: 1.0;
-				yourself.
-		]) asArray;
-		yourself
+	^ renderingSceneState lightingStateInViewSpaceWithMaxNumberOfLights: 8
 ]
 
 { #category : #rendering }
@@ -243,7 +235,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
-		useShaderResources: shaderSignature samplersBinding.
+		useShaderResources: shaderSignature samplersBinding;
+		setFrontFace: AGPU_COUNTER_CLOCKWISE;
+		yourself.
 
 	self
 		bindCameraState: (self convertedCameraState: renderingSceneState cameraState);

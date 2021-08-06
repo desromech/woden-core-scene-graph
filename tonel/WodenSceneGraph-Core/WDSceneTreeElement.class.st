@@ -12,7 +12,13 @@ Class {
 }
 
 { #category : #adding }
-WDSceneTreeElement >> add: aNode [
+WDSceneTreeElement >> add: anObject [
+	self addSceneElement: anObject asSceneElement
+]
+
+{ #category : #adding }
+WDSceneTreeElement >> addSceneElement: aNode [
+	self assert: aNode isWodenSceneElement.
 	self assert: aNode parent isNil.
 	
 	children add: aNode.
@@ -51,6 +57,12 @@ WDSceneTreeElement >> parent: anObject [
 
 { #category : #adding }
 WDSceneTreeElement >> remove: aNode [
+	self removeSceneElement: aNode
+]
+
+{ #category : #adding }
+WDSceneTreeElement >> removeSceneElement: aNode [
+	self assert: aNode isWodenSceneElement.
 	self assert: aNode parent == self.
 	
 	children remove: aNode.

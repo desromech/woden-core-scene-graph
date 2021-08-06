@@ -22,6 +22,14 @@ Class {
 }
 
 { #category : #accessing }
+WDMetallicRoughnessMaterial class >> default [
+	^ self new
+		roughnessFactor: 0.4;
+		metallicFactor: 0.0;
+		yourself
+]
+
+{ #category : #accessing }
 WDMetallicRoughnessMaterial >> baseColorFactor [
 
 	^ baseColorFactor

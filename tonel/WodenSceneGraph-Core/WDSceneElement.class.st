@@ -12,6 +12,11 @@ WDSceneElement class >> isAbstract [
 	^ self == WDSceneElement
 ]
 
+{ #category : #converting }
+WDSceneElement >> asSceneElement [
+	^ self
+]
+
 { #category : #accessing }
 WDSceneElement >> children [
 	self subclassResponsibility
@@ -45,6 +50,11 @@ WDSceneElement >> isSceneLayer [
 { #category : #testing }
 WDSceneElement >> isSceneNode [
 	^ false
+]
+
+{ #category : #testing }
+WDSceneElement >> isWodenSceneElement [
+	^ true
 ]
 
 { #category : #accessing }

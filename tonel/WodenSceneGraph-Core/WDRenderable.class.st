@@ -12,6 +12,18 @@ WDRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectSta
 	self subclassResponsibility
 ]
 
+{ #category : #converting }
+WDRenderable >> asSceneElement [
+	^ self asSceneNode
+]
+
+{ #category : #converting }
+WDRenderable >> asSceneNode [
+	^ WDSceneNode new
+		renderables: { self };
+		yourself
+]
+
 { #category : #'double dispatch' }
 WDRenderable >> emitRenderingCommandsWithRenderer: renderer [
 ]

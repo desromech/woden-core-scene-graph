@@ -10,11 +10,16 @@ Class {
 	#instVars : [
 		'cameraState',
 		'renderingObjects',
-		'lights',
-		'ambientLighting'
+		'globalLightingState',
+		'lights'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
+
+{ #category : #adding }
+WDRenderingSceneState >> addLight: aLightState [
+	lights add: aLightState
+]
 
 { #category : #adding }
 WDRenderingSceneState >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState [
@@ -39,18 +44,6 @@ WDRenderingSceneState >> addRenderable: renderable withObjectState: anObjectStat
 ]
 
 { #category : #accessing }
-WDRenderingSceneState >> ambientLighting [
-
-	^ ambientLighting
-]
-
-{ #category : #accessing }
-WDRenderingSceneState >> ambientLighting: anObject [
-
-	ambientLighting := anObject
-]
-
-{ #category : #accessing }
 WDRenderingSceneState >> cameraState [
 
 	^ cameraState
@@ -62,13 +55,44 @@ WDRenderingSceneState >> cameraState: anObject [
 	cameraState := anObject
 ]
 
+{ #category : #accessing }
+WDRenderingSceneState >> globalLightingState [
+	^ globalLightingState
+]
+
+{ #category : #accessing }
+WDRenderingSceneState >> globalLightingState: anObject [
+
+	globalLightingState := anObject
+]
+
 { #category : #initialization }
 WDRenderingSceneState >> initialize [
 	super initialize.
 	cameraState := WDCameraState new.
-	ambientLighting := Vector3 zeros.
+	globalLightingState := WDGlobalLightingState new.
 	lights := OrderedCollection new.
 	renderingObjects := OrderedCollection new.
+]
+
+{ #category : #'as yet unclassified' }
+WDRenderingSceneState >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLights [
+	| viewMatrix |
+	viewMatrix := cameraState inverseTransformationMatrix.
+	^ WDLightingState new
+		globalLightingState: globalLightingState;
+		lights: ((lights first: (lights size min: maxNumberOfLights)) asArray collect: [ :each |
+			each transformedWithMatrix: viewMatrix
+		]);
+		yourself.
+]
+
+{ #category : #'as yet unclassified' }
+WDRenderingSceneState >> lightingStateWithMaxNumberOfLights: maxNumberOfLights [
+	^ WDLightingState new
+		globalLightingState: globalLightingState;
+		lights: (lights first: (lights size min: maxNumberOfLights)) asArray;
+		yourself.
 ]
 
 { #category : #accessing }
