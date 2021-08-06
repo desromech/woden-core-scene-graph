@@ -3,12 +3,25 @@ I am a morph that displays a single Woden scene.
 "
 Class {
 	#name : #WDSceneMorph,
-	#superclass : #WDAbstractRenderingSceneMorph,
+	#superclass : #WDAbstractRenderingSceneStateMorph,
 	#instVars : [
-		'scene'
+		'scene',
+		'camera'
 	],
 	#category : #'WodenSceneGraph-Morphic'
 }
+
+{ #category : #accessing }
+WDSceneMorph >> camera [
+
+	^ camera
+]
+
+{ #category : #accessing }
+WDSceneMorph >> camera: anObject [
+
+	camera := anObject
+]
 
 { #category : #accessing }
 WDSceneMorph >> scene [

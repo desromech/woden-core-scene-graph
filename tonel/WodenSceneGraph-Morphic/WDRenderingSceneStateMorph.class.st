@@ -2,8 +2,8 @@
 I am a morph that displays a single Woden rendering scene state which is specified in a explicit way.
 "
 Class {
-	#name : #WDRenderingSceneMorph,
-	#superclass : #WDAbstractRenderingSceneMorph,
+	#name : #WDRenderingSceneStateMorph,
+	#superclass : #WDAbstractRenderingSceneStateMorph,
 	#instVars : [
 		'renderingSceneState'
 	],
@@ -11,13 +11,13 @@ Class {
 }
 
 { #category : #accessing }
-WDRenderingSceneMorph >> renderingSceneState [
+WDRenderingSceneStateMorph >> renderingSceneState [
 
 	^ renderingSceneState
 ]
 
 { #category : #accessing }
-WDRenderingSceneMorph >> renderingSceneState: aWDRenderingSceneState [
+WDRenderingSceneStateMorph >> renderingSceneState: aWDRenderingSceneState [
 	renderingSceneState := aWDRenderingSceneState.
 	self changed
 ]

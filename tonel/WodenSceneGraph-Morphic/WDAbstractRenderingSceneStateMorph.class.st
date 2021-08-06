@@ -2,7 +2,7 @@
 I am an abstract morph that connect a Woden RenderingSceneState with the Pharo UI by using the current per-session renderer.
 "
 Class {
-	#name : #WDAbstractRenderingSceneMorph,
+	#name : #WDAbstractRenderingSceneStateMorph,
 	#superclass : #Morph,
 	#instVars : [
 		'formFrameBuffer',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : #drawing }
-WDAbstractRenderingSceneMorph >> drawOn: aCanvas [
+WDAbstractRenderingSceneStateMorph >> drawOn: aCanvas [
 	| renderingSceneState |
 	renderingSceneState := self renderingSceneState.
 	renderingSceneState ifNil: [ ^ super drawOn: aCanvas ].
@@ -22,7 +22,7 @@ WDAbstractRenderingSceneMorph >> drawOn: aCanvas [
 ]
 
 { #category : #drawing }
-WDAbstractRenderingSceneMorph >> renderRenderingSceneStateIntoFormFramebuffer: renderingSceneState [
+WDAbstractRenderingSceneStateMorph >> renderRenderingSceneStateIntoFormFramebuffer: renderingSceneState [
 	| drawingExtent |
 	drawingExtent := self extent ceiling.
 	(formFrameBuffer isNil or: [ formFrameBuffer extent ~= drawingExtent ]) ifTrue: [
@@ -34,6 +34,6 @@ WDAbstractRenderingSceneMorph >> renderRenderingSceneStateIntoFormFramebuffer: r
 ]
 
 { #category : #accessing }
-WDAbstractRenderingSceneMorph >> renderingSceneState [
+WDAbstractRenderingSceneStateMorph >> renderingSceneState [
 	^ nil
 ]
