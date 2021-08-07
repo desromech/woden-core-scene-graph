@@ -16,7 +16,7 @@ WDSpSceneMorphicAdapter class >> adaptingName [
 WDSpSceneMorphicAdapter >> buildWidget [
 	| newWidget |
 
-	newWidget := WDSceneMorph new
+	newWidget := self sceneMorphClass new
 		hResizing: #spaceFill;
 		vResizing: #spaceFill;
 		scene: self presenter scene;
@@ -27,4 +27,9 @@ WDSpSceneMorphicAdapter >> buildWidget [
 	self presenter whenCameraChangedDo: [ :newCamera | newWidget camera: newCamera ].
 
 	^ newWidget
+]
+
+{ #category : #hooks }
+WDSpSceneMorphicAdapter >> sceneMorphClass [
+	^ WDSceneMorph
 ]

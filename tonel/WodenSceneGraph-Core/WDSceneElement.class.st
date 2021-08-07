@@ -13,6 +13,11 @@ WDSceneElement class >> isAbstract [
 ]
 
 { #category : #converting }
+WDSceneElement >> asRenderingSceneWithCameraState: baseCameraState [
+	self subclassResponsibility
+]
+
+{ #category : #converting }
 WDSceneElement >> asSceneElement [
 	^ self
 ]
@@ -20,6 +25,11 @@ WDSceneElement >> asSceneElement [
 { #category : #accessing }
 WDSceneElement >> children [
 	self subclassResponsibility
+]
+
+{ #category : #accessing }
+WDSceneElement >> globalTransform [
+	^ ReversibleAffineTransform3D identity
 ]
 
 { #category : #testing }

@@ -18,9 +18,24 @@ WDSceneMorph >> camera [
 ]
 
 { #category : #accessing }
-WDSceneMorph >> camera: anObject [
+WDSceneMorph >> camera: aCameraNode [
+	camera := aCameraNode asSceneNode
+]
 
-	camera := anObject
+{ #category : #initialization }
+WDSceneMorph >> initialize [
+	super initialize.
+	self camera: WDCamera new.
+]
+
+{ #category : #accessing }
+WDSceneMorph >> renderingSceneState [
+	| extent aspectRatio |
+	scene ifNil: [ ^ nil ].
+	camera ifNil: [ ^ nil ].
+	extent := self extent.
+	aspectRatio := extent x asFloat / extent y.
+	^ (camera asCameraStateWithAspectRatio: aspectRatio) ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
 ]
 
 { #category : #accessing }

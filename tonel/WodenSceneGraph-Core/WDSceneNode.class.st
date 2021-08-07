@@ -9,6 +9,7 @@ Class {
 	#instVars : [
 		'renderables',
 		'lights',
+		'cameras',
 		'transform'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
@@ -41,11 +42,44 @@ WDSceneNode >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCamera
 		addChildrenRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: renderingGlobalTransform
 ]
 
+{ #category : #converting }
+WDSceneNode >> asCameraStateWithAspectRatio: aspectRatio [
+	cameras isEmpty ifTrue: [ ^ nil ].
+	^ (cameras first asCameraStateWithAspectRatio: aspectRatio) copy
+		transformation: self globalTransform;
+		yourself
+]
+
+{ #category : #converting }
+WDSceneNode >> asSceneNode [
+	^ self
+]
+
+{ #category : #accessing }
+WDSceneNode >> cameras [
+
+	^ cameras
+]
+
+{ #category : #accessing }
+WDSceneNode >> cameras: anObject [
+
+	cameras := anObject
+]
+
+{ #category : #accessing }
+WDSceneNode >> globalTransform [
+	^ parent
+		ifNil: [ transform asReversibleAffineTransform]
+		ifNotNil: [ parent globalTransform transformTransform: transform asReversibleAffineTransform ]
+]
+
 { #category : #initialization }
 WDSceneNode >> initialize [
 	super initialize.
 	renderables := #().
 	lights := #().
+	cameras := #().
 	transform := DecomposedTransform3D new.
 ]
 
@@ -68,12 +102,12 @@ WDSceneNode >> lights: anObject [
 
 { #category : #accessing }
 WDSceneNode >> orientation [
-	^ transform orientation
+	^ transform rotation
 ]
 
 { #category : #accessing }
 WDSceneNode >> orientation: anOrientation [
-	transform orientation: anOrientation
+	transform rotation: anOrientation
 ]
 
 { #category : #accessing }
@@ -122,4 +156,9 @@ WDSceneNode >> transform [
 { #category : #accessing }
 WDSceneNode >> transform: aTransform [
 	transform := aTransform asDecomposedTransform3D
+]
+
+{ #category : #transforming }
+WDSceneNode >> translateBy: aVector [
+	transform translateBy: aVector
 ]
