@@ -47,3 +47,8 @@ WDPrimitiveTopology >> isTriangleStrip [
 WDPrimitiveTopology >> isTriangles [
 	^ false
 ]
+
+{ #category : #'as yet unclassified' }
+WDPrimitiveTopology >> triangleIndicesWithBase: baseIndex count: indexCount do: aBlock [
+	"Iterate through the triangle indices that corresponds to this topology."
+]

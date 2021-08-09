@@ -795,6 +795,13 @@ WDAGPUSceneRendererResourceCache >> validTextureHandleFor: aWDTexture [
 ]
 
 { #category : #handles }
+WDAGPUSceneRendererResourceCache >> validTextureViewHandleFor: aWDTexture [
+	| textureHandle |
+	textureHandle := self validTextureHandleFor: aWDTexture.
+	^ { textureHandle getOrCreateFullView . textureHandle }
+]
+
+{ #category : #handles }
 WDAGPUSceneRendererResourceCache >> validVertexBindingFor: aWDVertexBufferBinding [
 	| cachedVertexBinding attributeBuffers offsets |
 	cachedVertexBinding := vertexBindings at: aWDVertexBufferBinding ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].

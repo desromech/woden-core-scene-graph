@@ -20,10 +20,26 @@ Class {
 		'indexBufferView',
 		'texcoords0',
 		'texcoords1',
-		'baseVertex'
+		'baseVertex',
+		'currentMaterial'
+	],
+	#classVars : [
+		'NormalAxis'
 	],
 	#category : #'WodenSceneGraph-Core-RenderableBuilder'
 }
+
+{ #category : #initialization }
+WDMeshBuilder class >> initialize [
+	NormalAxis := { 
+		Vector3 x: 1 y: 0 z: 0.
+		Vector3 x: -1 y: 0 z: 0 .
+		Vector3 x: 0 y: 1 z: 0.
+		Vector3 x: 0 y: -1 z: 0 .
+		Vector3 x: 0 y: 0 z: 1 .
+		Vector3 x: 0 y: 0 z: -1 .
+	}.
+]
 
 { #category : #adding }
 WDMeshBuilder >> addCr: r g: g b: b a: a [
@@ -153,6 +169,11 @@ WDMeshBuilder >> beginTriangles [
 	^ self beginPrimitiveWithTopology: WDPrimitiveTopologyTriangles
 ]
 
+{ #category : #private }
+WDMeshBuilder >> bitangentForAxis: normalAxis [
+	^ NormalAxis at: ((normalAxis + 3) rem: NormalAxis size) + 1
+]
+
 { #category : #accessing }
 WDMeshBuilder >> colors [
 
@@ -170,9 +191,62 @@ WDMeshBuilder >> computeBoundingBoxForPrimitive: builderPrimitive [
 	^ box
 ]
 
+{ #category : #private }
+WDMeshBuilder >> computeNormalAxis: normal [
+	| amount bestAmount best |
+	bestAmount := Float negativeInfinity.
+	best := -1.
+	1 to: NormalAxis size do: [ :i |
+		amount := normal dot: (NormalAxis at: i).
+		amount > bestAmount ifTrue: [
+			bestAmount := amount.
+			best := i.
+		]
+	].
+
+	best < 1 ifTrue: [ self error: 'Using invalid normal.' ].
+	^ best
+
+]
+
 { #category : #accessing }
 WDMeshBuilder >> currentMaterial [
-	^ primitives ifEmpty: [ nil ] ifNotEmpty: [ primitives last material ]
+	^ currentMaterial
+]
+
+{ #category : #accessing }
+WDMeshBuilder >> currentMaterial: aMaterial [
+	currentMaterial := aMaterial
+]
+
+{ #category : #'as yet unclassified' }
+WDMeshBuilder >> decodeNormals [
+	| sourceIndex |
+	sourceIndex := -2.
+	^ (1 to: vertexCount) collect: [ :i |
+		sourceIndex := sourceIndex + 3.
+		Vector3 x: (normals at: sourceIndex) y: (normals at: sourceIndex + 1) z: (normals at: sourceIndex + 2)
+	]
+]
+
+{ #category : #'as yet unclassified' }
+WDMeshBuilder >> decodePositions [
+	| sourceIndex |
+	sourceIndex := -2.
+	^ (1 to: vertexCount) collect: [ :i |
+		sourceIndex := sourceIndex + 3.
+		Vector3 x: (positions at: sourceIndex) y: (positions at: sourceIndex + 1) z: (positions at: sourceIndex + 2)
+	]
+]
+
+{ #category : #'as yet unclassified' }
+WDMeshBuilder >> decodeTexcoords0 [
+	| sourceIndex |
+	sourceIndex := -1.
+	^ (1 to: vertexCount) collect: [ :i |
+		sourceIndex := sourceIndex + 2.
+		Vector2 x: (texcoords0 at: sourceIndex) y: (texcoords0 at: sourceIndex + 1)
+	]
 ]
 
 { #category : #private }
@@ -278,6 +352,141 @@ WDMeshBuilder >> finishLastPrimitive [
 	primitive indexCount: indices size - primitive firstIndex.
 ]
 
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTangentSpaceFrame [
+	| tangents bitangents decodedPositions decodedNormals decodedTexcoords0 |
+	self assert: self hasValidPositions.
+	self assert: self hasValidNormals.
+	self assert: self hasValidTexcoords0.
+	self finishLastPrimitive.
+	
+	decodedPositions := self decodePositions.
+	decodedTexcoords0 := self decodeTexcoords0.
+	decodedNormals := self decodeNormals.
+	tangents := Array new: vertexCount withAll: Vector3 zeros.
+	bitangents := Array new: vertexCount withAll: Vector3 zeros.
+	
+	primitives do: [ :eachPrimitive |
+		eachPrimitive topology triangleIndicesWithBase: eachPrimitive firstIndex + 1 count: eachPrimitive indexCount do: [ :i0 :i1 :i2 |
+			| vi0 vi1 vi2 p0 p1 p2 tc0 tc1 tc2 u v du0 du1 dv0 dv1 det |
+			vi0 := (indices at: i0) + 1.
+			vi1 := (indices at: i1) + 1.
+			vi2 := (indices at: i2) + 1.
+			
+			p0 := decodedPositions at: vi0.
+			p1 := decodedPositions at: vi1.
+			p2 := decodedPositions at: vi2.
+
+			tc0 := decodedTexcoords0 at: vi0.
+			tc1 := decodedTexcoords0 at: vi1.
+			tc2 := decodedTexcoords0 at: vi2.
+
+			u := p1 - p0.
+			v := p2 - p0.
+			
+			du0 := tc1 x - tc0 x.
+			dv0 := tc1 y - tc0 y.
+			
+			du1 := tc2 x - tc0 x.
+			dv1 := tc2 y - tc0 y.
+			
+			det := (du0*dv1) - (du1*dv0).
+			(det closeTo: 0) ifFalse: [
+				| den tangent bitangent |
+				den := 1.0 / det.
+				
+				tangent := (u * (den*dv1))  - (v * (den*dv0)).
+				bitangent := (v * (den*du0)) - (u * (den*du1)).
+				
+				tangents at: vi0 put: (tangents at: vi0) + tangent.
+				tangents at: vi1 put: (tangents at: vi1) + tangent.
+				tangents at: vi2 put: (tangents at: vi2) + tangent.
+
+				bitangents at: vi0 put: (bitangents at: vi0) + bitangent.
+				bitangents at: vi1 put: (bitangents at: vi1) + bitangent.
+				bitangents at: vi2 put: (bitangents at: vi2) + bitangent.
+			].
+		]
+	].
+	
+	tangents4 := OrderedCollection new: vertexCount * 4.
+	1 to: vertexCount do: [ :i |
+		| t b n s |
+		t := tangents at: i. 
+		b := bitangents at: i. 
+		n := decodedNormals at: i. 
+		
+		"Gram schmidth orthogonalization"
+		t := (t - (n * (n dot: t))) normalized.
+		b := (b - (n * (n dot: b)) - (t * (t dot: b))) normalized.
+		s := (n cross: t) dot: b.
+		
+		tangents4
+			add: t x; add: t y; add: t z; add: s
+	].
+
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithFacePlanarTransform: transformMatrix [
+	| sourceIndex |
+	self assert: self hasValidPositions.
+	self assert: self hasValidNormals.
+	texcoords0 := OrderedCollection new: vertexCount * 2.
+	sourceIndex := 1.
+	1 to: vertexCount do: [ :i |
+		| position normal normalAxis tangent bitangent uv transformedUV |
+		"Fetch the position and normal"
+		position := Vector3 x: (positions at: sourceIndex) y: (positions at: sourceIndex + 1) z: (positions at: sourceIndex + 2).
+		normal := Vector3 x: (normals at: sourceIndex) y: (normals at: sourceIndex + 1) z: (normals at: sourceIndex + 2).
+		
+		"Compute the predominant normal plane."
+		normalAxis := self computeNormalAxis: normal.
+		tangent := self tangentForAxis: normalAxis.
+		bitangent := self bitangentForAxis: normalAxis.
+		
+		"Compute the new texcoord"
+		uv := Vector2 x: (tangent dot: position) y: (bitangent dot: position).
+		transformedUV := transformMatrix transformVector2: uv.
+
+		texcoords0
+			add: transformedUV x; add: transformedUV y.		
+
+		sourceIndex := sourceIndex + 3.
+	].
+
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithFacePlanarTransformWithScale: scale [
+	^ self generateTexcoords0WithFacePlanarTransform: (Matrix3x3 texScale: scale offset: 0)
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithFacePlanarTransformWithScale: scale offset: offset [
+	^ self generateTexcoords0WithFacePlanarTransform: (Matrix3x3 texScale: scale offset: offset)
+]
+
+{ #category : #testing }
+WDMeshBuilder >> hasValidNormals [
+	^ normals size = (vertexCount * 3)
+]
+
+{ #category : #testing }
+WDMeshBuilder >> hasValidPositions [
+	^ positions size = (vertexCount * 3)
+]
+
+{ #category : #testing }
+WDMeshBuilder >> hasValidTexcoords0 [
+	^ texcoords0 size = (vertexCount * 2)
+]
+
+{ #category : #testing }
+WDMeshBuilder >> hasValidTexcoords1 [
+	^ texcoords1 size = (vertexCount * 1)
+]
+
 { #category : #private }
 WDMeshBuilder >> indexAccessorForPrimitive: builderPrimitive [
 	^ WDBinaryBufferAccessor new
@@ -357,6 +566,16 @@ WDMeshBuilder >> reset [
 	vertexCount := 0.
 	baseVertex := 0.
 
+]
+
+{ #category : #private }
+WDMeshBuilder >> tangentForAxis: normalAxis [
+	^ NormalAxis at: ((normalAxis + 1) rem: NormalAxis size) + 1
+]
+
+{ #category : #accessing }
+WDMeshBuilder >> tangents4 [
+	^ tangents4
 ]
 
 { #category : #accessing }

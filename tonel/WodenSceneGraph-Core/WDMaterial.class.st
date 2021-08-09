@@ -11,3 +11,8 @@ Class {
 WDMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ false
 ]
+
+{ #category : #rendering }
+WDMaterial >> renderPriority [
+	^ WDRenderPriority default
+]

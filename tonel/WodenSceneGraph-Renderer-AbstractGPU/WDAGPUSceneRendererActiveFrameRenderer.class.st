@@ -301,7 +301,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> validTextureViewHandleFor: aWDTexture 
 		^ aBlock value getOrCreateFullView
 	].
 
-	self halt
+	^ (activeResourceDictionary at: aWDTexture ifAbsentPut: [
+			| handle |
+			handle := renderer resourceCache validTextureViewHandleFor: aWDTexture.
+			activeResources add: handle.
+			handle
+		]) first
 ]
 
 { #category : #handles }

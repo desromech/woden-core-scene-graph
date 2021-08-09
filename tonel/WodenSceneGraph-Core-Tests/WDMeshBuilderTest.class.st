@@ -19,6 +19,7 @@ WDMeshBuilderTest >> testCube [
 	self assert: builder positions size equals: 4*6*3.
 	self assert: builder colors size equals: 0.
 	self assert: builder normals size equals: 4*6*3.
+	self assert: builder tangents4 size equals: 0.
 	self assert: builder texcoords0 size equals: 0.
 	self assert: builder indices size equals: 6*6.
 	
@@ -46,6 +47,7 @@ WDMeshBuilderTest >> testCube2 [
 	self assert: builder positions size equals: 4*6*3.
 	self assert: builder colors size equals: 0.
 	self assert: builder normals size equals: 4*6*3.
+	self assert: builder tangents4 size equals: 0.
 	self assert: builder texcoords0 size equals: 0.
 	self assert: builder indices size equals: 6*6.
 	
@@ -59,6 +61,94 @@ WDMeshBuilderTest >> testCube2 [
 	self assert: primitive indices count equals: 6*6.
 	self assert: primitive boundingBox equals: (AABox min: (Vector3 x: -1/2 y: -1/2 z: -1/2) max: (Vector3 x: 1/2 y: 1/2 z: 1/2)).
 	self assert: mesh boundingBox equals: (AABox min: (Vector3 x: -1/2 y: -1/2 z: -1/2) max: (Vector3 x: 1/2 y: 1/2 z: 1/2)).
+]
+
+{ #category : #tests }
+WDMeshBuilderTest >> testCubePlanarProjectionTexcoords [
+	| builder mesh primitive |
+	builder := WDMeshBuilder new.
+	
+	builder
+		addCubeMinX: -1 y: -1 z: -1 maxX: 1 y: 1 z: 1;
+		generateTexcoords0WithFacePlanarTransformWithScale: (Vector2 x: 2 y: 3) offset: (Vector2 x: 4 y: 5).
+		
+	self assert: builder vertexCount equals: 4*6.
+	self assert: builder positions size equals: 4*6*3.
+	self assert: builder colors size equals: 0.
+	self assert: builder normals size equals: 4*6*3.
+	self assert: builder tangents4 size equals: 0.
+	self assert: builder texcoords0 size equals: 4*6*2.
+	self assert: builder indices size equals: 6*6.
+	
+	mesh := builder mesh.
+	self assert: mesh primitives size equals: 1.
+	primitive := mesh primitives first.
+
+	self assert: primitive vertexBinding vertexCount equals: 4*6.
+	
+	self assert: primitive topology isTriangles.
+	self assert: primitive indices count equals: 6*6.
+	self assert: primitive boundingBox equals: (AABox min: (Vector3 x: -1 y: -1 z: -1) max: (Vector3 x: 1 y: 1 z: 1)).
+	self assert: mesh boundingBox equals: (AABox min: (Vector3 x: -1 y: -1 z: -1) max: (Vector3 x: 1 y: 1 z: 1)).
+]
+
+{ #category : #tests }
+WDMeshBuilderTest >> testCubePlanarProjectionTexcoords2 [
+	| builder mesh primitive |
+	builder := WDMeshBuilder new.
+	
+	builder
+		addCubeMinX: -1 y: -1 z: -1 maxX: 1 y: 1 z: 1;
+		generateTexcoords0WithFacePlanarTransformWithScale: (Vector2 x: 2 y: 3).
+		
+	self assert: builder vertexCount equals: 4*6.
+	self assert: builder positions size equals: 4*6*3.
+	self assert: builder colors size equals: 0.
+	self assert: builder normals size equals: 4*6*3.
+	self assert: builder tangents4 size equals: 0.
+	self assert: builder texcoords0 size equals: 4*6*2.
+	self assert: builder indices size equals: 6*6.
+	
+	mesh := builder mesh.
+	self assert: mesh primitives size equals: 1.
+	primitive := mesh primitives first.
+
+	self assert: primitive vertexBinding vertexCount equals: 4*6.
+	
+	self assert: primitive topology isTriangles.
+	self assert: primitive indices count equals: 6*6.
+	self assert: primitive boundingBox equals: (AABox min: (Vector3 x: -1 y: -1 z: -1) max: (Vector3 x: 1 y: 1 z: 1)).
+	self assert: mesh boundingBox equals: (AABox min: (Vector3 x: -1 y: -1 z: -1) max: (Vector3 x: 1 y: 1 z: 1)).
+]
+
+{ #category : #tests }
+WDMeshBuilderTest >> testCubeTangentSpaceFrame [
+	| builder mesh primitive |
+	builder := WDMeshBuilder new.
+	
+	builder
+		addCubeMinX: -1 y: -1 z: -1 maxX: 1 y: 1 z: 1;
+		generateTexcoords0WithFacePlanarTransformWithScale: (Vector2 x: 2 y: 3);
+		generateTangentSpaceFrame.
+		
+	self assert: builder vertexCount equals: 4*6.
+	self assert: builder positions size equals: 4*6*3.
+	self assert: builder colors size equals: 0.
+	self assert: builder normals size equals: 4*6*3.
+	self assert: builder texcoords0 size equals: 4*6*2.
+	self assert: builder tangents4 size equals: 4*6*4.
+	self assert: builder indices size equals: 6*6.
+	
+	mesh := builder mesh.
+	self assert: mesh primitives size equals: 1.
+	primitive := mesh primitives first.
+
+	self assert: primitive vertexBinding vertexCount equals: 4*6.
+	
+	self assert: primitive topology isTriangles.
+	self assert: primitive indices count equals: 6*6.
+	self assert: primitive boundingBox equals: (AABox min: (Vector3 x: -1 y: -1 z: -1) max: (Vector3 x: 1 y: 1 z: 1)).
+	self assert: mesh boundingBox equals: (AABox min: (Vector3 x: -1 y: -1 z: -1) max: (Vector3 x: 1 y: 1 z: 1)).
 ]
 
 { #category : #tests }

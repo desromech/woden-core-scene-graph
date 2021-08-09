@@ -13,3 +13,15 @@ Class {
 WDPrimitiveTopologyTriangles >> isTriangles [
 	^ true
 ]
+
+{ #category : #'as yet unclassified' }
+WDPrimitiveTopologyTriangles >> triangleIndicesWithBase: baseIndex count: indexCount do: aBlock [
+	"Iterate through the triangle indices that corresponds to this topology."
+	| triangleCount currentIndex |
+	triangleCount := indexCount  // 3.
+	currentIndex := baseIndex.
+	1 to: triangleCount do: [ :i |
+		aBlock value: currentIndex value: currentIndex + 1 value: currentIndex + 2.
+		currentIndex := currentIndex + 3
+	]
+]
