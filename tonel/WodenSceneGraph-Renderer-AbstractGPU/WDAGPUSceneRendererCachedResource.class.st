@@ -12,7 +12,7 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
+	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Resources'
 }
 
 { #category : #accessing }

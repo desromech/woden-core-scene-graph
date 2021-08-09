@@ -86,6 +86,9 @@ WDAGPURendererShaderSignature >> buildHandle [
 		"Lighting state"
 		beginBindingBank: 100;
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_UNIFORM_BUFFER bindingPointCount: 1;
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "BRDF LUT"
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "IBL Diffuse Light Probe"
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "IBL Specular Light Probe"
 
 		"Object state"
 		beginBindingBank: 100000;

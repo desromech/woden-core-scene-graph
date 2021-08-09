@@ -86,7 +86,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindLightingState: lightingState [
 	stateTracker useShaderResources: (activeResourceDictionary at: lightingState ifAbsentPut: [ 
 		| binding |
 		binding := renderer resourceCache rendererShaderSignature allocateLightingState.
-		binding writeState: lightingState with: WDAGPULightingStateUniformBufferWriter.
+		binding
+			writeState: lightingState with: WDAGPULightingStateUniformBufferWriter;
+			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 1.
 		activeSlabResource add: binding.
 		binding
 	]) bindingHandle.

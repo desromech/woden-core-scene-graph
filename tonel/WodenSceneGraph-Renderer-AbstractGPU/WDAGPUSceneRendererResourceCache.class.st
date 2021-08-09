@@ -21,7 +21,8 @@ Class {
 		'whiteTexture2D',
 		'transparentTexture2D',
 		'neutralNormalTexture',
-		'projectionNDCAdjustMatrix'
+		'projectionNDCAdjustMatrix',
+		'brdfLutTexture'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -33,7 +34,7 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
+	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Resources'
 }
 
 { #category : #'instance creation' }
@@ -98,6 +99,11 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 		{ false . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_SINT.
 		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32A32_SINT.
 	}.
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> brdfLutTexture [
+	^ brdfLutTexture
 ]
 
 { #category : #'private shaders' }
@@ -534,7 +540,8 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	projectionNDCAdjustMatrix :=
 		device hasTopLeftNdcOrigin ~~ 0
 			ifTrue: [ Matrix4x4 projectionInvertYMatrix ]
-			ifFalse: [ Matrix4x4 identity ]
+			ifFalse: [ Matrix4x4 identity ].
+	brdfLutTexture := textureUploader createAndComputeBRDFLut.
 ]
 
 { #category : #'private shaders' }
@@ -558,6 +565,8 @@ layout(set=2, binding=0, std140) uniform LightingStateBlock
 	uint numberOfLights;
 	LightSource[8] lights;
 } LightingState;
+
+layout(set=2, binding=1) uniform texture2D BRDFLutTexture;
 '
 ]
 
