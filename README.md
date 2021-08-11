@@ -4,8 +4,8 @@
 The minimalistic scene graph and associated renderer component be loaded in a standard Pharo 9 image by doing the following in a Playground:
 ```smalltalk
 Metacello new
-   baseline: 'Sysmel';
-   repository: 'github://ronsaldo/sysmel';
+   baseline: 'WodenSceneGraph';
+   repository: 'github://ronsaldo/woden-core-scene-graph';
    load
 ```
 
