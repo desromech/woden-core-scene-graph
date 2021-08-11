@@ -13,7 +13,8 @@ Class {
 		'commandQueue',
 		'activeResourceDictionary',
 		'currentObjectVertexBinding',
-		'currentObjectPrimitiveTopology'
+		'currentObjectPrimitiveTopology',
+		'depthFunction'
 	],
 	#classVars : [
 		'PrimitiveTopologyMap'
@@ -75,6 +76,18 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindCameraState: cameraState [
 		| binding |
 		binding := renderer resourceCache rendererShaderSignature allocateCameraState.
 		binding writeState: cameraState with: WDAGPUCameraStateUniformBufferWriter.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindHDRColorBuffer: hdrColorBuffer [
+	stateTracker useShaderResources: (activeResourceDictionary at: hdrColorBuffer ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+		binding bindSampledTextureView: hdrColorBuffer getOrCreateFullView inSlot: 1.
 		activeSlabResource add: binding.
 		binding
 	]) bindingHandle.
@@ -229,23 +242,53 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: rend
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
-	| framebufferHandle shaderSignature |
-	framebufferHandle := self validFramebufferFor: framebuffer.
+	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState |
+	sampleCount := renderingSceneState sampleCount.
+	hasReverseDepth := renderingSceneState hasReverseDepth.
+	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
+	intermediateFramebuffers := self validIntermediateFramebuffersFor: framebuffer
+		sampleCount: sampleCount
+		initialDepth: initialDepth.
+	depthFunction := hasReverseDepth ifTrue: [AGPU_GREATER_EQUAL] ifFalse: [ AGPU_LESS_EQUAL ].
+	
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	stateTracker
-		beginRenderPass: renderer resourceCache viewportOutputRenderPass framebuffer: framebufferHandle bundle_content: 0;
+		beginRenderPass: (renderer resourceCache hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth) framebuffer: intermediateFramebuffers hdrFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
 		setFrontFace: AGPU_COUNTER_CLOCKWISE;
-		yourself.
+		setDepthState: true writeMask: true function: depthFunction.
 
 	renderingSceneState cameraLayers do: [ :each |
 		self recordRenderingCommandsForCameraLayer: each
 	].
 		
-	stateTracker endRenderPass
+	stateTracker endRenderPass.
+	
+	"For the exposure level."
+	mainCameraState := renderingSceneState mainCameraState ifNil: [WDCameraState new].
+	outputFramebufferHandle := self validFramebufferFor: framebuffer.
+	stateTracker
+		beginRenderPass: renderer resourceCache viewportOutputRenderPass framebuffer: outputFramebufferHandle bundle_content: 0;
+		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setShaderSignature: shaderSignature handle;
+		useShaderResources: shaderSignature samplersBinding;
+		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+		setFragmentStage: (renderer resourceCache toneMappingOperatorShaderFor: mainCameraState toneMappingOperator) entryPoint: 'main'.
+
+	self
+		bindCameraState: mainCameraState;
+		bindHDRColorBuffer: (intermediateFramebuffers hdrColorBufferTexture).
+
+	stateTracker
+		setCullMode: AGPU_CULL_MODE_NONE;
+		setDepthState: false writeMask: false function: AGPU_ALWAYS;
+		setPrimitiveType: AGPU_TRIANGLES;
+		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+		endRenderPass
 ]
 
 { #category : #rendering }
@@ -292,6 +335,26 @@ WDAGPUSceneRendererActiveFrameRenderer >> validFramebufferFor: aWDFramebuffer [
 	^ activeResourceDictionary at: aWDFramebuffer ifAbsentPut: [
 		| handle |
 		handle := renderer resourceCache validFramebufferFor: aWDFramebuffer.
+		activeResources add: handle.
+		handle
+	]
+]
+
+{ #category : #handles }
+WDAGPUSceneRendererActiveFrameRenderer >> validIntermediateFramebuffersFor: aWDFramebuffer [
+	^ activeResourceDictionary at: {#intermediateFramebuffer . aWDFramebuffer} ifAbsentPut: [
+		| handle |
+		handle := renderer resourceCache validIntermediateFramebuffersFor: aWDFramebuffer.
+		activeResources add: handle.
+		handle
+	]
+]
+
+{ #category : #handles }
+WDAGPUSceneRendererActiveFrameRenderer >> validIntermediateFramebuffersFor: aWDFramebuffer sampleCount: sampleCount initialDepth: initialDepth [
+	^ activeResourceDictionary at: {#intermediateFramebuffer . aWDFramebuffer} ifAbsentPut: [
+		| handle |
+		handle := renderer resourceCache validIntermediateFramebuffersFor: aWDFramebuffer sampleCount: sampleCount initialDepth: initialDepth.
 		activeResources add: handle.
 		handle
 	]

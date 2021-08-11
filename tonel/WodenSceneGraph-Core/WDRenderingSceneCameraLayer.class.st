@@ -71,6 +71,11 @@ WDRenderingSceneCameraLayer >> globalLightingState: anObject [
 	globalLightingState := anObject
 ]
 
+{ #category : #testing }
+WDRenderingSceneCameraLayer >> hasReverseDepth [
+	^ cameraState hasReverseDepth
+]
+
 { #category : #initialization }
 WDRenderingSceneCameraLayer >> initialize [
 	super initialize.
@@ -109,4 +114,9 @@ WDRenderingSceneCameraLayer >> lights [
 { #category : #accessing }
 WDRenderingSceneCameraLayer >> renderingObjects [
 	^ renderingObjects
+]
+
+{ #category : #testing }
+WDRenderingSceneCameraLayer >> sampleCount [
+	^ 1
 ]

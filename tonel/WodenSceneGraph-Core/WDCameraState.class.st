@@ -10,7 +10,9 @@ Class {
 		'nearDistance',
 		'farDistance',
 		'currentTime',
-		'exposure'
+		'exposure',
+		'hasReverseDepth',
+		'toneMappingOperator'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -79,6 +81,18 @@ WDCameraState >> frustum: anObject [
 	frustum := anObject
 ]
 
+{ #category : #accessing }
+WDCameraState >> hasReverseDepth [
+
+	^ hasReverseDepth
+]
+
+{ #category : #accessing }
+WDCameraState >> hasReverseDepth: anObject [
+
+	hasReverseDepth := anObject
+]
+
 { #category : #initialization }
 WDCameraState >> initialize [
 	super initialize.
@@ -86,6 +100,8 @@ WDCameraState >> initialize [
 	frustum := Frustum new.
 	currentTime := 0.0.
 	exposure := 1.0.
+	hasReverseDepth := true.
+	self toneMappingOperator: WDLinearToneMappingOperator.
 ]
 
 { #category : #accessing }
@@ -110,4 +126,15 @@ WDCameraState >> projectionMatrix [
 WDCameraState >> projectionMatrix: anObject [
 
 	projectionMatrix := anObject
+]
+
+{ #category : #accessing }
+WDCameraState >> toneMappingOperator [
+
+	^ toneMappingOperator
+]
+
+{ #category : #accessing }
+WDCameraState >> toneMappingOperator: aToneMapOperator [
+	toneMappingOperator := aToneMapOperator asToneMappingOperator
 ]

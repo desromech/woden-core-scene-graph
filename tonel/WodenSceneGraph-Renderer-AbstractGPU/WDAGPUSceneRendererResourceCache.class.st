@@ -22,7 +22,16 @@ Class {
 		'transparentTexture2D',
 		'neutralNormalTexture',
 		'projectionNDCAdjustMatrix',
-		'brdfLutTexture'
+		'brdfLutTexture',
+		'intermediateFramebuffers',
+		'renderPasses',
+		'depthFormat',
+		'screenQuadVertexShader',
+		'linearToneMappingOperator',
+		'toneMapOperatorShaderDictionary',
+		'reinhardToneMappingOperator',
+		'exponentialToneMappingOperator',
+		'filmicToneMappingOperator'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -189,8 +198,59 @@ WDAGPUSceneRendererResourceCache >> defaultMaterial [
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache >> depthFormat [
+	^ depthFormat
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> device [
 	^ device
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> exponentialToneMappingOperatorShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self toneMappingOperatorIOSource , self cameraStateBlockSource , '
+#line 6
+
+
+void main()
+{
+	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
+	vec3 ldrColor = 1.0 - exp(-hdrColor);
+	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> filmicToneMappingOperatorShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self toneMappingOperatorIOSource , self cameraStateBlockSource , '
+#line 6
+
+vec3 filmicCurve(vec3 x)
+{
+	// Filmic tone mapping curve from: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
+	float a = 2.51;
+	float b = 0.03;
+	float c = 2.43;
+	float d = 0.59;
+	float e = 0.14;
+	return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
+}
+
+void main()
+{
+	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
+	vec3 ldrColor = filmicCurve(hdrColor);
+	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
+}
+'
 ]
 
 { #category : #'private shaders' }
@@ -519,15 +579,53 @@ WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocati
 ]
 
 { #category : #initialization }
+WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth [
+	^ renderPasses at: {#hdrRenderPass . sampleCount . initialDepth} ifAbsentPut: [
+		| colorAttachment depthStencilAttachment |
+		[
+			| renderpassDescription |
+			colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
+			colorAttachment
+				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+				begin_action: AGPU_ATTACHMENT_CLEAR;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				sample_quality: 0.
+			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
+				format: depthFormat;
+				sample_count: sampleCount;
+				begin_action: AGPU_ATTACHMENT_CLEAR;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				clear_value: (AGPUDepthStencilValue new
+					depth: initialDepth;
+					yourself);
+				yourself.
+			renderpassDescription := AGPURenderpassDescription new.
+			renderpassDescription
+				color_attachment_count: 1;
+				color_attachments: colorAttachment;
+				depth_stencil_attachment: depthStencilAttachment.
+			device createRenderPass: renderpassDescription
+		] ensure: [
+			colorAttachment ifNotNil: [colorAttachment free].
+			depthStencilAttachment ifNotNil: [colorAttachment free].
+		]
+	].
+
+]
+
+{ #category : #initialization }
 WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUploader: aTextureUploader [
 	device := aDevice.
 	textureUploader := aTextureUploader.
 	textures := WeakKeyDictionary new.
 	framebuffers := WeakKeyDictionary new.
+	intermediateFramebuffers := WeakKeyDictionary new.
 	buffers := WeakKeyDictionary new.
 	vertexBindings := WeakKeyDictionary new.
 	rendererShaderSignature := WDAGPURendererShaderSignature for: device.
 	vertexLayouts := Dictionary new.
+	renderPasses := Dictionary new.
 	
 	whiteTexture2D := self createTexture2DWithSingleColor: #[255 255 255 255].
 	transparentTexture2D := self createTexture2DWithSingleColor: #[0 0 0 0].
@@ -536,12 +634,27 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	genericSurfaceMaterialVertexShaders := Dictionary new.
 	forwardMetallicRoughnessFragmentShader := self compileShader: self forwardMetallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	forwardUnlitFragmentShader := self compileShader: self forwardUnlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	screenQuadVertexShader := textureUploader utilityResourceCache screenQuadVertexShader.
 	defaultMaterial := WDMetallicRoughnessMaterial default.
 	projectionNDCAdjustMatrix :=
 		device hasTopLeftNdcOrigin ~~ 0
 			ifTrue: [ Matrix4x4 projectionInvertYMatrix ]
 			ifFalse: [ Matrix4x4 identity ].
 	brdfLutTexture := textureUploader createAndComputeBRDFLut.
+	depthFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT.
+
+	linearToneMappingOperator := self compileShader: self linearToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
+	reinhardToneMappingOperator := self compileShader: self reinhardToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
+	exponentialToneMappingOperator := self compileShader: self exponentialToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
+	filmicToneMappingOperator := self compileShader: self filmicToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
+	
+	toneMapOperatorShaderDictionary := Dictionary newFromPairs: {
+		WDLinearToneMappingOperator asToneMappingOperator . linearToneMappingOperator.
+		WDReinhardToneMappingOperator asToneMappingOperator . reinhardToneMappingOperator.
+		WDExponentialToneMappingOperator asToneMappingOperator . exponentialToneMappingOperator.
+		WDFilmicToneMappingOperator asToneMappingOperator . filmicToneMappingOperator.
+	}.
+
 ]
 
 { #category : #'private shaders' }
@@ -567,6 +680,27 @@ layout(set=2, binding=0, std140) uniform LightingStateBlock
 } LightingState;
 
 layout(set=2, binding=1) uniform texture2D BRDFLutTexture;
+'
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> linearToneMappingOperator [
+	^ linearToneMappingOperator
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> linearToneMappingOperatorShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self toneMappingOperatorIOSource , self cameraStateBlockSource , '
+#line 6
+
+
+void main()
+{
+	vec4 hdrColor = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	FragmentOutputColor = vec4(hdrColor.rgb * CameraState.exposure, hdrColor.a);
+}
 '
 ]
 
@@ -616,6 +750,24 @@ WDAGPUSceneRendererResourceCache >> projectionNDCAdjustMatrix [
 	^ projectionNDCAdjustMatrix
 ]
 
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> reinhardToneMappingOperatorShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self toneMappingOperatorIOSource , self cameraStateBlockSource , '
+#line 6
+
+
+void main()
+{
+	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
+	vec3 ldrColor = hdrColor / (hdrColor + 1.0);
+	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
+}
+'
+]
+
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> rendererShaderSignature [
 	^ rendererShaderSignature
@@ -630,8 +782,29 @@ layout(set=0, binding=0) uniform sampler TextureSampler	;
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache >> screenQuadVertexShader [
+	^ screenQuadVertexShader
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> textureUploader [
 	^ textureUploader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> toneMappingOperatorIOSource [
+	^ '
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputColor;
+
+layout(set=4, binding=1) uniform texture2D HDRColorBuffer;
+'
+
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> toneMappingOperatorShaderFor: aToneMapOperator [
+	^ toneMapOperatorShaderDictionary at: aToneMapOperator ifAbsent:[ linearToneMappingOperator ]
 ]
 
 { #category : #accessing }
@@ -765,7 +938,7 @@ WDAGPUSceneRendererResourceCache >> validDepthStencilAttachmentTextureViewFor: a
 { #category : #handles }
 WDAGPUSceneRendererResourceCache >> validFramebufferFor: aWDFramebuffer [
 	| cachedFramebuffer colorBufferViews depthStencilView |
-	cachedFramebuffer := textures at: aWDFramebuffer ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
+	cachedFramebuffer := framebuffers at: aWDFramebuffer ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
 	cachedFramebuffer modificationCount == aWDFramebuffer modificationCount ifTrue: [ ^ cachedFramebuffer handle ].
 	
 	colorBufferViews := aWDFramebuffer colorAttachments collect: [ :each |
@@ -778,6 +951,20 @@ WDAGPUSceneRendererResourceCache >> validFramebufferFor: aWDFramebuffer [
 	cachedFramebuffer handle: (device createFrameBuffer: aWDFramebuffer width height: aWDFramebuffer height colorCount: colorBufferViews size colorViews: (AGPU packListOfReferences: colorBufferViews) depthStencilView: depthStencilView).
 
 	^ cachedFramebuffer handle
+]
+
+{ #category : #handles }
+WDAGPUSceneRendererResourceCache >> validIntermediateFramebuffersFor: aWDFramebuffer sampleCount: sampleCount initialDepth: initialDepth [
+	| result |
+	result := intermediateFramebuffers at: aWDFramebuffer ifAbsent: [ nil ].
+	result ifNotNil: [ 
+		(result extent = aWDFramebuffer extent and: [ result sampleCount = sampleCount and: [ result initialDepth = initialDepth ] ]) ifTrue: [ ^ result ]
+	].
+
+	result := WDAGPUIntermediateFramebuffersForExtent for: device resourceCache: self withExtent: aWDFramebuffer extent sampleCount: sampleCount initialDepth: initialDepth.
+	intermediateFramebuffers at: aWDFramebuffer put: result.
+	
+	^ result
 ]
 
 { #category : #handles }
@@ -904,7 +1091,7 @@ WDAGPUSceneRendererResourceCache >> viewportOutputRenderPass [
 		colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
 		colorAttachment
 			format: AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB;
-			begin_action: AGPU_ATTACHMENT_CLEAR;
+			begin_action: AGPU_ATTACHMENT_DISCARD;
 			end_action: AGPU_ATTACHMENT_KEEP;
 			sample_count: 1;
 			sample_quality: 0.

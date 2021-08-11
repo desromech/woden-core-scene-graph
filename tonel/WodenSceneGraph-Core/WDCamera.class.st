@@ -12,7 +12,8 @@ Class {
 		'isPerspective',
 		'hasReverseDepth',
 		'currentTime',
-		'exposure'
+		'exposure',
+		'toneMappingOperator'
 	],
 	#category : #'WodenSceneGraph-Core-Camera'
 }
@@ -25,6 +26,8 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		projectionMatrix: (self projectionMatrixWithAspect: aspectRatio);
 		currentTime: currentTime;
 		exposure: exposure;
+		toneMappingOperator: toneMappingOperator;
+		hasReverseDepth: hasReverseDepth;
 		yourself
 ]
 
@@ -123,6 +126,7 @@ WDCamera >> initialize [
 	hasReverseDepth := true.
 	currentTime := 0.0.
 	exposure := 1.0.
+	self toneMappingOperator: WDLinearToneMappingOperator.
 ]
 
 { #category : #accessing }
@@ -158,4 +162,15 @@ WDCamera >> projectionMatrixWithAspect: aspectRatio [
 	] ifFalse: [
 		self halt
 	]
+]
+
+{ #category : #accessing }
+WDCamera >> toneMappingOperator [
+
+	^ toneMappingOperator
+]
+
+{ #category : #accessing }
+WDCamera >> toneMappingOperator: aToneMappingOperator [
+	toneMappingOperator := aToneMappingOperator asToneMappingOperator
 ]
