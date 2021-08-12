@@ -47,6 +47,11 @@ WDAGPUSceneRenderer >> initializeWithResourceCache: aResourceCache [
 	stateTracker := stateTrackerCache createStateTracker: AGPU_COMMAND_LIST_TYPE_DIRECT command_queue: commandQueue.
 ]
 
+{ #category : #testing }
+WDAGPUSceneRenderer >> isAGPUSceneRenderer [
+	^ true
+]
+
 { #category : #rendering }
 WDAGPUSceneRenderer >> readbackFramebufferAttachmentsOf: framebuffer [
 	framebuffer colorAttachments do: [ :each |

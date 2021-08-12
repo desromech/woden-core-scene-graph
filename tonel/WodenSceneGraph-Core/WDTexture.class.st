@@ -56,6 +56,23 @@ WDTexture class >> forReadedColorBufferWithExtent: anExtent [
 		yourself
 ]
 
+{ #category : #'as yet unclassified' }
+WDTexture class >> forSampledColorBufferWithExtent: anExtent [
+	^ self new
+		type: WDTextureType2D;
+		dataKind: WDTextureDataKindColor;
+		format: WDTextureFormatB8G8R8A8UNormSRGB;
+		width: anExtent x;
+		height: anExtent y;
+		depth: 1;
+		layers: 1;
+		usageMode: WDTextureUsageModeSampledColorAttachment;
+		miplevels: 1;
+		sampleCount: 1;
+		changed;
+		yourself
+]
+
 { #category : #accessing }
 WDTexture >> data [
 

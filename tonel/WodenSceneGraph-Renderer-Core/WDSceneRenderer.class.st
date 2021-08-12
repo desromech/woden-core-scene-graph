@@ -44,6 +44,16 @@ WDSceneRenderer class >> reset [
 	Current := nil
 ]
 
+{ #category : #testing }
+WDSceneRenderer >> isAGPUSceneRenderer [
+	^ false
+]
+
+{ #category : #testing }
+WDSceneRenderer >> isNullSceneRenderer [
+	^ false
+]
+
 { #category : #rendering }
 WDSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
 	self subclassResponsibility
