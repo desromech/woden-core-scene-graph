@@ -8,7 +8,7 @@ Class {
 		'Current',
 		'CurrentSession'
 	],
-	#category : #'WodenSceneGraph-Renderer-Core-WodenSceneGraph-Renderer-Core'
+	#category : #'WodenSceneGraph-Renderer-Core'
 }
 
 { #category : #accessing }
