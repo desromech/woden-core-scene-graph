@@ -590,6 +590,7 @@ WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount in
 				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
 				sample_quality: 0.
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
 				format: depthFormat;
@@ -1093,6 +1094,7 @@ WDAGPUSceneRendererResourceCache >> viewportOutputRenderPass [
 			format: AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB;
 			begin_action: AGPU_ATTACHMENT_DISCARD;
 			end_action: AGPU_ATTACHMENT_KEEP;
+			clear_value: AGPUColor4f new;
 			sample_count: 1;
 			sample_quality: 0.
 		renderpassDescription := AGPURenderpassDescription new.
