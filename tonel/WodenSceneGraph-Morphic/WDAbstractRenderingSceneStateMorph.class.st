@@ -98,5 +98,5 @@ WDAbstractRenderingSceneStateMorph >> uiScaleFactor [
 { #category : #'scale factor' }
 WDAbstractRenderingSceneStateMorph >> worldRendererScaleFactor [
 	^ self world ifNil: [ 1 ]
-		ifNotNil: [ :world | world worldState worldRenderer screenScaleFactor]
+		ifNotNil: [ :world | world worldState worldRenderer scaleFactor]
 ]
