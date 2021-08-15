@@ -114,14 +114,32 @@ WDMeshBuilder >> addCubeWithWidth: width height: height depth: depth [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addN: normal [
+	normals add: normal x; add: normal y; add: normal z.
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addNx: x y: y z: z [
 	normals add: x; add: y; add: z.
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addP: position [
+	positions add: position x; add: position y; add: position z.
+	vertexCount := vertexCount + 1.
 ]
 
 { #category : #adding }
 WDMeshBuilder >> addPx: x y: y z: z [
 	positions add: x; add: y; add: z.
 	vertexCount := vertexCount + 1.
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addQuadI0: i0 i1: i1 i2: i2 i3: i3 [ 
+	indices
+		add: i0 + baseVertex ; add: i1 + baseVertex; add: i2 + baseVertex;
+		add: i2 + baseVertex ; add: i3 + baseVertex; add: i0 + baseVertex
 ]
 
 { #category : #adding }
@@ -135,8 +153,59 @@ WDMeshBuilder >> addT1u: u v: v [
 ]
 
 { #category : #adding }
-WDMeshBuilder >> addTriangleI0: i0 i1: i1 i2: i3 [
-	indices add: i0 + baseVertex ; add: i1 + baseVertex; add: i3 + baseVertex
+WDMeshBuilder >> addTriangleI0: i0 i1: i1 i2: i2 [
+	indices add: i0 + baseVertex ; add: i1 + baseVertex; add: i2 + baseVertex
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addUVEllipsoidWithDiameters: diameters segments: segments slices: slices [
+	self addUVEllipsoidWithRadiuses: diameters / 2 segments: segments slices: slices
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addUVEllipsoidWithRadiuses: radiuses segments: segments slices: slices [
+	self beginTriangles.
+
+	"Add the vertices"
+	(0 to: segments - 1) do: [ :segment |
+		| theta |
+		theta := (Float pi * segment) / (segments - 1) - Float halfPi.
+		
+		(0 to: slices - 1) do: [ :slice |
+			| phi x y z position normal |
+			phi := (Float twoPi  * slice) / (slices - 1) - Float pi.
+			x := (phi cos) * (theta cos).
+			y := theta sin.
+			z := (phi sin) * (theta cos).
+			position := Vector3 x: x * radiuses x y: y * radiuses y z: z * radiuses z.
+			normal := position normalized.
+			self addP: position; addN: normal.
+		].
+	].
+
+	"Add the quads"
+	(0 to: segments - 2) do: [ :segment |
+		| firstRow secondRow |
+		firstRow := segment*slices.
+		secondRow := (segment+1)*slices.
+		(0 to: slices - 1) do: [ :slice |
+			| firstSlice secondSlice |
+			firstSlice := slice.
+			secondSlice := (slice + 1) % slices.
+			self addQuadI0: firstRow + secondSlice i1: firstRow+firstSlice i2: secondRow+firstSlice i3: secondRow+secondSlice
+		]
+	].
+
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addUVSphereWithDiameter: diameter segments: segments slices: slices [
+	self addUVEllipsoidWithRadiuses: (diameter / 2) asVector3 segments: segments slices: slices
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addUVSphereWithRadius: radius segments: segments slices: slices [
+	self addUVEllipsoidWithRadiuses: radius asVector3 segments: segments slices: slices
 ]
 
 { #category : #builder }
@@ -219,7 +288,7 @@ WDMeshBuilder >> currentMaterial: aMaterial [
 	currentMaterial := aMaterial
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDMeshBuilder >> decodeNormals [
 	| sourceIndex |
 	sourceIndex := -2.
@@ -229,7 +298,7 @@ WDMeshBuilder >> decodeNormals [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDMeshBuilder >> decodePositions [
 	| sourceIndex |
 	sourceIndex := -2.
@@ -239,7 +308,7 @@ WDMeshBuilder >> decodePositions [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDMeshBuilder >> decodeTexcoords0 [
 	| sourceIndex |
 	sourceIndex := -1.
@@ -465,6 +534,46 @@ WDMeshBuilder >> generateTexcoords0WithFacePlanarTransformWithScale: scale [
 { #category : #'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithFacePlanarTransformWithScale: scale offset: offset [
 	^ self generateTexcoords0WithFacePlanarTransform: (Matrix3x3 texScale: scale offset: offset)
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithSphericalProjection [
+	^ self generateTexcoords0WithSphericalProjectionWithCenter: Vector3 zeros
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center [
+	self generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: Vector3 ones
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: radiuses [
+	| sourceIndex |
+	self assert: self hasValidPositions.
+	texcoords0 := OrderedCollection new: vertexCount * 2.
+	sourceIndex := 1.
+	1 to: vertexCount do: [ :i |
+		| x y l z u v |
+		"Fetch the position and normal"
+		x := ((positions at: sourceIndex) - center x) / radiuses x.
+		y := ((positions at: sourceIndex + 1) - center y) / radiuses y.
+		z := ((positions at: sourceIndex + 2) - center z) / radiuses z.
+		l := ((x*x) + (y*y) + (z*z)) sqrt.
+		l > 0.0 ifTrue: [ 
+			x := x/l.
+			y := y/l.
+			z := z/l.
+		].
+		
+		"Compute the new texcoord"
+		u := z arcTan: x.
+		v := y arcSin.
+
+		texcoords0 add: u / Float pi * 0.5 + 0.5; add: v / Float halfPi * -0.5 + 0.5.
+
+		sourceIndex := sourceIndex + 3.
+	].
+
 ]
 
 { #category : #testing }

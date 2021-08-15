@@ -110,6 +110,96 @@ WDSceneExamples class >> exampleTexturedCube3 [
 		inspect
 ]
 
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleTexturedUVSphere [
+	"
+	self exampleCube
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+			addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
+			generateTexcoords0WithSphericalProjection;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		inspect
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleTexturedUVSphere2 [
+	"
+	self exampleCube
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+			addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
+			generateTexcoords0WithSphericalProjection;
+			generateTangentSpaceFrame;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		inspect
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleTexturedUVSphere3 [
+	"
+	self exampleCube
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDUnlitMaterial new
+				colorTexture: self checkboardTexture;
+				yourself);
+			addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
+			generateTexcoords0WithSphericalProjection;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		inspect
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleUVSphere [
+	"
+	self exampleCube
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		inspect
+]
+
 { #category : #'see class side' }
 WDSceneExamples >> seeClassSide [
 ]
