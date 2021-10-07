@@ -253,6 +253,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	stateTracker
+		resetGraphicsPipeline;
 		beginRenderPass: (renderer resourceCache hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth) framebuffer: intermediateFramebuffers hdrFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
@@ -271,6 +272,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	mainCameraState := renderingSceneState mainCameraState ifNil: [WDCameraState new].
 	outputFramebufferHandle := self validFramebufferFor: framebuffer.
 	stateTracker
+		resetGraphicsPipeline;
 		beginRenderPass: renderer resourceCache viewportOutputRenderPass framebuffer: outputFramebufferHandle bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;

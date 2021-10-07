@@ -12,6 +12,18 @@ Class {
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
 
+{ #category : #'as yet unclassified' }
+WDGlobalLightingState class >> default [
+	^ self new
+		ambientLighting: (Vector3 withAll: 0.2);
+		yourself
+]
+
+{ #category : #'as yet unclassified' }
+WDGlobalLightingState class >> defaultForInspector [
+	^ self default
+]
+
 { #category : #accessing }
 WDGlobalLightingState >> ambientLighting [
 

@@ -45,6 +45,14 @@ WDSceneExamples class >> exampleCube [
 ]
 
 { #category : #'basic shapes' }
+WDSceneExamples class >> exampleEmpty [
+	"
+	self exampleEmpty
+	"
+	WDScene new inspect
+]
+
+{ #category : #'basic shapes' }
 WDSceneExamples class >> exampleTexturedCube [
 	"
 	self exampleTexturedCube

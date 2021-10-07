@@ -43,6 +43,27 @@ WDSceneTreeElement >> addedTo: newParent [
 	parent := newParent.
 ]
 
+{ #category : #converting }
+WDSceneTreeElement >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
+	| result |
+	result := WDRenderingSceneCameraLayer new
+		globalLightingState: WDGlobalLightingState defaultForInspector;
+		cameraState: baseCameraState;
+		yourself.
+	self addRecursivelyIntoRenderingSceneCameraLayer: result parentGlobalTransform: ReversibleAffineTransform3D identity.
+	^ result
+]
+
+{ #category : #converting }
+WDSceneTreeElement >> asRenderingSceneWithCameraState: baseCameraState [
+	^ WDRenderingScene new
+		mainCameraState: baseCameraState;
+		cameraLayers: { 
+			self asRenderingSceneCameraLayerWithCameraState: baseCameraState
+		};
+		yourself.
+]
+
 { #category : #accessing }
 WDSceneTreeElement >> children [
 

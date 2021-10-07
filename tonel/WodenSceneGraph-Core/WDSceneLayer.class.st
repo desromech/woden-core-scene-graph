@@ -42,6 +42,18 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	^ result
 ]
 
+{ #category : #converting }
+WDSceneLayer >> asRenderingSceneWithCameraState: baseCameraState [
+	^ WDRenderingScene new
+		mainCameraState: baseCameraState;
+		cameraLayers: { 
+			self asRenderingSceneCameraLayerWithCameraState: baseCameraState
+		};
+		yourself.
+		
+		 
+]
+
 { #category : #accessing }
 WDSceneLayer >> globalLightingState [
 
@@ -57,9 +69,7 @@ WDSceneLayer >> globalLightingState: aWDGlobalLightingState [
 { #category : #initialization }
 WDSceneLayer >> initialize [
 	super initialize.
-	globalLightingState := WDGlobalLightingState new
-		ambientLighting: (Vector3 withAll: 0.2);
-		yourself.
+	globalLightingState := WDGlobalLightingState default
 ]
 
 { #category : #initialization }
@@ -78,7 +88,7 @@ WDSceneLayer >> scene [
 	^ parent
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDSceneLayer >> sceneLayer [
 	^ self
 ]
