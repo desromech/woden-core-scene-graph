@@ -1,6 +1,16 @@
 Extension { #name : #WDSceneElement }
 
 { #category : #'*WodenSceneGraph-Spec' }
+WDSceneElement >> inspectionSceneTree [
+	<inspectorPresentationOrder: 1 title: 'Scene Tree'>
+	
+	^ SpTreePresenter  new 
+		roots: {self};
+		children: [ :aNode | aNode children ];
+		yourself
+]
+
+{ #category : #'*WodenSceneGraph-Spec' }
 WDSceneElement >> inspectionSceneView [
 	<inspectorPresentationOrder: 0 title: 'Scene View'>
 	
