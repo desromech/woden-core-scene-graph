@@ -40,6 +40,11 @@ WDSpScenePresenter >> scene: anObject [
 	scene := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+WDSpScenePresenter >> sceneChanged [
+	self scene: scene
+]
+
 { #category : #enumerating }
 WDSpScenePresenter >> whenCameraChangedDo: aBlock [
 	self property: #camera whenChangedDo: aBlock

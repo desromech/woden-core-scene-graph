@@ -33,6 +33,13 @@ WDMeshPrimitive >> boundingBox: anObject [
 	boundingBox := anObject
 ]
 
+{ #category : #copying }
+WDMeshPrimitive >> copyWithMaterial: aMaterial [
+	^ self copy
+		material: aMaterial;
+		yourself
+]
+
 { #category : #'double dispatch' }
 WDMeshPrimitive >> emitRenderingCommandsWithRenderer: renderer [
 	renderer emitRenderingCommandsForMeshPrimitive: self

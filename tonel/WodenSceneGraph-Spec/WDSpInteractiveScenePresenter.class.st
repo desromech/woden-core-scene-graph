@@ -1,3 +1,6 @@
+"
+I am a Spec2 presenter for a Woden Scene with basic minimalistic interactions.
+"
 Class {
 	#name : #WDSpInteractiveScenePresenter,
 	#superclass : #WDSpScenePresenter,

@@ -4,9 +4,8 @@ Extension { #name : #WDSurfaceMaterial }
 WDSurfaceMaterial >> inspectionMaterialPreview [
 	<inspectorPresentationOrder: 0 title: 'Material Preview'>
 	
-	^ WDSpInteractiveScenePresenter new 
-		scene: self makeMaterialInteractivePreviewScene;
-		camera: (WDCamera new asSceneNode position: (Vector3 x: 0 y: 0 z: 3));
+	^ WDSpSurfaceMaterialPresenter new 
+		material: self;
 		yourself
 ]
 

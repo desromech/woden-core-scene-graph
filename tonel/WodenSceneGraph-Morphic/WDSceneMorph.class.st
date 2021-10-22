@@ -19,7 +19,7 @@ WDSceneMorph >> camera [
 
 { #category : #accessing }
 WDSceneMorph >> camera: aCameraNode [
-	camera := aCameraNode asSceneNode
+	camera := aCameraNode ifNotNil: [aCameraNode asSceneNode]
 ]
 
 { #category : #initialization }

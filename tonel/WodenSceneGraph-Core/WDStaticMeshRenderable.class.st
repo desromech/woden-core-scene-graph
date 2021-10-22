@@ -38,6 +38,13 @@ WDStaticMeshRenderable >> computeBoundingBoxFromPrimitives [
 	].
 ]
 
+{ #category : #copying }
+WDStaticMeshRenderable >> copyWithMaterial: aMaterial [
+	^ self copy
+		primitives: (primitives collect: [:each | each copyWithMaterial: aMaterial ]);
+		yourself
+]
+
 { #category : #initialization }
 WDStaticMeshRenderable >> initialize [
 	super initialize.

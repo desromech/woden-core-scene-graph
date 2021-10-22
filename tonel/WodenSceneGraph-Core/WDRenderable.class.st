@@ -24,6 +24,11 @@ WDRenderable >> asSceneNode [
 		yourself
 ]
 
+{ #category : #copying }
+WDRenderable >> copyWithMaterial: aMaterial [
+	self subclassResponsibility
+]
+
 { #category : #'double dispatch' }
 WDRenderable >> emitRenderingCommandsWithRenderer: renderer [
 ]
