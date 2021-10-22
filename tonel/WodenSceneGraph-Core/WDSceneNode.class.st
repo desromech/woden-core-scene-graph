@@ -80,7 +80,7 @@ WDSceneNode >> initialize [
 	renderables := #().
 	lights := #().
 	cameras := #().
-	transform := DecomposedTransform3D new.
+	transform := TRSTransform3D new.
 ]
 
 { #category : #testing }
@@ -155,7 +155,7 @@ WDSceneNode >> transform [
 
 { #category : #accessing }
 WDSceneNode >> transform: aTransform [
-	transform := aTransform asDecomposedTransform3D
+	transform := aTransform asTRSTransform3D
 ]
 
 { #category : #transforming }
