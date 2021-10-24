@@ -1,6 +1,6 @@
 Class {
 	#name : #WDIGLTF2SubMesh,
-	#superclass : #WDSSceneAssetModelLoader,
+	#superclass : #Object,
 	#instVars : [
 		'vertexData',
 		'indexBufferAccessor',

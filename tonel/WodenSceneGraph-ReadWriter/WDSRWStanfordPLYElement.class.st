@@ -2,7 +2,7 @@
 I represent an element int PLY 3D model format.
 "
 Class {
-	#name : #WDIStanfordPLYElement,
+	#name : #WDSRWStanfordPLYElement,
 	#superclass : #Object,
 	#instVars : [
 		'name',
@@ -15,7 +15,7 @@ Class {
 }
 
 { #category : #adding }
-WDIStanfordPLYElement >> addProperty: aProperty [
+WDSRWStanfordPLYElement >> addProperty: aProperty [
 	propertyDictionary at: aProperty name put: aProperty.
 	properties add: aProperty.
 	aProperty index: properties size.
@@ -23,58 +23,58 @@ WDIStanfordPLYElement >> addProperty: aProperty [
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> count [
+WDSRWStanfordPLYElement >> count [
 	^ count
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> count: anObject [
+WDSRWStanfordPLYElement >> count: anObject [
 	count := anObject
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> indexOfProperty: propertyName [
+WDSRWStanfordPLYElement >> indexOfProperty: propertyName [
 	^ (propertyDictionary at: propertyName) index
 ]
 
 { #category : #initialization }
-WDIStanfordPLYElement >> initialize [
+WDSRWStanfordPLYElement >> initialize [
 	super initialize.
 	properties := OrderedCollection new.
 	propertyDictionary := Dictionary new.
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> name [
+WDSRWStanfordPLYElement >> name [
 	^ name
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> name: anObject [
+WDSRWStanfordPLYElement >> name: anObject [
 	name := anObject
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> properties [
+WDSRWStanfordPLYElement >> properties [
 	^ properties
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> properties: anObject [
+WDSRWStanfordPLYElement >> properties: anObject [
 	properties := anObject
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> propertyDictionary [
+WDSRWStanfordPLYElement >> propertyDictionary [
 	^ propertyDictionary
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> values [
+WDSRWStanfordPLYElement >> values [
 	^ values
 ]
 
 { #category : #accessing }
-WDIStanfordPLYElement >> values: anObject [
+WDSRWStanfordPLYElement >> values: anObject [
 	values := anObject
 ]

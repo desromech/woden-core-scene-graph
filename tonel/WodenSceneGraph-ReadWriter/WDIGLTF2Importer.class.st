@@ -1,6 +1,6 @@
 Class {
 	#name : #WDIGLTF2Importer,
-	#superclass : #WDSSceneAssetModelLoader,
+	#superclass : #Object,
 	#instVars : [
 		'loadingDirectory',
 		'buffers',

@@ -2,8 +2,8 @@
 I am a list property. I am used for holding the vertex indices of the faces.
 "
 Class {
-	#name : #WDIStanfordPLYPropertyList,
-	#superclass : #WDIStanfordPLYProperty,
+	#name : #WDSRWStanfordPLYPropertyList,
+	#superclass : #WDSRWStanfordPLYProperty,
 	#instVars : [
 		'countType',
 		'elementType'
@@ -12,32 +12,32 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-WDIStanfordPLYPropertyList class >> typeName [
+WDSRWStanfordPLYPropertyList class >> typeName [
 	^ #list
 ]
 
 { #category : #accessing }
-WDIStanfordPLYPropertyList >> countType [
+WDSRWStanfordPLYPropertyList >> countType [
 	^ countType
 ]
 
 { #category : #accessing }
-WDIStanfordPLYPropertyList >> countType: anObject [
+WDSRWStanfordPLYPropertyList >> countType: anObject [
 	countType := anObject
 ]
 
 { #category : #accessing }
-WDIStanfordPLYPropertyList >> elementType [
+WDSRWStanfordPLYPropertyList >> elementType [
 	^ elementType
 ]
 
 { #category : #accessing }
-WDIStanfordPLYPropertyList >> elementType: anObject [
+WDSRWStanfordPLYPropertyList >> elementType: anObject [
 	elementType := anObject
 ]
 
 { #category : #'instance creation' }
-WDIStanfordPLYPropertyList >> readFrom: inputStream [
+WDSRWStanfordPLYPropertyList >> readFrom: inputStream [
 	| count |
 	count := countType readFrom: inputStream.
 	^ (1 to: count) collect: [ :i | elementType readFrom: inputStream ]

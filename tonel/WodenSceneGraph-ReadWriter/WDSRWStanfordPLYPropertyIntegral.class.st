@@ -2,12 +2,12 @@
 I am an integral property.
 "
 Class {
-	#name : #WDIStanfordPLYPropertyIntegral,
-	#superclass : #WDIStanfordPLYProperty,
+	#name : #WDSRWStanfordPLYPropertyIntegral,
+	#superclass : #WDSRWStanfordPLYProperty,
 	#category : #'WodenSceneGraph-ReadWriter-PLY'
 }
 
 { #category : #'instance creation' }
-WDIStanfordPLYPropertyIntegral >> readFrom: inputStream [
+WDSRWStanfordPLYPropertyIntegral >> readFrom: inputStream [
 	^ inputStream next asInteger
 ]

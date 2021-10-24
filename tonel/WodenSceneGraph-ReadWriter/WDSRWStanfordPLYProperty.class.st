@@ -2,7 +2,7 @@
 I represent a property of an element in a PLY model.
 "
 Class {
-	#name : #WDIStanfordPLYProperty,
+	#name : #WDSRWStanfordPLYProperty,
 	#superclass : #Object,
 	#instVars : [
 		'name',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-WDIStanfordPLYProperty class >> findPropertyClassFromType: typeName [
+WDSRWStanfordPLYProperty class >> findPropertyClassFromType: typeName [
 	self allSubclassesDo: [ :sc |
 		sc typeName = typeName ifTrue: [ ^ sc ]
 	].
@@ -21,26 +21,26 @@ WDIStanfordPLYProperty class >> findPropertyClassFromType: typeName [
 ]
 
 { #category : #'as yet unclassified' }
-WDIStanfordPLYProperty class >> typeName [
+WDSRWStanfordPLYProperty class >> typeName [
 	^ nil
 ]
 
 { #category : #accessing }
-WDIStanfordPLYProperty >> index [
+WDSRWStanfordPLYProperty >> index [
 	^ index
 ]
 
 { #category : #accessing }
-WDIStanfordPLYProperty >> index: anObject [
+WDSRWStanfordPLYProperty >> index: anObject [
 	index := anObject
 ]
 
 { #category : #accessing }
-WDIStanfordPLYProperty >> name [
+WDSRWStanfordPLYProperty >> name [
 	^ name
 ]
 
 { #category : #accessing }
-WDIStanfordPLYProperty >> name: anObject [
+WDSRWStanfordPLYProperty >> name: anObject [
 	name := anObject
 ]

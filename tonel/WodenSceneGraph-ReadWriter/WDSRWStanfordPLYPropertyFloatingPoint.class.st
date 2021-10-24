@@ -2,12 +2,12 @@
 I am a floating point property.
 "
 Class {
-	#name : #WDIStanfordPLYPropertyFloatingPoint,
-	#superclass : #WDIStanfordPLYProperty,
+	#name : #WDSRWStanfordPLYPropertyFloatingPoint,
+	#superclass : #WDSRWStanfordPLYProperty,
 	#category : #'WodenSceneGraph-ReadWriter-PLY'
 }
 
 { #category : #'instance creation' }
-WDIStanfordPLYPropertyFloatingPoint >> readFrom: inputStream [
+WDSRWStanfordPLYPropertyFloatingPoint >> readFrom: inputStream [
 	^ inputStream next asNumber asFloat
 ]
