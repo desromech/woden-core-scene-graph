@@ -13,7 +13,7 @@ Class {
 		'rootNode'
 	],
 	#pools : [
-		'WDIGLTF2Constants'
+		'WDSRWGGLTF2Constants'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }

@@ -1002,6 +1002,7 @@ WDAGPUSceneRendererResourceCache >> validTextureViewHandleFor: aWDTexture [
 { #category : #handles }
 WDAGPUSceneRendererResourceCache >> validVertexBindingFor: aWDVertexBufferBinding [
 	| cachedVertexBinding attributeBuffers offsets |
+	aWDVertexBufferBinding ifNil: [ ^ nil ].
 	cachedVertexBinding := vertexBindings at: aWDVertexBufferBinding ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
 	cachedVertexBinding modificationCount == aWDVertexBufferBinding modificationCount ifTrue: [ ^ cachedVertexBinding handle ].
 	

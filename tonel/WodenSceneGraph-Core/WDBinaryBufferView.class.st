@@ -84,3 +84,8 @@ WDBinaryBufferView >> name: anObject [
 
 	name := anObject
 ]
+
+{ #category : #accessing }
+WDBinaryBufferView >> readStream [
+	^ buffer readStreamFrom: byteOffset withSize: byteLength
+]

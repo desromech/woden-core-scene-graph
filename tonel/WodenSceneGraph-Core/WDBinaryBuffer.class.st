@@ -36,3 +36,8 @@ WDBinaryBuffer >> name: anObject [
 
 	name := anObject
 ]
+
+{ #category : #'as yet unclassified' }
+WDBinaryBuffer >> readStreamFrom: offset withSize: length [
+	^ ReadStream on: data from: offset + 1 to: offset + length
+]

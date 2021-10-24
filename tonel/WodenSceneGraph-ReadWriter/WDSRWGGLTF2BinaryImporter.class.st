@@ -1,19 +1,19 @@
 Class {
-	#name : #WDIGLTF2BinaryImporter,
-	#superclass : #WDIGLTF2Importer,
+	#name : #WDSRWGGLTF2BinaryImporter,
+	#superclass : #WDSRWGGLTF2Importer,
 	#instVars : [
 		'chunks'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
 
-{ #category : #accessing }
-WDIGLTF2BinaryImporter class >> extension [
-	^ 'glb'
+{ #category : #documentation }
+WDSRWGGLTF2BinaryImporter class >> readFromFileReference: aFileReference [
+	^ self new readFromFileReference: aFileReference
 ]
 
 { #category : #loading }
-WDIGLTF2BinaryImporter >> getBinaryDataChunkWithIndex: binaryChunkIndex [
+WDSRWGGLTF2BinaryImporter >> getBinaryDataChunkWithIndex: binaryChunkIndex [
 	| chunk |
 	chunk := (chunks at: binaryChunkIndex + 1).
 	chunk isBinary ifFalse: [ 
@@ -24,7 +24,7 @@ WDIGLTF2BinaryImporter >> getBinaryDataChunkWithIndex: binaryChunkIndex [
 ]
 
 { #category : #loading }
-WDIGLTF2BinaryImporter >> loadFromFileReference: fileReference [
+WDSRWGGLTF2BinaryImporter >> readFromFileReference: fileReference [
 	| version length gltfJson |
 	chunks := OrderedCollection new.
 	
@@ -52,12 +52,12 @@ WDIGLTF2BinaryImporter >> loadFromFileReference: fileReference [
 ]
 
 { #category : #loading }
-WDIGLTF2BinaryImporter >> readGLTFChunkFrom: in [
+WDSRWGGLTF2BinaryImporter >> readGLTFChunkFrom: in [
 	| chunkLength chunkType chunkPayload |
 	chunkLength := in nextLittleEndianNumber: 4.
 	chunkType := in next: 4.
 	chunkPayload := in next: chunkLength.
-	chunks add: (WDIGLTF2BinaryChunk new
+	chunks add: (WDSRWGGLTF2BinaryChunk new
 		type: chunkType;
 		content: chunkPayload;
 		yourself
@@ -65,7 +65,7 @@ WDIGLTF2BinaryImporter >> readGLTFChunkFrom: in [
 ]
 
 { #category : #loading }
-WDIGLTF2BinaryImporter >> readGLTFChunksFrom: in until: targetPosition [
+WDSRWGGLTF2BinaryImporter >> readGLTFChunksFrom: in until: targetPosition [
 	[in position < targetPosition] whileTrue: [ 
 		self readGLTFChunkFrom: in
 	]

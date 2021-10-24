@@ -1,5 +1,5 @@
 Class {
-	#name : #WDIGLTF2Constants,
+	#name : #WDSRWGGLTF2Constants,
 	#superclass : #SharedPool,
 	#classVars : [
 		'GL_2_BYTES',
@@ -28,7 +28,7 @@ Class {
 }
 
 { #category : #'class initialization' }
-WDIGLTF2Constants class >> initialize [
+WDSRWGGLTF2Constants class >> initialize [
 	"Data types"
 	GL_BYTE					:= 16r1400.
 	GL_UNSIGNED_BYTE		:= 16r1401.

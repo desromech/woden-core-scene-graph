@@ -45,6 +45,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> abortRecording [
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexBinding: vertexBinding primitiveTopology: primitiveTopology [
 	| validMaterial vertexBindingHandle |
+	vertexBinding ifNil: [ ^ false ].
 	validMaterial := material ifNil: [ renderer resourceCache defaultMaterial ].
 	
 	vertexBindingHandle := self validVertexBindingFor: vertexBinding.
@@ -381,6 +382,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> validTextureViewHandleFor: aWDTexture 
 
 { #category : #handles }
 WDAGPUSceneRendererActiveFrameRenderer >> validVertexBindingFor: aWDVertexBufferBinding [
+	aWDVertexBufferBinding ifNil: [ ^ nil ].
 	^ activeResourceDictionary at: aWDVertexBufferBinding ifAbsentPut: [
 		| handle |
 		handle := renderer resourceCache validVertexBindingFor: aWDVertexBufferBinding.

@@ -4,6 +4,9 @@ I represent an arbitrary element in the logical description of a scene.
 Class {
 	#name : #WDSceneElement,
 	#superclass : #Object,
+	#instVars : [
+		'name'
+	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
@@ -65,6 +68,18 @@ WDSceneElement >> isSceneNode [
 { #category : #testing }
 WDSceneElement >> isWodenSceneElement [
 	^ true
+]
+
+{ #category : #accessing }
+WDSceneElement >> name [
+
+	^ name
+]
+
+{ #category : #accessing }
+WDSceneElement >> name: anObject [
+
+	name := anObject
 ]
 
 { #category : #accessing }

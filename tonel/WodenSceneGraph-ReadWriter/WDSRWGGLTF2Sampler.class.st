@@ -1,5 +1,5 @@
 Class {
-	#name : #WDIGLTF2Sampler,
+	#name : #WDSRWGGLTF2Sampler,
 	#superclass : #Object,
 	#instVars : [
 		'minFilter',
@@ -8,47 +8,47 @@ Class {
 		'wrapT'
 	],
 	#pools : [
-		'WDIGLTF2Constants'
+		'WDSRWGGLTF2Constants'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
 
 { #category : #accessing }
-WDIGLTF2Sampler >> magFilter [
+WDSRWGGLTF2Sampler >> magFilter [
 	^ magFilter
 ]
 
 { #category : #accessing }
-WDIGLTF2Sampler >> magFilter: anObject [
+WDSRWGGLTF2Sampler >> magFilter: anObject [
 	magFilter := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Sampler >> minFilter [
+WDSRWGGLTF2Sampler >> minFilter [
 	^ minFilter
 ]
 
 { #category : #accessing }
-WDIGLTF2Sampler >> minFilter: anObject [
+WDSRWGGLTF2Sampler >> minFilter: anObject [
 	minFilter := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Sampler >> wrapS [
+WDSRWGGLTF2Sampler >> wrapS [
 	^ wrapS
 ]
 
 { #category : #accessing }
-WDIGLTF2Sampler >> wrapS: anObject [
+WDSRWGGLTF2Sampler >> wrapS: anObject [
 	wrapS := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Sampler >> wrapT [
+WDSRWGGLTF2Sampler >> wrapT [
 	^ wrapT
 ]
 
 { #category : #accessing }
-WDIGLTF2Sampler >> wrapT: anObject [
+WDSRWGGLTF2Sampler >> wrapT: anObject [
 	wrapT := anObject
 ]
