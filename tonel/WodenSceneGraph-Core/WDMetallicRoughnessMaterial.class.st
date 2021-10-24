@@ -29,6 +29,16 @@ WDMetallicRoughnessMaterial class >> default [
 		yourself
 ]
 
+{ #category : #adding }
+WDMetallicRoughnessMaterial >> addIntoModelAssetWithDependencies: modelAsset [
+	super addIntoModelAssetWithDependencies: modelAsset.
+	baseColorTexture ifNotNil: [ modelAsset addTexture: baseColorTexture ].
+	emissiveTexture ifNotNil: [ modelAsset addTexture: emissiveTexture ].
+	normalTexture ifNotNil: [ modelAsset addTexture: normalTexture ].
+	metallicRoughnessTexture ifNotNil: [ modelAsset addTexture: metallicRoughnessTexture ].
+	occlusionTexture ifNotNil: [ modelAsset addTexture: occlusionTexture ].
+]
+
 { #category : #accessing }
 WDMetallicRoughnessMaterial >> baseColorFactor [
 

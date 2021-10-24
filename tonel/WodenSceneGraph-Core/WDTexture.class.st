@@ -5,6 +5,7 @@ Class {
 	#name : #WDTexture,
 	#superclass : #WDRendererCacheableResource,
 	#instVars : [
+		'name',
 		'description',
 		'data'
 	],
@@ -34,13 +35,28 @@ WDTexture class >> computeMiplevelsForWidth: width height: height [
 ]
 
 { #category : #construction }
+WDTexture class >> forColorFileReference: aFileReferencee [
+	^ self new setupForColorFileReference: aFileReferencee; yourself
+]
+
+{ #category : #construction }
 WDTexture class >> forColorForm: aForm [
 	^ self new setupForColorForm: aForm; yourself
 ]
 
 { #category : #construction }
+WDTexture class >> forNonColorFileReference: aFileReferencee [
+	^ self new setupForNonColorFileReference: aFileReferencee; yourself
+]
+
+{ #category : #construction }
 WDTexture class >> forNonColorForm: aForm [
 	^ self new setupForNonColorForm: aForm; yourself
+]
+
+{ #category : #construction }
+WDTexture class >> forNormalMapFileReference: aForm [
+	^ self new setupForNormalMapFileReference: aForm; yourself
 ]
 
 { #category : #construction }
@@ -162,6 +178,18 @@ WDTexture >> miplevels: anInteger [
 ]
 
 { #category : #accessing }
+WDTexture >> name [
+
+	^ name
+]
+
+{ #category : #accessing }
+WDTexture >> name: anObject [
+
+	name := anObject
+]
+
+{ #category : #accessing }
 WDTexture >> sampleCount [
 	^ description sampleCount
 ]
@@ -182,11 +210,25 @@ WDTexture >> sampleQuality: anInteger [
 ]
 
 { #category : #initialization }
+WDTexture >> setupForColorFileReference: aFileReference [
+	self
+		dataKind: WDTextureDataKindColor;
+		format: WDTextureFormatB8G8R8A8UNormSRGB;
+		setupForFileReferenceCommon: aFileReference
+]
+
+{ #category : #initialization }
 WDTexture >> setupForColorForm: aForm [
 	self
 		dataKind: WDTextureDataKindColor;
 		format: WDTextureFormatB8G8R8A8UNormSRGB;
 		setupForFormCommon: aForm
+]
+
+{ #category : #private }
+WDTexture >> setupForFileReferenceCommon: aFileReference [
+	self flag: 'TODO: Add support for asynchronous loading'.
+	self setupForFormCommon: (ImageReadWriter formFromFileNamed: aFileReference)
 ]
 
 { #category : #private }
@@ -204,11 +246,27 @@ WDTexture >> setupForFormCommon: aForm [
 ]
 
 { #category : #initialization }
+WDTexture >> setupForNonColorFileReference: aFileReference [
+	self
+		dataKind: WDTextureDataKindNonColor;
+		format: WDTextureFormatB8G8R8A8UNorm;
+		setupForFileReferenceCommon: aFileReference
+]
+
+{ #category : #initialization }
 WDTexture >> setupForNonColorForm: aForm [
 	self
 		dataKind: WDTextureDataKindNonColor;
 		format: WDTextureFormatB8G8R8A8UNorm;
 		setupForFormCommon: aForm
+]
+
+{ #category : #initialization }
+WDTexture >> setupForNormalMapFileReference: aFileReference [
+	self
+		dataKind: WDTextureDataKindNormalMap;
+		format: WDTextureFormatB8G8R8A8UNorm;
+		setupForFileReferenceCommon: aFileReference
 ]
 
 { #category : #initialization }

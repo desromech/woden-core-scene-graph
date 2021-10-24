@@ -889,6 +889,7 @@ WDAGPUSceneRendererResourceCache >> validBufferHandleFor: aWDBinaryBuffer [
 
 { #category : #handles }
 WDAGPUSceneRendererResourceCache >> validBufferHandleForAccessor: aWDBinaryBufferAccessor [
+	aWDBinaryBufferAccessor bufferView ifNil: [ ^ nil ].
 	^ self validBufferHandleFor: aWDBinaryBufferAccessor bufferView buffer
 ]
 

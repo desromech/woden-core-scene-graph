@@ -17,6 +17,13 @@ Class {
 }
 
 { #category : #adding }
+WDMeshPrimitive >> addIntoModelAssetWithDependencies: modelAsset [
+	material ifNotNil: [ 
+		material addIntoModelAssetWithDependencies: modelAsset
+	]
+]
+
+{ #category : #adding }
 WDMeshPrimitive >> addToRenderingScene: renderingScene withObjectState: anObjectState [
 	renderingScene addMeshPrimitive: self withMaterial: material objectState: anObjectState
 ]

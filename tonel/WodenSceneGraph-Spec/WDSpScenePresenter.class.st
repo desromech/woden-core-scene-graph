@@ -28,6 +28,11 @@ WDSpScenePresenter >> camera: anObject [
 	camera := anObject
 ]
 
+{ #category : #'API - changes' }
+WDSpScenePresenter >> refresh [
+	self scene: scene; camera: camera.
+]
+
 { #category : #accessing }
 WDSpScenePresenter >> scene [
 
@@ -38,11 +43,6 @@ WDSpScenePresenter >> scene [
 WDSpScenePresenter >> scene: anObject [
 
 	scene := anObject
-]
-
-{ #category : #'as yet unclassified' }
-WDSpScenePresenter >> sceneChanged [
-	self scene: scene
 ]
 
 { #category : #enumerating }

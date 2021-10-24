@@ -12,6 +12,12 @@ Class {
 }
 
 { #category : #adding }
+WDStaticMeshRenderable >> addIntoModelAssetWithDependencies: modelAsset [
+	modelAsset addMesh: self.
+	primitives do: [ :each | each addIntoModelAssetWithDependencies: modelAsset ]
+]
+
+{ #category : #adding }
 WDStaticMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
 	primitives do: [ :each |
 		each addToRenderingScene: renderingScene withObjectState: anObjectState

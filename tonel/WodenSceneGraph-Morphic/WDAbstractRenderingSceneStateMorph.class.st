@@ -46,6 +46,11 @@ WDAbstractRenderingSceneStateMorph >> buildSceneGraphNodeWith: builder [
 
 ]
 
+{ #category : #accessing }
+WDAbstractRenderingSceneStateMorph >> defaultExtent [
+	^ 853@480
+]
+
 { #category : #drawing }
 WDAbstractRenderingSceneStateMorph >> drawOn: aCanvas [
 	| renderingSceneState |
@@ -59,6 +64,12 @@ WDAbstractRenderingSceneStateMorph >> drawOn: aCanvas [
 { #category : #'scale factor' }
 WDAbstractRenderingSceneStateMorph >> drawingSurfaceExtent [
 	^ (self innerBounds extent * self uiScaleFactor) ceiling
+]
+
+{ #category : #initialization }
+WDAbstractRenderingSceneStateMorph >> initialize [
+	super initialize.
+	self extent: self defaultExtent
 ]
 
 { #category : #drawing }

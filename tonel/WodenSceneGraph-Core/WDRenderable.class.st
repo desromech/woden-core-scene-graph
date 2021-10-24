@@ -4,8 +4,16 @@ I am an object that can be rendered on 3D graphics scene.
 Class {
 	#name : #WDRenderable,
 	#superclass : #Object,
+	#instVars : [
+		'name'
+	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
+
+{ #category : #adding }
+WDRenderable >> addIntoModelAssetWithDependencies: modelAsset [
+	"By default do nothing"
+]
 
 { #category : #adding }
 WDRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
@@ -31,4 +39,16 @@ WDRenderable >> copyWithMaterial: aMaterial [
 
 { #category : #'double dispatch' }
 WDRenderable >> emitRenderingCommandsWithRenderer: renderer [
+]
+
+{ #category : #accessing }
+WDRenderable >> name [
+
+	^ name
+]
+
+{ #category : #accessing }
+WDRenderable >> name: anObject [
+
+	name := anObject
 ]

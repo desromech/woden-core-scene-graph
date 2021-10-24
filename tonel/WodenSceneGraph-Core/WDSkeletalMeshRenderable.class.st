@@ -11,3 +11,9 @@ Class {
 	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
+
+{ #category : #adding }
+WDSkeletalMeshRenderable >> addIntoModelAssetWithDependencies: modelAsset [
+	modelAsset addSkeletalMesh: self.
+	referenceMesh addIntoModelAssetWithDependencies: modelAsset.
+]

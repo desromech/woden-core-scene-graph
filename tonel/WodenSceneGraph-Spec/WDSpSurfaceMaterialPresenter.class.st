@@ -110,5 +110,5 @@ WDSpSurfaceMaterialPresenter >> updatePresenter [
 
 	mesh := previewBaseMesh copyWithMaterial: material.
 	materialSceneNode renderables: { mesh }.
-	scenePresenter sceneChanged.
+	scenePresenter refresh.
 ]

@@ -162,8 +162,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive:
 		stateTracker
 			drawArrays: meshPrimitive vertexBinding vertexCount instance_count: 1 first_vertex: 0 base_instance: 0
 	] ifNotNil: [ :indicesAccessor |
+		| handle |
+		handle := self validBufferHandleForAccessor: indicesAccessor.
+		handle ifNil: [ ^ self ].
 		stateTracker
-			useIndexBufferAt: (self validBufferHandleForAccessor: indicesAccessor)
+			useIndexBufferAt: handle
 				offset: indicesAccessor byteOffset + indicesAccessor bufferView byteOffset
 				index_size: indicesAccessor componentType size;
 			drawElements: indicesAccessor count instance_count: 1 first_index: 0 base_vertex: 0 base_instance: 0
