@@ -3,7 +3,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'imageData',
-		'imageReader',
 		'form',
 		'name'
 	],
@@ -28,11 +27,6 @@ WDSRWGGLTF2Image >> asNormalTexture [
 	^ WDTexture forNormalMapForm: self form
 ]
 
-{ #category : #'as yet unclassified' }
-WDSRWGGLTF2Image >> cachingKey [
-	^ { imageReader class name . imageData readStream }
-]
-
 { #category : #converting }
 WDSRWGGLTF2Image >> extent [
 	^ self form extent
@@ -40,7 +34,7 @@ WDSRWGGLTF2Image >> extent [
 
 { #category : #'as yet unclassified' }
 WDSRWGGLTF2Image >> form [
-	^ form ifNil: [form := imageReader formFromStream: imageData readStream].
+	^ form ifNil: [form := ImageReadWriter formFromStream: imageData readStream ].
 ]
 
 { #category : #accessing }
@@ -51,16 +45,6 @@ WDSRWGGLTF2Image >> imageData [
 { #category : #accessing }
 WDSRWGGLTF2Image >> imageData: anObject [
 	imageData := anObject
-]
-
-{ #category : #accessing }
-WDSRWGGLTF2Image >> imageReader [
-	^ imageReader
-]
-
-{ #category : #accessing }
-WDSRWGGLTF2Image >> imageReader: anObject [
-	imageReader := anObject
 ]
 
 { #category : #initialization }

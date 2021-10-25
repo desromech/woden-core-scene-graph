@@ -26,7 +26,6 @@ Class {
 	],
 	#classVars : [
 		'ComponentTypeMap',
-		'ImageReaderForMimeType',
 		'PrimitiveModeMap',
 		'TypeMap',
 		'VertexAttributeToLocationMap'
@@ -81,10 +80,6 @@ WDSRWGGLTF2Importer class >> initialize [
 		GL_DOUBLE . WDBinaryBufferAccessorFloat64ComponentType asBinaryBufferAccessorComponentType.
 	}.
 	
-	ImageReaderForMimeType := Dictionary newFromPairs: {
-		'image/png' . PNGReadWriter.
-		'image/jpeg' . JPEGReadWriter.
-	}.
 ]
 
 { #category : #'as yet unclassified' }
@@ -288,22 +283,15 @@ WDSRWGGLTF2Importer >> loadImageFrom: imageDescription [
 
 	imageDescription at: 'uri' ifPresent: [ :uri |
 		imageData := self loadBinaryDataFromURI: uri.
-		imageReader := imageDescription at: 'mimeType' ifPresent: [ :mimeType |
-			ImageReaderForMimeType at: mimeType
-		] ifAbsent: [
-			ImageReadWriter
-		]
 	].
 
 	imageDescription at: 'bufferView' ifPresent: [ :bufferViewIndex |
 		imageData := bufferViews at: bufferViewIndex + 1.
-		imageReader := ImageReaderForMimeType at: (imageDescription at: 'mimeType')
 	].
 
 	image := WDSRWGGLTF2Image new
 		name: imageName;
 		imageData: imageData;
-		imageReader: imageReader;
 		yourself.
 	images add: image
 ]
