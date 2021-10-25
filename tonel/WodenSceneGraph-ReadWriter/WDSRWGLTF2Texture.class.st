@@ -1,5 +1,5 @@
 Class {
-	#name : #WDSRWGGLTF2Texture,
+	#name : #WDSRWGLTF2Texture,
 	#superclass : #Object,
 	#instVars : [
 		'image',
@@ -9,13 +9,13 @@ Class {
 		'colorTexture'
 	],
 	#pools : [
-		'WDSRWGGLTF2Constants'
+		'WDSRWGLTF2Constants'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
 
 { #category : #adding }
-WDSRWGGLTF2Texture >> addOntoModelAsset: modelAsset [
+WDSRWGLTF2Texture >> addOntoModelAsset: modelAsset [
 	colorTexture ifNotNil: [
 		modelAsset addTexture: colorTexture
 	].
@@ -28,36 +28,36 @@ WDSRWGGLTF2Texture >> addOntoModelAsset: modelAsset [
 ]
 
 { #category : #converting }
-WDSRWGGLTF2Texture >> asColorTexture [
+WDSRWGLTF2Texture >> asColorTexture [
 	^ colorTexture ifNil: [ colorTexture := image asColorTexture ]
 ]
 
 { #category : #converting }
-WDSRWGGLTF2Texture >> asNonColorTexture [
+WDSRWGLTF2Texture >> asNonColorTexture [
 	^ nonColorTexture ifNil: [ nonColorTexture := image asNonColorTexture ]
 ]
 
 { #category : #converting }
-WDSRWGGLTF2Texture >> asNormalTexture [
+WDSRWGLTF2Texture >> asNormalTexture [
 	^ normalTexture ifNil: [ normalTexture := image asNormalTexture ]
 ]
 
 { #category : #accessing }
-WDSRWGGLTF2Texture >> image [
+WDSRWGLTF2Texture >> image [
 	^ image
 ]
 
 { #category : #accessing }
-WDSRWGGLTF2Texture >> image: anObject [
+WDSRWGLTF2Texture >> image: anObject [
 	image := anObject
 ]
 
 { #category : #accessing }
-WDSRWGGLTF2Texture >> sampler [
+WDSRWGLTF2Texture >> sampler [
 	^ sampler
 ]
 
 { #category : #accessing }
-WDSRWGGLTF2Texture >> sampler: anObject [
+WDSRWGLTF2Texture >> sampler: anObject [
 	sampler := anObject
 ]

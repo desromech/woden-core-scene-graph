@@ -1,5 +1,5 @@
 Class {
-	#name : #WDIGLTF2Skin,
+	#name : #WDSRWGLTF2Skin,
 	#superclass : #Object,
 	#instVars : [
 		'name',
@@ -7,77 +7,72 @@ Class {
 		'jointIndices',
 		'rootNodeIndex',
 		'inverseBindMatricesAccessor',
-		'armature',
+		'skeleton',
 		'jointIndexToBoneIndexPermutationTable',
 		'actualBoneCount',
 		'rootNode'
 	],
 	#pools : [
-		'WDSRWGGLTF2Constants'
+		'WDSRWGLTF2Constants'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
 
-{ #category : #accessing }
-WDIGLTF2Skin >> armature [
-	^ armature ifNil: [ armature := WDCSkinnedModelArmature new name: name ]
-]
-
 { #category : #'as yet unclassified' }
-WDIGLTF2Skin >> fetchInverseBindMatrices [
+WDSRWGLTF2Skin >> fetchInverseBindMatrices [
 	^ inverseBindMatricesAccessor decodeContentAsArray
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> inverseBindMatrices [
+WDSRWGLTF2Skin >> inverseBindMatrices [
 	^ inverseBindMatrices ifNil: [ inverseBindMatrices := self fetchInverseBindMatrices ]
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> inverseBindMatricesAccessor [
+WDSRWGLTF2Skin >> inverseBindMatricesAccessor [
 	^ inverseBindMatricesAccessor
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> inverseBindMatricesAccessor: anObject [
+WDSRWGLTF2Skin >> inverseBindMatricesAccessor: anObject [
 	inverseBindMatricesAccessor := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> jointIndexToBoneIndexPermutationTable [
+WDSRWGLTF2Skin >> jointIndexToBoneIndexPermutationTable [
 	^ jointIndexToBoneIndexPermutationTable
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> jointIndexToBoneIndexPermutationTable: anObject [
+WDSRWGLTF2Skin >> jointIndexToBoneIndexPermutationTable: anObject [
 	jointIndexToBoneIndexPermutationTable := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> jointIndices [
+WDSRWGLTF2Skin >> jointIndices [
 	^ jointIndices
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> jointIndices: anObject [
+WDSRWGLTF2Skin >> jointIndices: anObject [
 	jointIndices := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> name [
+WDSRWGLTF2Skin >> name [
 	^ name
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> name: anObject [
+WDSRWGLTF2Skin >> name: anObject [
 	name := anObject
 ]
 
 { #category : #'as yet unclassified' }
-WDIGLTF2Skin >> permutatedInverseBindMatrices [
+WDSRWGLTF2Skin >> permutatedInverseBindMatrices [
 	| permutatedMatrices |
-	permutatedMatrices := Array new: armature bones size.
-	permutatedMatrices atAllPut: Float32x4x4 identity.
+	permutatedMatrices := Array new: skeleton bones size.
+	permutatedMatrices atAllPut: Matrix4x4 identity.
 	self inverseBindMatrices doWithIndex: [ :each :index |
 		permutatedMatrices at: (jointIndexToBoneIndexPermutationTable at: index) + 1 put: each
 	].
@@ -85,23 +80,28 @@ WDIGLTF2Skin >> permutatedInverseBindMatrices [
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> rootNode [
+WDSRWGLTF2Skin >> rootNode [
 
 	^ rootNode
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> rootNode: anObject [
+WDSRWGLTF2Skin >> rootNode: anObject [
 
 	rootNode := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> rootNodeIndex [
+WDSRWGLTF2Skin >> rootNodeIndex [
 	^ rootNodeIndex
 ]
 
 { #category : #accessing }
-WDIGLTF2Skin >> rootNodeIndex: anObject [
+WDSRWGLTF2Skin >> rootNodeIndex: anObject [
 	rootNodeIndex := anObject
+]
+
+{ #category : #accessing }
+WDSRWGLTF2Skin >> skeleton [
+	^ skeleton ifNil: [ skeleton := WDSkeleton new name: name ]
 ]

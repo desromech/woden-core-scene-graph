@@ -98,6 +98,22 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 		{ true . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_FLOAT.
 		{ true . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorFloat32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32A32_FLOAT.
 
+		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorUInt8ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R8G8B8A8_UINT.
+		{ true . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorUInt8ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM.
+
+		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorInt8ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R8G8B8A8_SINT.
+		{ true . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorInt8ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R8G8B8A8_SNORM.
+
+		{ false . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorUInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16_UINT.
+		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorUInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16B16A16_UINT.
+		{ true . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorUInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16_UNORM.
+		{ true . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorUInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16B16A16_UNORM.
+
+		{ false . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16_SINT.
+		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16B16A16_SINT.
+		{ true . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16_SNORM.
+		{ true . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorInt16ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R16G16B16A16_SNORM.
+
 		{ false . WDBinaryBufferAccessorScalarType uniqueInstance . WDBinaryBufferAccessorUInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32_UINT.
 		{ false . WDBinaryBufferAccessorVector2Type uniqueInstance . WDBinaryBufferAccessorUInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32_UINT.
 		{ false . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorUInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_UINT.

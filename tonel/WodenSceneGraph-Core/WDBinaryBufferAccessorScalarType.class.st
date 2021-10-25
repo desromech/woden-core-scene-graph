@@ -4,7 +4,12 @@ Class {
 	#category : #'WodenSceneGraph-Core-Resources'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDBinaryBufferAccessorScalarType >> componentCount [
 	^ 1
+]
+
+{ #category : #accessing }
+WDBinaryBufferAccessorScalarType >> makeWithComponents: components [
+	^ components first
 ]

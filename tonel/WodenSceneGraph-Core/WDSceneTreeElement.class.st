@@ -70,6 +70,11 @@ WDSceneTreeElement >> children [
 	^ children
 ]
 
+{ #category : #enumerating }
+WDSceneTreeElement >> childrenDo: aBlock [
+	children do: aBlock
+]
+
 { #category : #initialization }
 WDSceneTreeElement >> initialize [
 	super initialize.

@@ -67,6 +67,44 @@ WDBinaryBufferAccessor >> count: anObject [
 	count := anObject
 ]
 
+{ #category : #'content accessing' }
+WDBinaryBufferAccessor >> decodeContentAsArray [
+	| result destIndex sourceIndex sourceBuffer componentSize stride |
+	result := Array new: count.
+	destIndex := 1.
+	sourceIndex := 1 + bufferView byteOffset + byteOffset.
+	sourceBuffer := bufferView buffer data.
+	componentSize := componentType size.
+	stride := bufferView byteStride max: componentSize.
+	
+	type componentCount = 1 ifTrue: [ 
+		1 to: count do: [
+		| componentCount |
+			result at: destIndex put: (componentType readFromBuffer: sourceBuffer at: sourceIndex).
+			sourceIndex := sourceIndex + stride.
+			destIndex := destIndex + 1
+		].
+	] ifFalse: [
+		| componentCount elementReadBuffer |
+		componentCount := type componentCount.
+		elementReadBuffer := Array new: componentCount.
+		
+		1 to: count do: [:i |
+			| componentSourceIndex |
+			componentSourceIndex := sourceIndex.
+			1 to: componentCount do: [ :componentIndex |
+				elementReadBuffer at: componentIndex put: (componentType readFromBuffer: sourceBuffer at: componentSourceIndex).
+				componentSourceIndex := componentSourceIndex + componentSize
+			].
+
+			result at: destIndex put: (type makeWithComponents: elementReadBuffer).
+			sourceIndex := sourceIndex + stride.
+			destIndex := destIndex + 1
+		].
+	].
+	^ result
+]
+
 { #category : #initialization }
 WDBinaryBufferAccessor >> initialize [
 	super initialize.

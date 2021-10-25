@@ -1,5 +1,5 @@
 Class {
-	#name : #WDIGLTF2AnimationSampler,
+	#name : #WDSRWGLTF2AnimationSampler,
 	#superclass : #Object,
 	#instVars : [
 		'inputAccessor',
@@ -13,7 +13,7 @@ Class {
 }
 
 { #category : #'class initialization' }
-WDIGLTF2AnimationSampler class >> initialize [
+WDSRWGLTF2AnimationSampler class >> initialize [
 	InterpolationAlgorithmToInterpolationMethodMap := Dictionary newFromPairs: { 
 		'LINEAR' . WDCAnimationInterpolationMethod linear.
 		'STEP' . WDCAnimationInterpolationMethod step.
@@ -23,56 +23,56 @@ WDIGLTF2AnimationSampler class >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-WDIGLTF2AnimationSampler >> animationInterpolationMethod [
+WDSRWGLTF2AnimationSampler >> animationInterpolationMethod [
 	^ InterpolationAlgorithmToInterpolationMethodMap at: interpolationAlgorithm ifAbsent: [ WDCAnimationStepInterpolationMethod uniqueInstance ]
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> inputAccessor [
+WDSRWGLTF2AnimationSampler >> inputAccessor [
 	^ inputAccessor
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> inputAccessor: anObject [
+WDSRWGLTF2AnimationSampler >> inputAccessor: anObject [
 	inputAccessor := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> inputMaxValue [
+WDSRWGLTF2AnimationSampler >> inputMaxValue [
 	^ inputAccessor max
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> inputMinValue [
+WDSRWGLTF2AnimationSampler >> inputMinValue [
 	^ inputAccessor min
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> inputValues [
+WDSRWGLTF2AnimationSampler >> inputValues [
 	^ inputAccessor decodeContentAsArray
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> interpolationAlgorithm [
+WDSRWGLTF2AnimationSampler >> interpolationAlgorithm [
 	^ interpolationAlgorithm
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> interpolationAlgorithm: anObject [
+WDSRWGLTF2AnimationSampler >> interpolationAlgorithm: anObject [
 	interpolationAlgorithm := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> outputAccessor [
+WDSRWGLTF2AnimationSampler >> outputAccessor [
 	^ outputAccessor
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> outputAccessor: anObject [
+WDSRWGLTF2AnimationSampler >> outputAccessor: anObject [
 	outputAccessor := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationSampler >> outputValues [
+WDSRWGLTF2AnimationSampler >> outputValues [
 	^ outputAccessor decodeContentAsArray
 ]

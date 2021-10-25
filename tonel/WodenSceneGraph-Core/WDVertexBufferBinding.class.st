@@ -37,7 +37,9 @@ WDVertexBufferBinding >> locationMask [
 
 { #category : #accessing }
 WDVertexBufferBinding >> validVertexCount [
-	^ vertexCount ifNil: [ attributes first accessor count ]
+	^ vertexCount ifNil: [ vertexCount := attributes
+			ifEmpty: [ 0 ]
+			ifNotEmpty: [ attributes first accessor count ]  ]
 ]
 
 { #category : #accessing }

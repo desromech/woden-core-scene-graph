@@ -14,5 +14,5 @@ WDSRWGLTF2BinaryReadWriter class >> extensions [
 
 { #category : #documentation }
 WDSRWGLTF2BinaryReadWriter class >> readFromFileReference: aFileReference [
-	^ WDSRWGGLTF2BinaryImporter readFromFileReference: aFileReference
+	^ WDSRWGLTF2BinaryImporter readFromFileReference: aFileReference
 ]

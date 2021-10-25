@@ -1,5 +1,5 @@
 Class {
-	#name : #WDIGLTF2Animation,
+	#name : #WDSRWGLTF2Animation,
 	#superclass : #Object,
 	#instVars : [
 		'samplers',
@@ -10,7 +10,7 @@ Class {
 }
 
 { #category : #converting }
-WDIGLTF2Animation >> asModelAssetAnimation [
+WDSRWGLTF2Animation >> asModelAssetAnimation [
 	^ WDCSkinnedModelAnimation new
 		name: name;
 		channels: (channels collect: [ :each | each asSkinnedModelAnimationChannel ]);
@@ -18,31 +18,31 @@ WDIGLTF2Animation >> asModelAssetAnimation [
 ]
 
 { #category : #accessing }
-WDIGLTF2Animation >> channels [
+WDSRWGLTF2Animation >> channels [
 	^ channels
 ]
 
 { #category : #accessing }
-WDIGLTF2Animation >> channels: anObject [
+WDSRWGLTF2Animation >> channels: anObject [
 	channels := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Animation >> name [
+WDSRWGLTF2Animation >> name [
 	^ name
 ]
 
 { #category : #accessing }
-WDIGLTF2Animation >> name: anObject [
+WDSRWGLTF2Animation >> name: anObject [
 	name := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2Animation >> samplers [
+WDSRWGLTF2Animation >> samplers [
 	^ samplers
 ]
 
 { #category : #accessing }
-WDIGLTF2Animation >> samplers: anObject [
+WDSRWGLTF2Animation >> samplers: anObject [
 	samplers := anObject
 ]

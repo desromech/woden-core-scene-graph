@@ -18,6 +18,21 @@ WDSkeletalMeshRenderable >> addIntoModelAssetWithDependencies: modelAsset [
 	referenceMesh addIntoModelAssetWithDependencies: modelAsset.
 ]
 
+{ #category : #adding }
+WDSkeletalMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
+	self flag: 'TODO: add the skin to the object state'.
+	referenceMesh ifNotNil: [ 
+		referenceMesh addToRenderingScene: renderingScene withObjectState: anObjectState
+	]
+]
+
+{ #category : #copying }
+WDSkeletalMeshRenderable >> copyWithMaterial: aMaterial [
+	^ self
+		referenceMesh: (referenceMesh copyWithMaterial: aMaterial);
+		yourself
+]
+
 { #category : #accessing }
 WDSkeletalMeshRenderable >> currentPose [
 

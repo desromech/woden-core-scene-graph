@@ -1,5 +1,5 @@
 Class {
-	#name : #WDSRWGGLTF2Importer,
+	#name : #WDSRWGLTF2Importer,
 	#superclass : #Object,
 	#instVars : [
 		'loadingDirectory',
@@ -33,14 +33,14 @@ Class {
 	#pools : [
 		'AGPUConstants',
 		'WDCVertexBindingConstants',
-		'WDSRWGGLTF2Constants'
+		'WDSRWGLTF2Constants'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
 
 { #category : #'class initialization' }
-WDSRWGGLTF2Importer class >> initialize [
-	WDSRWGGLTF2Constants initialize.
+WDSRWGLTF2Importer class >> initialize [
+	WDSRWGLTF2Constants initialize.
 	TypeMap := Dictionary newFromPairs: {
 		'SCALAR' . WDBinaryBufferAccessorScalarType asBinaryBufferAccessorType.
 		'VEC2' . WDBinaryBufferAccessorVector2Type asBinaryBufferAccessorType.
@@ -83,18 +83,18 @@ WDSRWGGLTF2Importer class >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-WDSRWGGLTF2Importer >> extractBoneGraph: nodeToBoneGraphDictionary topologyFrom: startingNode parent: parentNode visited: visitedNodes nodeToBoneDictionary: nodeToBoneDictionary boneToNodeDictionary: boneToNodeDictionary [
+WDSRWGLTF2Importer >> extractBoneGraph: nodeToBoneGraphDictionary topologyFrom: startingNode parent: parentNode visited: visitedNodes nodeToBoneDictionary: nodeToBoneDictionary boneToNodeDictionary: boneToNodeDictionary [
 	| newParentNode boneGraphNode |
 	newParentNode := parentNode.
 	nodeToBoneGraphDictionary at: startingNode ifAbsentPut: [ 
 		| extraNonJointBone |
-		extraNonJointBone := WDCSkinnedModelBone new
+		extraNonJointBone := WDSkeletonBone new
 			name: startingNode name;
-			loadStateFrom: (nodeBoneStates at: (nodes indexOf: startingNode));
+			transform: (nodeBoneStates at: (nodes indexOf: startingNode));
 			yourself.
 		nodeToBoneDictionary at: startingNode put: extraNonJointBone.
 		boneToNodeDictionary at: extraNonJointBone put: startingNode.
-		WDIGLTF2SkeletonGraphNode new
+		WDSRWGLTF2SkeletonGraphNode new
 			bone: extraNonJointBone;
 			yourself
 	].
@@ -116,12 +116,12 @@ WDSRWGGLTF2Importer >> extractBoneGraph: nodeToBoneGraphDictionary topologyFrom:
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> getBinaryDataChunkWithIndex: binaryChunkIndex [
+WDSRWGLTF2Importer >> getBinaryDataChunkWithIndex: binaryChunkIndex [
 	self error: 'Missing required binary data specification.'
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadAccessorFrom: accessorDescription [
+WDSRWGLTF2Importer >> loadAccessorFrom: accessorDescription [
 	| bufferView componentType type count pixelFormatName byteOffset minValues maxValues max min |
 	bufferView := bufferViews at: (accessorDescription at: 'bufferView') + 1.
 	componentType := accessorDescription at: 'componentType'.
@@ -168,15 +168,15 @@ WDSRWGGLTF2Importer >> loadAccessorFrom: accessorDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadAccessorsFrom: elements [
+WDSRWGLTF2Importer >> loadAccessorsFrom: elements [
 	accessors := OrderedCollection new.
 	elements do: [ :el | self loadAccessorFrom: el ]
 ]
 
 { #category : #'as yet unclassified' }
-WDSRWGGLTF2Importer >> loadAnimationChannelFrom: channelDescription withSamplers: animationSamplers [
+WDSRWGLTF2Importer >> loadAnimationChannelFrom: channelDescription withSamplers: animationSamplers [
 	| channel targetDescription |
-	channel := WDIGLTF2AnimationChannel new.
+	channel := WDSRWGLTF2AnimationChannel new.
 	channel sampler: (animationSamplers at: (channelDescription at: 'sampler') + 1).
 	targetDescription := channelDescription at: 'target'.
 	channel
@@ -187,7 +187,7 @@ WDSRWGGLTF2Importer >> loadAnimationChannelFrom: channelDescription withSamplers
 ]
 
 { #category : #'as yet unclassified' }
-WDSRWGGLTF2Importer >> loadAnimationFrom: animationDescription [
+WDSRWGLTF2Importer >> loadAnimationFrom: animationDescription [
 	| animationSamplers animationChannels |
 	animationSamplers := OrderedCollection new.
 	animationDescription at: 'samplers' ifPresent: [ :elements |
@@ -203,7 +203,7 @@ WDSRWGGLTF2Importer >> loadAnimationFrom: animationDescription [
 		]
 	].
 
-	animations add: (WDIGLTF2Animation new
+	animations add: (WDSRWGLTF2Animation new
 		name: (animationDescription at: 'name' ifAbsent: [ nil ]);
 		samplers: animationSamplers asArray;
 		channels: animationChannels asArray;
@@ -212,8 +212,8 @@ WDSRWGGLTF2Importer >> loadAnimationFrom: animationDescription [
 ]
 
 { #category : #'as yet unclassified' }
-WDSRWGGLTF2Importer >> loadAnimationSampler: samplerDescription [
-	^ WDIGLTF2AnimationSampler new
+WDSRWGLTF2Importer >> loadAnimationSampler: samplerDescription [
+	^ WDSRWGLTF2AnimationSampler new
 		inputAccessor: (accessors at: (samplerDescription at: 'input') + 1);
 		outputAccessor: (accessors at: (samplerDescription at: 'output') + 1);
 		interpolationAlgorithm: (samplerDescription at: 'interpolation' ifAbsent: ['LINEAR']) asSymbol;
@@ -221,7 +221,7 @@ WDSRWGGLTF2Importer >> loadAnimationSampler: samplerDescription [
 ]
 
 { #category : #'as yet unclassified' }
-WDSRWGGLTF2Importer >> loadAnimationsFrom: elements [
+WDSRWGLTF2Importer >> loadAnimationsFrom: elements [
 	animations := OrderedCollection new.
 	elements do: [ :each |
 		self loadAnimationFrom: each
@@ -230,7 +230,7 @@ WDSRWGGLTF2Importer >> loadAnimationsFrom: elements [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadBinaryDataFromURI: uri [
+WDSRWGLTF2Importer >> loadBinaryDataFromURI: uri [
 	| absolutePath |
 	(uri beginsWith: 'data:') ifTrue: [ ^ self parseDataURI: uri ].
 	absolutePath := loadingDirectory resolve: uri asFileReference.
@@ -238,7 +238,7 @@ WDSRWGGLTF2Importer >> loadBinaryDataFromURI: uri [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadBuffer: bufferIndex from: bufferDescription [
+WDSRWGLTF2Importer >> loadBuffer: bufferIndex from: bufferDescription [
 	| byteLength description data |
 	data := bufferDescription at: 'uri'
 		ifPresent: [ :uri | self loadBinaryDataFromURI: uri ]
@@ -252,7 +252,7 @@ WDSRWGGLTF2Importer >> loadBuffer: bufferIndex from: bufferDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadBufferViewFrom: viewDescription [
+WDSRWGLTF2Importer >> loadBufferViewFrom: viewDescription [
 	bufferViews add: (WDBinaryBufferView new
 		name: (viewDescription at: 'name' ifAbsent: ['']);
 		buffer: (buffers at: (viewDescription at: 'buffer') + 1);
@@ -263,19 +263,19 @@ WDSRWGGLTF2Importer >> loadBufferViewFrom: viewDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadBufferViewsFrom: elements [
+WDSRWGLTF2Importer >> loadBufferViewsFrom: elements [
 	bufferViews := OrderedCollection new.
 	elements do: [ :el | self loadBufferViewFrom: el ]
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadBuffersFrom: elements [
+WDSRWGLTF2Importer >> loadBuffersFrom: elements [
 	buffers := OrderedCollection new.
 	elements doWithIndex: [ :el :index | self loadBuffer: index from: el ]
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadImageFrom: imageDescription [
+WDSRWGLTF2Importer >> loadImageFrom: imageDescription [
 	| imageData imageReader imageName image |
 	imageData := nil.
 	imageReader := nil.
@@ -289,7 +289,7 @@ WDSRWGGLTF2Importer >> loadImageFrom: imageDescription [
 		imageData := bufferViews at: bufferViewIndex + 1.
 	].
 
-	image := WDSRWGGLTF2Image new
+	image := WDSRWGLTF2Image new
 		name: imageName;
 		imageData: imageData;
 		yourself.
@@ -297,13 +297,13 @@ WDSRWGGLTF2Importer >> loadImageFrom: imageDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadImagesFrom: elements [
+WDSRWGLTF2Importer >> loadImagesFrom: elements [
 	images := OrderedCollection new.
 	elements do: [ :element | self loadImageFrom: element ].
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadMaterialFrom: materialDescription [
+WDSRWGLTF2Importer >> loadMaterialFrom: materialDescription [
 	| material |
 	material := nil.
 	material ifNil: [ 
@@ -317,13 +317,13 @@ WDSRWGGLTF2Importer >> loadMaterialFrom: materialDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadMaterialsFrom: elements [
+WDSRWGLTF2Importer >> loadMaterialsFrom: elements [
 	materials := OrderedCollection new.
 	elements do: [ :el | self loadMaterialFrom: el ]
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadMeshFrom: meshDescription [
+WDSRWGLTF2Importer >> loadMeshFrom: meshDescription [
 	| name mesh |
 	name := meshDescription at: 'name' ifAbsent: [nil].
 	mesh := WDStaticMeshRenderable new
@@ -337,7 +337,7 @@ WDSRWGGLTF2Importer >> loadMeshFrom: meshDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
+WDSRWGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
 	| primitive attributes vertexAttributes |
 	primitive := WDMeshPrimitive new
 		boundingBox: AABox empty;
@@ -384,13 +384,13 @@ WDSRWGGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadMeshesFrom: elements [
+WDSRWGLTF2Importer >> loadMeshesFrom: elements [
 	meshes := OrderedCollection new.
 	elements do: [ :el | self loadMeshFrom: el ]
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadMetallicRoughnessMaterial: description commonDescription: commonDescription [
+WDSRWGLTF2Importer >> loadMetallicRoughnessMaterial: description commonDescription: commonDescription [
 	| material occlusionTexture metallicRoughnessTexture |
 	material := WDMetallicRoughnessMaterial new.
 	description at: 'baseColorFactor' ifPresent: [ :baseColor |
@@ -440,7 +440,7 @@ WDSRWGGLTF2Importer >> loadMetallicRoughnessMaterial: description commonDescript
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadNode: node childrenFrom: nodeDescription [
+WDSRWGLTF2Importer >> loadNode: node childrenFrom: nodeDescription [
 	nodeDescription at: 'children' ifPresent: [ :children |
 		children do: [ :childIndex |
 			node add: (nodes at: childIndex + 1)
@@ -450,7 +450,7 @@ WDSRWGGLTF2Importer >> loadNode: node childrenFrom: nodeDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadNodeFrom: nodeDescription [
+WDSRWGLTF2Importer >> loadNodeFrom: nodeDescription [
 	| node cameraDescription perspective transform |
 	node := WDSceneNode new.
 
@@ -465,7 +465,6 @@ WDSRWGGLTF2Importer >> loadNodeFrom: nodeDescription [
 			node renderables: {WDSkeletalMeshRenderable new
 				referenceMesh: mesh;
 				skeleton: skin skeleton;
-				mesh: node renderable;
 				yourself}
 		]
 	].
@@ -507,7 +506,7 @@ WDSRWGGLTF2Importer >> loadNodeFrom: nodeDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadNodesFrom: elements [
+WDSRWGLTF2Importer >> loadNodesFrom: elements [
 	nodes := OrderedCollection new.
 	nodeBoneStates := OrderedCollection new.
 	nodesUsingSkin := Dictionary new.
@@ -522,21 +521,21 @@ WDSRWGGLTF2Importer >> loadNodesFrom: elements [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadSamplerFrom: samplerDescription [
+WDSRWGLTF2Importer >> loadSamplerFrom: samplerDescription [
 	| sampler |
-	sampler := WDSRWGGLTF2Sampler new.
+	sampler := WDSRWGLTF2Sampler new.
 	self flag: 'TODO: Parse the sampler description.'.
 	samplers add: sampler
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadSamplersFrom: elements [
+WDSRWGLTF2Importer >> loadSamplersFrom: elements [
 	samplers := OrderedCollection new.
 	elements do: [ :el | self loadSamplerFrom: el ].
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadSceneFrom: sceneDescription [
+WDSRWGLTF2Importer >> loadSceneFrom: sceneDescription [
 	| scene |
 	scene := WDScene new.
 	scene name: (sceneDescription at: 'name' ifAbsent: [ nil ]).
@@ -550,15 +549,15 @@ WDSRWGGLTF2Importer >> loadSceneFrom: sceneDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadScenesFrom: elements [
+WDSRWGLTF2Importer >> loadScenesFrom: elements [
 	scenes := OrderedCollection new.
 	elements do: [ :el | self loadSceneFrom: el ]
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadSkinFrom: skinDescription [
+WDSRWGLTF2Importer >> loadSkinFrom: skinDescription [
 	| skin |
-	skin := WDIGLTF2Skin new.
+	skin := WDSRWGLTF2Skin new.
 	skin
 		name: (skinDescription at: 'name' ifAbsent: [ nil ]);
 		jointIndices: (skinDescription at: 'joints'	);
@@ -571,7 +570,7 @@ WDSRWGGLTF2Importer >> loadSkinFrom: skinDescription [
 ]
 
 { #category : #'as yet unclassified' }
-WDSRWGGLTF2Importer >> loadSkinTopology: skin [
+WDSRWGLTF2Importer >> loadSkinTopology: skin [
 	| jointNodes bones visitedNodes sortedBones jointStates boneGraphNodes nodeToBoneGraphDictionary nodeToBoneDictionary boneToNodeDictionary rootMatrix |
 	jointNodes := skin jointIndices collect: [ :each | nodes at: each + 1 ].
 	jointStates := skin jointIndices collect: [ :each | nodeBoneStates at: each + 1 ].
@@ -581,9 +580,9 @@ WDSRWGGLTF2Importer >> loadSkinTopology: skin [
 	bones := jointNodes collectWithIndex: [ :node :index |
 		| bone |
 		
-		bone := WDCSkinnedModelBone new
+		bone := WDSkeletonBone new
 			name: node name;
-			loadStateFrom: (jointStates at: index);
+			transform: (jointStates at: index);
 			yourself.
 		nodeToBoneDictionary at: node put: bone.
 		boneToNodeDictionary at: bone put: node.
@@ -596,7 +595,7 @@ WDSRWGGLTF2Importer >> loadSkinTopology: skin [
 	nodeToBoneGraphDictionary := IdentityDictionary new.
 	boneGraphNodes := jointNodes collect: [ :node |
 		| graphNode |
-		graphNode := WDIGLTF2SkeletonGraphNode new
+		graphNode := WDSRWGLTF2SkeletonGraphNode new
 			bone: (nodeToBoneDictionary at: node);
 			yourself.
 		nodeToBoneGraphDictionary at: node put: graphNode.
@@ -623,7 +622,7 @@ WDSRWGGLTF2Importer >> loadSkinTopology: skin [
 	skin rootNode: (boneToNodeDictionary at: sortedBones first).
 
 	rootMatrix := skin rootNode parent
-		ifNil: [ Float32x4x4 identity ]
+		ifNil: [ Matrix4x4 identity ]
 		ifNotNil: [ :p | p globalTransform matrix4 ].
 
 	sortedBones doWithIndex: [ :bone :index |
@@ -644,14 +643,14 @@ WDSRWGGLTF2Importer >> loadSkinTopology: skin [
 	].
 
 	skin jointIndices doWithIndex: [ :nodeIndex :boneIndex |
-		nodeToArmature at: nodeIndex + 1 put: skin armature.
+		nodeToArmature at: nodeIndex + 1 put: skin skeleton.
 		nodeToBoneIndices at: nodeIndex + 1 put: (bones at: boneIndex) index
 	].
 
 	skin
 		jointIndexToBoneIndexPermutationTable: (bones collect: [ :each | each index ]) asArray.
 
-	skin armature
+	skin skeleton
 		rootMatrix: rootMatrix;
 		bones: sortedBones asArray;
 		restPoseInverseMatrices: skin permutatedInverseBindMatrices;
@@ -660,16 +659,16 @@ WDSRWGGLTF2Importer >> loadSkinTopology: skin [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadSkinsFrom: elements [
+WDSRWGLTF2Importer >> loadSkinsFrom: elements [
 	skins := OrderedCollection new.
 	elements do: [ :el | self loadSkinFrom: el ].
 
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadTextureFrom: textureDescription [
+WDSRWGLTF2Importer >> loadTextureFrom: textureDescription [
 	| texture |
-	texture := WDSRWGGLTF2Texture new.
+	texture := WDSRWGLTF2Texture new.
 	textureDescription at: 'sampler' ifPresent: [ :samplerIndex |
 		texture sampler: (samplers at: samplerIndex + 1)
 	].
@@ -682,23 +681,23 @@ WDSRWGGLTF2Importer >> loadTextureFrom: textureDescription [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> loadTexturesFrom: elements [
+WDSRWGLTF2Importer >> loadTexturesFrom: elements [
 	textures := OrderedCollection new.
 	elements do: [ :el | self loadTextureFrom: el ]
 ]
 
 { #category : #accessing }
-WDSRWGGLTF2Importer >> loadingDirectory [
+WDSRWGLTF2Importer >> loadingDirectory [
 	^ loadingDirectory
 ]
 
 { #category : #accessing }
-WDSRWGGLTF2Importer >> loadingDirectory: anObject [
+WDSRWGLTF2Importer >> loadingDirectory: anObject [
 	loadingDirectory := anObject
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> parseDataURI: uri [
+WDSRWGLTF2Importer >> parseDataURI: uri [
 	| dataStartIndex metadata data mediaTypeAndEncoding mediaType encoding |
 	dataStartIndex := uri indexOf: $,.
 	metadata := uri copyFrom: 'data:' size + 1 to: dataStartIndex - 1.
@@ -713,7 +712,7 @@ WDSRWGGLTF2Importer >> parseDataURI: uri [
 ]
 
 { #category : #loading }
-WDSRWGGLTF2Importer >> processGLTFJson: json [
+WDSRWGLTF2Importer >> processGLTFJson: json [
 	| asset |
 	currentGLTFJson := json.
 
@@ -751,7 +750,7 @@ WDSRWGGLTF2Importer >> processGLTFJson: json [
 ]
 
 { #category : #'as yet unclassified' }
-WDSRWGGLTF2Importer >> topologicalSortBoneGraphNode: boneGraphNode into: sortedBones visited: visitedNodes [
+WDSRWGLTF2Importer >> topologicalSortBoneGraphNode: boneGraphNode into: sortedBones visited: visitedNodes [
 	(visitedNodes includes: boneGraphNode) ifTrue: [ ^ self ].
 	visitedNodes add: boneGraphNode.
 

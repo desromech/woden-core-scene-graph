@@ -22,7 +22,12 @@ WDBinaryBufferAccessorType >> asBinaryBufferAccessorType [
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDBinaryBufferAccessorType >> componentCount [
 	^ self subclassResponsibility
+]
+
+{ #category : #factory }
+WDBinaryBufferAccessorType >> makeWithComponents: components [
+	self subclassResponsibility
 ]

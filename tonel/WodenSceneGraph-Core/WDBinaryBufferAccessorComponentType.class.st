@@ -17,6 +17,11 @@ WDBinaryBufferAccessorComponentType >> asBinaryBufferAccessorComponentType [
 	^ self
 ]
 
+{ #category : #'reading-writing' }
+WDBinaryBufferAccessorComponentType >> readFromBuffer: buffer at: index [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 WDBinaryBufferAccessorComponentType >> size [
 	self subclassResponsibility

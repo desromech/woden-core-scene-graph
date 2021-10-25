@@ -1,5 +1,5 @@
 Class {
-	#name : #WDIGLTF2AnimationChannel,
+	#name : #WDSRWGLTF2AnimationChannel,
 	#superclass : #Object,
 	#instVars : [
 		'sampler',
@@ -14,7 +14,7 @@ Class {
 }
 
 { #category : #'class initialization' }
-WDIGLTF2AnimationChannel class >> initialize [
+WDSRWGLTF2AnimationChannel class >> initialize [
 	TargetPropertyToClassMap := Dictionary newFromPairs: { 
 		#translation . WDCSkinnedModelTranslationAnimationChannel.
 		#rotation . WDCSkinnedModelRotationAnimationChannel.
@@ -24,7 +24,7 @@ WDIGLTF2AnimationChannel class >> initialize [
 ]
 
 { #category : #converting }
-WDIGLTF2AnimationChannel >> asSkinnedModelAnimationChannel [
+WDSRWGLTF2AnimationChannel >> asSkinnedModelAnimationChannel [
 	^ self skinnedModelAnimationChannelClass new
 		targetArmature: targetArmature;
 		targetBoneIndex: targetBoneIndex;
@@ -37,48 +37,48 @@ WDIGLTF2AnimationChannel >> asSkinnedModelAnimationChannel [
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> sampler [
+WDSRWGLTF2AnimationChannel >> sampler [
 	^ sampler
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> sampler: anObject [
+WDSRWGLTF2AnimationChannel >> sampler: anObject [
 	sampler := anObject
 ]
 
 { #category : #'as yet unclassified' }
-WDIGLTF2AnimationChannel >> skinnedModelAnimationChannelClass [
+WDSRWGLTF2AnimationChannel >> skinnedModelAnimationChannelClass [
 	^ TargetPropertyToClassMap at: targetProperty
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> targetArmature [
+WDSRWGLTF2AnimationChannel >> targetArmature [
 
 	^ targetArmature
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> targetArmature: anObject [
+WDSRWGLTF2AnimationChannel >> targetArmature: anObject [
 
 	targetArmature := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> targetBoneIndex [
+WDSRWGLTF2AnimationChannel >> targetBoneIndex [
 	^ targetBoneIndex
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> targetBoneIndex: anObject [
+WDSRWGLTF2AnimationChannel >> targetBoneIndex: anObject [
 	targetBoneIndex := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> targetProperty [
+WDSRWGLTF2AnimationChannel >> targetProperty [
 	^ targetProperty
 ]
 
 { #category : #accessing }
-WDIGLTF2AnimationChannel >> targetProperty: anObject [
+WDSRWGLTF2AnimationChannel >> targetProperty: anObject [
 	targetProperty := anObject
 ]

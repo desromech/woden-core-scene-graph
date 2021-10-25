@@ -41,6 +41,12 @@ WDRenderable >> copyWithMaterial: aMaterial [
 WDRenderable >> emitRenderingCommandsWithRenderer: renderer [
 ]
 
+{ #category : #initialization }
+WDRenderable >> initialize [
+	super initialize.
+	name := ''.
+]
+
 { #category : #accessing }
 WDRenderable >> name [
 

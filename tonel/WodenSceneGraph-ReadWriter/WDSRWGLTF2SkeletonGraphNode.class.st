@@ -1,36 +1,36 @@
 Class {
-	#name : #WDIGLTF2SkeletonGraphNode,
+	#name : #WDSRWGLTF2SkeletonGraphNode,
 	#superclass : #Object,
 	#instVars : [
 		'parent',
 		'bone'
 	],
 	#pools : [
-		'WDSRWGGLTF2Constants'
+		'WDSRWGLTF2Constants'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
 
 { #category : #accessing }
-WDIGLTF2SkeletonGraphNode >> bone [
+WDSRWGLTF2SkeletonGraphNode >> bone [
 
 	^ bone
 ]
 
 { #category : #accessing }
-WDIGLTF2SkeletonGraphNode >> bone: anObject [
+WDSRWGLTF2SkeletonGraphNode >> bone: anObject [
 
 	bone := anObject
 ]
 
 { #category : #accessing }
-WDIGLTF2SkeletonGraphNode >> parent [
+WDSRWGLTF2SkeletonGraphNode >> parent [
 
 	^ parent
 ]
 
 { #category : #accessing }
-WDIGLTF2SkeletonGraphNode >> parent: anObject [
+WDSRWGLTF2SkeletonGraphNode >> parent: anObject [
 
 	parent := anObject
 ]

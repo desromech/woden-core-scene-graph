@@ -14,5 +14,5 @@ WDSRWGLTF2ReadWriter class >> extensions [
 
 { #category : #documentation }
 WDSRWGLTF2ReadWriter class >> readFromFileReference: aFileReference [
-	^ WDSRWGGLTF2TextImporter readFromFileReference: aFileReference
+	^ WDSRWGLTF2TextImporter readFromFileReference: aFileReference
 ]
