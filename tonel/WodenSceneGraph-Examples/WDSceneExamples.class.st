@@ -45,6 +45,24 @@ WDSceneExamples class >> exampleCube [
 ]
 
 { #category : #'basic shapes' }
+WDSceneExamples class >> exampleCubeSphere [
+	"
+	self exampleCubeSphere
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			addCubeSphereWithRadius: 0.5 subdivisions: 2;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		inspect
+]
+
+{ #category : #'basic shapes' }
 WDSceneExamples class >> exampleEmpty [
 	"
 	self exampleEmpty
@@ -115,6 +133,78 @@ WDSceneExamples class >> exampleTexturedCube3 [
 			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
 			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
 			mesh);
+		inspect
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleTexturedCubeSphere [
+	"
+	self exampleCubeSphere
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+			addCubeSphereWithRadius: 0.5 subdivisions: 2;
+			generateTexcoords0WithSphericalProjection;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		inspect
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleTexturedCubeSphere2 [
+	"
+	self exampleCube
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+			addCubeSphereWithRadius: 0.5 subdivisions: 2;
+			generateTexcoords0WithSphericalProjection;
+			generateTangentSpaceFrame;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		inspect
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleTexturedCubeSphere3 [
+	"
+	self exampleCube
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDUnlitMaterial new
+				colorTexture: self checkboardTexture;
+				yourself);
+			addCubeSphereWithRadius: 0.5 subdivisions: 2;
+			generateTexcoords0WithSphericalProjection;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
 		inspect
 ]
 
@@ -193,7 +283,7 @@ WDSceneExamples class >> exampleTexturedUVSphere3 [
 { #category : #'basic shapes' }
 WDSceneExamples class >> exampleUVSphere [
 	"
-	self exampleCube
+	self exampleUVSphere
 	"
 	WDScene new
 		add: (WDMeshBuilder new

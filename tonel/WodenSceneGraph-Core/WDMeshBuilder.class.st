@@ -24,6 +24,7 @@ Class {
 		'currentMaterial'
 	],
 	#classVars : [
+		'CubeSphereBaseLevelQuads',
 		'NormalAxis'
 	],
 	#category : #'WodenSceneGraph-Core-RenderableBuilder'
@@ -38,6 +39,50 @@ WDMeshBuilder class >> initialize [
 		Vector3 x: 0 y: -1 z: 0 .
 		Vector3 x: 0 y: 0 z: 1 .
 		Vector3 x: 0 y: 0 z: -1 .
+	}.
+	
+	CubeSphereBaseLevelQuads := { 
+		{
+			Vector3 x: -1 y: -1 z: -1. 
+			Vector3 x: -1 y: -1 z: 1. 
+			Vector3 x: -1 y: 1 z: 1. 
+			Vector3 x: -1 y: 1 z: -1.
+		}.
+
+		{
+			Vector3 x: 1 y: 1 z: -1. 
+			Vector3 x: 1 y: 1 z: 1. 
+			Vector3 x: 1 y: -1 z: 1. 
+			Vector3 x: 1 y: -1 z: -1.
+		}.
+
+		{
+			Vector3 x: 1 y: -1  z: -1. 
+			Vector3 x: 1 y: -1 z: 1. 
+			Vector3 x: -1 y: -1 z: 1. 
+			Vector3 x: -1 y: -1 z: -1.
+		}.
+
+		{
+			Vector3 x: -1 y: 1 z: -1. 
+			Vector3 x: -1 y: 1 z: 1. 
+			Vector3 x: 1 y: 1 z: 1. 
+			Vector3 x: 1 y: 1 z: -1.
+		}.
+
+		{
+			Vector3 x: 1 y: 1 z: -1. 
+			Vector3 x: 1 y: -1 z: -1. 
+			Vector3 x: -1 y: -1 z: -1. 
+			Vector3 x: -1 y: 1 z: -1.
+		}.
+
+		{
+			Vector3 x: -1 y: 1 z: 1. 
+			Vector3 x: -1 y: -1 z: 1. 
+			Vector3 x: 1 y: -1 z: 1. 
+			Vector3 x: 1 y: 1 z: 1.
+		}.
 	}.
 ]
 
@@ -105,6 +150,11 @@ WDMeshBuilder >> addCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z: maxZ [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addCubeSphereWithRadius: radius subdivisions: subdivisions [
+	self privateAddCubeSphereWithRadius: radius subdivisions: subdivisions quads: CubeSphereBaseLevelQuads
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addCubeWithWidth: width height: height depth: depth [
 	| halfWidth halfHeight halfDepth |
 	halfWidth := width / 2.
@@ -140,6 +190,13 @@ WDMeshBuilder >> addQuadI0: i0 i1: i1 i2: i2 i3: i3 [
 	indices
 		add: i0 + baseVertex ; add: i1 + baseVertex; add: i2 + baseVertex;
 		add: i2 + baseVertex ; add: i3 + baseVertex; add: i0 + baseVertex
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addQuadIndices: quadIndices [
+	indices
+		add: quadIndices first + baseVertex ; add: quadIndices second + baseVertex; add: quadIndices third + baseVertex;
+		add: quadIndices third + baseVertex ; add: quadIndices fourth + baseVertex; add: quadIndices first + baseVertex
 ]
 
 { #category : #adding }
@@ -658,6 +715,67 @@ WDMeshBuilder >> positions [
 WDMeshBuilder >> primitives [
 
 	^ primitives
+]
+
+{ #category : #adding }
+WDMeshBuilder >> privateAddCubeSphereWithRadius: radius subdivisions: subdivisions quads: quads [
+	| subdividedQuads |
+	subdivisions <= 0 ifTrue: [
+		| positionDictionary sphereVertexCount |
+		positionDictionary := Dictionary new.
+
+		self beginTriangles.
+		sphereVertexCount := 0.
+		
+		quads do: [ :eachQuad |
+			self addQuadIndices: (eachQuad collect: [ :position |
+				positionDictionary at: position ifAbsentPut: [
+					| normal |
+					sphereVertexCount := sphereVertexCount + 1.
+					normal := position normalized.
+					self addP: normal * radius; addN: normal.
+					sphereVertexCount - 1
+				]
+			])
+		].
+	
+		^ self
+	].
+
+	subdividedQuads := OrderedCollection new.
+	quads do: [ :quad |
+		| bl br tr tl l r b t m|
+		bl := quad first.
+		br := quad second.
+		tr := quad third.
+		tl := quad fourth.
+
+		l := (tl + bl) / 2.
+		r := (tr + br) / 2.
+		b := (br + bl) / 2.
+		t := (tr + tl) / 2.
+		m := (bl + br + tr + tl) / 2.
+		
+		bl := bl normalized.
+		br := br normalized.
+		tl := tl normalized.
+		tr := tr normalized.
+
+		l := l normalized.
+		r := r normalized.
+		b := b normalized.
+		t := t normalized.
+		m := m normalized.
+
+		subdividedQuads
+			add: { l . bl . b . m };
+			add: { b . br . r . m };
+			add: { r . tr . t . m };
+			add: { t . tl . l . m }.
+	].
+
+	self privateAddCubeSphereWithRadius: radius subdivisions: subdivisions - 1 quads: subdividedQuads
+
 ]
 
 { #category : #initialization }
