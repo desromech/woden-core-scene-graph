@@ -35,6 +35,9 @@ BaselineOfWodenSceneGraph >> baseline: spec [
 			package: #'WodenSceneGraph-Renderer-AbstractGPU' with: [
 				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'AbstractGPU').
 			];
+			package: #'WodenSceneGraph-ReadWriter' with: [
+				spec requires: #( #'WodenSceneGraph-Renderer-Core').
+			];
 			package: #'WodenSceneGraph-Examples' with: [
 				spec requires: #( #'WodenSceneGraph-Spec').
 			]

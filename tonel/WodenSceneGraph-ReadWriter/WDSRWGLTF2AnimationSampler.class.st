@@ -15,9 +15,9 @@ Class {
 { #category : #'class initialization' }
 WDSRWGLTF2AnimationSampler class >> initialize [
 	InterpolationAlgorithmToInterpolationMethodMap := Dictionary newFromPairs: { 
-		'LINEAR' . WDCAnimationInterpolationMethod linear.
-		'STEP' . WDCAnimationInterpolationMethod step.
-		'CUBICSPLINE' . WDCAnimationInterpolationMethod cubicSpline.
+		'LINEAR' . WDCurveInterpolationMethodLinear asCurveInterpolationMethod.
+		'STEP' . WDCurveInterpolationMethodStep asCurveInterpolationMethod.
+		'CUBICSPLINE' . WDCurveInterpolationMethodCubicSpline asCurveInterpolationMethod.
 	}
 
 ]
