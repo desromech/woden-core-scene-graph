@@ -32,7 +32,6 @@ Class {
 	],
 	#pools : [
 		'AGPUConstants',
-		'WDCVertexBindingConstants',
 		'WDSRWGLTF2Constants'
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
