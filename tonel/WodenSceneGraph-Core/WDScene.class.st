@@ -19,6 +19,16 @@ WDScene >> add: aNode [
 	normalLayer add: aNode
 ]
 
+{ #category : #adding }
+WDScene >> addBackground: aNode [
+	backgroundLayer add: aNode
+]
+
+{ #category : #adding }
+WDScene >> addForeground: aNode [
+	foregroundLayer add: aNode
+]
+
 { #category : #accessing }
 WDScene >> ambientLightProbe: aWDLightProbe [
 	normalLayer ambientLightProbe: aWDLightProbe

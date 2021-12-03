@@ -164,6 +164,73 @@ WDMeshBuilder >> addCubeWithWidth: width height: height depth: depth [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addInteriorCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z: maxZ [
+	self
+		"Left"
+		beginTriangles;
+		addPx: minX y: minY z: minZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addPx: minX y: maxY z: minZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addPx: minX y: maxY z: maxZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addPx: minX y: minY z: maxZ; addNx: 1.0 y: 0.0 z: 0.0;
+		addTriangleI0: 0 i1: 1 i2: 2;
+		addTriangleI0: 2 i1: 3 i2: 0;
+
+		"Right"
+		beginTriangles;
+		addPx: maxX y: minY z: minZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addPx: maxX y: maxY z: minZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addPx: maxX y: maxY z: maxZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addPx: maxX y: minY z: maxZ; addNx: -1.0 y: 0.0 z: 0.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0;
+
+		"Top"
+		beginTriangles;
+		addPx: minX y: maxY z: minZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addPx: maxX y: maxY z: minZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addPx: maxX y: maxY z: maxZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addPx: minX y: maxY z: maxZ; addNx: 0.0 y: -1.0 z: 0.0;
+		addTriangleI0: 0 i1: 1 i2: 2;
+		addTriangleI0: 2 i1: 3 i2: 0;
+
+		"Bottom"
+		beginTriangles;
+		addPx: minX y: minY z: minZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: maxX y: minY z: minZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: maxX y: minY z: maxZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: minX y: minY z: maxZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0;
+
+		"Back"
+		beginTriangles;
+		addPx: minX y: minY z: minZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addPx: maxX y: minY z: minZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addPx: maxX y: maxY z: minZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addPx: minX y: maxY z: minZ; addNx: 0.0 y: 0.0 z: 1.0;
+		addTriangleI0: 0 i1: 1 i2: 2;
+		addTriangleI0: 2 i1: 3 i2: 0;
+
+		"Front"
+		beginTriangles;
+		addPx: minX y: minY z: maxZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: maxX y: minY z: maxZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: maxX y: maxY z: maxZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: minX y: maxY z: maxZ; addNx: 0.0 y: 0.0 z: -1.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addInteriorCubeWithWidth: width height: height depth: depth [
+	| halfWidth halfHeight halfDepth |
+	halfWidth := width / 2.
+	halfHeight := height / 2.
+	halfDepth := depth / 2.
+	self addInteriorCubeMinX: halfWidth negated y: halfHeight negated z: halfDepth negated maxX: halfWidth y: halfHeight z: halfDepth
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addN: normal [
 	normals add: normal x; add: normal y; add: normal z.
 ]

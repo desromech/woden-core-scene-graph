@@ -32,7 +32,8 @@ Class {
 		'reinhardToneMappingOperator',
 		'exponentialToneMappingOperator',
 		'filmicToneMappingOperator',
-		'transparentTextureCube'
+		'transparentTextureCube',
+		'forwardEnvironmentMapFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -247,6 +248,20 @@ WDAGPUSceneRendererResourceCache >> device [
 ]
 
 { #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> environmentMapMaterialStateSource [
+	^ '
+layout(set=4, binding=0, std140) uniform MaterialStateBlock
+{
+	int doubleSided;
+	float alphaCutoff;
+	vec4 colorFactor;
+} MaterialState;
+
+layout(set=4, binding=1) uniform textureCube ColorTexture;
+'
+]
+
+{ #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> exponentialToneMappingOperatorShaderSource [
 	^ '
 #version 450
@@ -288,6 +303,29 @@ void main()
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = filmicCurve(hdrColor);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> forwardEnvironmentMapFragmentShader [
+	^ forwardEnvironmentMapFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> forwardEnvironmentMapFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , self genericSurfaceMaterialFragmentShaderInputs, self forwardFragmentShaderOutputs, self environmentMapMaterialStateSource , '
+#line 6
+
+void main()
+{ 
+	vec4 color = StageInput.color * MaterialState.colorFactor * texture(samplerCube(ColorTexture, TextureSampler), StageInput.worldPosition - CameraState.transformationMatrix[3].xyz);
+	if(color.a < MaterialState.alphaCutoff)
+		discard;
+		
+	FragmentOutputColor = color;
 }
 '
 ]
@@ -691,6 +729,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	genericSurfaceMaterialVertexShaders := Dictionary new.
 	forwardMetallicRoughnessFragmentShader := self compileShader: self forwardMetallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	forwardUnlitFragmentShader := self compileShader: self forwardUnlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	forwardEnvironmentMapFragmentShader  := self compileShader: self forwardEnvironmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	screenQuadVertexShader := textureUploader utilityResourceCache screenQuadVertexShader.
 	defaultMaterial := WDMetallicRoughnessMaterial default.
 	projectionNDCAdjustMatrix :=

@@ -131,6 +131,30 @@ WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState [
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCommands: material [
+	| locationMask |
+	locationMask := currentObjectVertexBinding locationMask.
+	
+	stateTracker
+		useShaderResources: (activeResourceDictionary at: material ifAbsentPut: [ 
+			| binding |
+			binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+			binding
+				writeState: material with: WDAGPUUnlitMaterialUniformBufferWriter;
+				bindSampledTextureView: (self validTextureViewHandleFor: material colorTexture fallbackTextureWith: [renderer resourceCache whiteTexture2D]) inSlot: 1.
+				
+			activeSlabResource add: binding.
+			binding
+		]) bindingHandle;
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
+		setFragmentStage: renderer resourceCache forwardEnvironmentMapFragmentShader entryPoint: 'main';
+		setCullMode: (material doubleSided
+			ifTrue: [ AGPU_CULL_MODE_NONE ]
+			ifFalse: [ AGPU_CULL_MODE_BACK ]).
+	^ true
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivationCommands: material [
 	| locationMask |
 	locationMask := currentObjectVertexBinding locationMask.
