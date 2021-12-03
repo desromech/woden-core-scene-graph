@@ -34,9 +34,19 @@ WDTexture class >> computeMiplevelsForWidth: width height: height [
 	^ result
 ]
 
+{ #category : #'as yet unclassified' }
+WDTexture class >> diffuseLightProbeWithSize: size forEnvironmentMap: environmentMap [
+	^ self new setupDiffuseLightProbeWithSize: size forEnvironmentMap: environmentMap; yourself
+]
+
+{ #category : #'as yet unclassified' }
+WDTexture class >> environmentMapWithSize: size forHDRITexture: texture [	
+	^ self new setupEnvironmentMapWithSize: size forHDRITexture: texture; yourself
+]
+
 { #category : #construction }
-WDTexture class >> forColorFileReference: aFileReferencee [
-	^ self new setupForColorFileReference: aFileReferencee; yourself
+WDTexture class >> forColorFileReference: aFileReference [
+	^ self new setupForColorFileReference: aFileReference; yourself
 ]
 
 { #category : #construction }
@@ -45,8 +55,13 @@ WDTexture class >> forColorForm: aForm [
 ]
 
 { #category : #construction }
-WDTexture class >> forNonColorFileReference: aFileReferencee [
-	^ self new setupForNonColorFileReference: aFileReferencee; yourself
+WDTexture class >> forHDRIFileReference: aFileReference [
+	^ self new setupForHDRIFileReference: aFileReference; yourself
+]
+
+{ #category : #construction }
+WDTexture class >> forNonColorFileReference: aFileReference [
+	^ self new setupForNonColorFileReference: aFileReference; yourself
 ]
 
 { #category : #construction }
@@ -55,8 +70,8 @@ WDTexture class >> forNonColorForm: aForm [
 ]
 
 { #category : #construction }
-WDTexture class >> forNormalMapFileReference: aForm [
-	^ self new setupForNormalMapFileReference: aForm; yourself
+WDTexture class >> forNormalMapFileReference: aFileReference [
+	^ self new setupForNormalMapFileReference: aFileReference; yourself
 ]
 
 { #category : #construction }
@@ -87,6 +102,11 @@ WDTexture class >> forSampledColorBufferWithExtent: anExtent [
 		sampleCount: 1;
 		changed;
 		yourself
+]
+
+{ #category : #'as yet unclassified' }
+WDTexture class >> specularLightProbeWithSize: size forEnvironmentMap: environmentMap [
+	^ self new setupSpecularLightProbeWithSize: size forEnvironmentMap: environmentMap; yourself
 ]
 
 { #category : #accessing }
@@ -210,6 +230,40 @@ WDTexture >> sampleQuality: anInteger [
 ]
 
 { #category : #initialization }
+WDTexture >> setupDiffuseLightProbeWithSize: size forEnvironmentMap: texture [
+	self
+		dataKind: WDTextureDataKindDiffuseLightProbe;
+		format: WDTextureFormatR16G16B16A16Float;
+		type: WDTextureTypeCube;
+		width: size;
+		height: size;
+		depth: 1;
+		layers: 6;
+		miplevels: 1;
+		sampleCount: 1;
+		data: texture;
+		changed
+
+]
+
+{ #category : #initialization }
+WDTexture >> setupEnvironmentMapWithSize: size forHDRITexture: texture [
+	self
+		dataKind: WDTextureDataKindCubeEnvironmentMap;
+		format: WDTextureFormatR16G16B16A16Float;
+		type: WDTextureTypeCube;
+		width: size;
+		height: size;
+		depth: 1;
+		layers: 6;
+		miplevels: 1;
+		sampleCount: 1;
+		data: texture;
+		changed
+
+]
+
+{ #category : #initialization }
 WDTexture >> setupForColorFileReference: aFileReference [
 	self
 		dataKind: WDTextureDataKindColor;
@@ -245,6 +299,31 @@ WDTexture >> setupForFormCommon: aForm [
 		changed
 ]
 
+{ #category : #private }
+WDTexture >> setupForHDRI: hdri [
+	self
+		type: WDTextureType2D;
+		width: hdri width;
+		height: hdri height;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		sampleCount: 1;
+		data: hdri;
+		changed
+]
+
+{ #category : #initialization }
+WDTexture >> setupForHDRIFileReference: aFileReference [
+	self
+		dataKind: WDTextureDataKindHDRI;
+		format: WDTextureFormatR8G8B8A8UNorm.
+		
+	
+	self flag: 'TODO: Add support for asynchronous loading'.
+	self setupForHDRI: (AGPURadianceHDRLoader tryToLoadFromFileReference: aFileReference)
+]
+
 { #category : #initialization }
 WDTexture >> setupForNonColorFileReference: aFileReference [
 	self
@@ -275,6 +354,23 @@ WDTexture >> setupForNormalMapForm: aForm [
 		dataKind: WDTextureDataKindNormalMap;
 		format: WDTextureFormatB8G8R8A8UNorm;
 		setupForFormCommon: aForm
+]
+
+{ #category : #initialization }
+WDTexture >> setupSpecularLightProbeWithSize: size forEnvironmentMap: texture [
+	self
+		dataKind: WDTextureDataKindSpecularLightProbe;
+		format: WDTextureFormatR16G16B16A16Float;
+		type: WDTextureTypeCube;
+		width: size;
+		height: size;
+		depth: 1;
+		layers: 6;
+		miplevels: (self class computeMiplevelsForWidth: size height: size);
+		sampleCount: 1;
+		data: texture;
+		changed
+
 ]
 
 { #category : #accessing }

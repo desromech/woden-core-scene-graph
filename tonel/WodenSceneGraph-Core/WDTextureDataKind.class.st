@@ -23,11 +23,31 @@ WDTextureDataKind >> isColorData [
 ]
 
 { #category : #testing }
+WDTextureDataKind >> isCubeEnvironmentMapData [
+	^ false
+]
+
+{ #category : #testing }
+WDTextureDataKind >> isDiffuseLightProbe [
+	^ false
+]
+
+{ #category : #testing }
+WDTextureDataKind >> isHDRIData [
+	^ false
+]
+
+{ #category : #testing }
 WDTextureDataKind >> isNonColorData [
 	^ false
 ]
 
 { #category : #testing }
 WDTextureDataKind >> isNormalMapData [
+	^ false
+]
+
+{ #category : #testing }
+WDTextureDataKind >> isSpecularLightProbe [
 	^ false
 ]

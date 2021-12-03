@@ -43,6 +43,11 @@ WDTextureFormat >> isR16G16B16A16Float [
 ]
 
 { #category : #testing }
+WDTextureFormat >> isR8G8B8A8UNorm [
+	^ false
+]
+
+{ #category : #testing }
 WDTextureFormat >> isSRGB [
 	^ false
 ]

@@ -30,6 +30,21 @@ WDSceneLayer >> adjustBaseCameraState: aBaseCameraState [
 	^ self subclassResponsibility
 ]
 
+{ #category : #accessing }
+WDSceneLayer >> ambientLightProbe: aWDLightProbe [
+	globalLightingState ambientLightProbe: aWDLightProbe
+]
+
+{ #category : #accessing }
+WDSceneLayer >> ambientLighting [
+	^ globalLightingState ambientLighting
+]
+
+{ #category : #accessing }
+WDSceneLayer >> ambientLighting: aLightingColor [
+	globalLightingState ambientLighting: aLightingColor
+]
+
 { #category : #converting }
 WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	| adjustedCameraState result |

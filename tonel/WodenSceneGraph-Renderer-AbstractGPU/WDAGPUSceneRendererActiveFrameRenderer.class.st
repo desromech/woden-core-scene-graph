@@ -102,7 +102,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindLightingState: lightingState [
 		binding := renderer resourceCache rendererShaderSignature allocateLightingState.
 		binding
 			writeState: lightingState with: WDAGPULightingStateUniformBufferWriter;
-			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 1.
+			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 1;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientDiffuseLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 2;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientSpecularLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 3.
 		activeSlabResource add: binding.
 		binding
 	]) bindingHandle.

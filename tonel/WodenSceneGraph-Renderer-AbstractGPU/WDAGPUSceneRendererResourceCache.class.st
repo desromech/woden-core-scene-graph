@@ -31,7 +31,8 @@ Class {
 		'toneMapOperatorShaderDictionary',
 		'reinhardToneMappingOperator',
 		'exponentialToneMappingOperator',
-		'filmicToneMappingOperator'
+		'filmicToneMappingOperator',
+		'transparentTextureCube'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -60,6 +61,7 @@ WDAGPUSceneRendererResourceCache class >> for: device withTextureUploader: textu
 WDAGPUSceneRendererResourceCache class >> initialize [
 	TextureFormatMap := Dictionary newFromPairs: {
 		WDTextureFormatUnknown uniqueInstance . AGPU_TEXTURE_FORMAT_UNKNOWN.
+		WDTextureFormatR8G8B8A8UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM.
 		WDTextureFormatB8G8R8A8UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM.
 		WDTextureFormatB8G8R8A8UNormSRGB uniqueInstance . AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB.
 		WDTextureFormatR16G16B16A16Float uniqueInstance . AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT.
@@ -208,6 +210,27 @@ WDAGPUSceneRendererResourceCache >> createTexture2DWithSingleColor: colorData [
 	^ result
 ]
 
+{ #category : #private }
+WDAGPUSceneRendererResourceCache >> createTextureCubeWithSingleColor: colorData [
+	| result |
+	result := device createTexture: (AGPUTextureDescription new
+			type: AGPU_TEXTURE_CUBE;
+			width: 1;
+			height: 1;
+			depth: 1;
+			layers: 6;
+			miplevels: 1;
+			format: AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM;
+			usage_modes: (AGPU_TEXTURE_USAGE_SAMPLED bitOr: AGPU_TEXTURE_USAGE_COPY_DESTINATION);
+			main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+			sample_count: 1;
+			yourself).
+	0 to: 5 do: [ :i |
+		result uploadTextureData: 0 arrayIndex: i pitch: 4 slicePitch: 4 data: colorData.
+	].
+	^ result
+]
+
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> defaultMaterial [
 	^ defaultMaterial
@@ -285,7 +308,7 @@ WDAGPUSceneRendererResourceCache >> forwardMetallicRoughnessFragmentShader [
 WDAGPUSceneRendererResourceCache >> forwardMetallicRoughnessFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self forwardMetallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self forwardMetallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , '
 #line 6
 
 void main()
@@ -406,7 +429,23 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	// Ambient lighting accumulation.
 	lightedColor += surfaceParameters.baseColor.rgb*LightingState.ambientLighting;
 
-	// TODO: Add support for image based lighting.
+	// Add the lighting cube.
+	vec3 R = reflect(-surfaceParameters.V, surfaceParameters.N);
+
+	mat3 viewToWorld = mat3(CameraState.inverseTransformationMatrix[0].xyz, CameraState.inverseTransformationMatrix[1].xyz, CameraState.inverseTransformationMatrix[2].xyz);
+	vec3 worldN = surfaceParameters.N * viewToWorld;
+	vec3 worldR = R * viewToWorld;
+
+	vec3 diffuseLightProbeSample = textureLod(samplerCube(AmbientDiffuseLightProbeTexture, BrdfLutSampler), worldN, 0.0).rgb;
+
+	float specularLightProbeLevel = float(textureQueryLevels(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler)) - 1) * surfaceParameters.roughnessFactor;
+	vec3 specularLightProbeSample = textureLod(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler), worldR, specularLightProbeLevel).rgb;
+
+	vec2 ambientReflectionFactors = textureLod(sampler2D(BRDFLutTexture, BrdfLutSampler), vec2(NdotV, surfaceParameters.roughnessFactor), 0.0).rg;
+	vec3 specularFactor = F0*ambientReflectionFactors.x + ambientReflectionFactors.y;
+
+	// Add the light probe.
+	lightedColor += diffuseLightProbeSample*diffuse + specularLightProbeSample*specularFactor;
 	
 	lightedColor *= surfaceParameters.occlusionFactor;
 	lightedColor += surfaceParameters.emissiveFactor;
@@ -529,7 +568,7 @@ vec3 transformNormalToWorld(vec3 normal)
 		ObjectState.inverseTransformationMatrix[2].xyz);
 }
 
-vec3 transformFormWorldToView(vec3 normal)
+vec3 transformNormalWorldToView(vec3 normal)
 { 
 	return normal *
 		mat3(CameraState.transformationMatrix[0].xyz,
@@ -539,7 +578,7 @@ vec3 transformFormWorldToView(vec3 normal)
 
 vec3 transformNormalToView(vec3 normal)
 { 
-	return transformFormWorldToView(transformNormalToWorld(normal));
+	return transformNormalWorldToView(transformNormalToWorld(normal));
 }
 
 void main()
@@ -647,6 +686,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	whiteTexture2D := self createTexture2DWithSingleColor: #[255 255 255 255].
 	transparentTexture2D := self createTexture2DWithSingleColor: #[0 0 0 0].
 	neutralNormalTexture := self createTexture2DWithSingleColor: #[128 128 255 255].
+	transparentTextureCube := self createTextureCubeWithSingleColor: #[0 0 0 0].
 	
 	genericSurfaceMaterialVertexShaders := Dictionary new.
 	forwardMetallicRoughnessFragmentShader := self compileShader: self forwardMetallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -697,6 +737,8 @@ layout(set=2, binding=0, std140) uniform LightingStateBlock
 } LightingState;
 
 layout(set=2, binding=1) uniform texture2D BRDFLutTexture;
+layout(set=2, binding=2) uniform textureCube AmbientDiffuseLightProbeTexture;
+layout(set=2, binding=3) uniform textureCube AmbientSpecularLightProbeTexture;
 '
 ]
 
@@ -793,8 +835,8 @@ WDAGPUSceneRendererResourceCache >> rendererShaderSignature [
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> samplerStateSource [
 	^ '
-layout(set=0, binding=0) uniform sampler TextureSampler	;
-
+layout(set=0, binding=0) uniform sampler TextureSampler;
+layout(set=0, binding=1) uniform sampler BrdfLutSampler;
 '
 ]
 
@@ -827,6 +869,11 @@ WDAGPUSceneRendererResourceCache >> toneMappingOperatorShaderFor: aToneMapOperat
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> transparentTexture2D [
 	^ transparentTexture2D
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> transparentTextureCube [
+	^ transparentTextureCube
 ]
 
 { #category : #accessing }

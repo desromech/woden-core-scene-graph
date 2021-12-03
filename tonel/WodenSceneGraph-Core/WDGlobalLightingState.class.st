@@ -7,7 +7,8 @@ Class {
 	#name : #WDGlobalLightingState,
 	#superclass : #Object,
 	#instVars : [
-		'ambientLighting'
+		'ambientLighting',
+		'ambientLightProbe'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -24,6 +25,21 @@ WDGlobalLightingState class >> defaultForInspector [
 	^ self default
 ]
 
+{ #category : #'as yet unclassified' }
+WDGlobalLightingState >> ambientDiffuseLightProbeTexture [
+	^ ambientLightProbe ifNotNil: [ ambientLightProbe diffuse ]
+]
+
+{ #category : #accessing }
+WDGlobalLightingState >> ambientLightProbe [
+	^ ambientLightProbe
+]
+
+{ #category : #accessing }
+WDGlobalLightingState >> ambientLightProbe: aWDLightProbe [
+	ambientLightProbe := aWDLightProbe
+]
+
 { #category : #accessing }
 WDGlobalLightingState >> ambientLighting [
 
@@ -31,14 +47,19 @@ WDGlobalLightingState >> ambientLighting [
 ]
 
 { #category : #accessing }
-WDGlobalLightingState >> ambientLighting: anObject [
+WDGlobalLightingState >> ambientLighting: anAmbientLightingFactor [
+	ambientLighting := anAmbientLightingFactor asVector3
+]
 
-	ambientLighting := anObject
+{ #category : #'as yet unclassified' }
+WDGlobalLightingState >> ambientSpecularLightProbeTexture [
+	^ ambientLightProbe ifNotNil: [ ambientLightProbe specular ]
 ]
 
 { #category : #'as yet unclassified' }
 WDGlobalLightingState >> globalLightingState: other [
 	ambientLighting := other ambientLighting.
+	ambientLightProbe := other ambientLightProbe.
 ]
 
 { #category : #initialization }

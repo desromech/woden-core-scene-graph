@@ -19,6 +19,21 @@ WDScene >> add: aNode [
 	normalLayer add: aNode
 ]
 
+{ #category : #accessing }
+WDScene >> ambientLightProbe: aWDLightProbe [
+	normalLayer ambientLightProbe: aWDLightProbe
+]
+
+{ #category : #accessing }
+WDScene >> ambientLighting [
+	^ normalLayer ambientLighting
+]
+
+{ #category : #accessing }
+WDScene >> ambientLighting: anAmbientLightingFactor [
+	normalLayer ambientLighting: anAmbientLightingFactor
+]
+
 { #category : #converting }
 WDScene >> asRenderingSceneWithCameraState: baseCameraState [
 	^ WDRenderingScene new
@@ -48,6 +63,16 @@ WDScene >> children [
 WDScene >> foregroundLayer [
 
 	^ foregroundLayer
+]
+
+{ #category : #accessing }
+WDScene >> globalLightingState [
+	^ normalLayer globalLightingState
+]
+
+{ #category : #accessing }
+WDScene >> globalLightingState: aGlobalLightingState [
+	normalLayer globalLightingState: aGlobalLightingState
 ]
 
 { #category : #initialization }
