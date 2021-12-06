@@ -20,6 +20,11 @@ WDMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ false
 ]
 
+{ #category : #testing }
+WDMaterial >> hasDepthTesting [
+	^ true
+]
+
 { #category : #accessing }
 WDMaterial >> name [
 

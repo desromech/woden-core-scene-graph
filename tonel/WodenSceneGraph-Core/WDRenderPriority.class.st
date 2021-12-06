@@ -5,6 +5,7 @@ Class {
 	#name : #WDRenderPriority,
 	#superclass : #Object,
 	#classVars : [
+		'RenderPriorityBackgroundNoDepth',
 		'RenderPriorityCount',
 		'RenderPriorityDefault',
 		'RenderPriorityOpaque',
@@ -12,6 +13,11 @@ Class {
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
+
+{ #category : #accessing }
+WDRenderPriority class >> backgroundNoDepth [
+	^ RenderPriorityBackgroundNoDepth
+]
 
 { #category : #accessing }
 WDRenderPriority class >> count [
@@ -25,9 +31,10 @@ WDRenderPriority class >> default [
 
 { #category : #initialization }
 WDRenderPriority class >> initialize [
-	RenderPriorityOpaque := 1.
-	RenderPriorityTranslucent := 2.
-	RenderPriorityCount := 2.
+	RenderPriorityBackgroundNoDepth := 1.
+	RenderPriorityOpaque := 2.
+	RenderPriorityTranslucent := 3.
+	RenderPriorityCount := 3.
 	
 	RenderPriorityDefault := RenderPriorityOpaque.
 ]

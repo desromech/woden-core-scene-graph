@@ -7,7 +7,8 @@ Class {
 	#instVars : [
 		'alphaMode',
 		'doubleSided',
-		'alphaCutoff'
+		'alphaCutoff',
+		'background'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -36,6 +37,18 @@ WDSurfaceMaterial >> alphaMode: aModeName [
 ]
 
 { #category : #accessing }
+WDSurfaceMaterial >> background [
+
+	^ background
+]
+
+{ #category : #accessing }
+WDSurfaceMaterial >> background: anObject [
+
+	background := anObject
+]
+
+{ #category : #accessing }
 WDSurfaceMaterial >> doubleSided [
 
 	^ doubleSided
@@ -57,15 +70,29 @@ WDSurfaceMaterial >> hasAlphaMasking [
 	^ alphaMode == #MASK
 ]
 
+{ #category : #testing }
+WDSurfaceMaterial >> hasDepthTesting [
+	^ background not and: [alphaMode ~~ #BLEND]
+]
+
 { #category : #initialization }
 WDSurfaceMaterial >> initialize [
 	super initialize.
 	alphaMode := #OPAQUE.
 	alphaCutoff := 0.5.
 	doubleSided := false.
+	background := false.
 ]
 
 { #category : #testing }
 WDSurfaceMaterial >> isOpaque [
 	^ alphaMode == #OPAQUE
+]
+
+{ #category : #rendering }
+WDSurfaceMaterial >> renderPriority [
+	self hasAlphaBlending ifTrue: [ ^ WDRenderPriority translucent ].
+	^ background
+		ifTrue: [ WDRenderPriority backgroundNoDepth ]
+		ifFalse: [ WDRenderPriority default ]
 ]

@@ -14,7 +14,8 @@ Class {
 		'activeResourceDictionary',
 		'currentObjectVertexBinding',
 		'currentObjectPrimitiveTopology',
-		'depthFunction'
+		'depthFunction',
+		'depthTestingEnabled'
 	],
 	#classVars : [
 		'PrimitiveTopologyMap'
@@ -47,6 +48,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexB
 	| validMaterial vertexBindingHandle |
 	vertexBinding ifNil: [ ^ false ].
 	validMaterial := material ifNil: [ renderer resourceCache defaultMaterial ].
+	
+	self setDepthTestingEnable: material hasDepthTesting.
 	
 	vertexBindingHandle := self validVertexBindingFor: vertexBinding.
 	stateTracker
@@ -292,11 +295,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setFrontFace: AGPU_COUNTER_CLOCKWISE;
 		setDepthState: true writeMask: true function: depthFunction.
 
+	depthTestingEnabled := true.
 	renderingSceneState cameraLayers do: [ :each |
 		self recordRenderingCommandsForCameraLayer: each
 	].
 		
 	stateTracker endRenderPass.
+	depthTestingEnabled := nil.
 	
 	"For the exposure level."
 	mainCameraState := renderingSceneState mainCameraState ifNil: [WDCameraState new].
@@ -350,6 +355,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderer: anObject [
 WDAGPUSceneRendererActiveFrameRenderer >> resetCurrentActiveState [
 	currentObjectVertexBinding := nil.
 	currentObjectPrimitiveTopology := nil.
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled [
+	depthTestingEnabled == enabled ifTrue: [ ^ self ].
+	stateTracker setDepthState: enabled writeMask: enabled function: depthFunction.
+	depthTestingEnabled := enabled.
 ]
 
 { #category : #handles }
