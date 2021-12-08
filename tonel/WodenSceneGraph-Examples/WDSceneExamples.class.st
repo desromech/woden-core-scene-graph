@@ -8,22 +8,13 @@ Class {
 }
 
 { #category : #'sample textures' }
-WDSceneExamples class >> checkboardMaterial [
-	^ WDMetallicRoughnessMaterial new
-		roughnessFactor: 0.3;
-		metallicFactor: 0.0;
-		baseColorTexture: self checkboardTexture;
-		yourself.
-]
-
-{ #category : #'sample textures' }
 WDSceneExamples class >> checkboardNormalTexture [
-	^ WDTexture forNormalMapForm: AGPUSampleImmediateRendererCommon basicNew checkboardNormalMapTextureForm.
+	^ WDSceneExamplesProceduralAssets uniqueInstance checkboardNormalTexture
 ]
 
 { #category : #'sample textures' }
 WDSceneExamples class >> checkboardTexture [
-	^ WDTexture forColorForm: AGPUSampleImmediateRendererCommon basicNew checkboardTextureForm.
+	^ WDSceneExamplesProceduralAssets uniqueInstance checkboardTexture
 ]
 
 { #category : #'basic shapes' }
@@ -133,6 +124,26 @@ WDSceneExamples class >> exampleTexturedCube3 [
 			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
 			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
 			mesh);
+		inspect
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleTexturedCube4 [
+	"
+	self exampleTexturedCube4
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: WDSceneExamplesProceduralAssets uniqueInstance tileMaterial;
+			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+			generateTexcoords0WithFacePlanarTransformWithScale: 2 asVector2;
+			mesh);
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
 		inspect
 ]
 

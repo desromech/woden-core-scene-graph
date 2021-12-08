@@ -672,6 +672,11 @@ WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center [
 
 { #category : #'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: radiuses [
+	self generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: radiuses scale: Vector2 ones
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: radiuses scale: scale [
 	| sourceIndex |
 	self assert: self hasValidPositions.
 	texcoords0 := OrderedCollection new: vertexCount * 2.
@@ -693,11 +698,21 @@ WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center rad
 		u := z arcTan: x.
 		v := y arcSin.
 
-		texcoords0 add: u / Float pi * 0.5 + 0.5; add: v / Float halfPi * -0.5 + 0.5.
+		texcoords0 add: (u / Float pi * 0.5 + 0.5) * scale x; add: (v / Float halfPi * -0.5 + 0.5) * scale y.
 
 		sourceIndex := sourceIndex + 3.
 	].
 
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center scale: scale [
+	self generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: Vector3 ones scale: scale
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithScale: scale [
+	^ self generateTexcoords0WithSphericalProjectionWithCenter: Vector3 zeros scale: scale
 ]
 
 { #category : #testing }

@@ -31,12 +31,12 @@ WDSpSurfaceMaterialPresenter class >> defaultSpec [
 WDSpSurfaceMaterialPresenter class >> initialize [
 	PreviewCubeBaseMesh := WDMeshBuilder new
 		addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
-		generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+		generateTexcoords0WithFacePlanarTransformWithScale: (Vector2 withAll: 4);
 		generateTangentSpaceFrame;
 		mesh.
 	PreviewSphereBaseMesh := WDMeshBuilder new
 		addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
-		generateTexcoords0WithSphericalProjection;
+		generateTexcoords0WithSphericalProjectionWithScale: (Vector2 withAll: 4);
 		generateTangentSpaceFrame;
 		mesh
 ]

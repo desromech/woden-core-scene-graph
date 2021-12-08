@@ -49,7 +49,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexB
 	vertexBinding ifNil: [ ^ false ].
 	validMaterial := material ifNil: [ renderer resourceCache defaultMaterial ].
 	
-	self setDepthTestingEnable: material hasDepthTesting.
+	self setDepthTestingEnable: validMaterial hasDepthTesting.
 	
 	vertexBindingHandle := self validVertexBindingFor: vertexBinding.
 	stateTracker
