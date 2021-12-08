@@ -162,3 +162,18 @@ WDSceneNode >> transform: aTransform [
 WDSceneNode >> translateBy: aVector [
 	transform translateBy: aVector
 ]
+
+{ #category : #transforming }
+WDSceneNode >> translateByX: amount [
+	transform translateByX: amount
+]
+
+{ #category : #transforming }
+WDSceneNode >> translateByY: amount [
+	transform translateByY: amount
+]
+
+{ #category : #transforming }
+WDSceneNode >> translateByZ: amount [
+	transform translateByZ: amount
+]

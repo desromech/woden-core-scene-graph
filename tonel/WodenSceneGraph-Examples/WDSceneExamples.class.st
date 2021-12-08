@@ -137,6 +137,7 @@ WDSceneExamples class >> exampleTexturedCube4 [
 			currentMaterial: WDSceneExamplesProceduralAssets uniqueInstance tileMaterial;
 			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
 			generateTexcoords0WithFacePlanarTransformWithScale: 2 asVector2;
+			generateTangentSpaceFrame;
 			mesh);
 		add: ((WDPointLightSource new
 			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
