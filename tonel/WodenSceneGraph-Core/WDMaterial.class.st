@@ -21,6 +21,11 @@ WDMaterial >> emitActivationCommandsOn: frameRenderer [
 ]
 
 { #category : #testing }
+WDMaterial >> hasAlphaBlending [
+	^ false
+]
+
+{ #category : #testing }
 WDMaterial >> hasDepthTesting [
 	^ true
 ]
@@ -40,4 +45,9 @@ WDMaterial >> name: anObject [
 { #category : #rendering }
 WDMaterial >> renderPriority [
 	^ WDRenderPriority default
+]
+
+{ #category : #testing }
+WDMaterial >> writesDepth [
+	^ true
 ]

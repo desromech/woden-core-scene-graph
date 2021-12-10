@@ -21,7 +21,8 @@ Class {
 		'texcoords0',
 		'texcoords1',
 		'baseVertex',
-		'currentMaterial'
+		'currentMaterial',
+		'currentTransform'
 	],
 	#classVars : [
 		'CubeSphereBaseLevelQuads',
@@ -232,24 +233,48 @@ WDMeshBuilder >> addInteriorCubeWithWidth: width height: height depth: depth [
 
 { #category : #adding }
 WDMeshBuilder >> addN: normal [
-	normals add: normal x; add: normal y; add: normal z.
+	| transformedNormal |
+	transformedNormal := currentTransform transformNormalVector: normal.
+	normals add: transformedNormal x; add: transformedNormal y; add: transformedNormal z.
 ]
 
 { #category : #adding }
 WDMeshBuilder >> addNx: x y: y z: z [
-	normals add: x; add: y; add: z.
+	self addN: (Vector3 x: x y: y z: z)
 ]
 
 { #category : #adding }
 WDMeshBuilder >> addP: position [
-	positions add: position x; add: position y; add: position z.
+	| transformedPosition |
+	transformedPosition := currentTransform transformPosition: position. 
+	positions add: transformedPosition x; add: transformedPosition y; add: transformedPosition z.
 	vertexCount := vertexCount + 1.
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addPlaneMinX: minX z: minZ maxX: maxX z: maxZ [
+	self
+		"Top"
+		beginTriangles;
+		addPx: minX y: 0 z: minZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: maxX y: 0 z: minZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: maxX y: 0 z: maxZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addPx: minX y: 0 z: maxZ; addNx: 0.0 y: 1.0 z: 0.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addPlaneWithWidth: width height: height [
+	| halfWidth halfHeight |
+	halfWidth := width / 2.
+	halfHeight := height / 2.
+	self addPlaneMinX: halfWidth negated z: halfHeight negated maxX: halfWidth z: halfHeight
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addPx: x y: y z: z [
-	positions add: x; add: y; add: z.
-	vertexCount := vertexCount + 1.
+	self addP: (Vector3 x: x y: y z: z)
 ]
 
 { #category : #adding }
@@ -862,6 +887,7 @@ WDMeshBuilder >> privateAddCubeSphereWithRadius: radius subdivisions: subdivisio
 
 { #category : #initialization }
 WDMeshBuilder >> reset [
+	currentTransform := TRSTransform3D identity.
 	positions removeAll.
 	colors removeAll.
 	texcoords0 removeAll.
@@ -896,6 +922,11 @@ WDMeshBuilder >> texcoords0 [
 { #category : #accessing }
 WDMeshBuilder >> texcoords1 [
 	^ texcoords1
+]
+
+{ #category : #transform }
+WDMeshBuilder >> translateToX: x y: y z: z [
+	currentTransform translateToX: x y: y z: z
 ]
 
 { #category : #private }

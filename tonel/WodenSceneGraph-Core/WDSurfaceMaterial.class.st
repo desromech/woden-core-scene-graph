@@ -70,11 +70,6 @@ WDSurfaceMaterial >> hasAlphaMasking [
 	^ alphaMode == #MASK
 ]
 
-{ #category : #testing }
-WDSurfaceMaterial >> hasDepthTesting [
-	^ background not and: [alphaMode ~~ #BLEND]
-]
-
 { #category : #initialization }
 WDSurfaceMaterial >> initialize [
 	super initialize.
@@ -95,4 +90,9 @@ WDSurfaceMaterial >> renderPriority [
 	^ background
 		ifTrue: [ WDRenderPriority backgroundNoDepth ]
 		ifFalse: [ WDRenderPriority default ]
+]
+
+{ #category : #testing }
+WDSurfaceMaterial >> writesDepth [
+	^ background not and: [alphaMode ~~ #BLEND]
 ]

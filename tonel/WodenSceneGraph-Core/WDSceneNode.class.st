@@ -137,6 +137,36 @@ WDSceneNode >> renderables: anObject [
 	renderables := anObject
 ]
 
+{ #category : #transforming }
+WDSceneNode >> rotateDegreesOnX: rotation [
+	transform rotateDegreesOnX: rotation
+]
+
+{ #category : #transforming }
+WDSceneNode >> rotateDegreesOnY: rotation [
+	transform rotateDegreesOnY: rotation
+]
+
+{ #category : #transforming }
+WDSceneNode >> rotateDegreesOnZ: rotation [
+	transform rotateDegreesOnZ: rotation
+]
+
+{ #category : #transforming }
+WDSceneNode >> rotateRadiansOnX: rotation [
+	transform rotateRadiansOnX: rotation
+]
+
+{ #category : #transforming }
+WDSceneNode >> rotateRadiansOnY: rotation [
+	transform rotateRadiansOnY: rotation
+]
+
+{ #category : #transforming }
+WDSceneNode >> rotateRadiansOnZ: rotation [
+	transform rotateRadiansOnZ: rotation
+]
+
 { #category : #accessing }
 WDSceneNode >> scale [
 	^ transform scale
@@ -176,4 +206,9 @@ WDSceneNode >> translateByY: amount [
 { #category : #transforming }
 WDSceneNode >> translateByZ: amount [
 	transform translateByZ: amount
+]
+
+{ #category : #transforming }
+WDSceneNode >> translateToX: x y: y z: z [
+	transform translateToX: x y: y z: z
 ]

@@ -30,7 +30,7 @@ WDAGPUMetallicRoughnessMaterialUniformBufferWriter >> instanceSize [
 { #category : #writing }
 WDAGPUMetallicRoughnessMaterialUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeBool: data doubleSided onto: pointer at: offset.
-	self writeFloat: data alphaCutoff onto: pointer at: offset + 4.
+	self writeFloat: (data effectiveAlphaCutoff) onto: pointer at: offset + 4.
 	self writeVec4: data baseColorFactor onto: pointer at: offset + 16.
 	self writeVec3: data emissiveFactor onto: pointer at: offset + 32.
 	self writeFloat: data occlusionFactor onto: pointer at: offset + 44.

@@ -64,6 +64,11 @@ WDMetallicRoughnessMaterial >> baseColorTexture: anObject [
 ]
 
 { #category : #accessing }
+WDMetallicRoughnessMaterial >> effectiveAlphaCutoff [
+	^ alphaMode == #MASK ifTrue: [ alphaCutoff ] ifFalse: [ 0.0 ]
+]
+
+{ #category : #accessing }
 WDMetallicRoughnessMaterial >> emissiveFactor [
 
 	^ emissiveFactor

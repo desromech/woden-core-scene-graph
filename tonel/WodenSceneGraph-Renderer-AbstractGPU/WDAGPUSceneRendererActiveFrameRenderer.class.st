@@ -15,7 +15,9 @@ Class {
 		'currentObjectVertexBinding',
 		'currentObjectPrimitiveTopology',
 		'depthFunction',
-		'depthTestingEnabled'
+		'depthTestingEnabled',
+		'depthWriteMask',
+		'alphaBlendingEnabled'
 	],
 	#classVars : [
 		'PrimitiveTopologyMap'
@@ -49,7 +51,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexB
 	vertexBinding ifNil: [ ^ false ].
 	validMaterial := material ifNil: [ renderer resourceCache defaultMaterial ].
 	
-	self setDepthTestingEnable: validMaterial hasDepthTesting.
+	self
+		setAlphaBlendingEnabled: validMaterial hasAlphaBlending;
+		setDepthTestingEnable: validMaterial hasDepthTesting writeMask: validMaterial writesDepth.
 	
 	vertexBindingHandle := self validVertexBindingFor: vertexBinding.
 	stateTracker
@@ -296,12 +300,16 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setDepthState: true writeMask: true function: depthFunction.
 
 	depthTestingEnabled := true.
+	depthWriteMask := true.
+	alphaBlendingEnabled := false.
 	renderingSceneState cameraLayers do: [ :each |
 		self recordRenderingCommandsForCameraLayer: each
 	].
 		
 	stateTracker endRenderPass.
 	depthTestingEnabled := nil.
+	depthWriteMask := nil.
+	alphaBlendingEnabled := nil.
 	
 	"For the exposure level."
 	mainCameraState := renderingSceneState mainCameraState ifNil: [WDCameraState new].
@@ -358,10 +366,32 @@ WDAGPUSceneRendererActiveFrameRenderer >> resetCurrentActiveState [
 ]
 
 { #category : #initialization }
-WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled [
-	depthTestingEnabled == enabled ifTrue: [ ^ self ].
-	stateTracker setDepthState: enabled writeMask: enabled function: depthFunction.
+WDAGPUSceneRendererActiveFrameRenderer >> setAlphaBlendingEnabled: enabled [
+	alphaBlendingEnabled == enabled  ifTrue: [ ^ self ].
+	enabled ifTrue: [
+		stateTracker 
+			setBlendState: -1 enabled: 1;
+		setBlendFunction: 1
+			sourceFactor: AGPU_BLENDING_ONE destFactor: AGPU_BLENDING_INVERTED_SRC_ALPHA colorOperation: AGPU_BLENDING_OPERATION_ADD
+			sourceAlphaFactor: AGPU_BLENDING_ONE destAlphaFactor: AGPU_BLENDING_INVERTED_SRC_ALPHA alphaOperation: AGPU_BLENDING_OPERATION_ADD
+	] ifFalse: [ 
+		stateTracker 
+			setBlendState: -1 enabled: 0;
+			setBlendFunction: 1
+				sourceFactor: AGPU_BLENDING_ONE destFactor: AGPU_BLENDING_ZERO colorOperation: AGPU_BLENDING_OPERATION_ADD
+				sourceAlphaFactor: AGPU_BLENDING_ONE destAlphaFactor: AGPU_BLENDING_ZERO alphaOperation: AGPU_BLENDING_OPERATION_ADD
+	].
+	alphaBlendingEnabled := enabled
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled writeMask: writeMask [
+	(depthTestingEnabled == enabled and: [ depthWriteMask == writeMask ])ifTrue: [ ^ self ].
+	stateTracker setDepthState: (enabled or: [writeMask])
+		writeMask: writeMask
+		function: (enabled ifTrue: [depthFunction] ifFalse: [AGPU_ALWAYS]).
 	depthTestingEnabled := enabled.
+	depthWriteMask := writeMask
 ]
 
 { #category : #handles }

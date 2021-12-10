@@ -8,7 +8,8 @@ Class {
 		'tileMaterial',
 		'checkboardMaterial',
 		'checkboardTexture',
-		'checkboardNormalTexture'
+		'checkboardNormalTexture',
+		'poolWaterMaterial'
 	],
 	#classInstVars : [
 		'uniqueInstance'
@@ -82,6 +83,36 @@ WDSceneExamplesProceduralAssets >> checkboardTexture [
 		form.
 	
 	^ checkboardTexture := WDTexture forColorForm: form
+]
+
+{ #category : #accessing }
+WDSceneExamplesProceduralAssets >> poolWaterMaterial [
+	<script: 'self uniqueInstance poolWaterMaterial inspect'>
+	| extent height normalMapForm |
+	poolWaterMaterial ifNotNil: [ ^ poolWaterMaterial ].
+
+	extent := 256@256.
+
+	height := [ :x :y |
+		| position |
+		position := Vector2 x: x y: y.
+		(position * 5) voronoiTurbulenceScales: 3 tiledWith: 5 asVector2
+	].
+
+
+	normalMapForm := (FPLFormRenderer extent: extent)
+		renderGray: height;
+		intoNormalMapWithScale: 2.0 gradientOperator: FPLGradientOperator sobel3x3;
+		form.
+
+	^ poolWaterMaterial := WDMetallicRoughnessMaterial new
+		alphaMode: #BLEND;
+		doubleSided: true;
+		roughnessFactor: 0.02;
+		metallicFactor: 0.0;
+		baseColorFactor: (Vector4 x: 0.0 y: 0.0 z: 0.0 w: 0.05);
+		normalTexture: (WDTexture forNormalMapForm: normalMapForm);
+		yourself
 ]
 
 { #category : #accessing }
