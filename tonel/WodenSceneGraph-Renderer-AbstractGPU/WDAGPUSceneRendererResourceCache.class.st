@@ -352,7 +352,8 @@ WDAGPUSceneRendererResourceCache >> forwardMetallicRoughnessFragmentShaderSource
 void main()
 {
 	vec2 texcoord0 = StageInput.texcoord0;
-
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+	
 	SurfaceLightingParameters lightingParameters;
 	
 	lightingParameters.baseColor = StageInput.color * MaterialState.baseColorFactor * texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0);
@@ -544,12 +545,15 @@ WDAGPUSceneRendererResourceCache >> forwardUnlitFragmentShader [
 WDAGPUSceneRendererResourceCache >> forwardUnlitFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self forwardFragmentShaderOutputs, self unlitMaterialStateSource , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self forwardFragmentShaderOutputs, self unlitMaterialStateSource , '
 #line 6
 
 void main()
-{ 
-	vec4 color = StageInput.color * MaterialState.colorFactor * texture(sampler2D(ColorTexture, TextureSampler), StageInput.texcoord0);
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+	
+	vec4 color = StageInput.color * MaterialState.colorFactor * texture(sampler2D(ColorTexture, TextureSampler), texcoord0);
 	if(color.a < MaterialState.alphaCutoff)
 		discard;
 		
@@ -816,6 +820,10 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 	float occlusionFactor;
 	float roughnessFactor;
 	float metallicFactor;
+		
+	vec2 texcoordOffset;
+	vec2 texcoordScale;
+	vec2 texcoordOffsetVelocity;
 } MaterialState;
 
 layout(set=4, binding=1) uniform texture2D BaseColorTexture;
@@ -958,6 +966,10 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 	int doubleSided;
 	float alphaCutoff;
 	vec4 colorFactor;
+		
+	vec2 texcoordOffset;
+	vec2 texcoordScale;
+	vec2 texcoordOffsetVelocity;
 } MaterialState;
 
 layout(set=4, binding=1) uniform texture2D ColorTexture;

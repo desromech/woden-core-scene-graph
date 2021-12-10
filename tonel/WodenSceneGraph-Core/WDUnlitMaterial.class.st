@@ -8,7 +8,10 @@ Class {
 	#superclass : #WDSurfaceMaterial,
 	#instVars : [
 		'colorFactor',
-		'colorTexture'
+		'colorTexture',
+		'texcoordScale',
+		'texcoordOffset',
+		'texcoordOffsetVelocity'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -47,4 +50,44 @@ WDUnlitMaterial >> initialize [
 	super initialize.
 	
 	colorFactor := Vector4 ones.
+	
+	texcoordScale := Vector2 ones.
+	texcoordOffset := Vector2 zeros.
+	texcoordOffsetVelocity := Vector2 zeros.
+]
+
+{ #category : #accessing }
+WDUnlitMaterial >> texcoordOffset [
+
+	^ texcoordOffset
+]
+
+{ #category : #accessing }
+WDUnlitMaterial >> texcoordOffset: anObject [
+
+	texcoordOffset := anObject
+]
+
+{ #category : #accessing }
+WDUnlitMaterial >> texcoordOffsetVelocity [
+
+	^ texcoordOffsetVelocity
+]
+
+{ #category : #accessing }
+WDUnlitMaterial >> texcoordOffsetVelocity: anObject [
+
+	texcoordOffsetVelocity := anObject
+]
+
+{ #category : #accessing }
+WDUnlitMaterial >> texcoordScale [
+
+	^ texcoordScale
+]
+
+{ #category : #accessing }
+WDUnlitMaterial >> texcoordScale: anObject [
+
+	texcoordScale := anObject
 ]

@@ -16,7 +16,10 @@ Class {
 		'occlusionTexture',
 		'metallicFactor',
 		'roughnessFactor',
-		'metallicRoughnessTexture'
+		'metallicRoughnessTexture',
+		'texcoordScale',
+		'texcoordOffset',
+		'texcoordOffsetVelocity'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -64,11 +67,6 @@ WDMetallicRoughnessMaterial >> baseColorTexture: anObject [
 ]
 
 { #category : #accessing }
-WDMetallicRoughnessMaterial >> effectiveAlphaCutoff [
-	^ alphaMode == #MASK ifTrue: [ alphaCutoff ] ifFalse: [ 0.0 ]
-]
-
-{ #category : #accessing }
 WDMetallicRoughnessMaterial >> emissiveFactor [
 
 	^ emissiveFactor
@@ -106,6 +104,10 @@ WDMetallicRoughnessMaterial >> initialize [
 	occlusionFactor := 1.0.
 	roughnessFactor := 1.0.
 	metallicFactor := 1.0.
+	
+	texcoordScale := Vector2 ones.
+	texcoordOffset := Vector2 zeros.
+	texcoordOffsetVelocity := Vector2 zeros.
 ]
 
 { #category : #accessing }
@@ -178,4 +180,40 @@ WDMetallicRoughnessMaterial >> roughnessFactor [
 WDMetallicRoughnessMaterial >> roughnessFactor: anObject [
 
 	roughnessFactor := anObject
+]
+
+{ #category : #accessing }
+WDMetallicRoughnessMaterial >> texcoordOffset [
+
+	^ texcoordOffset
+]
+
+{ #category : #accessing }
+WDMetallicRoughnessMaterial >> texcoordOffset: anObject [
+
+	texcoordOffset := anObject
+]
+
+{ #category : #accessing }
+WDMetallicRoughnessMaterial >> texcoordOffsetVelocity [
+
+	^ texcoordOffsetVelocity
+]
+
+{ #category : #accessing }
+WDMetallicRoughnessMaterial >> texcoordOffsetVelocity: anObject [
+
+	texcoordOffsetVelocity := anObject
+]
+
+{ #category : #accessing }
+WDMetallicRoughnessMaterial >> texcoordScale [
+
+	^ texcoordScale
+]
+
+{ #category : #accessing }
+WDMetallicRoughnessMaterial >> texcoordScale: anObject [
+
+	texcoordScale := anObject
 ]

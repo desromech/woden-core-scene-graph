@@ -60,6 +60,11 @@ WDSurfaceMaterial >> doubleSided: anObject [
 	doubleSided := anObject
 ]
 
+{ #category : #accessing }
+WDSurfaceMaterial >> effectiveAlphaCutoff [
+	^ alphaMode == #MASK ifTrue: [ alphaCutoff ] ifFalse: [ 0.0 ]
+]
+
 { #category : #testing }
 WDSurfaceMaterial >> hasAlphaBlending [
 	^ alphaMode == #BLEND

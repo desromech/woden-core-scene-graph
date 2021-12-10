@@ -147,7 +147,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 			| binding |
 			binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
 			binding
-				writeState: material with: WDAGPUUnlitMaterialUniformBufferWriter;
+				writeState: material with: WDAGPUEnvironmentMapMaterialUniformBufferWriter;
 				bindSampledTextureView: (self validTextureViewHandleFor: material colorTexture fallbackTextureWith: [renderer resourceCache whiteTexture2D]) inSlot: 1.
 				
 			activeSlabResource add: binding.

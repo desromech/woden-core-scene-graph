@@ -8,7 +8,7 @@ Class {
 WDAGPUSurfaceMaterialUniformBufferWriter class >> fieldsDesc [
 	^ #(
 		bool doubleSided
-		float alphaCutoff
+		float effectiveAlphaCutoff
 	)
 ]
 
