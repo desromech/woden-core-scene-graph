@@ -88,6 +88,13 @@ WDMeshBuilder class >> initialize [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addColor: color [
+	| v4 |
+	v4 := color asVector4.
+	self addCr: v4 x g: v4 y b: v4 z a: v4 w
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addCr: r g: g b: b a: a [
 	colors add: r; add: g; add: b; add: a.
 ]
@@ -232,6 +239,45 @@ WDMeshBuilder >> addInteriorCubeWithWidth: width height: height depth: depth [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addLineGridWithWidth: width height: height subdivisions: subdivisions [
+	| dx dy x y px py nx ny tc  |
+	
+	"Add vertices"
+	dx := width / (subdivisions - 1).
+	dy := height / (subdivisions - 1).
+	px := width / 2.
+	py := height / 2.
+	nx := px negated.
+	ny := py negated.
+	x := nx.
+	
+	"Vertical lines"
+	self beginLines.
+	0 to: subdivisions - 1 do: [:i |
+		self addPx: x y: ny z: 0.
+		self addPx: x y: py z: 0.
+		self addLineI0: i*2 i1: i*2 + 1.
+		x := x + dx.
+	].
+
+	"Horizontal lines"
+	self beginLines.
+	y := ny.
+	0 to: subdivisions - 1 do: [:i |
+		self addPx: nx y: y z: 0.
+		self addPx: px y: y z: 0.
+		self addLineI0: i*2 i1: i*2 + 1.
+		y := y + dy.
+	].
+
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addLineI0: i0 i1: i1 [
+	indices add: i0 + baseVertex ; add: i1 + baseVertex
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addN: normal [
 	| transformedNormal |
 	transformedNormal := currentTransform transformNormalVector: normal.
@@ -355,6 +401,11 @@ WDMeshBuilder >> addUVSphereWithDiameter: diameter segments: segments slices: sl
 { #category : #adding }
 WDMeshBuilder >> addUVSphereWithRadius: radius segments: segments slices: slices [
 	self addUVEllipsoidWithRadiuses: radius asVector3 segments: segments slices: slices
+]
+
+{ #category : #builder }
+WDMeshBuilder >> beginLines [
+	^ self beginPrimitiveWithTopology: WDPrimitiveTopologyLines
 ]
 
 { #category : #builder }

@@ -22,6 +22,21 @@ WDSceneMorph >> camera: aCameraNode [
 	camera := aCameraNode ifNotNil: [aCameraNode asSceneNode]
 ]
 
+{ #category : #'event handling' }
+WDSceneMorph >> handlesMouseDown: anEvent [
+	^ anEvent wasHandled not
+]
+
+{ #category : #'event handling' }
+WDSceneMorph >> handlesMouseMove: anEvent [
+	^ anEvent wasHandled not 
+]
+
+{ #category : #'event handling' }
+WDSceneMorph >> handlesMouseWheel: anEvent [
+	^ anEvent wasHandled not 
+]
+
 { #category : #initialization }
 WDSceneMorph >> initialize [
 	super initialize.

@@ -49,9 +49,9 @@ WDMetallicRoughnessMaterial >> baseColorFactor [
 ]
 
 { #category : #accessing }
-WDMetallicRoughnessMaterial >> baseColorFactor: anObject [
+WDMetallicRoughnessMaterial >> baseColorFactor: aColor [
 
-	baseColorFactor := anObject
+	baseColorFactor := aColor asVector4
 ]
 
 { #category : #accessing }

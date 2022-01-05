@@ -18,9 +18,9 @@ WDEnvironmentMapMaterial >> colorFactor [
 ]
 
 { #category : #accessing }
-WDEnvironmentMapMaterial >> colorFactor: anObject [
+WDEnvironmentMapMaterial >> colorFactor: aColor [
 
-	colorFactor := anObject
+	colorFactor := aColor asVector4
 ]
 
 { #category : #accessing }

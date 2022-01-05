@@ -23,9 +23,9 @@ WDUnlitMaterial >> colorFactor [
 ]
 
 { #category : #accessing }
-WDUnlitMaterial >> colorFactor: anObject [
+WDUnlitMaterial >> colorFactor: aColor [
 
-	colorFactor := anObject
+	colorFactor := aColor asVector4 
 ]
 
 { #category : #accessing }
