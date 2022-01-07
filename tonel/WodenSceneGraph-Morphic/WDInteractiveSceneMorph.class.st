@@ -16,6 +16,21 @@ WDInteractiveSceneMorph >> computeCameraOrientation [
 	^ (Quaternion yRotation: cameraAngles y) * (Quaternion xRotation: cameraAngles x)
 ]
 
+{ #category : #'event handling' }
+WDInteractiveSceneMorph >> handlesMouseDown: anEvent [
+	^ anEvent wasHandled not
+]
+
+{ #category : #'event handling' }
+WDInteractiveSceneMorph >> handlesMouseMove: anEvent [
+	^ anEvent wasHandled not 
+]
+
+{ #category : #'event handling' }
+WDInteractiveSceneMorph >> handlesMouseWheel: anEvent [
+	^ anEvent wasHandled not 
+]
+
 { #category : #initialization }
 WDInteractiveSceneMorph >> initialize [
 	super initialize.

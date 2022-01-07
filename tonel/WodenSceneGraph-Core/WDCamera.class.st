@@ -103,6 +103,18 @@ WDCamera >> fovY: anObject [
 	fovY := anObject
 ]
 
+{ #category : #converting }
+WDCamera >> frustumWithAspect: aspectRatio [
+	^ isPerspective ifTrue: [ 
+		Frustum new makePerspectiveFovY: fovY aspect: aspectRatio near: nearDistance far: farDistance
+	] ifFalse: [
+		| hh hw |
+		hh := (fovY / 2 ) degreesToRadians tan * focalDistance.
+		hw := hh * aspectRatio.
+		^ Frustum new makeOrthoLeft: hw negated right: hw bottom: hh negated top: hh near: nearDistance far: farDistance	
+	]
+]
+
 { #category : #accessing }
 WDCamera >> hasReverseDepth [
 
