@@ -163,9 +163,10 @@ WDCamera >> projectionMatrixWithAspect: aspectRatio [
 		| hh hw |
 		hh := (fovY / 2 ) degreesToRadians tan * focalDistance.
 		hw := hh * aspectRatio.
-		^ Matrix4x4 reverseDepthOrthoLeft: hw negated right: hw
-			bottom: hh negated top: hh
-			near: nearDistance far: farDistance
+		^  hasReverseDepth
+				ifTrue: [ Matrix4x4 reverseDepthOrthoLeft: hw negated right: hw bottom: hh negated top: hh near: nearDistance far: farDistance ]
+				ifFalse: [ Matrix4x4 orthoLeft: hw negated right: hw bottom: hh negated top: hh near: nearDistance far: farDistance ]
+			
 	]
 ]
 
