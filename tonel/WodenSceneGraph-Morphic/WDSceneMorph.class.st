@@ -22,6 +22,12 @@ WDSceneMorph >> camera: aCameraNode [
 	camera := aCameraNode ifNotNil: [aCameraNode asSceneNode]
 ]
 
+{ #category : #'event handling' }
+WDSceneMorph >> handleMouseWheel: event [
+	super handleMouseWheel: event.
+	^ self eventHandler ifNotNil: [:handler | handler notifyMorphsOfEvent: event ofType: #mouseWheel from: self ]
+]
+
 { #category : #initialization }
 WDSceneMorph >> initialize [
 	super initialize.
