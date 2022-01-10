@@ -30,6 +30,11 @@ WDMaterial >> hasDepthTesting [
 	^ true
 ]
 
+{ #category : #'as yet unclassified' }
+WDMaterial >> makeThumbnail [
+	^ nil
+]
+
 { #category : #accessing }
 WDMaterial >> name [
 
