@@ -10,13 +10,15 @@ Class {
 		'renderables',
 		'lights',
 		'cameras',
-		'transform'
+		'transform',
+		'visible'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
 { #category : #adding }
 WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withTransform: renderingGlobalTransform [
+	visible ifFalse: [ ^ self ].
 	renderables isEmpty ifFalse: [ 
 		| objectState |
 		objectState := WDRenderingObjectState new
@@ -35,6 +37,7 @@ WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withT
 { #category : #adding }
 WDSceneNode >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
 	| renderingGlobalTransform |
+	visible ifFalse: [ ^ self ].
 	renderingGlobalTransform := parentGlobalTransform transformTransform: transform asReversibleAffineTransform.
 	
 	self
@@ -80,6 +83,7 @@ WDSceneNode >> initialize [
 	renderables := #().
 	lights := #().
 	cameras := #().
+	visible := true.
 	transform := TRSTransform3D new.
 ]
 
@@ -211,4 +215,15 @@ WDSceneNode >> translateByZ: amount [
 { #category : #transforming }
 WDSceneNode >> translateToX: x y: y z: z [
 	transform translateToX: x y: y z: z
+]
+
+{ #category : #accessing }
+WDSceneNode >> visible [
+
+	^ visible
+]
+
+{ #category : #accessing }
+WDSceneNode >> visible: aBoolean [
+	visible := aBoolean
 ]
