@@ -8,7 +8,8 @@ Class {
 		'alphaMode',
 		'doubleSided',
 		'alphaCutoff',
-		'background'
+		'background',
+		'xray'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -75,9 +76,15 @@ WDSurfaceMaterial >> hasAlphaMasking [
 	^ alphaMode == #MASK
 ]
 
+{ #category : #testing }
+WDSurfaceMaterial >> hasDepthTesting [
+	^ xray not
+]
+
 { #category : #initialization }
 WDSurfaceMaterial >> initialize [
 	super initialize.
+	xray := false.
 	alphaMode := #OPAQUE.
 	alphaCutoff := 0.5.
 	doubleSided := false.
@@ -99,5 +106,16 @@ WDSurfaceMaterial >> renderPriority [
 
 { #category : #testing }
 WDSurfaceMaterial >> writesDepth [
-	^ background not and: [alphaMode ~~ #BLEND]
+	^ background not and: [alphaMode ~~ #BLEND and: [xray not]]
+]
+
+{ #category : #accessing }
+WDSurfaceMaterial >> xray [
+
+	^ xray
+]
+
+{ #category : #accessing }
+WDSurfaceMaterial >> xray: aBoolean [
+	xray := aBoolean
 ]

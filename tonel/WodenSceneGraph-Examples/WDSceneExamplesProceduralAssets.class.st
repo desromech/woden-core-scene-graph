@@ -34,6 +34,12 @@ WDSceneExamplesProceduralAssets class >> noteCompilationOf: aSelector meta: isMe
 ]
 
 { #category : #accessing }
+WDSceneExamplesProceduralAssets class >> reset [
+	<script>
+	uniqueInstance := nil.
+]
+
+{ #category : #accessing }
 WDSceneExamplesProceduralAssets class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self basicNew ]
 ]
