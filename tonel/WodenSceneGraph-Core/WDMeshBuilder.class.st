@@ -280,7 +280,7 @@ WDMeshBuilder >> addLineI0: i0 i1: i1 [
 { #category : #adding }
 WDMeshBuilder >> addN: normal [
 	| transformedNormal |
-	transformedNormal := currentTransform transformNormalVector: normal.
+	transformedNormal := (currentTransform transformNormalVector: normal) normalized.
 	normals add: transformedNormal x; add: transformedNormal y; add: transformedNormal z.
 ]
 
