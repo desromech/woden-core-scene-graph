@@ -41,6 +41,13 @@ WDMeshPrimitive >> boundingBox: anObject [
 ]
 
 { #category : #copying }
+WDMeshPrimitive >> copyTransformingMaterialsWith: aBlock [
+	^ self copy
+		material: (aBlock value: material);
+		yourself
+]
+
+{ #category : #copying }
 WDMeshPrimitive >> copyWithMaterial: aMaterial [
 	^ self copy
 		material: aMaterial;

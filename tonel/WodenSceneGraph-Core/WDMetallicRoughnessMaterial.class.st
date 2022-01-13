@@ -42,6 +42,19 @@ WDMetallicRoughnessMaterial >> addIntoModelAssetWithDependencies: modelAsset [
 	occlusionTexture ifNotNil: [ modelAsset addTexture: occlusionTexture ].
 ]
 
+{ #category : #converting }
+WDMetallicRoughnessMaterial >> asUnlitMaterial [
+	^ WDUnlitMaterial new
+		alphaMode: alphaMode;
+		alphaCutoff: alphaCutoff;
+		doubleSided: doubleSided;
+		background: background;
+		xray: xray;
+		colorFactor: baseColorFactor;
+		colorTexture: baseColorTexture;
+		yourself
+]
+
 { #category : #accessing }
 WDMetallicRoughnessMaterial >> baseColorFactor [
 

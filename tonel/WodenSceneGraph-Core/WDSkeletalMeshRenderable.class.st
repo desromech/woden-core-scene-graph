@@ -27,6 +27,13 @@ WDSkeletalMeshRenderable >> addToRenderingScene: renderingScene withObjectState:
 ]
 
 { #category : #copying }
+WDSkeletalMeshRenderable >> copyTransformingMaterialsWith: aBlock [
+	^ self
+		referenceMesh: (referenceMesh copyTransformingMaterialsWith: aBlock);
+		yourself
+]
+
+{ #category : #copying }
 WDSkeletalMeshRenderable >> copyWithMaterial: aMaterial [
 	^ self
 		referenceMesh: (referenceMesh copyWithMaterial: aMaterial);

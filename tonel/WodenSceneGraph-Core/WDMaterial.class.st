@@ -15,6 +15,11 @@ WDMaterial >> addIntoModelAssetWithDependencies: modelAsset [
 	modelAsset addMaterial: self.
 ]
 
+{ #category : #converting }
+WDMaterial >> asUnlitMaterial [
+	^ self
+]
+
 { #category : #'double dispatch' }
 WDMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ false

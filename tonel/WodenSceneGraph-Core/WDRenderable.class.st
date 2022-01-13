@@ -33,6 +33,11 @@ WDRenderable >> asSceneNode [
 ]
 
 { #category : #copying }
+WDRenderable >> copyTransformingMaterialsWith: aBlock [
+	self subclassResponsibility
+]
+
+{ #category : #copying }
 WDRenderable >> copyWithMaterial: aMaterial [
 	self subclassResponsibility
 ]
