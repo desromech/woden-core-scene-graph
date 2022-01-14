@@ -12,7 +12,8 @@ Class {
 		'currentTime',
 		'exposure',
 		'hasReverseDepth',
-		'toneMappingOperator'
+		'toneMappingOperator',
+		'viewMode'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -102,6 +103,7 @@ WDCameraState >> initialize [
 	exposure := 1.0.
 	hasReverseDepth := true.
 	self toneMappingOperator: WDLinearToneMappingOperator.
+	self viewMode: WDFullShadedViewMode.
 ]
 
 { #category : #accessing }
@@ -137,4 +139,15 @@ WDCameraState >> toneMappingOperator [
 { #category : #accessing }
 WDCameraState >> toneMappingOperator: aToneMapOperator [
 	toneMappingOperator := aToneMapOperator asToneMappingOperator
+]
+
+{ #category : #accessing }
+WDCameraState >> viewMode [
+
+	^ viewMode
+]
+
+{ #category : #accessing }
+WDCameraState >> viewMode: aViewMode [
+	viewMode := aViewMode asViewMode
 ]

@@ -13,7 +13,8 @@ Class {
 		'hasReverseDepth',
 		'currentTime',
 		'exposure',
-		'toneMappingOperator'
+		'toneMappingOperator',
+		'viewMode'
 	],
 	#category : #'WodenSceneGraph-Core-Camera'
 }
@@ -27,6 +28,7 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		currentTime: currentTime;
 		exposure: exposure;
 		toneMappingOperator: toneMappingOperator;
+		viewMode: viewMode;
 		hasReverseDepth: hasReverseDepth;
 		yourself
 ]
@@ -139,6 +141,7 @@ WDCamera >> initialize [
 	currentTime := 0.0.
 	exposure := 1.0.
 	self toneMappingOperator: WDLinearToneMappingOperator.
+	self viewMode: WDFullShadedViewMode.
 ]
 
 { #category : #accessing }
@@ -191,4 +194,14 @@ WDCamera >> toneMappingOperator [
 { #category : #accessing }
 WDCamera >> toneMappingOperator: aToneMappingOperator [
 	toneMappingOperator := aToneMappingOperator asToneMappingOperator
+]
+
+{ #category : #accessing }
+WDCamera >> viewMode [
+	^ viewMode
+]
+
+{ #category : #accessing }
+WDCamera >> viewMode: aViewMode [
+	viewMode := aViewMode asViewMode
 ]

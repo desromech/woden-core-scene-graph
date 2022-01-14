@@ -120,3 +120,8 @@ WDRenderingSceneCameraLayer >> renderingObjects [
 WDRenderingSceneCameraLayer >> sampleCount [
 	^ 1
 ]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> viewMode [
+	^ cameraState viewMode
+]
