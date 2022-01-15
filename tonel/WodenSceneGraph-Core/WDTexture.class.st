@@ -104,6 +104,12 @@ WDTexture class >> forSampledColorBufferWithExtent: anExtent [
 		yourself
 ]
 
+{ #category : #serialization }
+WDTexture class >> loadFromJson: jsonData [
+	jsonData ifNil: [ ^ nil ].
+	self halt
+]
+
 { #category : #'as yet unclassified' }
 WDTexture class >> specularLightProbeWithSize: size forEnvironmentMap: environmentMap [
 	^ self new setupSpecularLightProbeWithSize: size forEnvironmentMap: environmentMap; yourself
@@ -185,6 +191,12 @@ WDTexture >> layers [
 { #category : #accessing }
 WDTexture >> layers: anInteger [
 	description layers: anInteger
+]
+
+{ #category : #'as yet unclassified' }
+WDTexture >> makeThumbnail [
+	data isForm ifTrue: [ ^ data asFormOfSize: 16@16 ].
+	^ nil
 ]
 
 { #category : #accessing }

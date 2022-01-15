@@ -17,6 +17,11 @@ Class {
 }
 
 { #category : #accessing }
+WDUnlitMaterial class >> typeName [
+	^ #Unlit
+]
+
+{ #category : #accessing }
 WDUnlitMaterial >> colorFactor [
 
 	^ colorFactor
@@ -45,6 +50,17 @@ WDUnlitMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitUnlitMaterialActivationCommands: self
 ]
 
+{ #category : #serialization }
+WDUnlitMaterial >> encodeJsonKeyValues [
+	^ super encodeJsonKeyValues , {
+		#colorFactor . colorFactor encodeForJSON.
+		#colorTexture . colorTexture ifNotNil: [:texture | texture encodeForJSON].
+		#texcoordScale . texcoordScale encodeForJSON.
+		#texcoordOffset . texcoordOffset encodeForJSON.
+		#texcoordOffsetVelocity . texcoordOffsetVelocity encodeForJSON.
+	}
+]
+
 { #category : #initialization }
 WDUnlitMaterial >> initialize [
 	super initialize.
@@ -54,6 +70,25 @@ WDUnlitMaterial >> initialize [
 	texcoordScale := Vector2 ones.
 	texcoordOffset := Vector2 zeros.
 	texcoordOffsetVelocity := Vector2 zeros.
+]
+
+{ #category : #serialization }
+WDUnlitMaterial >> loadFromJson: jsonData [
+	super loadFromJson: jsonData.
+	jsonData at: #colorFactor ifPresent: [ :found | colorFactor := Vector4 loadFromJson: found ].
+	jsonData at: #colorTexture ifPresent: [ :found | colorTexture := WDTexture loadFromJson: found ].
+
+	jsonData at: #texcoordScale ifPresent: [ :found | texcoordScale := Vector2 loadFromJson: found ].
+	jsonData at: #texcoordOffset ifPresent: [ :found | texcoordOffset := Vector2 loadFromJson: found ].
+	jsonData at: #texcoordOffsetVelocity ifPresent: [ :found | texcoordOffsetVelocity := Vector2 loadFromJson: found ].
+]
+
+{ #category : #'as yet unclassified' }
+WDUnlitMaterial >> makeThumbnail [
+	colorTexture ifNotNil: [ colorTexture makeThumbnail ifNotNil: [ :thumb | ^ thumb ] ].
+	^ (Form extent: 16@16 depth: 32)
+		fillColor: colorFactor asColor;
+		yourself
 ]
 
 { #category : #accessing }

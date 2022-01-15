@@ -14,6 +14,11 @@ Class {
 	#category : #'WodenSceneGraph-Core-Material'
 }
 
+{ #category : #testing }
+WDSurfaceMaterial class >> isAbstract [
+	^ self == WDSurfaceMaterial
+]
+
 { #category : #accessing }
 WDSurfaceMaterial >> alphaCutoff [
 
@@ -66,6 +71,17 @@ WDSurfaceMaterial >> effectiveAlphaCutoff [
 	^ alphaMode == #MASK ifTrue: [ alphaCutoff ] ifFalse: [ 0.0 ]
 ]
 
+{ #category : #serializationm }
+WDSurfaceMaterial >> encodeJsonKeyValues [
+	^ super encodeJsonKeyValues , {
+		#alphaMode . alphaMode.
+		#doubleSided . doubleSided.
+		#alphaCutoff . alphaCutoff.
+		#background . background.
+		#xray . xray.
+	}
+]
+
 { #category : #testing }
 WDSurfaceMaterial >> hasAlphaBlending [
 	^ alphaMode == #BLEND
@@ -94,6 +110,16 @@ WDSurfaceMaterial >> initialize [
 { #category : #testing }
 WDSurfaceMaterial >> isOpaque [
 	^ alphaMode == #OPAQUE
+]
+
+{ #category : #serializationm }
+WDSurfaceMaterial >> loadFromJson: jsonData [
+	super loadFromJson: jsonData.
+	self alphaMode: (jsonData at: #alphaMode ifAbsent: [ alphaMode ]).
+	doubleSided := jsonData at: #doubleSided ifAbsent: [ doubleSided ].
+	alphaCutoff := jsonData at: #alphaCutoff ifAbsent: [ alphaCutoff ].
+	background := jsonData at: #background ifAbsent: [ background ].
+	xray := jsonData at: #xray ifAbsent: [ xray ].
 ]
 
 { #category : #rendering }

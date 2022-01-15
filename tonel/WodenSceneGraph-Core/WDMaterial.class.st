@@ -10,6 +10,30 @@ Class {
 	#category : #'WodenSceneGraph-Core-Material'
 }
 
+{ #category : #'as yet unclassified' }
+WDMaterial class >> getClassForTypeName: expectedTypeName [
+	self allSubclassesDo: [ :each |
+		(each isAbstract not and: [ each typeName = expectedTypeName ]) ifTrue: [ ^ each ]
+	].
+	^ nil
+]
+
+{ #category : #testing }
+WDMaterial class >> isAbstract [
+	^ self == WDMaterial
+]
+
+{ #category : #serialization }
+WDMaterial class >> loadFromJson: jsonData [
+	^ (self getClassForTypeName: (jsonData at: #type)) new loadFromJson: jsonData
+	
+]
+
+{ #category : #accessing }
+WDMaterial class >> typeName [
+	self subclassResponsibility
+]
+
 { #category : #adding }
 WDMaterial >> addIntoModelAssetWithDependencies: modelAsset [
 	modelAsset addMaterial: self.
@@ -25,6 +49,14 @@ WDMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ false
 ]
 
+{ #category : #serialization }
+WDMaterial >> encodeJsonKeyValues [
+	^ {
+		#type . self typeName.
+		#name . name.
+	}
+]
+
 { #category : #testing }
 WDMaterial >> hasAlphaBlending [
 	^ false
@@ -33,6 +65,11 @@ WDMaterial >> hasAlphaBlending [
 { #category : #testing }
 WDMaterial >> hasDepthTesting [
 	^ true
+]
+
+{ #category : #serialization }
+WDMaterial >> loadFromJson: jsonData [
+	name := jsonData at: #name ifAbsent: [ name ].
 ]
 
 { #category : #'as yet unclassified' }
@@ -55,6 +92,11 @@ WDMaterial >> name: anObject [
 { #category : #rendering }
 WDMaterial >> renderPriority [
 	^ WDRenderPriority default
+]
+
+{ #category : #accessing }
+WDMaterial >> typeName [
+	^ self class typeName
 ]
 
 { #category : #testing }

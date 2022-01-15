@@ -32,6 +32,11 @@ WDMetallicRoughnessMaterial class >> default [
 		yourself
 ]
 
+{ #category : #accessing }
+WDMetallicRoughnessMaterial class >> typeName [
+	^ #MetallicRoughness
+]
+
 { #category : #adding }
 WDMetallicRoughnessMaterial >> addIntoModelAssetWithDependencies: modelAsset [
 	super addIntoModelAssetWithDependencies: modelAsset.
@@ -108,6 +113,26 @@ WDMetallicRoughnessMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitMetallicRoughnessMaterialActivationCommands: self
 ]
 
+{ #category : #serialization }
+WDMetallicRoughnessMaterial >> encodeJsonKeyValues [
+	^ super encodeJsonKeyValues , {
+		#baseColorFactor . baseColorFactor encodeForJSON.
+		#baseColorTexture . baseColorTexture ifNotNil: [:texture | texture encodeForJSON].
+		#emissiveFactor . emissiveFactor encodeForJSON.
+		#emissiveTexture . emissiveTexture ifNotNil: [:texture | texture encodeForJSON].
+		#normalTexture . normalTexture ifNotNil: [:texture | texture encodeForJSON].
+		#occlusionFactor . occlusionFactor.
+		#occlusionTexture . occlusionTexture ifNotNil: [:texture | texture encodeForJSON].
+		#metallicFactor . metallicFactor.
+		#roughnessFactor . roughnessFactor.
+		#metallicRoughnessTexture . metallicRoughnessTexture ifNotNil: [:texture | texture encodeForJSON].
+
+		#texcoordScale . texcoordScale encodeForJSON.
+		#texcoordOffset . texcoordOffset encodeForJSON.
+		#texcoordOffsetVelocity . texcoordOffsetVelocity encodeForJSON.
+	}
+]
+
 { #category : #initialization }
 WDMetallicRoughnessMaterial >> initialize [
 	super initialize.
@@ -121,6 +146,33 @@ WDMetallicRoughnessMaterial >> initialize [
 	texcoordScale := Vector2 ones.
 	texcoordOffset := Vector2 zeros.
 	texcoordOffsetVelocity := Vector2 zeros.
+]
+
+{ #category : #serialization }
+WDMetallicRoughnessMaterial >> loadFromJson: jsonData [
+	super loadFromJson: jsonData.
+	jsonData at: #baseColorFactor ifPresent: [ :found | baseColorFactor := Vector4 loadFromJson: found ].
+	jsonData at: #baseColorTexture ifPresent: [ :found | baseColorTexture := WDTexture loadFromJson: found ].
+	jsonData at: #emissiveFactor ifPresent: [ :found | emissiveFactor := Vector3 loadFromJson: found ].
+	jsonData at: #emissiveTexture ifPresent: [ :found | emissiveTexture := WDTexture loadFromJson: found ].
+	jsonData at: #normalTexture ifPresent: [ :found | normalTexture := WDTexture loadFromJson: found ].
+	occlusionFactor := jsonData at: #occlusionFactor ifAbsent: [occlusionFactor].
+	jsonData at: #occlusionTexture ifPresent: [ :found | occlusionTexture := WDTexture loadFromJson: found ].
+	metallicFactor := jsonData at: #metallicFactor ifAbsent: [metallicFactor].
+	roughnessFactor := jsonData at: #roughnessFactor ifAbsent: [roughnessFactor].
+	jsonData at: #metallicRoughnessTexture ifPresent: [ :found | metallicRoughnessTexture := WDTexture loadFromJson: found ].
+	
+	jsonData at: #texcoordScale ifPresent: [ :found | texcoordScale := Vector2 loadFromJson: found ].
+	jsonData at: #texcoordOffset ifPresent: [ :found | texcoordOffset := Vector2 loadFromJson: found ].
+	jsonData at: #texcoordOffsetVelocity ifPresent: [ :found | texcoordOffsetVelocity := Vector2 loadFromJson: found ].
+]
+
+{ #category : #'as yet unclassified' }
+WDMetallicRoughnessMaterial >> makeThumbnail [
+	baseColorTexture ifNotNil: [ baseColorTexture makeThumbnail ifNotNil: [ :thumb | ^ thumb ] ].
+	^ (Form extent: 16@16 depth: 32)
+		fillColor: baseColorFactor asColor;
+		yourself
 ]
 
 { #category : #accessing }

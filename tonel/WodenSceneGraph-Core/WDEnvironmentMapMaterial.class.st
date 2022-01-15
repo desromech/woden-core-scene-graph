@@ -12,6 +12,11 @@ Class {
 }
 
 { #category : #accessing }
+WDEnvironmentMapMaterial class >> typeName [
+	^ #EnvironmentMap
+]
+
+{ #category : #accessing }
 WDEnvironmentMapMaterial >> colorFactor [
 
 	^ colorFactor
@@ -40,9 +45,24 @@ WDEnvironmentMapMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitEnvironmentMapMaterialActivationCommands: self
 ]
 
+{ #category : #serialization }
+WDEnvironmentMapMaterial >> encodeJsonKeyValues [
+	^ super encodeJsonKeyValues , {
+		#colorFactor . colorFactor encodeForJSON.
+		#colorTexture . colorTexture ifNotNil: [:texture | texture encodeForJSON]
+	}
+]
+
 { #category : #initialization }
 WDEnvironmentMapMaterial >> initialize [
 	super initialize.
 	
 	colorFactor := Vector4 ones.
+]
+
+{ #category : #serialization }
+WDEnvironmentMapMaterial >> loadFromJson: jsonData [
+	super loadFromJson: jsonData.
+	jsonData at: #colorFactor ifPresent: [ :found | colorFactor := Vector4 loadFromJson: found ].
+	jsonData at: #colorTexture ifPresent: [ :found | colorTexture := WDTexture loadFromJson: found ].
 ]
