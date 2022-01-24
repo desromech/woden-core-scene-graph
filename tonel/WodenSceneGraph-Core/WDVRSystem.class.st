@@ -23,8 +23,18 @@ WDVRSystem >> leftEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRa
 ]
 
 { #category : #projection }
-WDVRSystem >> leftEyeTransform [
+WDVRSystem >> leftEyeLocalTransform [
 	^ ReversibleAffineTransform3D identity
+]
+
+{ #category : #'as yet unclassified' }
+WDVRSystem >> leftEyeTransform [
+	^ self headTransform transformTransform: self leftEyeLocalTransform
+]
+
+{ #category : #'as yet unclassified' }
+WDVRSystem >> perEyeFrameBufferExtentForDisplayWithExtent: displayExtent [
+	^ displayExtent
 ]
 
 { #category : #'vr system' }
@@ -37,8 +47,13 @@ WDVRSystem >> rightEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectR
 ]
 
 { #category : #projection }
-WDVRSystem >> rightEyeTransform [
+WDVRSystem >> rightEyeLocalTransform [
 	^ ReversibleAffineTransform3D identity
+]
+
+{ #category : #'as yet unclassified' }
+WDVRSystem >> rightEyeTransform [
+	^ self headTransform transformTransform: self rightEyeLocalTransform
 ]
 
 { #category : #'vr system' }

@@ -32,6 +32,16 @@ WDAGPUSceneRenderer class >> withResourceCache: aResourceCache [
 	^ self basicNew initializeWithResourceCache: aResourceCache; yourself
 ]
 
+{ #category : #vr }
+WDAGPUSceneRenderer >> createVRSystem [
+	| vrSystemHandle |
+	vrSystemHandle := device getVRSystem.
+	(vrSystemHandle isNil or: [ vrSystemHandle isNull ]) ifTrue: [ ^ nil ].
+	^ WDAGPUVRSystem new
+		initializeWithSceneRenderer: self handle: vrSystemHandle;
+		yourself
+]
+
 { #category : #accessing }
 WDAGPUSceneRenderer >> device [
 

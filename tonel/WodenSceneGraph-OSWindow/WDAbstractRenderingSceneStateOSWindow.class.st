@@ -35,6 +35,20 @@ WDAbstractRenderingSceneStateOSWindow class >> eventHandlerClass [
 	^ WDAbstractRenderingSceneStateOSWindowEventHandler
 ]
 
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> attempToCreateActualVRSystem [
+	vrEnabled ifFalse: [
+		vrSystem := WDDummyVRSystem new.
+		^ self
+	].
+
+	vrSystem := self sceneRenderer createVRSystem.
+	vrSystem ifNil: [ 
+		vrSystem := WDDummyVRSystem new.
+	].
+
+]
+
 { #category : #updating }
 WDAbstractRenderingSceneStateOSWindow >> changed [
 	needsToRender := true.
@@ -125,7 +139,6 @@ WDAbstractRenderingSceneStateOSWindow >> initialize [
 	isOutOfDate := true.
 	needsToRender := true.
 	vrEnabled := false.
-	vrSystem := WDDummyVRSystem new.
 	self stereoComposeMode: WDSideBySideStereoCompositionMode.
 ]
 
@@ -151,6 +164,7 @@ WDAbstractRenderingSceneStateOSWindow >> open [
 		visible: false;
 		yourself.
 	osWindow := OSWindow createWithAttributes: attributes eventHandler: eventHandler.
+	self attempToCreateActualVRSystem.
 	osWindow show.
 	self startRenderingProcess
 ]
@@ -197,7 +211,7 @@ WDAbstractRenderingSceneStateOSWindow >> renderingSceneState [
 
 { #category : #'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> requiredPerEyeExtent [
-	^ self displayExtent
+	^ vrSystem perEyeFrameBufferExtentForDisplayWithExtent: self displayExtent
 ]
 
 { #category : #accessing }

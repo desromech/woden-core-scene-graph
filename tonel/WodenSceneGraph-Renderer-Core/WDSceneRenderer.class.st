@@ -49,6 +49,11 @@ WDSceneRenderer class >> reset [
 	Current := nil
 ]
 
+{ #category : #vr }
+WDSceneRenderer >> createVRSystem [
+	^ nil
+]
+
 { #category : #testing }
 WDSceneRenderer >> isAGPUSceneRenderer [
 	^ false

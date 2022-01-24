@@ -30,7 +30,7 @@ WDDummyVRSystem >> leftEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAsp
 ]
 
 { #category : #projection }
-WDDummyVRSystem >> leftEyeTransform [
+WDDummyVRSystem >> leftEyeLocalTransform [
 	^ ReversibleAffineTransform3D translation: (Vector3 x: ipd * -0.5)
 ]
 
@@ -40,6 +40,6 @@ WDDummyVRSystem >> rightEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAs
 ]
 
 { #category : #projection }
-WDDummyVRSystem >> rightEyeTransform [
+WDDummyVRSystem >> rightEyeLocalTransform [
 	^ ReversibleAffineTransform3D translation: (Vector3 x: ipd * 0.5)
 ]
