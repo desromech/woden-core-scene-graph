@@ -25,6 +25,7 @@ WDRenderingScene >> cameraLayers: anObject [
 
 { #category : #accessing }
 WDRenderingScene >> hasReverseDepth [
+	cameraLayers ifEmpty: [ ^ true ].
 	^ cameraLayers first hasReverseDepth
 ]
 
@@ -48,5 +49,6 @@ WDRenderingScene >> mainCameraState: anObject [
 
 { #category : #accessing }
 WDRenderingScene >> sampleCount [
+	cameraLayers ifEmpty: [ ^ 1 ].
 	^ cameraLayers first sampleCount
 ]

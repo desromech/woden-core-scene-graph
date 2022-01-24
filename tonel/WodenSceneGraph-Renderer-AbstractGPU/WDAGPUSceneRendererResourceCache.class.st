@@ -1054,6 +1054,8 @@ WDAGPUSceneRendererResourceCache >> validDepthStencilAttachmentTextureViewFor: a
 { #category : #handles }
 WDAGPUSceneRendererResourceCache >> validFramebufferFor: aWDFramebuffer [
 	| cachedFramebuffer colorBufferViews depthStencilView |
+	aWDFramebuffer swapChain ifNotNil: [ :swapChain | ^ swapChain getCurrentBackBuffer ].
+	
 	cachedFramebuffer := framebuffers at: aWDFramebuffer ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
 	cachedFramebuffer modificationCount == aWDFramebuffer modificationCount ifTrue: [ ^ cachedFramebuffer handle ].
 	

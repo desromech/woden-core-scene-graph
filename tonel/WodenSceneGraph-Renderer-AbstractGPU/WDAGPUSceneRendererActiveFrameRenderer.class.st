@@ -415,16 +415,6 @@ WDAGPUSceneRendererActiveFrameRenderer >> validFramebufferFor: aWDFramebuffer [
 ]
 
 { #category : #handles }
-WDAGPUSceneRendererActiveFrameRenderer >> validIntermediateFramebuffersFor: aWDFramebuffer [
-	^ activeResourceDictionary at: {#intermediateFramebuffer . aWDFramebuffer} ifAbsentPut: [
-		| handle |
-		handle := renderer resourceCache validIntermediateFramebuffersFor: aWDFramebuffer.
-		activeResources add: handle.
-		handle
-	]
-]
-
-{ #category : #handles }
 WDAGPUSceneRendererActiveFrameRenderer >> validIntermediateFramebuffersFor: aWDFramebuffer sampleCount: sampleCount initialDepth: initialDepth [
 	^ activeResourceDictionary at: {#intermediateFramebuffer . aWDFramebuffer} ifAbsentPut: [
 		| handle |

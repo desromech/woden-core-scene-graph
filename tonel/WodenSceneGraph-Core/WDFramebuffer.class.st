@@ -7,7 +7,8 @@ Class {
 	#instVars : [
 		'extent',
 		'colorAttachments',
-		'depthStencilAttachment'
+		'depthStencilAttachment',
+		'swapChain'
 	],
 	#category : #'WodenSceneGraph-Core-Texture'
 }
@@ -18,6 +19,14 @@ WDFramebuffer class >> forColorAttachment: aColorAttachment [
 	^ self new
 		extent: aColorAttachment width @ aColorAttachment height;
 		colorAttachments: { aColorAttachment };
+		yourself
+]
+
+{ #category : #'as yet unclassified' }
+WDFramebuffer class >> forSwapChain: swapChain extent: extent [
+	^ self new
+		extent: extent;
+		swapChain: swapChain;
 		yourself
 ]
 
@@ -67,6 +76,18 @@ WDFramebuffer >> initialize [
 	super initialize.
 	extent := 0@0.
 	colorAttachments := #().
+]
+
+{ #category : #accessing }
+WDFramebuffer >> swapChain [
+
+	^ swapChain
+]
+
+{ #category : #accessing }
+WDFramebuffer >> swapChain: anObject [
+
+	swapChain := anObject
 ]
 
 { #category : #accessing }

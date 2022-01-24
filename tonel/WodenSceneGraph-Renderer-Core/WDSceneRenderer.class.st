@@ -30,6 +30,11 @@ WDSceneRenderer class >> isAvailable [
 	^ false
 ]
 
+{ #category : #'instance creation' }
+WDSceneRenderer class >> newStandalone [
+	^ self pick new
+]
+
 { #category : #private }
 WDSceneRenderer class >> pick [
 	self allSubclassesDo: [ :each |
