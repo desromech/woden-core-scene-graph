@@ -13,7 +13,9 @@ Class {
 		'isOutOfDate',
 		'device',
 		'extent',
-		'swapChainFramebuffer'
+		'swapChainFramebuffer',
+		'needsToRender',
+		'renderingProcess'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -26,6 +28,11 @@ WDAbstractRenderingSceneStateOSWindow class >> eventHandlerClass [
 	^ WDAbstractRenderingSceneStateOSWindowEventHandler
 ]
 
+{ #category : #updating }
+WDAbstractRenderingSceneStateOSWindow >> changed [
+	needsToRender := true.
+]
+
 { #category : #'initialize-release' }
 WDAbstractRenderingSceneStateOSWindow >> close [
 	renderMutex critical: [ 
@@ -34,6 +41,7 @@ WDAbstractRenderingSceneStateOSWindow >> close [
 		osWindow destroy.
 		osWindow := nil.
 	].
+	self terminateRenderProcess
 ]
 
 { #category : #'as yet unclassified' }
@@ -72,7 +80,8 @@ WDAbstractRenderingSceneStateOSWindow >> doRender [
 	self sceneRenderer
 		renderSceneState: self renderingSceneState intoFramebuffer: swapChainFramebuffer.
 	
-	self swapBuffers
+	self swapBuffers.
+	needsToRender := false.
 ]
 
 { #category : #'updating screen' }
@@ -85,6 +94,12 @@ WDAbstractRenderingSceneStateOSWindow >> initialize [
 	super initialize.
 	extent := self defaultExtent.
 	isOutOfDate := true.
+	needsToRender := true.
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> needsToRender [
+	^ needsToRender
 ]
 
 { #category : #'instance creation' }
@@ -100,6 +115,7 @@ WDAbstractRenderingSceneStateOSWindow >> open [
 		yourself.
 	osWindow := OSWindow createWithAttributes: attributes eventHandler: eventHandler.
 	osWindow show.
+	self startRenderingProcess
 ]
 
 { #category : #rendering }
@@ -108,6 +124,33 @@ WDAbstractRenderingSceneStateOSWindow >> render [
 	renderMutex critical: [ 
 		self doRender.
 	]
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> renderingProcessEntry [
+	| session |
+	session := Smalltalk session.
+	[ session == Smalltalk session and: [ osWindow isNotNil ] ] whileTrue: [ 
+		self renderingProcessIteration
+	]
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> renderingProcessIteration [
+	self needsToRender ifTrue: [ 
+		| renderStartTime renderEndTime renderDeltaTime timeToSleep |
+		renderStartTime := Time microsecondClockValue.
+		self updateAndRender.
+
+		renderEndTime := Time microsecondClockValue.
+		renderDeltaTime := renderEndTime - renderStartTime.
+		timeToSleep := (16000 - renderDeltaTime) // 1000.
+		timeToSleep > 0 ifTrue: [
+			(Delay forMilliseconds: timeToSleep) wait
+		]
+	] ifFalse: [ 
+		(Delay forMilliseconds: 16) wait
+	].
 ]
 
 { #category : #accessing }
@@ -126,6 +169,12 @@ WDAbstractRenderingSceneStateOSWindow >> shouldUseVSync [
 ]
 
 { #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> startRenderingProcess [
+	self terminateRenderProcess.
+	renderingProcess := [ self renderingProcessEntry ] fork
+]
+
+{ #category : #'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> swapBuffers [
 	[ 
 		swapChain swapBuffers
@@ -138,6 +187,19 @@ WDAbstractRenderingSceneStateOSWindow >> swapBuffers [
 			ex signal
 		]
 	]
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> terminateRenderProcess [
+	renderingProcess ifNotNil: [
+		renderingProcess terminate.
+		renderingProcess := nil.
+	].
+]
+
+{ #category : #rendering }
+WDAbstractRenderingSceneStateOSWindow >> updateAndRender [
+	self render
 ]
 
 { #category : #'as yet unclassified' }
