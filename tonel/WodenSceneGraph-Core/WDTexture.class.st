@@ -195,7 +195,7 @@ WDTexture >> layers: anInteger [
 
 { #category : #'as yet unclassified' }
 WDTexture >> makeThumbnail [
-	data isForm ifTrue: [ ^ data asFormOfSize: 16@16 ].
+	data isForm ifTrue: [ ^ data scaledToSize: 16@16 ].
 	^ nil
 ]
 

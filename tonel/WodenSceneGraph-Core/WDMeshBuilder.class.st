@@ -338,8 +338,18 @@ WDMeshBuilder >> addQuadIndices: quadIndices [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addT0: tc [
+	texcoords0 add: tc x; add: tc y
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addT0u: u v: v [
 	texcoords0 add: u; add: v
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addT1: tc [
+	texcoords1 add: tc x; add: tc y
 ]
 
 { #category : #adding }
