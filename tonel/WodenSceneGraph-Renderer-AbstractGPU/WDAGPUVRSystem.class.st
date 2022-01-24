@@ -95,6 +95,9 @@ WDAGPUVRSystem >> initialize [
 WDAGPUVRSystem >> initializeWithSceneRenderer: aSceneRenderer handle: aVRSystemHandle [
 	"Fetch the recommended render target extent."
 	| size agpuFrustumTangents rawEyeMatrix |
+	sceneRenderer := aSceneRenderer.
+	handle := aVRSystemHandle.
+	
 	size := AGPUSize2d new.
 	handle getRecommendedRenderTargetSize: size.
 	recommendedRenderTargetExtent := size width @ size height.
@@ -116,6 +119,11 @@ WDAGPUVRSystem >> initializeWithSceneRenderer: aSceneRenderer handle: aVRSystemH
 	handle getEyeToHeadTransform: AGPU_VR_EYE_RIGHT transform: rawEyeMatrix.
 	rightEyeLocalTransform := self convertEyeToHeadTransform: rawEyeMatrix.
 
+]
+
+{ #category : #testing }
+WDAGPUVRSystem >> isRealVRSystem [
+	^ true
 ]
 
 { #category : #eyes }
@@ -156,7 +164,7 @@ WDAGPUVRSystem >> processEvent: agpuVREvent [
 	trackedDevices ifNil: [ ^ self ].
 	trackedDevice := trackedDevices at: agpuVREvent tracked_device_index + 1 ifAbsent: [^ self].
 	trackedDevice ifNil: [ ^ self ].
-	trackedDevice processAndDispatchEvent: agpuVREvent
+	trackedDevice processAndDispatchAgpuVREvent: agpuVREvent
 ]
 
 { #category : #eyes }
@@ -173,6 +181,14 @@ WDAGPUVRSystem >> rightEyeLocalTransform [
 WDAGPUVRSystem >> sceneRenderer [
 
 	^ sceneRenderer
+]
+
+{ #category : #'vr system' }
+WDAGPUVRSystem >> submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeTexture rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeTexture [
+	| leftEyeTextureHandle rightEyeTextureHandle |
+	leftEyeTextureHandle := sceneRenderer resourceCache validTextureHandleFor: leftEyeTexture.
+	rightEyeTextureHandle := sceneRenderer resourceCache validTextureHandleFor: rightEyeTexture.
+	handle submitEyeRenderTargets: leftEyeTextureHandle right_eye: rightEyeTextureHandle
 ]
 
 { #category : #'vr system' }

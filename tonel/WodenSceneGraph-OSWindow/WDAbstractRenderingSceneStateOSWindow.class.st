@@ -143,13 +143,18 @@ WDAbstractRenderingSceneStateOSWindow >> initialize [
 ]
 
 { #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> isUsingRealVRSystem [
+	^ vrSystem isNotNil and: [ vrSystem isRealVRSystem ]
+]
+
+{ #category : #accessing }
 WDAbstractRenderingSceneStateOSWindow >> leftEyeRenderingSceneState [
 	^ self renderingSceneState
 ]
 
 { #category : #accessing }
 WDAbstractRenderingSceneStateOSWindow >> needsToRender [
-	^ needsToRender
+	^ needsToRender or: [ self isUsingRealVRSystem ]
 ]
 
 { #category : #'instance creation' }

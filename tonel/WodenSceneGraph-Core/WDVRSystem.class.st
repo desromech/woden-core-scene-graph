@@ -17,6 +17,11 @@ WDVRSystem >> isDummyVRSystem [
 	^ false
 ]
 
+{ #category : #testing }
+WDVRSystem >> isRealVRSystem [
+	^ false
+]
+
 { #category : #eyes }
 WDVRSystem >> leftEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRatio [
 	^ self subclassResponsibility
