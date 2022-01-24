@@ -103,6 +103,20 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindHDRColorBuffer: hdrColorBuffer [
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindLeftEye: leftEyeTexture rightEye: rightEyeTexture [
+	stateTracker useShaderResources: (activeResourceDictionary at: {leftEyeTexture . rightEyeTexture} ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+		binding
+			bindSampledTextureView: (self validTextureViewHandleFor: leftEyeTexture fallbackTextureWith: [[renderer resourceCache transparentTexture2D]]) inSlot: 1;
+			bindSampledTextureView: (self validTextureViewHandleFor: rightEyeTexture fallbackTextureWith: [[renderer resourceCache transparentTexture2D]])inSlot: 2.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> bindLightingState: lightingState [
 	stateTracker useShaderResources: (activeResourceDictionary at: lightingState ifAbsentPut: [ 
 		| binding |
@@ -128,6 +142,34 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindObjectState: objectState [
 		binding
 	]) bindingHandle.
 
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer right: rightEyeFramebuffer into: framebuffer mode: composeMode [
+
+	| outputFramebufferHandle shaderSignature leftEyeTexture rightEyeTexture |
+	shaderSignature := renderer resourceCache rendererShaderSignature.
+	outputFramebufferHandle := self validFramebufferFor: framebuffer.
+	stateTracker
+		resetGraphicsPipeline;
+		beginRenderPass: renderer resourceCache viewportOutputRenderPass framebuffer: outputFramebufferHandle bundle_content: 0;
+		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setShaderSignature: shaderSignature handle;
+		useShaderResources: shaderSignature samplersBinding;
+		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+		setFragmentStage: (renderer resourceCache stereoComposeShaderFor: composeMode) entryPoint: 'main'.		
+
+	leftEyeTexture := leftEyeFramebuffer colorAttachments first.
+	rightEyeTexture := rightEyeFramebuffer colorAttachments first.
+	self bindLeftEye: leftEyeTexture rightEye: rightEyeTexture.
+		
+	stateTracker
+		setCullMode: AGPU_CULL_MODE_NONE;
+		setDepthState: false writeMask: false function: AGPU_ALWAYS;
+		setPrimitiveType: AGPU_TRIANGLES;
+		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+		endRenderPass
 ]
 
 { #category : #rendering }

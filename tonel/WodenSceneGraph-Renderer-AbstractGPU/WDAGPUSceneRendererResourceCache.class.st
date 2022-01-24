@@ -33,7 +33,12 @@ Class {
 		'exponentialToneMappingOperator',
 		'filmicToneMappingOperator',
 		'transparentTextureCube',
-		'forwardEnvironmentMapFragmentShader'
+		'forwardEnvironmentMapFragmentShader',
+		'sideBySideStereoComposeMode',
+		'leftEyeStereoComposeMode',
+		'topBottomStereoComposeMode',
+		'redCyanAnaglyphStereoComposeMode',
+		'stereoComposeModeShaderDictionary'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -755,6 +760,31 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 		WDFilmicToneMappingOperator asToneMappingOperator . filmicToneMappingOperator.
 	}.
 
+	leftEyeStereoComposeMode := self compileShader: self leftEyeStereoComposeShaderSource type: AGPU_FRAGMENT_SHADER.
+	sideBySideStereoComposeMode := self compileShader: self sideBySideStereoComposeShaderSource type: AGPU_FRAGMENT_SHADER.
+	topBottomStereoComposeMode := self compileShader: self topBottomStereoComposeShaderSource type: AGPU_FRAGMENT_SHADER.
+	redCyanAnaglyphStereoComposeMode := self compileShader: self redCyanAnaglyphComposeShaderSource type: AGPU_FRAGMENT_SHADER.
+	
+	stereoComposeModeShaderDictionary := Dictionary newFromPairs: {
+		WDLeftEyeStereoCompositionMode asStereoComposeMode . leftEyeStereoComposeMode.
+		WDSideBySideStereoCompositionMode asStereoComposeMode . sideBySideStereoComposeMode.
+		WDTopBottomStereoCompositionMode asStereoComposeMode . topBottomStereoComposeMode.
+		WDRedCyanAnaglyphStereoCompositionMode asStereoComposeMode . redCyanAnaglyphStereoComposeMode.
+	}.
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> leftEyeStereoComposeShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self stereoComposeShaderIOSource , '
+#line 6
+
+void main()
+{
+	FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord);
+}
+'
 ]
 
 { #category : #'private shaders' }
@@ -857,6 +887,22 @@ WDAGPUSceneRendererResourceCache >> projectionNDCAdjustMatrix [
 ]
 
 { #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> redCyanAnaglyphComposeShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self stereoComposeShaderIOSource , '
+#line 6
+
+void main()
+{
+	vec4 leftEyeColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord);
+	vec4 rightEyeColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord);
+	FragmentOutputColor = vec4(leftEyeColor.r, rightEyeColor.gb, (leftEyeColor.a + rightEyeColor.a) * 0.5);
+}
+'
+]
+
+{ #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> reinhardToneMappingOperatorShaderSource [
 	^ '
 #version 450
@@ -892,6 +938,40 @@ WDAGPUSceneRendererResourceCache >> screenQuadVertexShader [
 	^ screenQuadVertexShader
 ]
 
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> sideBySideStereoComposeShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self stereoComposeShaderIOSource , '
+#line 6
+
+void main()
+{
+	if(inTexcoord.x < 0.5)
+		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord * vec2(2.0, 1.0));
+	else
+		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, TextureSampler), inTexcoord * vec2(2.0, 1.0) - vec2(1.0, 0.0));
+}
+'
+]
+
+{ #category : #'as yet unclassified' }
+WDAGPUSceneRendererResourceCache >> stereoComposeShaderFor: composeMode [
+	^ stereoComposeModeShaderDictionary at: composeMode
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> stereoComposeShaderIOSource [
+	^ '
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputColor;
+
+layout(set=4, binding=1) uniform texture2D LeftEyeBuffer;
+layout(set=4, binding=2) uniform texture2D RightEyeBuffer;
+'
+
+]
+
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> textureUploader [
 	^ textureUploader
@@ -911,6 +991,23 @@ layout(set=4, binding=1) uniform texture2D HDRColorBuffer;
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> toneMappingOperatorShaderFor: aToneMapOperator [
 	^ toneMapOperatorShaderDictionary at: aToneMapOperator ifAbsent:[ linearToneMappingOperator ]
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> topBottomStereoComposeShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self stereoComposeShaderIOSource , '
+#line 6
+
+void main()
+{
+	if(inTexcoord.x < 0.5)
+		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, TextureSampler), inTexcoord * vec2(1.0, 2.0));
+	else
+		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord * vec2(0.0, 2.0) - vec2(0.0, 1.0));
+}
+'
 ]
 
 { #category : #accessing }

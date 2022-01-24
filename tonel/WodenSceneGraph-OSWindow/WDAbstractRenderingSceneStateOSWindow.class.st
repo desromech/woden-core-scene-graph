@@ -15,7 +15,13 @@ Class {
 		'extent',
 		'swapChainFramebuffer',
 		'needsToRender',
-		'renderingProcess'
+		'renderingProcess',
+		'vrEnabled',
+		'leftEyeFramebuffer',
+		'rightEyeFramebuffer',
+		'leftEyeColorBuffer',
+		'rightEyeColorBuffer',
+		'stereoComposeMode'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -77,8 +83,16 @@ WDAbstractRenderingSceneStateOSWindow >> doRender [
 	self validateDevice ifFalse: [ ^ self ].
 	self validateSwapChain ifFalse: [ ^ self ].
 	
-	self sceneRenderer
-		renderSceneState: self renderingSceneState intoFramebuffer: swapChainFramebuffer.
+	self hasStereoRendering ifTrue: [
+		self validateEyeFramebuffers ifFalse: [ ^ self ].
+		self sceneRenderer
+			renderLeftEyeSceneState: self leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer
+			renderRightEyeSceneState: self rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer
+			composeInto: swapChainFramebuffer mode: self stereoComposeMode
+	] ifFalse: [ 
+		self sceneRenderer
+			renderSceneState: self renderingSceneState intoFramebuffer: swapChainFramebuffer.
+	].
 	
 	self swapBuffers.
 	needsToRender := false.
@@ -89,12 +103,24 @@ WDAbstractRenderingSceneStateOSWindow >> exposed [
 	self render
 ]
 
+{ #category : #testing }
+WDAbstractRenderingSceneStateOSWindow >> hasStereoRendering [
+	^ vrEnabled
+]
+
 { #category : #initialization }
 WDAbstractRenderingSceneStateOSWindow >> initialize [
 	super initialize.
 	extent := self defaultExtent.
 	isOutOfDate := true.
 	needsToRender := true.
+	vrEnabled := false.
+	self stereoComposeMode: WDSideBySideStereoCompositionMode.
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> leftEyeRenderingSceneState [
+	^ self renderingSceneState
 ]
 
 { #category : #accessing }
@@ -158,6 +184,16 @@ WDAbstractRenderingSceneStateOSWindow >> renderingSceneState [
 	^ nil
 ]
 
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> requiredPerEyeExtent [
+	^ self displayExtent
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> rightEyeRenderingSceneState [
+	^ self renderingSceneState
+]
+
 { #category : #accessing }
 WDAbstractRenderingSceneStateOSWindow >> sceneRenderer [
 	^ sceneRenderer ifNil: [ sceneRenderer := WDSceneRenderer newStandalone ]
@@ -172,6 +208,17 @@ WDAbstractRenderingSceneStateOSWindow >> shouldUseVSync [
 WDAbstractRenderingSceneStateOSWindow >> startRenderingProcess [
 	self terminateRenderProcess.
 	renderingProcess := [ self renderingProcessEntry ] fork
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> stereoComposeMode [
+	^ stereoComposeMode
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> stereoComposeMode: aStereoComposeMode [
+	stereoComposeMode := aStereoComposeMode asStereoComposeMode.
+	self changed
 ]
 
 { #category : #'as yet unclassified' }
@@ -207,6 +254,21 @@ WDAbstractRenderingSceneStateOSWindow >> validateDevice [
 	self sceneRenderer isAGPUSceneRenderer ifFalse: [ ^ false ].
 	device := self sceneRenderer device.
 	^ device isNotNil and: [ device isNull not ]
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> validateEyeFramebuffers [
+	| requiredExtent |
+	requiredExtent := self requiredPerEyeExtent.
+	(leftEyeFramebuffer isNil or: [ leftEyeFramebuffer extent ~= requiredExtent]) ifTrue: [ 
+		leftEyeColorBuffer := WDTexture forSampledColorBufferWithExtent: requiredExtent.
+		leftEyeFramebuffer := WDFramebuffer forColorAttachment: leftEyeColorBuffer.
+	].
+	(rightEyeFramebuffer isNil or: [ rightEyeFramebuffer extent ~= requiredExtent]) ifTrue: [ 
+		rightEyeColorBuffer := WDTexture forSampledColorBufferWithExtent: requiredExtent.
+		rightEyeFramebuffer := WDFramebuffer forColorAttachment: rightEyeColorBuffer.
+	].
+	^ true
 ]
 
 { #category : #'scale factor' }
@@ -247,6 +309,17 @@ WDAbstractRenderingSceneStateOSWindow >> validateSwapChain [
 	swapChainFramebuffer := WDFramebuffer forSwapChain: swapChain extent: swapChainExtent.
 
 	^ swapChain isNotNil
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> vrEnabled [
+
+	^ vrEnabled
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> vrEnabled: anObject [
+	vrEnabled := anObject
 ]
 
 { #category : #initialization }

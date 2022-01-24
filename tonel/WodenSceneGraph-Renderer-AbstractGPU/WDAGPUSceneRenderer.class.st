@@ -81,6 +81,22 @@ WDAGPUSceneRenderer >> readbackTextureData: texture [
 ]
 
 { #category : #rendering }
+WDAGPUSceneRenderer >> renderLeftEyeSceneState: leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer
+renderRightEyeSceneState: rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer
+composeInto: destinationFramebuffer mode: composeMode [
+	WDAGPUSceneRendererActiveFrameRenderer new
+		renderer: self;
+		recordAndFlushCommandsOn: stateTracker queue: commandQueue with: [ :frame |
+			frame
+				recordRenderingCommandsFor: leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer;
+				recordRenderingCommandsFor: rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer;
+				composeStereoLeft: leftEyeFramebuffer right: rightEyeFramebuffer into: destinationFramebuffer mode: composeMode
+		];
+		finishExecution.
+	self readbackFramebufferAttachmentsOf: destinationFramebuffer
+]
+
+{ #category : #rendering }
 WDAGPUSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
 	WDAGPUSceneRendererActiveFrameRenderer new
 		renderer: self;
