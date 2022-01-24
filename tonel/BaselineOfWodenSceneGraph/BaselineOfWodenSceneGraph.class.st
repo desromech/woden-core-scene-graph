@@ -34,7 +34,7 @@ BaselineOfWodenSceneGraph >> baseline: spec [
 				spec requires: #( #'WodenSceneGraph-Morphic').
 			];
 			package: #'WodenSceneGraph-OSWindow' with: [
-				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core').
+				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core' #'AbstractGPU' #'WodenSceneGraph-Renderer-AbstractGPU').
 			];
 			package: #'WodenSceneGraph-Renderer-AbstractGPU' with: [
 				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'AbstractGPU').

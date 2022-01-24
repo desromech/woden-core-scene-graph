@@ -46,10 +46,24 @@ WDSceneNode >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCamera
 ]
 
 { #category : #converting }
+WDSceneNode >> asCameraFovY [
+	cameras ifEmpty: [ ^ 60.0 ].
+	^ cameras first asCameraFovY
+]
+
+{ #category : #converting }
 WDSceneNode >> asCameraStateWithAspectRatio: aspectRatio [
 	cameras isEmpty ifTrue: [ ^ nil ].
 	^ (cameras first asCameraStateWithAspectRatio: aspectRatio) copy
 		transformation: self globalTransform;
+		yourself
+]
+
+{ #category : #converting }
+WDSceneNode >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeTransform [
+	cameras isEmpty ifTrue: [ ^ nil ].
+	^ (cameras first asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeTransform) copy
+		transformation: (self globalTransform transformTransform: eyeTransform);
 		yourself
 ]
 

@@ -21,7 +21,8 @@ Class {
 		'rightEyeFramebuffer',
 		'leftEyeColorBuffer',
 		'rightEyeColorBuffer',
-		'stereoComposeMode'
+		'stereoComposeMode',
+		'vrSystem'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -82,13 +83,18 @@ WDAbstractRenderingSceneStateOSWindow >> doDestroySwapChain [
 WDAbstractRenderingSceneStateOSWindow >> doRender [
 	self validateDevice ifFalse: [ ^ self ].
 	self validateSwapChain ifFalse: [ ^ self ].
-	
+
 	self hasStereoRendering ifTrue: [
 		self validateEyeFramebuffers ifFalse: [ ^ self ].
 		self sceneRenderer
 			renderLeftEyeSceneState: self leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer
 			renderRightEyeSceneState: self rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer
-			composeInto: swapChainFramebuffer mode: self stereoComposeMode
+			composeInto: swapChainFramebuffer mode: self stereoComposeMode.
+			
+		vrSystem ifNotNil: [ 
+			vrSystem submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeColorBuffer
+				rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeColorBuffer
+		]
 	] ifFalse: [ 
 		self sceneRenderer
 			renderSceneState: self renderingSceneState intoFramebuffer: swapChainFramebuffer.
@@ -96,6 +102,10 @@ WDAbstractRenderingSceneStateOSWindow >> doRender [
 	
 	self swapBuffers.
 	needsToRender := false.
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> doUpdate [
 ]
 
 { #category : #'updating screen' }
@@ -115,6 +125,7 @@ WDAbstractRenderingSceneStateOSWindow >> initialize [
 	isOutOfDate := true.
 	needsToRender := true.
 	vrEnabled := false.
+	vrSystem := WDDummyVRSystem new.
 	self stereoComposeMode: WDSideBySideStereoCompositionMode.
 ]
 
@@ -244,9 +255,25 @@ WDAbstractRenderingSceneStateOSWindow >> terminateRenderProcess [
 	].
 ]
 
+{ #category : #updating }
+WDAbstractRenderingSceneStateOSWindow >> update [
+	renderMutex critical: [ 
+		self doUpdate
+	]
+]
+
 { #category : #rendering }
 WDAbstractRenderingSceneStateOSWindow >> updateAndRender [
-	self render
+	renderMutex critical: [ 
+		vrSystem ifNotNil: [ vrSystem pollEvents ].
+		self doUpdate.
+
+		self needsToRender ifTrue: [ 
+			self doRender
+		].
+	
+		vrSystem ifNotNil: [ vrSystem waitAndFetchPoses ]
+	].
 ]
 
 { #category : #'as yet unclassified' }
@@ -320,6 +347,11 @@ WDAbstractRenderingSceneStateOSWindow >> vrEnabled [
 { #category : #accessing }
 WDAbstractRenderingSceneStateOSWindow >> vrEnabled: anObject [
 	vrEnabled := anObject
+]
+
+{ #category : #accessing }
+WDAbstractRenderingSceneStateOSWindow >> vrSystem [
+	^ vrSystem
 ]
 
 { #category : #initialization }

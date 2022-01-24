@@ -19,6 +19,11 @@ Class {
 	#category : #'WodenSceneGraph-Core-Camera'
 }
 
+{ #category : #accessing }
+WDCamera >> asCameraFovY [
+	^ fovY
+]
+
 { #category : #converting }
 WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 	^ WDCameraState new
@@ -30,6 +35,21 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		toneMappingOperator: toneMappingOperator;
 		viewMode: viewMode;
 		hasReverseDepth: hasReverseDepth;
+		yourself
+]
+
+{ #category : #converting }
+WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeTransform [
+	^ WDCameraState new
+		nearDistance: nearDistance;
+		farDistance: farDistance;
+		projectionMatrix: (self projectionMatrixWithFrustumTangents: frustumTangents);
+		currentTime: currentTime;
+		exposure: exposure;
+		toneMappingOperator: toneMappingOperator;
+		viewMode: viewMode;
+		hasReverseDepth: hasReverseDepth;
+		transformation: eyeTransform;
 		yourself
 ]
 
@@ -183,6 +203,13 @@ WDCamera >> projectionMatrixWithAspect: aspectRatio [
 				ifFalse: [ Matrix4x4 orthoLeft: hw negated right: hw bottom: hh negated top: hh near: nearDistance far: farDistance ]
 			
 	]
+]
+
+{ #category : #converting }
+WDCamera >> projectionMatrixWithFrustumTangents: frustumTangents [
+	^ hasReverseDepth
+		ifTrue: [ Matrix4x4 reverseDepthFrustumTangents: frustumTangents near: nearDistance far: farDistance ]
+		ifFalse: [ Matrix4x4 frustumTangents: frustumTangents near: nearDistance far: farDistance ]
 ]
 
 { #category : #accessing }

@@ -30,6 +30,17 @@ WDSceneOSWindow >> initialize [
 ]
 
 { #category : #accessing }
+WDSceneOSWindow >> leftEyeRenderingSceneState [
+	| displayExtent aspectRatio |
+	scene ifNil: [ ^ nil ].
+	camera ifNil: [ ^ nil ].
+	displayExtent := self displayExtent.
+	aspectRatio := displayExtent x asFloat / displayExtent y.
+	^ (camera asCameraStateWithFrustumTangents: (vrSystem leftEyeFrustumTangentsWithFovY: camera asCameraFovY aspect: aspectRatio) eyeTransform: vrSystem leftEyeTransform)
+		ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
+]
+
+{ #category : #accessing }
 WDSceneOSWindow >> renderingSceneState [
 	| displayExtent aspectRatio |
 	scene ifNil: [ ^ nil ].
@@ -37,6 +48,17 @@ WDSceneOSWindow >> renderingSceneState [
 	displayExtent := self displayExtent.
 	aspectRatio := displayExtent x asFloat / displayExtent y.
 	^ (camera asCameraStateWithAspectRatio: aspectRatio) ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
+]
+
+{ #category : #accessing }
+WDSceneOSWindow >> rightEyeRenderingSceneState [
+	| displayExtent aspectRatio |
+	scene ifNil: [ ^ nil ].
+	camera ifNil: [ ^ nil ].
+	displayExtent := self displayExtent.
+	aspectRatio := displayExtent x asFloat / displayExtent y.
+	^ (camera asCameraStateWithFrustumTangents: (vrSystem rightEyeFrustumTangentsWithFovY: camera asCameraFovY aspect: aspectRatio) eyeTransform: vrSystem rightEyeTransform)
+		ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
 ]
 
 { #category : #accessing }
