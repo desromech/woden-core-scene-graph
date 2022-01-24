@@ -196,17 +196,32 @@ WDAbstractRenderingSceneStateOSWindow >> renderingProcessIteration [
 	self needsToRender ifTrue: [ 
 		| renderStartTime renderEndTime renderDeltaTime timeToSleep |
 		renderStartTime := Time microsecondClockValue.
+		"self isUsingRealVRSystem" false ifTrue: [
+			vrSystem beginFrameRenderingCycle
+		].
+
 		self updateAndRender.
 
 		renderEndTime := Time microsecondClockValue.
 		renderDeltaTime := renderEndTime - renderStartTime.
 		timeToSleep := (16000 - renderDeltaTime) // 1000.
-		timeToSleep > 0 ifTrue: [
-			(Delay forMilliseconds: timeToSleep) wait
-		]
+		false "self isUsingRealVRSystem" ifTrue: [
+			vrSystem endFrameCycleWaiting: timeToSleep.
+		] ifFalse: [ 
+			timeToSleep > 0 ifTrue: [
+				(Delay forMilliseconds: timeToSleep) wait
+			]
+		].
 	] ifFalse: [ 
 		(Delay forMilliseconds: 16) wait
 	].
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> renderingProcessPriority [
+	^ vrEnabled
+		ifTrue: [ Processor userInterruptPriority ]
+		ifFalse: [ Processor userSchedulingPriority ]
 ]
 
 { #category : #accessing }
@@ -237,7 +252,7 @@ WDAbstractRenderingSceneStateOSWindow >> shouldUseVSync [
 { #category : #'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> startRenderingProcess [
 	self terminateRenderProcess.
-	renderingProcess := [ self renderingProcessEntry ] fork
+	renderingProcess := [ self renderingProcessEntry ] forkAt: self renderingProcessPriority
 ]
 
 { #category : #accessing }

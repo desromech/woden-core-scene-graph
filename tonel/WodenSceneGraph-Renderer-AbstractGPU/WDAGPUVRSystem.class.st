@@ -188,7 +188,8 @@ WDAGPUVRSystem >> submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeT
 	| leftEyeTextureHandle rightEyeTextureHandle |
 	leftEyeTextureHandle := sceneRenderer resourceCache validTextureHandleFor: leftEyeTexture.
 	rightEyeTextureHandle := sceneRenderer resourceCache validTextureHandleFor: rightEyeTexture.
-	handle submitEyeRenderTargets: leftEyeTextureHandle right_eye: rightEyeTextureHandle
+	handle submitEyeRenderTargets: leftEyeTextureHandle right_eye: rightEyeTextureHandle.
+	super submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeTexture rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeTexture
 ]
 
 { #category : #'vr system' }
