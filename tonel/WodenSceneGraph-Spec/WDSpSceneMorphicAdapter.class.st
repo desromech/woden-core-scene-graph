@@ -21,10 +21,12 @@ WDSpSceneMorphicAdapter >> buildWidget [
 		vResizing: #spaceFill;
 		scene: self presenter scene;
 		camera: self presenter camera;
+		overlay: self presenter overlay;
 		yourself.
 
 	self presenter whenSceneChangedDo: [ :newScene | newWidget scene: newScene ].
 	self presenter whenCameraChangedDo: [ :newCamera | newWidget camera: newCamera ].
+	self presenter whenOverlayChangedDo: [ :newOverlay | newWidget overlay: newOverlay ].
 
 	^ newWidget
 ]

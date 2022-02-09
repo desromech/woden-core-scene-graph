@@ -6,7 +6,8 @@ Class {
 	#superclass : #SpAbstractWidgetPresenter,
 	#instVars : [
 		'#scene => ObservableSlot',
-		'#camera => ObservableSlot'
+		'#camera => ObservableSlot',
+		'#overlay => ObservableSlot'
 	],
 	#category : #'WodenSceneGraph-Spec'
 }
@@ -28,9 +29,21 @@ WDSpScenePresenter >> camera: anObject [
 	camera := anObject
 ]
 
+{ #category : #accessing }
+WDSpScenePresenter >> overlay [
+
+	^ overlay
+]
+
+{ #category : #accessing }
+WDSpScenePresenter >> overlay: anObject [
+
+	overlay := anObject
+]
+
 { #category : #'API - changes' }
 WDSpScenePresenter >> refresh [
-	self scene: scene; camera: camera.
+	self scene: scene; camera: camera; overlay: overlay.
 ]
 
 { #category : #accessing }
@@ -48,6 +61,11 @@ WDSpScenePresenter >> scene: anObject [
 { #category : #enumerating }
 WDSpScenePresenter >> whenCameraChangedDo: aBlock [
 	self property: #camera whenChangedDo: aBlock
+]
+
+{ #category : #enumerating }
+WDSpScenePresenter >> whenOverlayChangedDo: aBlock [
+	self property: #overlay whenChangedDo: aBlock
 ]
 
 { #category : #enumerating }

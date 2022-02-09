@@ -6,10 +6,22 @@ Class {
 	#superclass : #WDAbstractRenderingSceneStateMorph,
 	#instVars : [
 		'scene',
-		'camera'
+		'camera',
+		'overlay'
 	],
 	#category : #'WodenSceneGraph-Morphic'
 }
+
+{ #category : #'as yet unclassified' }
+WDSceneMorph >> buildWindowOverlaySceneGraphNodeWith: builder [
+	overlay ifNil: [ ^ builder null ].
+	^ builder withTranslation: self bounds origin build: [
+		builder withClippingBounds: (0@0 extent: self extent) build: [ 
+			overlay buildFullSceneGraphWith: builder
+		]
+	]
+
+]
 
 { #category : #accessing }
 WDSceneMorph >> camera [
@@ -22,6 +34,17 @@ WDSceneMorph >> camera: aCameraNode [
 	camera := aCameraNode ifNotNil: [aCameraNode asSceneNode]
 ]
 
+{ #category : #'as yet unclassified' }
+WDSceneMorph >> drawWindowOverlayOn: aCanvas [
+	| formScene |
+	overlay ifNil: [ ^ self ].
+
+	formScene := overlay buildFullSceneGraphWith: (FormSGBuilder extent: self extent).
+	formScene isNullNode ifTrue: [ ^ self ].
+	
+	FormSGCanvasRenderer render: formScene withTransform: (FormSGAffineTransform translation: self bounds origin) on: aCanvas.
+]
+
 { #category : #'event handling' }
 WDSceneMorph >> handleMouseWheel: event [
 	super handleMouseWheel: event.
@@ -32,6 +55,18 @@ WDSceneMorph >> handleMouseWheel: event [
 WDSceneMorph >> initialize [
 	super initialize.
 	self camera: WDCamera new.
+]
+
+{ #category : #accessing }
+WDSceneMorph >> overlay [
+
+	^ overlay
+]
+
+{ #category : #accessing }
+WDSceneMorph >> overlay: aWDWindowOverlay [
+	overlay := aWDWindowOverlay.
+	self changed
 ]
 
 { #category : #accessing }

@@ -14,6 +14,19 @@ Class {
 }
 
 { #category : #drawing }
+WDAbstractRenderingSceneStateMorph >> build3DSceneGraphNodeWith: builder [
+	| renderingSceneState |
+	renderingSceneState := self renderingSceneState.
+	renderingSceneState ifNil: [ ^ builder null ].
+
+	(builder isFormSGAGPUBuilder and: [ WDSceneRenderer current isAGPUSceneRenderer ]) ifFalse: [
+		^ self buildReadbackBasedSceneGraphNodeWith: builder renderingSceneState: renderingSceneState
+	].
+	^ self buildAGPUBasedSceneGraphNodeWith: builder renderingSceneState: renderingSceneState
+
+]
+
+{ #category : #drawing }
 WDAbstractRenderingSceneStateMorph >> buildAGPUBasedSceneGraphNodeWith: builder renderingSceneState: renderingSceneState [
 	| textureHandle |
 	self renderRenderingSceneStateIntoSampledFramebuffer: renderingSceneState.
@@ -35,15 +48,13 @@ WDAbstractRenderingSceneStateMorph >> buildReadbackBasedSceneGraphNodeWith: buil
 
 { #category : #drawing }
 WDAbstractRenderingSceneStateMorph >> buildSceneGraphNodeWith: builder [
-	| renderingSceneState |
-	renderingSceneState := self renderingSceneState.
-	renderingSceneState ifNil: [ ^ super buildSceneGraphNodeWith: builder ].
+	^ (super buildSceneGraphNodeWith: builder) , (self build3DSceneGraphNodeWith: builder) , (self buildWindowOverlaySceneGraphNodeWith: builder)
+	
+]
 
-	(builder isFormSGAGPUBuilder and: [ WDSceneRenderer current isAGPUSceneRenderer ]) ifFalse: [
-		^ self buildReadbackBasedSceneGraphNodeWith: builder renderingSceneState: renderingSceneState
-	].
-	^ self buildAGPUBasedSceneGraphNodeWith: builder renderingSceneState: renderingSceneState
-
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateMorph >> buildWindowOverlaySceneGraphNodeWith: builder [
+	^ builder null
 ]
 
 { #category : #accessing }
@@ -58,7 +69,12 @@ WDAbstractRenderingSceneStateMorph >> drawOn: aCanvas [
 	renderingSceneState ifNil: [ ^ super drawOn: aCanvas ].
 	self renderRenderingSceneStateIntoFormFramebuffer: renderingSceneState.
 	aCanvas drawImage: formColorBuffer data at: self bounds origin.
+	self drawWindowOverlayOn: aCanvas
 	
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateMorph >> drawWindowOverlayOn: aCanvas [
 ]
 
 { #category : #'scale factor' }
