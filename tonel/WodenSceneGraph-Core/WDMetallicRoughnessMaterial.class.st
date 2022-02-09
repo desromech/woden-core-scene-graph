@@ -91,9 +91,8 @@ WDMetallicRoughnessMaterial >> emissiveFactor [
 ]
 
 { #category : #accessing }
-WDMetallicRoughnessMaterial >> emissiveFactor: anObject [
-
-	emissiveFactor := anObject
+WDMetallicRoughnessMaterial >> emissiveFactor: aFactor [
+	emissiveFactor := aFactor asVector3
 ]
 
 { #category : #accessing }
