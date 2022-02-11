@@ -1084,8 +1084,9 @@ WDAGPUSceneRendererResourceCache >> validBufferHandleFor: aWDBinaryBuffer [
 		cachedBuffer handle: (device createBuffer: (AGPUBufferDescription new
 			size: requiredCapacity;
 			heap_type: AGPU_MEMORY_HEAP_TYPE_DEVICE_LOCAL;
-			usage_modes: (AGPU_ARRAY_BUFFER bitOr: AGPU_ELEMENT_ARRAY_BUFFER);
+			usage_modes: ((AGPU_ARRAY_BUFFER bitOr: AGPU_ELEMENT_ARRAY_BUFFER) bitOr: AGPU_COPY_DESTINATION_BUFFER);
 			main_usage_mode: (AGPU_ARRAY_BUFFER bitOr: AGPU_ELEMENT_ARRAY_BUFFER);
+			mapping_flags: AGPU_MAP_DYNAMIC_STORAGE_BIT;
 			stride: 0;
 			yourself		
 		) initial_data: aWDBinaryBuffer data).
