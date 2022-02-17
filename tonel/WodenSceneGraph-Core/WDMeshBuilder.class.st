@@ -95,6 +95,30 @@ WDMeshBuilder >> addColor: color [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addConeWithRadius: radius halfDepth: halfDepth segments: segments [
+	self beginTriangles.
+	self addP: Vector3 zeros; addN: (Vector3 z: 1).
+	
+	(0 to: segments - 1) do: [ :segment |
+		| theta x y z position normal |
+		theta := (Float twoPi * segment) / (segments - 1) - Float halfPi.
+		x := theta cos.
+		y := theta sin.
+		z := halfDepth negated.
+
+		position := Vector3 x: x * radius y: y * radius z: z.
+		normal := (Vector3 x: x y: y z: 0) normalized.
+		self addP: position; addN: normal.		
+	].
+
+	"Add the triangles"
+	(0 to: segments - 1) do: [ :segment |
+		self addTriangleI0: 0 i1: segment + 1 i2: (segment + 1) % segments + 1
+	].
+
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addCr: r g: g b: b a: a [
 	colors add: r; add: g; add: b; add: a.
 ]
