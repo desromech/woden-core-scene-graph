@@ -76,7 +76,7 @@ WDUnlitMaterial >> initialize [
 WDUnlitMaterial >> loadFromJson: jsonData [
 	super loadFromJson: jsonData.
 	jsonData at: #colorFactor ifPresent: [ :found | colorFactor := Vector4 loadFromJson: found ].
-	jsonData at: #colorTexture ifPresent: [ :found | colorTexture := WDTexture loadFromJson: found ].
+	jsonData at: #colorTexture ifPresent: [ :found | colorTexture := WDTexture loadFromJson: found inDirectory: materialDirectory ].
 
 	jsonData at: #texcoordScale ifPresent: [ :found | texcoordScale := Vector2 loadFromJson: found ].
 	jsonData at: #texcoordOffset ifPresent: [ :found | texcoordOffset := Vector2 loadFromJson: found ].

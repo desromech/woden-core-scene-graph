@@ -5,7 +5,8 @@ Class {
 	#name : #WDMaterial,
 	#superclass : #Object,
 	#instVars : [
-		'name'
+		'name',
+		'materialDirectory'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -24,9 +25,28 @@ WDMaterial class >> isAbstract [
 ]
 
 { #category : #serialization }
-WDMaterial class >> loadFromJson: jsonData [
-	^ (self getClassForTypeName: (jsonData at: #type)) new loadFromJson: jsonData
+WDMaterial class >> loadFromFileNamed: aFileName [
+	^ self loadFromFileReference: aFileName asFileReference
 	
+]
+
+{ #category : #serialization }
+WDMaterial class >> loadFromFileReference: aFileReference [
+	| jsonData |
+	jsonData := NeoJSONReader fromString: aFileReference contents.
+	^ self loadFromJson: jsonData inDirectory: aFileReference parent
+	
+]
+
+{ #category : #serialization }
+WDMaterial class >> loadFromJson: jsonData [
+	^ self loadFromJson: jsonData inDirectory: FileSystem workingDirectory
+	
+]
+
+{ #category : #serialization }
+WDMaterial class >> loadFromJson: jsonData inDirectory: materialDirectory [
+	^ (self getClassForTypeName: (jsonData at: #type)) new loadFromJson: jsonData inDirectory: materialDirectory
 ]
 
 { #category : #accessing }
@@ -70,6 +90,12 @@ WDMaterial >> hasDepthTesting [
 { #category : #serialization }
 WDMaterial >> loadFromJson: jsonData [
 	name := jsonData at: #name ifAbsent: [ name ].
+]
+
+{ #category : #serialization }
+WDMaterial >> loadFromJson: jsonData inDirectory: theMaterialDirectory [
+	materialDirectory := theMaterialDirectory.
+	self loadFromJson: jsonData
 ]
 
 { #category : #'as yet unclassified' }

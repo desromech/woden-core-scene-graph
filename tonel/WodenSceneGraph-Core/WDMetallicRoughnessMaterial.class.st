@@ -151,15 +151,15 @@ WDMetallicRoughnessMaterial >> initialize [
 WDMetallicRoughnessMaterial >> loadFromJson: jsonData [
 	super loadFromJson: jsonData.
 	jsonData at: #baseColorFactor ifPresent: [ :found | baseColorFactor := Vector4 loadFromJson: found ].
-	jsonData at: #baseColorTexture ifPresent: [ :found | baseColorTexture := WDTexture loadFromJson: found ].
+	jsonData at: #baseColorTexture ifPresent: [ :found | baseColorTexture := WDTexture loadFromJson: found inDirectory: materialDirectory ].
 	jsonData at: #emissiveFactor ifPresent: [ :found | emissiveFactor := Vector3 loadFromJson: found ].
-	jsonData at: #emissiveTexture ifPresent: [ :found | emissiveTexture := WDTexture loadFromJson: found ].
-	jsonData at: #normalTexture ifPresent: [ :found | normalTexture := WDTexture loadFromJson: found ].
+	jsonData at: #emissiveTexture ifPresent: [ :found | emissiveTexture := WDTexture loadFromJson: found inDirectory: materialDirectory ].
+	jsonData at: #normalTexture ifPresent: [ :found | normalTexture := WDTexture loadNormalMapFromJson: found inDirectory: materialDirectory ].
 	occlusionFactor := jsonData at: #occlusionFactor ifAbsent: [occlusionFactor].
-	jsonData at: #occlusionTexture ifPresent: [ :found | occlusionTexture := WDTexture loadFromJson: found ].
+	jsonData at: #occlusionTexture ifPresent: [ :found | occlusionTexture := WDTexture loadNonColorFromJson: found inDirectory: materialDirectory ].
 	metallicFactor := jsonData at: #metallicFactor ifAbsent: [metallicFactor].
 	roughnessFactor := jsonData at: #roughnessFactor ifAbsent: [roughnessFactor].
-	jsonData at: #metallicRoughnessTexture ifPresent: [ :found | metallicRoughnessTexture := WDTexture loadFromJson: found ].
+	jsonData at: #metallicRoughnessTexture ifPresent: [ :found | metallicRoughnessTexture := WDTexture loadNonColorFromJson: found inDirectory: materialDirectory ].
 	
 	jsonData at: #texcoordScale ifPresent: [ :found | texcoordScale := Vector2 loadFromJson: found ].
 	jsonData at: #texcoordOffset ifPresent: [ :found | texcoordOffset := Vector2 loadFromJson: found ].

@@ -105,9 +105,33 @@ WDTexture class >> forSampledColorBufferWithExtent: anExtent [
 ]
 
 { #category : #serialization }
-WDTexture class >> loadFromJson: jsonData [
-	jsonData ifNil: [ ^ nil ].
-	self halt
+WDTexture class >> loadFromJson: jsonData inDirectory: directory [
+	^ (self solveFileName: jsonData inDirectory: directory)
+		ifNotNil: [ :solved | self forColorFileReference: solved ]
+]
+
+{ #category : #serialization }
+WDTexture class >> loadNonColorFromJson: jsonData inDirectory: directory [
+	^ (self solveFileName: jsonData inDirectory: directory)
+		ifNotNil: [ :solved | self forNonColorFileReference: solved ]
+]
+
+{ #category : #serialization }
+WDTexture class >> loadNormalMapFromJson: jsonData inDirectory: directory [
+	^ (self solveFileName: jsonData inDirectory: directory)
+		ifNotNil: [ :solved | self forNormalMapFileReference: solved ]
+]
+
+{ #category : #serialization }
+WDTexture class >> solveFileName: fileName inDirectory: directory [
+	| fileReference |
+	fileName ifNil: [ ^ nil ].
+	fileReference := fileName asFileReference.
+	directory ifNotNil: [
+		fileReference := directory asFileReference resolve: fileReference
+	].
+	fileReference exists ifFalse: [ ^ nil ].
+	^ fileReference
 ]
 
 { #category : #'as yet unclassified' }
