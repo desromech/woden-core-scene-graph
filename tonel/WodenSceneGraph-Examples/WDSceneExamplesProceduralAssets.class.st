@@ -111,13 +111,15 @@ WDSceneExamplesProceduralAssets >> poolWaterMaterial [
 		intoNormalMapWithScale: 2.0 gradientOperator: FPLGradientOperator sobel3x3;
 		form.
 
-	^ poolWaterMaterial := WDMetallicRoughnessMaterial new
+	^ poolWaterMaterial := WDDuplicatedMetallicRoughnessLiquidMaterial new
 		alphaMode: #BLEND;
 		doubleSided: true;
 		roughnessFactor: 0.02;
 		metallicFactor: 0.0;
 		baseColorFactor: (Vector4 x: 0.0 y: 0.0 z: 0.0 w: 0.05);
 		normalTexture: (WDTexture forNormalMapForm: normalMapForm);
+		texcoordOffsetVelocity: (Vector2 withAll: 0.3);
+		duplicatedTexcoordOffsetVelocity: (Vector2 withAll: -0.3);
 		yourself
 ]
 

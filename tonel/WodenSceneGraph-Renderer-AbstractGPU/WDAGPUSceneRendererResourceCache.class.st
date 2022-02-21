@@ -38,7 +38,8 @@ Class {
 		'leftEyeStereoComposeMode',
 		'topBottomStereoComposeMode',
 		'redCyanAnaglyphStereoComposeMode',
-		'stereoComposeModeShaderDictionary'
+		'stereoComposeModeShaderDictionary',
+		'forwardDuplicatedMetallicRoughnessLiquidFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -253,6 +254,40 @@ WDAGPUSceneRendererResourceCache >> device [
 ]
 
 { #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidMaterialStateSource [
+	^ '
+layout(set=4, binding=0, std140) uniform MaterialStateBlock	
+{
+	int doubleSided;
+	float alphaCutoff;
+
+	vec4 baseColorFactor;
+	vec3 emissiveFactor;
+
+	float occlusionFactor;
+	float roughnessFactor;
+	float metallicFactor;
+		
+	vec2 texcoordOffset;
+	vec2 texcoordScale;
+	vec2 texcoordOffsetVelocity;
+
+	vec2 duplicatedTexcoordOffset;
+	vec2 duplicatedTexcoordScale;
+	vec2 duplicatedTexcoordOffsetVelocity;
+
+	float mixAlpha;
+} MaterialState;
+
+layout(set=4, binding=1) uniform texture2D BaseColorTexture;
+layout(set=4, binding=2) uniform texture2D EmissiveTexture;
+layout(set=4, binding=3) uniform texture2D NormalTexture;
+layout(set=4, binding=4) uniform texture2D OcclusionTexture;
+layout(set=4, binding=5) uniform texture2D MetallicRoughnessTexture;
+'
+]
+
+{ #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapMaterialStateSource [
 	^ '
 layout(set=4, binding=0, std140) uniform MaterialStateBlock
@@ -308,6 +343,61 @@ void main()
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = filmicCurve(hdrColor);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
+}
+'
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> forwardDuplicatedMetallicRoughnessLiquidFragmentShader [
+	^ forwardDuplicatedMetallicRoughnessLiquidFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> forwardDuplicatedMetallicRoughnessLiquidFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self forwardMetallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , '
+#line 6
+
+void main()
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+
+	vec2 texcoord1 = StageInput.texcoord0;
+	texcoord1 = texcoord1*MaterialState.duplicatedTexcoordScale + MaterialState.duplicatedTexcoordOffset + MaterialState.duplicatedTexcoordOffsetVelocity*CameraState.currentTime;
+	
+	SurfaceLightingParameters lightingParameters;
+		
+	lightingParameters.baseColor = StageInput.color * MaterialState.baseColorFactor *
+		mix(texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0),
+			texture(sampler2D(BaseColorTexture, TextureSampler), texcoord1),
+			MaterialState.mixAlpha);
+	if(lightingParameters.baseColor.a < MaterialState.alphaCutoff)
+		discard;
+
+	lightingParameters.emissiveFactor = StageInput.color.rgb * MaterialState.emissiveFactor.rgb * texture(sampler2D(EmissiveTexture, TextureSampler), texcoord0).rgb;
+	vec3 tangentSpaceN = mix(
+		texture(sampler2D(NormalTexture, TextureSampler), texcoord0),
+		texture(sampler2D(NormalTexture, TextureSampler), texcoord1),
+		MaterialState.mixAlpha).rgb*2.0 - 1.0;
+	lightingParameters.N = normalize(mat3(StageInput.tangent, StageInput.bitangent, StageInput.normal) * tangentSpaceN);
+	lightingParameters.P = StageInput.viewPosition;
+	lightingParameters.V = normalize(-StageInput.viewPosition);
+
+	lightingParameters.occlusionFactor = MaterialState.occlusionFactor *
+		mix(texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r,
+			texture(sampler2D(OcclusionTexture, TextureSampler), texcoord1).r,
+			MaterialState.mixAlpha);
+
+	vec2 roughnessMetallicFactor = vec2(MaterialState.roughnessFactor, MaterialState.metallicFactor) *
+		mix(texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord0).gb,
+			texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord1).gb,
+			MaterialState.mixAlpha);
+	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
+	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
+	
+	FragmentOutputColor = performLightingModelComputation(lightingParameters);
 }
 '
 ]
@@ -739,6 +829,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	forwardMetallicRoughnessFragmentShader := self compileShader: self forwardMetallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	forwardUnlitFragmentShader := self compileShader: self forwardUnlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	forwardEnvironmentMapFragmentShader  := self compileShader: self forwardEnvironmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	forwardDuplicatedMetallicRoughnessLiquidFragmentShader := self compileShader: self forwardDuplicatedMetallicRoughnessLiquidFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	screenQuadVertexShader := textureUploader utilityResourceCache screenQuadVertexShader.
 	defaultMaterial := WDMetallicRoughnessMaterial default.
 	projectionNDCAdjustMatrix :=
