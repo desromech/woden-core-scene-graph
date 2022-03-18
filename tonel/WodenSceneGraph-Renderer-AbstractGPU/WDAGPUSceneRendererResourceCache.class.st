@@ -604,7 +604,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 			L = normalize(L);
 		}
 		
-		if(currentLightSource.outerSpotCosCutoff > -0.5)
+		if(currentLightSource.outerSpotCosCutoff > -1.0)
 		{
 			float spotCos = dot(L, currentLightSource.spotDirection);
 			attenuation *= smoothstep(currentLightSource.outerSpotCosCutoff, currentLightSource.innerSpotCosCutoff, spotCos);

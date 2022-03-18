@@ -15,7 +15,7 @@ Class {
 { #category : #converting }
 WDSpotLightSource >> asLightStateWithTransform: renderingTransform [
 	^ (super asLightStateWithTransform: renderingTransform)
-		spotDirection: renderingTransform matrix thirdColumn;
+		spotDirection: renderingTransform matrix thirdColumn normalized;
 		innerSpotCosCutoff: innerCutoff degreeCos;
 		outerSpotCosCutoff: outerCutoff degreeCos;
 		yourself.

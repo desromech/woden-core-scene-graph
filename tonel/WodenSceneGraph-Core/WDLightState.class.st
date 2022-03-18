@@ -101,6 +101,6 @@ WDLightState >> spotDirection: anObject [
 WDLightState >> transformedWithMatrix: aMatrix [
 	^ self shallowCopy
 		positionOrDirection: (aMatrix * positionOrDirection);
-		spotDirection: (aMatrix transformVector3: positionOrDirection);
+		spotDirection: (aMatrix transformVector3: spotDirection) normalized;
 		yourself
 ]
