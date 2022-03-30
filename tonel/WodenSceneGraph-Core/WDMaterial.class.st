@@ -46,7 +46,10 @@ WDMaterial class >> loadFromJson: jsonData [
 
 { #category : #serialization }
 WDMaterial class >> loadFromJson: jsonData inDirectory: materialDirectory [
-	^ (self getClassForTypeName: (jsonData at: #type)) new loadFromJson: jsonData inDirectory: materialDirectory
+	^ (self getClassForTypeName: (jsonData at: #type))
+		ifNil: [ nil ]
+		ifNotNil: [ :cls | cls new loadFromJson: jsonData inDirectory: materialDirectory ]
+		
 ]
 
 { #category : #accessing }
