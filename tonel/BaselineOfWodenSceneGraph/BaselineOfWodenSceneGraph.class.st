@@ -7,6 +7,7 @@ Class {
 { #category : #baselines }
 BaselineOfWodenSceneGraph >> baseline: spec [
     <baseline>
+	spec postLoadDoIt: #postLoadActions.
 	spec for: #'common' do: [
 		spec
 			baseline: #'AbstractGPU' with: [ spec repository: 'github://ronsaldo/abstract-gpu' ];
@@ -47,4 +48,16 @@ BaselineOfWodenSceneGraph >> baseline: spec [
 			]
 	].
 
+]
+
+{ #category : #initialization }
+BaselineOfWodenSceneGraph >> postLoadActions [
+	self resetSpec2Bindings
+]
+
+{ #category : #initialization }
+BaselineOfWodenSceneGraph >> resetSpec2Bindings [
+	(Smalltalk at: #SpMorphicAdapterBindings ifAbsent: [ nil ]) ifNotNil: [ :cls |
+		cls allInstancesDo: [ :each | each initializeBindings ]
+	]
 ]
