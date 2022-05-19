@@ -96,3 +96,8 @@ WDSceneElement >> scene [
 WDSceneElement >> sceneLayer [
 	^ nil
 ]
+
+{ #category : #update }
+WDSceneElement >> updateWithDeltaTime: deltaTime [
+	^ false
+]

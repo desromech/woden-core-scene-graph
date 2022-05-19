@@ -9,7 +9,8 @@ Class {
 	#instVars : [
 		'backgroundLayer',
 		'normalLayer',
-		'foregroundLayer'
+		'foregroundLayer',
+		'updateBlock'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
@@ -91,6 +92,7 @@ WDScene >> initialize [
 	backgroundLayer := WDBackgroundSceneLayer for: self.
 	normalLayer := WDNormalSceneLayer for: self.
 	foregroundLayer := WDForegroundSceneLayer for: self.
+	updateBlock := [ :delta | false ].
 ]
 
 { #category : #testing }
@@ -117,4 +119,21 @@ WDScene >> remove: aNode [
 { #category : #accessing }
 WDScene >> scene [
 	^ self
+]
+
+{ #category : #accessing }
+WDScene >> updateBlock [
+
+	^ updateBlock
+]
+
+{ #category : #accessing }
+WDScene >> updateBlock: anObject [
+
+	updateBlock := anObject
+]
+
+{ #category : #update }
+WDScene >> updateWithDeltaTime: deltaTime [
+	^ (updateBlock cull: deltaTime) ~~ false
 ]

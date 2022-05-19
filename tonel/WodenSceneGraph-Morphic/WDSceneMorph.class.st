@@ -88,5 +88,26 @@ WDSceneMorph >> scene [
 { #category : #accessing }
 WDSceneMorph >> scene: aWDScene [
 	scene := aWDScene.
-	self changed
+	scene ifNotNil: [ 
+		self startStepping
+	] ifNil: [ 
+		self changed
+	]
+
+]
+
+{ #category : #stepping }
+WDSceneMorph >> step [
+	scene ifNotNil: [ 
+		(scene updateWithDeltaTime: self stepTime * 0.001) ifFalse: [
+			self stopStepping
+		].
+		self changed
+	].
+
+]
+
+{ #category : #stepping }
+WDSceneMorph >> stepTime [
+	^ 16
 ]

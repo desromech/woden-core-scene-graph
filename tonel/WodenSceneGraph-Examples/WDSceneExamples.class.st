@@ -18,6 +18,32 @@ WDSceneExamples class >> checkboardTexture [
 ]
 
 { #category : #'basic shapes' }
+WDSceneExamples class >> exampleAnimatedCube [
+	"
+	self exampleAnimatedCube
+	"
+	| cube animationTime |
+	cube := (WDMeshBuilder new
+		addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+		mesh) asSceneNode.
+	animationTime := 0.0.
+	WDScene new
+		add: cube;
+		add: ((WDPointLightSource new
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		updateBlock: [ :delta |
+			animationTime := animationTime + delta.
+			cube position: (Vector3 y: (animationTime * Float twoPi) sin * 1.5).
+			true
+		];
+		inspect
+]
+
+{ #category : #'basic shapes' }
 WDSceneExamples class >> exampleCube [
 	"
 	self exampleCube
