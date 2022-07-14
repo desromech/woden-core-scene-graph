@@ -131,7 +131,7 @@ WDSRWGLTF2Importer >> loadAccessorFrom: accessorDescription [
 	maxValues := accessorDescription at: 'max' ifAbsent: [nil].
 
 	min := max := nil.	
-	(minValues isNotNil and: [ maxValues isNotNil ]) ifTrue: [ 
+	(minValues notNil and: [ maxValues notNil ]) ifTrue: [ 
 		type = 'SCALAR' ifTrue: [
 			min := minValues first.
 			max := maxValues first.
@@ -635,7 +635,7 @@ WDSRWGLTF2Importer >> loadSkinTopology: skin [
 		(nodeToBoneGraphDictionary at: node) parent ifNotNil: [ :parentBoneGraphNode |
 			| parentBone |
 			parentBone := parentBoneGraphNode bone.
-			self assert: parentBone index isNotNil.
+			self assert: parentBone index notNil.
 			self assert: parentBone index < bone index.
 			bone parentIndex: parentBone index
 		]

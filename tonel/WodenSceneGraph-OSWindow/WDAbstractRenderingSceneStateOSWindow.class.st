@@ -144,7 +144,7 @@ WDAbstractRenderingSceneStateOSWindow >> initialize [
 
 { #category : #accessing }
 WDAbstractRenderingSceneStateOSWindow >> isUsingRealVRSystem [
-	^ vrSystem isNotNil and: [ vrSystem isRealVRSystem ]
+	^ vrSystem notNil and: [ vrSystem isRealVRSystem ]
 ]
 
 { #category : #accessing }
@@ -186,7 +186,7 @@ WDAbstractRenderingSceneStateOSWindow >> render [
 WDAbstractRenderingSceneStateOSWindow >> renderingProcessEntry [
 	| session |
 	session := Smalltalk session.
-	[ session == Smalltalk session and: [ osWindow isNotNil ] ] whileTrue: [ 
+	[ session == Smalltalk session and: [ osWindow notNil ] ] whileTrue: [ 
 		self renderingProcessIteration
 	]
 ]
@@ -314,7 +314,7 @@ WDAbstractRenderingSceneStateOSWindow >> updateAndRender [
 WDAbstractRenderingSceneStateOSWindow >> validateDevice [
 	self sceneRenderer isAGPUSceneRenderer ifFalse: [ ^ false ].
 	device := self sceneRenderer device.
-	^ device isNotNil and: [ device isNull not ]
+	^ device notNil and: [ device isNull not ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -336,7 +336,7 @@ WDAbstractRenderingSceneStateOSWindow >> validateEyeFramebuffers [
 WDAbstractRenderingSceneStateOSWindow >> validateSwapChain [
 	| oldSwapChain requiredExtent swapChainInfo platformSpecificHandle |
 	requiredExtent := self windowExtent.
-	(swapChain isNotNil and: [ swapChainExtent = requiredExtent and: [isOutOfDate not]]) ifTrue: [ ^ true ].
+	(swapChain notNil and: [ swapChainExtent = requiredExtent and: [isOutOfDate not]]) ifTrue: [ ^ true ].
 	
 	swapChainInfo := AGPUSwapChainCreateInfo new
 		buffer_count: 2;
@@ -369,7 +369,7 @@ WDAbstractRenderingSceneStateOSWindow >> validateSwapChain [
 	isOutOfDate := false.
 	swapChainFramebuffer := WDFramebuffer forSwapChain: swapChain extent: swapChainExtent.
 
-	^ swapChain isNotNil
+	^ swapChain notNil
 ]
 
 { #category : #accessing }

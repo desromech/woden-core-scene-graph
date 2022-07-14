@@ -221,7 +221,7 @@ WDAGPUVRSystem >> waitAndFetchPoses [
 		].
 	].
 
-	trackedDevices detect: [:each | each isNotNil and: [each isHeadMountedDisplay]] ifFound: [ :device | hmdTrackedDevice := device ].
+	trackedDevices detect: [:each | each notNil and: [each isHeadMountedDisplay]] ifFound: [ :device | hmdTrackedDevice := device ].
 	
 	"Transcript show: hmdTrackedDevice currentPose deviceToAbsoluteTransform translation; cr.
 	Transcript show: hmdTrackedDevice currentPose deviceToAbsoluteTransform matrix; cr."

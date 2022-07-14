@@ -25,7 +25,7 @@ WDSceneExamplesProceduralAssets class >> new [
 { #category : #compiling }
 WDSceneExamplesProceduralAssets class >> noteCompilationOf: aSelector meta: isMeta [
 	isMeta ifFalse: [ 
-		(uniqueInstance isNotNil and: [ self hasInstVarNamed: aSelector ]) ifTrue: [
+		(uniqueInstance notNil and: [ self hasInstVarNamed: aSelector ]) ifTrue: [
 			uniqueInstance instVarNamed: aSelector put: nil
 		].
 	].
