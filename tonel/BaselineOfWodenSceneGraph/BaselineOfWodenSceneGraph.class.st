@@ -7,47 +7,85 @@ Class {
 { #category : #baselines }
 BaselineOfWodenSceneGraph >> baseline: spec [
     <baseline>
-	spec postLoadDoIt: #postLoadActions.
-	spec for: #'common' do: [
-		spec
-			baseline: #'AbstractGPU' with: [ spec repository: 'github://ronsaldo/abstract-gpu' ];
-			baseline: #'WodenMath' with: [ spec repository: 'github://ronsaldo/woden-core-math' ];
-			baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://ronsaldo/form-procedural-library' ];
-			baseline: #'FormSceneGraph' with: [
-				spec
-					repository: 'github://ronsaldo/form-scene-graph';
-					loads: #('AcceleratedAbstractGPU')
-			];
-		
-			package: #'WodenSceneGraph-Core' with: [
-				spec requires: #( #'WodenMath' #'FormSceneGraph').				
-			];
-			package: #'WodenSceneGraph-Core-Tests' with: [
-				spec requires: #( #'WodenSceneGraph-Core' ).
-			];
-			package: #'WodenSceneGraph-Renderer-Core' with: [
-				spec requires: #( #'WodenSceneGraph-Core').
-			];
-			package: #'WodenSceneGraph-Morphic' with: [
-				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core').
-			];
-			package: #'WodenSceneGraph-Spec' with: [
-				spec requires: #( #'WodenSceneGraph-Morphic').
-			];
-			package: #'WodenSceneGraph-OSWindow' with: [
-				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core' #'AbstractGPU' #'WodenSceneGraph-Renderer-AbstractGPU').
-			];
-			package: #'WodenSceneGraph-Renderer-AbstractGPU' with: [
-				spec requires: #( #'WodenSceneGraph-Renderer-Core' #'AbstractGPU').
-			];
-			package: #'WodenSceneGraph-ReadWriter' with: [
-				spec requires: #( #'WodenSceneGraph-Renderer-Core').
-			];
-			package: #'WodenSceneGraph-Examples' with: [
-				spec requires: #( #'WodenSceneGraph-Spec' #FormProceduralLibrary).
-			]
-	].
+	spec for: #pharo do: [ self baselineForPharo: spec ].
+	spec for: #squeak do: [ self baselineForSqueak: spec ].
+]
 
+{ #category : #baselines }
+BaselineOfWodenSceneGraph >> baselineForPharo: spec [
+	spec postLoadDoIt: #postLoadActions.
+	spec
+		baseline: #'AbstractGPU' with: [ spec repository: 'github://ronsaldo/abstract-gpu' ];
+		baseline: #'WodenMath' with: [ spec repository: 'github://ronsaldo/woden-core-math' ];
+		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://ronsaldo/form-procedural-library' ];
+		baseline: #'FormSceneGraph' with: [
+			spec
+				repository: 'github://ronsaldo/form-scene-graph';
+				loads: #('AcceleratedAbstractGPU')
+		];
+	
+		package: #'WodenSceneGraph-Core' with: [
+			spec requires: #( #'WodenMath' #'FormSceneGraph').				
+		];
+		package: #'WodenSceneGraph-Core-Tests' with: [
+			spec requires: #( #'WodenSceneGraph-Core' ).
+		];
+		package: #'WodenSceneGraph-Renderer-Core' with: [
+			spec requires: #( #'WodenSceneGraph-Core').
+		];
+		package: #'WodenSceneGraph-Morphic' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core').
+		];
+		package: #'WodenSceneGraph-Spec' with: [
+			spec requires: #( #'WodenSceneGraph-Morphic').
+		];
+		package: #'WodenSceneGraph-OSWindow' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core' #'AbstractGPU' #'WodenSceneGraph-Renderer-AbstractGPU').
+		];
+		package: #'WodenSceneGraph-Renderer-AbstractGPU' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'AbstractGPU').
+		];
+		package: #'WodenSceneGraph-ReadWriter' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core').
+		];
+		package: #'WodenSceneGraph-Examples' with: [
+			spec requires: #( #'WodenSceneGraph-Spec' #FormProceduralLibrary).
+		]
+]
+
+{ #category : #baselines }
+BaselineOfWodenSceneGraph >> baselineForSqueak: spec [
+	spec
+		baseline: #'AbstractGPU' with: [ spec repository: 'github://ronsaldo/abstract-gpu' ];
+		baseline: #'WodenMath' with: [ spec repository: 'github://ronsaldo/woden-core-math' ];
+		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://ronsaldo/form-procedural-library' ];
+		baseline: #'FormSceneGraph' with: [
+			spec
+				repository: 'github://ronsaldo/form-scene-graph';
+				loads: #('AcceleratedAbstractGPU')
+		];
+	
+		package: #'WodenSceneGraph-Core' with: [
+			spec requires: #( #'WodenMath' #'FormSceneGraph').				
+		];
+		package: #'WodenSceneGraph-Core-Tests' with: [
+			spec requires: #( #'WodenSceneGraph-Core' ).
+		];
+		package: #'WodenSceneGraph-Renderer-Core' with: [
+			spec requires: #( #'WodenSceneGraph-Core').
+		];
+		package: #'WodenSceneGraph-Morphic' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core').
+		];
+		package: #'WodenSceneGraph-Renderer-AbstractGPU' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'AbstractGPU').
+		];
+		package: #'WodenSceneGraph-ReadWriter' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core').
+		];
+		package: #'WodenSceneGraph-Examples' with: [
+			spec requires: #( #FormProceduralLibrary).
+		]
 ]
 
 { #category : #initialization }
