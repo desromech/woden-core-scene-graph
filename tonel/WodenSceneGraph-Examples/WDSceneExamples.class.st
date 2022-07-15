@@ -89,6 +89,9 @@ WDSceneExamples class >> exampleEmpty [
 
 { #category : #'sample scenes' }
 WDSceneExamples class >> examplePool [
+	"
+	self examplePool
+	"
 	| tilesMaterial concreteMaterial waterMaterial borderThickness |
 	tilesMaterial := WDSceneExamplesProceduralAssets uniqueInstance tileMaterial.
 	concreteMaterial := WDMetallicRoughnessMaterial new.
@@ -264,7 +267,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere [
 { #category : #'basic shapes' }
 WDSceneExamples class >> exampleTexturedCubeSphere2 [
 	"
-	self exampleCube
+	self exampleTexturedCubeSphere2
 	"
 	WDScene new
 		add: (WDMeshBuilder new
@@ -290,7 +293,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere2 [
 { #category : #'basic shapes' }
 WDSceneExamples class >> exampleTexturedCubeSphere3 [
 	"
-	self exampleCube
+	self exampleTexturedCubeSphere3
 	"
 	WDScene new
 		add: (WDMeshBuilder new
@@ -312,7 +315,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere3 [
 { #category : #'basic shapes' }
 WDSceneExamples class >> exampleTexturedUVSphere [
 	"
-	self exampleCube
+	self exampleTexturedUVSphere
 	"
 	WDScene new
 		add: (WDMeshBuilder new
@@ -336,7 +339,7 @@ WDSceneExamples class >> exampleTexturedUVSphere [
 { #category : #'basic shapes' }
 WDSceneExamples class >> exampleTexturedUVSphere2 [
 	"
-	self exampleCube
+	self exampleTexturedUVSphere2
 	"
 	WDScene new
 		add: (WDMeshBuilder new
@@ -362,7 +365,7 @@ WDSceneExamples class >> exampleTexturedUVSphere2 [
 { #category : #'basic shapes' }
 WDSceneExamples class >> exampleTexturedUVSphere3 [
 	"
-	self exampleCube
+	self exampleTexturedUVSphere3
 	"
 	WDScene new
 		add: (WDMeshBuilder new
