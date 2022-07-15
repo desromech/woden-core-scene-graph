@@ -40,7 +40,7 @@ WDSceneExamples class >> exampleAnimatedCube [
 			cube position: (Vector3 y: (animationTime * Float twoPi) sin * 1.5).
 			true
 		];
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -58,7 +58,7 @@ WDSceneExamples class >> exampleCube [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -76,7 +76,7 @@ WDSceneExamples class >> exampleCubeSphere [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -84,7 +84,7 @@ WDSceneExamples class >> exampleEmpty [
 	"
 	self exampleEmpty
 	"
-	WDScene new inspect
+	WDScene new openInWindow
 ]
 
 { #category : #'sample scenes' }
@@ -147,7 +147,7 @@ WDSceneExamples class >> examplePool [
 				rotateDegreesOnX: -35;
 				translateToX: 0.0 y: 1.5 z: 2.5;
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -171,7 +171,7 @@ WDSceneExamples class >> exampleTexturedCube [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -197,7 +197,7 @@ WDSceneExamples class >> exampleTexturedCube2 [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -213,7 +213,7 @@ WDSceneExamples class >> exampleTexturedCube3 [
 			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
 			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
 			mesh);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -234,7 +234,7 @@ WDSceneExamples class >> exampleTexturedCube4 [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -258,7 +258,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -284,7 +284,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere2 [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -306,7 +306,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere3 [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -330,7 +330,7 @@ WDSceneExamples class >> exampleTexturedUVSphere [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -356,7 +356,7 @@ WDSceneExamples class >> exampleTexturedUVSphere2 [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -378,7 +378,7 @@ WDSceneExamples class >> exampleTexturedUVSphere3 [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'basic shapes' }
@@ -396,7 +396,7 @@ WDSceneExamples class >> exampleUVSphere [
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
 				yourself);
-		inspect
+		openInWindow
 ]
 
 { #category : #'see class side' }
