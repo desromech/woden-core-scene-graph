@@ -103,6 +103,12 @@ WDAGPUShaderBindingResourceSlabAllocatorBlock >> validBufferPointer [
 	bufferPointer ifNotNil: [ ^ bufferPointer ].
 	
 	bufferPointer := buffer mapBuffer: AGPU_WRITE_ONLY.
+
+	"We require here an ExternalAddress instead of an ExternalData. This check is required for runing Squeak."
+	bufferPointer class == ExternalData ifTrue: [
+		bufferPointer := bufferPointer getHandle
+	].
+
 	allocator hasPersistentMapping ifFalse: [ 
 		self halt
 	].
