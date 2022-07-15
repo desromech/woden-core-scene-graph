@@ -74,8 +74,9 @@ BaselineOfWodenSceneGraph >> baselineForSqueak: spec [
 		package: #'WodenSceneGraph-Renderer-Core' with: [
 			spec requires: #( #'WodenSceneGraph-Core').
 		];
+		package: #'WodenSceneGraph-MorphicSqueak' with: [];
 		package: #'WodenSceneGraph-Morphic' with: [
-			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core').
+			spec requires: #( #'WodenSceneGraph-MorphicSqueak' #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core').
 		];
 		package: #'WodenSceneGraph-Renderer-AbstractGPU' with: [
 			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'AbstractGPU').
