@@ -195,14 +195,14 @@ WDAbstractRenderingSceneStateOSWindow >> renderingProcessEntry [
 WDAbstractRenderingSceneStateOSWindow >> renderingProcessIteration [
 	self needsToRender ifTrue: [ 
 		| renderStartTime renderEndTime renderDeltaTime timeToSleep |
-		renderStartTime := Time microsecondClockValue.
+		renderStartTime := Time monotonicMicrosecondClockValue.
 		"self isUsingRealVRSystem" false ifTrue: [
 			vrSystem beginFrameRenderingCycle
 		].
 
 		self updateAndRender.
 
-		renderEndTime := Time microsecondClockValue.
+		renderEndTime := Time monotonicMicrosecondClockValue.
 		renderDeltaTime := renderEndTime - renderStartTime.
 		timeToSleep := (16000 - renderDeltaTime) // 1000.
 		false "self isUsingRealVRSystem" ifTrue: [
