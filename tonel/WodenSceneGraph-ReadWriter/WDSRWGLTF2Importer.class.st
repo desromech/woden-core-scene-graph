@@ -617,7 +617,7 @@ WDSRWGLTF2Importer >> loadSkinTopology: skin [
 	boneGraphNodes do: [ :boneGraphNode |
 		self topologicalSortBoneGraphNode: boneGraphNode into: sortedBones visited: visitedNodes.
 	].
-	self assert: sortedBones isNotEmpty.
+	self assert: sortedBones isEmpty not.
 	skin rootNode: (boneToNodeDictionary at: sortedBones first).
 
 	rootMatrix := skin rootNode parent

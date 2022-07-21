@@ -94,7 +94,7 @@ WDModelAsset >> meshes [
 { #category : #private }
 WDModelAsset >> privateAddElement: anElement [
 	elementSet add: anElement.
-	(anElement name notNil and: [anElement name isNotEmpty]) ifTrue: [ 
+	(anElement name notNil and: [anElement name isEmpty not]) ifTrue: [ 
 		nameDictionary at: anElement name put: anElement
 	]
 ]

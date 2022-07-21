@@ -45,7 +45,7 @@ WDSRWGLTF2BinaryImporter >> readFromFileReference: fileReference [
 		self error: 'The first chunk of a GLTF 2 binary file is expected to be a JSON.'
 	].
 
-	gltfJson := (STONJSON on: chunks first utf8ReadStream) next.
+	gltfJson := STONJSON fromStream: chunks first utf8ReadStream.
 	^ self
 		loadingDirectory: fileReference asAbsolute parent;
 		processGLTFJson: gltfJson

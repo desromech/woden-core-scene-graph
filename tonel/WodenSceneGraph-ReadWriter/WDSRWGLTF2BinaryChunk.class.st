@@ -46,5 +46,10 @@ WDSRWGLTF2BinaryChunk >> type: anObject [
 
 { #category : #'as yet unclassified' }
 WDSRWGLTF2BinaryChunk >> utf8ReadStream [
-	^ ZnCharacterReadStream on: content readStream encoding: 'utf8'
+	^ Smalltalk at: #ZnCharacterReadStream
+		ifPresent: [ :cls | cls on: content readStream encoding: 'utf8' ]
+		ifAbsent: [
+			"HACK: for Squeak"
+			content asString readStream
+		]
 ]
