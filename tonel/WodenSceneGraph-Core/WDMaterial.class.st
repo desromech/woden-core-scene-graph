@@ -33,7 +33,7 @@ WDMaterial class >> loadFromFileNamed: aFileName [
 { #category : #serialization }
 WDMaterial class >> loadFromFileReference: aFileReference [
 	| jsonData |
-	jsonData := NeoJSONReader fromString: aFileReference contents.
+	jsonData := STONJSON fromString: aFileReference contents.
 	^ self loadFromJson: jsonData inDirectory: aFileReference parent
 	
 ]

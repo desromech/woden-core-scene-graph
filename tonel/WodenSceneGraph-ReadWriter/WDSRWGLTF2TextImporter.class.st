@@ -13,7 +13,7 @@ WDSRWGLTF2TextImporter class >> readFromFileReference: aFileReference [
 WDSRWGLTF2TextImporter >> readFromFileReference: fileReference [
 	| gltfJson |
 	fileReference readStreamDo: [ :in |
-		gltfJson := (NeoJSONReader on: in) next.
+		gltfJson := (STONJSON on: in) next.
 	].
 
 	^ self
