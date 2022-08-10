@@ -87,6 +87,84 @@ WDSceneExamples class >> exampleEmpty [
 	WDScene new openInWindow
 ]
 
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleManyCubes [
+	"
+	self exampleManyCubes
+	"
+	| scene cubeMesh |
+	scene := WDScene new.
+	cubeMesh := WDMeshBuilder new
+		currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+		addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+		generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones * 0.5;
+		generateTangentSpaceFrame;
+		mesh.
+		
+	1 to: 1000 do: [ :cubeIndex |
+		| position |
+		position := cubeIndex signedRandomNoiseVector3 * 40.
+		scene add: (cubeMesh asSceneNode
+			scale: (Vector2 x: position x y: position z) randomNoiseVector3 *3 + 1.0;
+			position: position;
+			yourself)
+	].
+
+	scene add: (WDPointLightSource new
+		intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 300.0;
+		influenceRadius: 100.0;
+		asSceneNode).
+		
+	scene openInWindow
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleManyCubesAndLights [
+	"
+	self exampleManyCubesAndLights
+	"
+	| scene cubeMesh |
+	scene := WDScene new.
+	cubeMesh := WDMeshBuilder new
+		currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+		addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+		generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones * 0.5;
+		generateTangentSpaceFrame;
+		mesh.
+		
+	1 to: 1000 do: [ :cubeIndex |
+		| position |
+		position := cubeIndex signedRandomNoiseVector3 * 40.
+		scene add: (cubeMesh asSceneNode
+			scale: (Vector2 x: position x y: position z) randomNoiseVector3 *3 + 1.0;
+			position: position;
+			yourself)
+	].
+
+	1 to: 100 do: [ :lightIndex |
+		| position |
+		position := (Vector2 x: lightIndex y: 1) signedRandomNoiseVector3 * 40.
+		scene add: ((WDPointLightSource new
+			intensity: (Vector2 x: lightIndex y: 2) randomNoiseVector3 * 30.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				position: position;
+				yourself).
+	].
+
+	scene openInWindow
+]
+
 { #category : #'sample scenes' }
 WDSceneExamples class >> examplePool [
 	"
