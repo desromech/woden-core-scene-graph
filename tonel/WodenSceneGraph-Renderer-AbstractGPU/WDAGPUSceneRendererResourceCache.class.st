@@ -756,6 +756,7 @@ WDAGPUSceneRendererResourceCache >> lightClusterListComputationShader [
 
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> lightClusterListComputationShaderSource [
+	"Clustered forward rendering list shader is heavily based in the one from http://www.aortiz.me/2018/12/21/CG.html by Ángel Ortiz"
 	^ '
 #version 450
 layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
@@ -768,11 +769,73 @@ layout(set=1, binding=1, std430) buffer ListComputationGlobalStateBlock
 } ListComputationGlobalState;
 
 const uint MaxNumberOfLightsPerTile = 100u;
+const uint BatchSize = 32u;
+
+shared bool[BatchSize] SharedLightIsVisible;
+shared vec4[BatchSize] SharedLightPositionOrDirection;
+shared float[BatchSize] SharedLightRadius;
+
+float computeBoundingBoxPointDistance2(vec3 bboxCenter, vec3 bboxHalfExtent, vec3 sphereCenter)
+{
+	vec3 delta = max(abs(sphereCenter - bboxCenter) / bboxHalfExtent, 0.0);
+	return dot(delta, delta);
+}
+
+bool testBoundingBoxWithSphere(vec3 bboxCenter, vec3 bboxHalfExtent, vec4 sphereCenter, float sphereRadius)
+{ 
+	if (sphereCenter.w == 0.0)
+		return true;
+	else
+		return computeBoundingBoxPointDistance2(bboxCenter, bboxHalfExtent, sphereCenter.xyz) <= sphereRadius*sphereRadius;
+}
 
 void main()
 {
+	uvec3 gridExtent = CameraState.lightGridExtent;
+	uint tileCount = gridExtent.x*gridExtent.y*gridExtent.z;
+	uint tileIndex = gl_GlobalInvocationID.x;
+	vec3 tileMin = tileIndex < tileCount ? LightClusters.clusters[tileIndex].min : vec3(0.0);
+	vec3 tileMax = tileIndex < tileCount ? LightClusters.clusters[tileIndex].max : vec3(0.0);
+	
+	vec3 tileHalfExtent = (tileMax - tileMin)*0.5;
+	vec3 tileCenter = tileMin + tileHalfExtent;
+
 	uint visibleLightCount = 0;
 	uint visibleLightIndices[MaxNumberOfLightsPerTile];
+	
+	uint lightCount = LightingState.numberOfLights;
+	
+	for(uint i = 0u; i < lightCount; i += BatchSize)
+	{
+		uint lightIndex = min(i + gl_LocalInvocationIndex, lightCount);
+		{ 
+#define ThisLight AllLight.lights[lightIndex]
+			vec3 intensity = ThisLight.intensity;
+
+			SharedLightIsVisible[gl_LocalInvocationIndex] = intensity.r > 0.0 || intensity.g > 0.0 || intensity.b > 0.0;
+			SharedLightPositionOrDirection[gl_LocalInvocationIndex] = ThisLight.positionOrDirection;
+			SharedLightRadius[gl_LocalInvocationIndex] = ThisLight.influenceRadius;
+#undef ThisLight
+		}
+		
+		barrier();
+		
+		if(SharedLightIsVisible[gl_LocalInvocationIndex] &&
+			visibleLightCount < MaxNumberOfLightsPerTile &&
+			gl_GlobalInvocationID.x < tileCount &&
+			testBoundingBoxWithSphere(tileCenter, tileHalfExtent, SharedLightPositionOrDirection[gl_LocalInvocationIndex], SharedLightRadius[gl_LocalInvocationIndex]))
+			visibleLightIndices[visibleLightCount++] = lightIndex;
+	}
+	
+	barrier();
+
+	uint destinationIndex = atomicAdd(ListComputationGlobalState.listSize, visibleLightCount);
+	
+	for(uint i = 0u; i < visibleLightCount; ++i)
+		TileLightIndices.indices[destinationIndex] = visibleLightIndices[i];
+
+	if(tileIndex < tileCount)
+		LightClusterLists.lists[tileIndex] = uvec2(destinationIndex, visibleLightCount);
 }
 '
 ]
@@ -1261,7 +1324,7 @@ void main()
 '
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> stereoComposeShaderFor: composeMode [
 	^ stereoComposeModeShaderDictionary at: composeMode
 ]
