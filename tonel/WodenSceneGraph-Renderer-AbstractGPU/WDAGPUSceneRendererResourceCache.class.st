@@ -15,8 +15,6 @@ Class {
 		'vertexBindings',
 		'vertexLayouts',
 		'defaultMaterial',
-		'forwardMetallicRoughnessFragmentShader',
-		'forwardUnlitFragmentShader',
 		'genericSurfaceMaterialVertexShaders',
 		'whiteTexture2D',
 		'transparentTexture2D',
@@ -33,20 +31,27 @@ Class {
 		'exponentialToneMappingOperator',
 		'filmicToneMappingOperator',
 		'transparentTextureCube',
-		'forwardEnvironmentMapFragmentShader',
 		'sideBySideStereoComposeMode',
 		'leftEyeStereoComposeMode',
 		'topBottomStereoComposeMode',
 		'redCyanAnaglyphStereoComposeMode',
 		'stereoComposeModeShaderDictionary',
-		'forwardDuplicatedMetallicRoughnessLiquidFragmentShader'
+		'lightStateBuffer',
+		'tileLightIndexListBuffer',
+		'lightGridBuffer',
+		'duplicatedMetallicRoughnessLiquidFragmentShader',
+		'environmentMapFragmentShader',
+		'metallicRoughnessFragmentShader',
+		'unlitFragmentShader',
+		'uploadBuffer'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
 		'TextureFormatMap',
 		'TextureMainUsageModeMap',
 		'TextureTypeMap',
-		'TextureUsageModesMap'
+		'TextureUsageModesMap',
+		'UploadBufferCapacity'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -133,6 +138,8 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 		{ false . WDBinaryBufferAccessorVector3Type uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32_SINT.
 		{ false . WDBinaryBufferAccessorVector4Type uniqueInstance . WDBinaryBufferAccessorInt32ComponentType uniqueInstance} . AGPU_TEXTURE_FORMAT_R32G32B32A32_SINT.
 	}.
+	
+	UploadBufferCapacity := 2*1024*1024.
 ]
 
 { #category : #accessing }
@@ -199,6 +206,21 @@ WDAGPUSceneRendererResourceCache >> convertTextureDescription: description [
 ]
 
 { #category : #private }
+WDAGPUSceneRendererResourceCache >> createStorageBufferFor: elementWriter capacity: capacity usageModes: usageModes [
+	^ self createStorageBufferForElementSize: elementWriter uniqueInstance instanceSize capacity: capacity usageModes: usageModes
+]
+
+{ #category : #private }
+WDAGPUSceneRendererResourceCache >> createStorageBufferForElementSize: elementSize capacity: capacity usageModes: usageModes [
+	^ device createBuffer: (AGPUBufferDescription new
+		heap_type: AGPU_MEMORY_HEAP_TYPE_DEVICE_LOCAL;
+		main_usage_mode: AGPU_STORAGE_BUFFER;
+		usage_modes: (AGPU_STORAGE_BUFFER bitOr: usageModes);
+		size: elementSize * capacity;
+		yourself) initial_data: nil
+]
+
+{ #category : #private }
 WDAGPUSceneRendererResourceCache >> createTexture2DWithSingleColor: colorData [
 	| result |
 	result := device createTexture: (AGPUTextureDescription new
@@ -253,6 +275,61 @@ WDAGPUSceneRendererResourceCache >> device [
 	^ device
 ]
 
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShader [
+	^ duplicatedMetallicRoughnessLiquidFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , '
+#line 6
+
+void main()
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+
+	vec2 texcoord1 = StageInput.texcoord0;
+	texcoord1 = texcoord1*MaterialState.duplicatedTexcoordScale + MaterialState.duplicatedTexcoordOffset + MaterialState.duplicatedTexcoordOffsetVelocity*CameraState.currentTime;
+	
+	SurfaceLightingParameters lightingParameters;
+		
+	lightingParameters.baseColor = StageInput.color * MaterialState.baseColorFactor *
+		mix(texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0),
+			texture(sampler2D(BaseColorTexture, TextureSampler), texcoord1),
+			MaterialState.mixAlpha);
+	if(lightingParameters.baseColor.a < MaterialState.alphaCutoff)
+		discard;
+
+	lightingParameters.emissiveFactor = StageInput.color.rgb * MaterialState.emissiveFactor.rgb * texture(sampler2D(EmissiveTexture, TextureSampler), texcoord0).rgb;
+	vec3 tangentSpaceN = mix(
+		texture(sampler2D(NormalTexture, TextureSampler), texcoord0),
+		texture(sampler2D(NormalTexture, TextureSampler), texcoord1),
+		MaterialState.mixAlpha).rgb*2.0 - 1.0;
+	lightingParameters.N = normalize(mat3(StageInput.tangent, StageInput.bitangent, StageInput.normal) * tangentSpaceN);
+	lightingParameters.P = StageInput.viewPosition;
+	lightingParameters.V = normalize(-StageInput.viewPosition);
+
+	lightingParameters.occlusionFactor = MaterialState.occlusionFactor *
+		mix(texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r,
+			texture(sampler2D(OcclusionTexture, TextureSampler), texcoord1).r,
+			MaterialState.mixAlpha);
+
+	vec2 roughnessMetallicFactor = vec2(MaterialState.roughnessFactor, MaterialState.metallicFactor) *
+		mix(texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord0).gb,
+			texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord1).gb,
+			MaterialState.mixAlpha);
+	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
+	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
+	
+	FragmentOutputColor = performLightingModelComputation(lightingParameters);
+}
+'
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidMaterialStateSource [
 	^ '
@@ -284,6 +361,29 @@ layout(set=4, binding=2) uniform texture2D EmissiveTexture;
 layout(set=4, binding=3) uniform texture2D NormalTexture;
 layout(set=4, binding=4) uniform texture2D OcclusionTexture;
 layout(set=4, binding=5) uniform texture2D MetallicRoughnessTexture;
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> environmentMapFragmentShader [
+	^ environmentMapFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> environmentMapFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , self genericSurfaceMaterialFragmentShaderInputs, self fragmentShaderOutputs, self environmentMapMaterialStateSource , '
+#line 6
+
+void main()
+{ 
+	vec4 color = StageInput.color * MaterialState.colorFactor * texture(samplerCube(ColorTexture, TextureSampler), StageInput.worldPosition - CameraState.transformationMatrix[3].xyz);
+	if(color.a < MaterialState.alphaCutoff)
+		discard;
+		
+	FragmentOutputColor = color;
+}
 '
 ]
 
@@ -347,313 +447,10 @@ void main()
 '
 ]
 
-{ #category : #initialization }
-WDAGPUSceneRendererResourceCache >> forwardDuplicatedMetallicRoughnessLiquidFragmentShader [
-	^ forwardDuplicatedMetallicRoughnessLiquidFragmentShader
-]
-
 { #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> forwardDuplicatedMetallicRoughnessLiquidFragmentShaderSource [
-	^ '
-#version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self forwardMetallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , '
-#line 6
-
-void main()
-{
-	vec2 texcoord0 = StageInput.texcoord0;
-	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
-
-	vec2 texcoord1 = StageInput.texcoord0;
-	texcoord1 = texcoord1*MaterialState.duplicatedTexcoordScale + MaterialState.duplicatedTexcoordOffset + MaterialState.duplicatedTexcoordOffsetVelocity*CameraState.currentTime;
-	
-	SurfaceLightingParameters lightingParameters;
-		
-	lightingParameters.baseColor = StageInput.color * MaterialState.baseColorFactor *
-		mix(texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0),
-			texture(sampler2D(BaseColorTexture, TextureSampler), texcoord1),
-			MaterialState.mixAlpha);
-	if(lightingParameters.baseColor.a < MaterialState.alphaCutoff)
-		discard;
-
-	lightingParameters.emissiveFactor = StageInput.color.rgb * MaterialState.emissiveFactor.rgb * texture(sampler2D(EmissiveTexture, TextureSampler), texcoord0).rgb;
-	vec3 tangentSpaceN = mix(
-		texture(sampler2D(NormalTexture, TextureSampler), texcoord0),
-		texture(sampler2D(NormalTexture, TextureSampler), texcoord1),
-		MaterialState.mixAlpha).rgb*2.0 - 1.0;
-	lightingParameters.N = normalize(mat3(StageInput.tangent, StageInput.bitangent, StageInput.normal) * tangentSpaceN);
-	lightingParameters.P = StageInput.viewPosition;
-	lightingParameters.V = normalize(-StageInput.viewPosition);
-
-	lightingParameters.occlusionFactor = MaterialState.occlusionFactor *
-		mix(texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r,
-			texture(sampler2D(OcclusionTexture, TextureSampler), texcoord1).r,
-			MaterialState.mixAlpha);
-
-	vec2 roughnessMetallicFactor = vec2(MaterialState.roughnessFactor, MaterialState.metallicFactor) *
-		mix(texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord0).gb,
-			texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord1).gb,
-			MaterialState.mixAlpha);
-	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
-	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
-	
-	FragmentOutputColor = performLightingModelComputation(lightingParameters);
-}
-'
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> forwardEnvironmentMapFragmentShader [
-	^ forwardEnvironmentMapFragmentShader
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> forwardEnvironmentMapFragmentShaderSource [
-	^ '
-#version 450
-' , self samplerStateSource, self cameraStateBlockSource , self genericSurfaceMaterialFragmentShaderInputs, self forwardFragmentShaderOutputs, self environmentMapMaterialStateSource , '
-#line 6
-
-void main()
-{ 
-	vec4 color = StageInput.color * MaterialState.colorFactor * texture(samplerCube(ColorTexture, TextureSampler), StageInput.worldPosition - CameraState.transformationMatrix[3].xyz);
-	if(color.a < MaterialState.alphaCutoff)
-		discard;
-		
-	FragmentOutputColor = color;
-}
-'
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> forwardFragmentShaderOutputs [
+WDAGPUSceneRendererResourceCache >> fragmentShaderOutputs [
 	^ '
 layout(location=0) out vec4 FragmentOutputColor;
-'
-]
-
-{ #category : #initialization }
-WDAGPUSceneRendererResourceCache >> forwardMetallicRoughnessFragmentShader [
-	^ forwardMetallicRoughnessFragmentShader
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> forwardMetallicRoughnessFragmentShaderSource [
-	^ '
-#version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self forwardMetallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , '
-#line 6
-
-void main()
-{
-	vec2 texcoord0 = StageInput.texcoord0;
-	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
-	
-	SurfaceLightingParameters lightingParameters;
-	
-	lightingParameters.baseColor = StageInput.color * MaterialState.baseColorFactor * texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0);
-	if(lightingParameters.baseColor.a < MaterialState.alphaCutoff)
-		discard;
-
-	lightingParameters.emissiveFactor = StageInput.color.rgb * MaterialState.emissiveFactor.rgb * texture(sampler2D(EmissiveTexture, TextureSampler), texcoord0).rgb;
-	vec3 tangentSpaceN = texture(sampler2D(NormalTexture, TextureSampler), texcoord0).rgb*2.0 - 1.0;
-	lightingParameters.N = normalize(mat3(StageInput.tangent, StageInput.bitangent, StageInput.normal) * tangentSpaceN);
-	lightingParameters.P = StageInput.viewPosition;
-	lightingParameters.V = normalize(-StageInput.viewPosition);
-
-	lightingParameters.occlusionFactor = MaterialState.occlusionFactor * texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r;
-	vec2 roughnessMetallicFactor = vec2(MaterialState.roughnessFactor, MaterialState.metallicFactor) * texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord0).gb;
-	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
-	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
-	
-	FragmentOutputColor = performLightingModelComputation(lightingParameters);
-}
-'
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> forwardMetallicRoughnessLightingModel [
-^ self lightingStateBlockSource , self forwardFragmentShaderOutputs , '
-#line 4
-const float DistanceEpsilon = 0.00001;
-
-const float Pi = 3.141592653589793;
-const float PiReciprocal = 0.3183098861837907;
-
-struct SurfaceLightingParameters
-{
-	vec4 baseColor;
-
-	vec3 emissiveFactor;
-	float occlusionFactor;
-
-	vec3 N;
-	float metallicFactor;
-
-	vec3 V;
-	float roughnessFactor;
-
-	vec3 P;
-};
-
-vec3 fresnelSchlick(vec3 F0, float cosTheta)
-{
-    float powFactor = 1.0 - cosTheta;
-    float powFactor2 = powFactor * powFactor;
-    float powFactor4 = powFactor2 * powFactor2;
-    float powValue = powFactor4 * powFactor;
-
-    return F0 + (vec3(1.0) - F0) * powValue;
-}
-
-vec3 fresnelSchlickRoughness(vec3 F0, float cosTheta, float roughness)
-{
-	// Function obtained from: https://learnopengl.com/PBR/IBL/Diffuse-irradiance
-    float powFactor = 1.0 - cosTheta;
-    float powFactor2 = powFactor * powFactor;
-    float powFactor4 = powFactor2 * powFactor2;
-    float powValue = powFactor4 * powFactor;
-
-    return F0 + (max(vec3(1.0) - roughness, F0) - F0) * powValue;
-}
-
-float ggxSpecularDistribution(float alpha, float cosTheta)
-{
-	float alphaSquare = alpha*alpha;
-	float den = cosTheta*cosTheta*(alphaSquare - 1.0) + 1.0;
-	return alphaSquare / (Pi * den*den);
-}
-
-float smithSchlickBeckmannReciprocalFunction(float k, float cosTheta)
-{
-    return cosTheta*(1.0 - k) + k;
-}
-
-float cookTorranceSmithSchlickGGXMasking(float k, float NdotL, float NdotV)
-{
-	return 1.0 / (4.0*smithSchlickBeckmannReciprocalFunction(k, NdotL)*smithSchlickBeckmannReciprocalFunction(k, NdotV));
-}
-
-float computeLightAttenuation(float distance, float influenceRadius)
-{
-    float a = distance / max(influenceRadius, DistanceEpsilon);
-    float a2 = a*a;
-    float a4 = a2*a2;
-    float num = clamp(1.0f - a4, 0.0, 1.0);
-    return num*num / (distance*distance + 1.0);
-}
-
-vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParameters)
-{
-	vec3 dielectricF0 = vec3(0.04);
-	vec3 Cdiffuse = mix(surfaceParameters.baseColor.rgb * (1.0 - dielectricF0), vec3(0.0), surfaceParameters.metallicFactor);
-	vec3 diffuse = Cdiffuse * PiReciprocal;
-	vec3 F0 = mix(dielectricF0, surfaceParameters.baseColor.rgb, surfaceParameters.metallicFactor);
-
-	float directRoughness = mix(0.01, 1.0, surfaceParameters.roughnessFactor);
-	float directAlpha = directRoughness*directRoughness;
-
-	float directKRoughness = (directRoughness + 1.0);
-	float directK = directKRoughness*directKRoughness / 8.0;
-
-	float NdotV = max(0.0, dot(surfaceParameters.N, surfaceParameters.V));
-			
-	vec3 lightedColor = vec3(0);
-	
-	// Ambient lighting accumulation.
-	lightedColor += surfaceParameters.baseColor.rgb*LightingState.ambientLighting;
-
-	// Add the lighting cube.
-	vec3 R = reflect(-surfaceParameters.V, surfaceParameters.N);
-
-	mat3 viewToWorld = mat3(CameraState.inverseTransformationMatrix[0].xyz, CameraState.inverseTransformationMatrix[1].xyz, CameraState.inverseTransformationMatrix[2].xyz);
-	vec3 worldN = surfaceParameters.N * viewToWorld;
-	vec3 worldR = R * viewToWorld;
-
-	vec3 diffuseLightProbeSample = textureLod(samplerCube(AmbientDiffuseLightProbeTexture, BrdfLutSampler), worldN, 0.0).rgb;
-
-	float specularLightProbeLevel = float(textureQueryLevels(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler)) - 1) * surfaceParameters.roughnessFactor;
-	vec3 specularLightProbeSample = textureLod(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler), worldR, specularLightProbeLevel).rgb;
-
-	vec2 ambientReflectionFactors = textureLod(sampler2D(BRDFLutTexture, BrdfLutSampler), vec2(NdotV, surfaceParameters.roughnessFactor), 0.0).rg;
-	vec3 specularFactor = F0*ambientReflectionFactors.x + ambientReflectionFactors.y;
-
-	// Add the light probe.
-	lightedColor += diffuseLightProbeSample*diffuse + specularLightProbeSample*specularFactor;
-	
-	lightedColor *= surfaceParameters.occlusionFactor;
-	lightedColor += surfaceParameters.emissiveFactor;
-	
-	// Direct light accumulation.
-	uint lightCount = min(LightingState.numberOfLights, 8u);
-	for(uint i = 0u; i < lightCount; ++i)
-	{
-#define currentLightSource LightingState.lights[i]
-		vec4 lightSourcePosition = currentLightSource.positionOrDirection;
-		vec3 L = lightSourcePosition.xyz;
-		float attenuation = 1.0;
-		if(lightSourcePosition.w != 0)
-		{ 
-			L = L - surfaceParameters.P;
-			float lightDistance = length(L);
-			L = L/ max(lightDistance, DistanceEpsilon);
-			attenuation = computeLightAttenuation(lightDistance, currentLightSource.influenceRadius);
-		}
-		else
-		{
-			L = normalize(L);
-		}
-		
-		if(currentLightSource.outerSpotCosCutoff > -1.0)
-		{
-			float spotCos = dot(L, currentLightSource.spotDirection);
-			attenuation *= smoothstep(currentLightSource.outerSpotCosCutoff, currentLightSource.innerSpotCosCutoff, spotCos);
-		}
-		
-		float NdotL = max(0.0, dot(surfaceParameters.N, L));
-		if(NdotL > 0.0 && attenuation > 0.0)
-		{
-			vec3 H = normalize(L + surfaceParameters.V);
-			float NdotH = max(0.0, dot(surfaceParameters.N, H));
-			float VdotH = max(0.0, dot(surfaceParameters.V, H));
-			
-			vec3 F = fresnelSchlick(F0, VdotH);
-			float D = ggxSpecularDistribution(directAlpha, NdotH);
-			float G = cookTorranceSmithSchlickGGXMasking(directK, NdotL, NdotV);
-
-			lightedColor += (currentLightSource.intensity * (diffuse + F*(D*G))) * (attenuation*NdotL*Pi);
-		}
-#undef currentLightSource
-	}
-	
-	return vec4(lightedColor, surfaceParameters.baseColor.a);
-}
-'
-]
-
-{ #category : #initialization }
-WDAGPUSceneRendererResourceCache >> forwardUnlitFragmentShader [
-	^ forwardUnlitFragmentShader
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> forwardUnlitFragmentShaderSource [
-	^ '
-#version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self forwardFragmentShaderOutputs, self unlitMaterialStateSource , '
-#line 6
-
-void main()
-{
-	vec2 texcoord0 = StageInput.texcoord0;
-	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
-	
-	vec4 color = StageInput.color * MaterialState.colorFactor * texture(sampler2D(ColorTexture, TextureSampler), texcoord0);
-	if(color.a < MaterialState.alphaCutoff)
-		discard;
-		
-	FragmentOutputColor = color;
-}
 '
 ]
 
@@ -771,15 +568,15 @@ WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocati
 ]
 
 { #category : #initialization }
-WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth [
-	^ renderPasses at: {#hdrRenderPass . sampleCount . initialDepth} ifAbsentPut: [
+WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: keepBegin [
+	^ renderPasses at: {#hdrRenderPass . sampleCount . initialDepth . keepBegin} ifAbsentPut: [
 		| colorAttachment depthStencilAttachment |
 		[
 			| renderpassDescription |
 			colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
 			colorAttachment
 				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
-				begin_action: AGPU_ATTACHMENT_CLEAR;
+				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
 				clear_value: AGPUColor4f new;
@@ -787,7 +584,7 @@ WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount in
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
 				format: depthFormat;
 				sample_count: sampleCount;
-				begin_action: AGPU_ATTACHMENT_CLEAR;
+				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
 				end_action: AGPU_ATTACHMENT_KEEP;
 				clear_value: (AGPUDepthStencilValue new
 					depth: initialDepth;
@@ -820,16 +617,22 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	vertexLayouts := Dictionary new.
 	renderPasses := Dictionary new.
 	
+	uploadBuffer := WDAGPUShaderStackAllocator for: device capacity: UploadBufferCapacity.
+	
+	lightStateBuffer := self createStorageBufferFor: WDAGPULightStateUniformBufferWriter capacity: WDAGPUSceneRenderer maxLightCapacity usageModes: AGPU_COPY_DESTINATION_BUFFER.
+	tileLightIndexListBuffer := self createStorageBufferForElementSize: 4 capacity: WDAGPUSceneRenderer maxLightCapacity * WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
+	lightGridBuffer := self createStorageBufferForElementSize: 8 capacity: WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
+	
 	whiteTexture2D := self createTexture2DWithSingleColor: #[255 255 255 255].
 	transparentTexture2D := self createTexture2DWithSingleColor: #[0 0 0 0].
 	neutralNormalTexture := self createTexture2DWithSingleColor: #[128 128 255 255].
 	transparentTextureCube := self createTextureCubeWithSingleColor: #[0 0 0 0].
 	
 	genericSurfaceMaterialVertexShaders := Dictionary new.
-	forwardMetallicRoughnessFragmentShader := self compileShader: self forwardMetallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	forwardUnlitFragmentShader := self compileShader: self forwardUnlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	forwardEnvironmentMapFragmentShader  := self compileShader: self forwardEnvironmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	forwardDuplicatedMetallicRoughnessLiquidFragmentShader := self compileShader: self forwardDuplicatedMetallicRoughnessLiquidFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	metallicRoughnessFragmentShader := self compileShader: self metallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	unlitFragmentShader := self compileShader: self unlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	environmentMapFragmentShader  := self compileShader: self environmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	duplicatedMetallicRoughnessLiquidFragmentShader := self compileShader: self duplicatedMetallicRoughnessLiquidFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	screenQuadVertexShader := textureUploader utilityResourceCache screenQuadVertexShader.
 	defaultMaterial := WDMetallicRoughnessMaterial default.
 	projectionNDCAdjustMatrix :=
@@ -878,6 +681,16 @@ void main()
 '
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> lightGridBuffer [
+	^ lightGridBuffer
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> lightStateBuffer [
+	^ lightStateBuffer
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> lightingStateBlockSource [
 	^ '
@@ -893,16 +706,21 @@ struct LightSource
 	float outerSpotCosCutoff;
 };
 
-layout(set=2, binding=0, std140) uniform LightingStateBlock	
+layout(set=2, binding=0, std140) uniform LightingStateBlock
 {
 	vec3 ambientLighting;
 	uint numberOfLights;
 	LightSource[8] lights;
 } LightingState;
 
-layout(set=2, binding=1) uniform texture2D BRDFLutTexture;
-layout(set=2, binding=2) uniform textureCube AmbientDiffuseLightProbeTexture;
-layout(set=2, binding=3) uniform textureCube AmbientSpecularLightProbeTexture;
+layout(set=2, binding=1, std430) buffer AllLightsBlock
+{
+	LightSource[] lights;
+} AllLight;
+
+layout(set=2, binding=4) uniform texture2D BRDFLutTexture;
+layout(set=2, binding=5) uniform textureCube AmbientDiffuseLightProbeTexture;
+layout(set=2, binding=6) uniform textureCube AmbientSpecularLightProbeTexture;
 '
 ]
 
@@ -923,6 +741,205 @@ void main()
 {
 	vec4 hdrColor = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
 	FragmentOutputColor = vec4(hdrColor.rgb * CameraState.exposure, hdrColor.a);
+}
+'
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShader [
+	^ metallicRoughnessFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , '
+#line 6
+
+void main()
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+	
+	SurfaceLightingParameters lightingParameters;
+	
+	lightingParameters.baseColor = StageInput.color * MaterialState.baseColorFactor * texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0);
+	if(lightingParameters.baseColor.a < MaterialState.alphaCutoff)
+		discard;
+
+	lightingParameters.emissiveFactor = StageInput.color.rgb * MaterialState.emissiveFactor.rgb * texture(sampler2D(EmissiveTexture, TextureSampler), texcoord0).rgb;
+	vec3 tangentSpaceN = texture(sampler2D(NormalTexture, TextureSampler), texcoord0).rgb*2.0 - 1.0;
+	lightingParameters.N = normalize(mat3(StageInput.tangent, StageInput.bitangent, StageInput.normal) * tangentSpaceN);
+	lightingParameters.P = StageInput.viewPosition;
+	lightingParameters.V = normalize(-StageInput.viewPosition);
+
+	lightingParameters.occlusionFactor = MaterialState.occlusionFactor * texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r;
+	vec2 roughnessMetallicFactor = vec2(MaterialState.roughnessFactor, MaterialState.metallicFactor) * texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord0).gb;
+	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
+	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
+	
+	FragmentOutputColor = performLightingModelComputation(lightingParameters);
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> metallicRoughnessLightingModel [
+^ self lightingStateBlockSource , self fragmentShaderOutputs , '
+#line 4
+const float DistanceEpsilon = 0.00001;
+
+const float Pi = 3.141592653589793;
+const float PiReciprocal = 0.3183098861837907;
+
+struct SurfaceLightingParameters
+{
+	vec4 baseColor;
+
+	vec3 emissiveFactor;
+	float occlusionFactor;
+
+	vec3 N;
+	float metallicFactor;
+
+	vec3 V;
+	float roughnessFactor;
+
+	vec3 P;
+};
+
+vec3 fresnelSchlick(vec3 F0, float cosTheta)
+{
+    float powFactor = 1.0 - cosTheta;
+    float powFactor2 = powFactor * powFactor;
+    float powFactor4 = powFactor2 * powFactor2;
+    float powValue = powFactor4 * powFactor;
+
+    return F0 + (vec3(1.0) - F0) * powValue;
+}
+
+vec3 fresnelSchlickRoughness(vec3 F0, float cosTheta, float roughness)
+{
+	// Function obtained from: https://learnopengl.com/PBR/IBL/Diffuse-irradiance
+    float powFactor = 1.0 - cosTheta;
+    float powFactor2 = powFactor * powFactor;
+    float powFactor4 = powFactor2 * powFactor2;
+    float powValue = powFactor4 * powFactor;
+
+    return F0 + (max(vec3(1.0) - roughness, F0) - F0) * powValue;
+}
+
+float ggxSpecularDistribution(float alpha, float cosTheta)
+{
+	float alphaSquare = alpha*alpha;
+	float den = cosTheta*cosTheta*(alphaSquare - 1.0) + 1.0;
+	return alphaSquare / (Pi * den*den);
+}
+
+float smithSchlickBeckmannReciprocalFunction(float k, float cosTheta)
+{
+    return cosTheta*(1.0 - k) + k;
+}
+
+float cookTorranceSmithSchlickGGXMasking(float k, float NdotL, float NdotV)
+{
+	return 1.0 / (4.0*smithSchlickBeckmannReciprocalFunction(k, NdotL)*smithSchlickBeckmannReciprocalFunction(k, NdotV));
+}
+
+float computeLightAttenuation(float distance, float influenceRadius)
+{
+    float a = distance / max(influenceRadius, DistanceEpsilon);
+    float a2 = a*a;
+    float a4 = a2*a2;
+    float num = clamp(1.0f - a4, 0.0, 1.0);
+    return num*num / (distance*distance + 1.0);
+}
+
+vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParameters)
+{
+	vec3 dielectricF0 = vec3(0.04);
+	vec3 Cdiffuse = mix(surfaceParameters.baseColor.rgb * (1.0 - dielectricF0), vec3(0.0), surfaceParameters.metallicFactor);
+	vec3 diffuse = Cdiffuse * PiReciprocal;
+	vec3 F0 = mix(dielectricF0, surfaceParameters.baseColor.rgb, surfaceParameters.metallicFactor);
+
+	float directRoughness = mix(0.01, 1.0, surfaceParameters.roughnessFactor);
+	float directAlpha = directRoughness*directRoughness;
+
+	float directKRoughness = (directRoughness + 1.0);
+	float directK = directKRoughness*directKRoughness / 8.0;
+
+	float NdotV = max(0.0, dot(surfaceParameters.N, surfaceParameters.V));
+			
+	vec3 lightedColor = vec3(0);
+	
+	// Ambient lighting accumulation.
+	lightedColor += surfaceParameters.baseColor.rgb*LightingState.ambientLighting;
+
+	// Add the lighting cube.
+	vec3 R = reflect(-surfaceParameters.V, surfaceParameters.N);
+
+	mat3 viewToWorld = mat3(CameraState.inverseTransformationMatrix[0].xyz, CameraState.inverseTransformationMatrix[1].xyz, CameraState.inverseTransformationMatrix[2].xyz);
+	vec3 worldN = surfaceParameters.N * viewToWorld;
+	vec3 worldR = R * viewToWorld;
+
+	vec3 diffuseLightProbeSample = textureLod(samplerCube(AmbientDiffuseLightProbeTexture, BrdfLutSampler), worldN, 0.0).rgb;
+
+	float specularLightProbeLevel = float(textureQueryLevels(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler)) - 1) * surfaceParameters.roughnessFactor;
+	vec3 specularLightProbeSample = textureLod(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler), worldR, specularLightProbeLevel).rgb;
+
+	vec2 ambientReflectionFactors = textureLod(sampler2D(BRDFLutTexture, BrdfLutSampler), vec2(NdotV, surfaceParameters.roughnessFactor), 0.0).rg;
+	vec3 specularFactor = F0*ambientReflectionFactors.x + ambientReflectionFactors.y;
+
+	// Add the light probe.
+	lightedColor += diffuseLightProbeSample*diffuse + specularLightProbeSample*specularFactor;
+	
+	lightedColor *= surfaceParameters.occlusionFactor;
+	lightedColor += surfaceParameters.emissiveFactor;
+	
+	// Direct light accumulation.
+	uint lightCount = LightingState.numberOfLights;
+	for(uint i = 0u; i < lightCount; ++i)
+	{
+#define currentLightSource AllLight.lights[i]
+		vec4 lightSourcePosition = currentLightSource.positionOrDirection;
+		vec3 L = lightSourcePosition.xyz;
+		float attenuation = 1.0;
+		if(lightSourcePosition.w != 0)
+		{ 
+			L = L - surfaceParameters.P;
+			float lightDistance = length(L);
+			L = L/ max(lightDistance, DistanceEpsilon);
+			attenuation = computeLightAttenuation(lightDistance, currentLightSource.influenceRadius);
+		}
+		else
+		{
+			L = normalize(L);
+		}
+		
+		if(currentLightSource.outerSpotCosCutoff > -1.0)
+		{
+			float spotCos = dot(L, currentLightSource.spotDirection);
+			attenuation *= smoothstep(currentLightSource.outerSpotCosCutoff, currentLightSource.innerSpotCosCutoff, spotCos);
+		}
+		
+		float NdotL = max(0.0, dot(surfaceParameters.N, L));
+		if(NdotL > 0.0 && attenuation > 0.0)
+		{
+			vec3 H = normalize(L + surfaceParameters.V);
+			float NdotH = max(0.0, dot(surfaceParameters.N, H));
+			float VdotH = max(0.0, dot(surfaceParameters.V, H));
+			
+			vec3 F = fresnelSchlick(F0, VdotH);
+			float D = ggxSpecularDistribution(directAlpha, NdotH);
+			float G = cookTorranceSmithSchlickGGXMasking(directK, NdotL, NdotV);
+
+			lightedColor += (currentLightSource.intensity * (diffuse + F*(D*G))) * (attenuation*NdotL*Pi);
+		}
+#undef currentLightSource
+	}
+	
+	return vec4(lightedColor, surfaceParameters.baseColor.a);
 }
 '
 ]
@@ -1068,6 +1085,11 @@ WDAGPUSceneRendererResourceCache >> textureUploader [
 	^ textureUploader
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> tileLightIndexListBuffer [
+	^ tileLightIndexListBuffer
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> toneMappingOperatorIOSource [
 	^ '
@@ -1146,6 +1168,32 @@ void main()
 '
 ]
 
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> unlitFragmentShader [
+	^ unlitFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> unlitFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self fragmentShaderOutputs, self unlitMaterialStateSource , '
+#line 6
+
+void main()
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+	
+	vec4 color = StageInput.color * MaterialState.colorFactor * texture(sampler2D(ColorTexture, TextureSampler), texcoord0);
+	if(color.a < MaterialState.alphaCutoff)
+		discard;
+		
+	FragmentOutputColor = color;
+}
+'
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> unlitMaterialStateSource [
 	^ '
@@ -1162,6 +1210,11 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 
 layout(set=4, binding=1) uniform texture2D ColorTexture;
 '
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> uploadBuffer [
+	^ uploadBuffer
 ]
 
 { #category : #handles }

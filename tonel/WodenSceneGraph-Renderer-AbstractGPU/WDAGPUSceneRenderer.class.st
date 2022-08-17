@@ -11,15 +11,56 @@ Class {
 		'stateTracker',
 		'resourceCache'
 	],
+	#classVars : [
+		'LightGridCellCount',
+		'LightGridColumns',
+		'LightGridRows',
+		'LightGridSlices',
+		'MaxLightCapacity'
+	],
 	#pools : [
 		'AGPUConstants'
 	],
 	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
 }
 
+{ #category : #initialization }
+WDAGPUSceneRenderer class >> initialize [
+	MaxLightCapacity := 1024.
+	LightGridRows := 9.
+	LightGridColumns := 16.
+	LightGridSlices := 24.
+	LightGridCellCount := LightGridRows*LightGridColumns*LightGridSlices
+]
+
 { #category : #testing }
 WDAGPUSceneRenderer class >> isAvailable [
 	^ true
+]
+
+{ #category : #initialization }
+WDAGPUSceneRenderer class >> lightGridCellCount [
+	^ LightGridCellCount
+]
+
+{ #category : #initialization }
+WDAGPUSceneRenderer class >> lightGridColumns [
+	^ LightGridColumns
+]
+
+{ #category : #initialization }
+WDAGPUSceneRenderer class >> lightGridRows [
+	^ LightGridRows
+]
+
+{ #category : #initialization }
+WDAGPUSceneRenderer class >> lightGridSlices [
+	^ LightGridSlices
+]
+
+{ #category : #initialization }
+WDAGPUSceneRenderer class >> maxLightCapacity [
+	^ MaxLightCapacity
 ]
 
 { #category : #'instance creation' }

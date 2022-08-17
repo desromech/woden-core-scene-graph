@@ -87,7 +87,11 @@ WDAGPURendererShaderSignature >> buildHandle [
 
 		"Lighting state"
 		beginBindingBank: 100;
-		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_UNIFORM_BUFFER bindingPointCount: 1;
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_UNIFORM_BUFFER bindingPointCount: 1; "Global lighting state"
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_STORAGE_BUFFER bindingPointCount: 1; "All lights"
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_STORAGE_BUFFER bindingPointCount: 1; "Tile Light Index List"
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_STORAGE_BUFFER bindingPointCount: 1; "Light Grid"
+
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "BRDF LUT"
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "IBL Diffuse Light Probe"
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "IBL Specular Light Probe"
@@ -153,7 +157,7 @@ WDAGPURendererShaderSignature >> initializeWithDevice: aDevice [
 		buildSamplersBinding.
 	cameraStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUCameraStateUniformBufferWriter }.
 
-	lightingStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: {WDAGPULightingStateUniformBufferWriter}.
+	lightingStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: {WDAGPUGlobalLightingStateUniformBufferWriter}.
 
 	objectStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUObjectStateUniformBufferWriter }.
 

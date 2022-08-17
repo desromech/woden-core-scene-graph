@@ -80,13 +80,19 @@ WDAGPUSceneRendererActiveFrameRenderer >> beginRecordingCommandsOn: aStateTracke
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> bindCameraState: cameraState [
-	stateTracker useShaderResources: (activeResourceDictionary at: cameraState ifAbsentPut: [ 
-		| binding |
-		binding := renderer resourceCache rendererShaderSignature allocateCameraState.
-		binding writeState: cameraState with: WDAGPUCameraStateUniformBufferWriter.
-		activeSlabResource add: binding.
-		binding
-	]) bindingHandle.
+	stateTracker useShaderResources: (self getOrCreateCameraStateBinding: cameraState) bindingHandle.
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindComputeCameraState: cameraState [
+	stateTracker useComputeShaderResources: (self getOrCreateCameraStateBinding: cameraState) bindingHandle.
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindComputeLightingState: lightingState [
+	stateTracker useComputeShaderResources: (self getOrCreateLightingStateBinding: lightingState) bindingHandle.
 
 ]
 
@@ -118,17 +124,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindLeftEye: leftEyeTexture rightEye: 
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> bindLightingState: lightingState [
-	stateTracker useShaderResources: (activeResourceDictionary at: lightingState ifAbsentPut: [ 
-		| binding |
-		binding := renderer resourceCache rendererShaderSignature allocateLightingState.
-		binding
-			writeState: lightingState with: WDAGPULightingStateUniformBufferWriter;
-			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 1;
-			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientDiffuseLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 2;
-			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientSpecularLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 3.
-		activeSlabResource add: binding.
-		binding
-	]) bindingHandle.
+	stateTracker useShaderResources: (self getOrCreateLightingStateBinding: lightingState) bindingHandle.
 
 ]
 
@@ -176,6 +172,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer 
 WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState [
 	^ aCameraState shallowCopy
 		projectionMatrix: renderer resourceCache projectionNDCAdjustMatrix * aCameraState projectionMatrix;
+		lightGridColumns: WDAGPUSceneRenderer lightGridColumns;
+		lightGridRows: WDAGPUSceneRenderer lightGridRows;
+		lightGridSlices: WDAGPUSceneRenderer lightGridSlices;
 		yourself
 ]
 
@@ -199,7 +198,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidM
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache forwardDuplicatedMetallicRoughnessLiquidFragmentShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache duplicatedMetallicRoughnessLiquidFragmentShader entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -223,7 +222,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache forwardEnvironmentMapFragmentShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache environmentMapFragmentShader entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -250,7 +249,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivatio
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache forwardMetallicRoughnessFragmentShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache metallicRoughnessFragmentShader entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -294,7 +293,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache forwardUnlitFragmentShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache unlitFragmentShader entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -315,12 +314,44 @@ WDAGPUSceneRendererActiveFrameRenderer >> freeActiveResources [
 	].
 	activeResources := nil.
 	activeResourceDictionary := nil.
+	renderer resourceCache uploadBuffer free.
 	self resetCurrentActiveState
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateCameraStateBinding: cameraState [
+	^ activeResourceDictionary at: cameraState ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateCameraState.
+		binding writeState: cameraState with: WDAGPUCameraStateUniformBufferWriter.
+		activeSlabResource add: binding.
+		binding
+	]
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateLightingStateBinding: lightingState [
+	^ activeResourceDictionary at: lightingState ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateLightingState.
+		binding
+			writeState: lightingState with: WDAGPUGlobalLightingStateUniformBufferWriter;
+			bindStorageBuffer: renderer resourceCache lightStateBuffer inSlot: 1;
+			bindStorageBuffer: renderer resourceCache tileLightIndexListBuffer inSlot: 2;
+			bindStorageBuffer: renderer resourceCache lightGridBuffer inSlot: 3;
+			
+			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 4;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientDiffuseLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 5;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientSpecularLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 6.
+		activeSlabResource add: binding.
+		binding
+	]
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> makeLightingStateForRenderingSceneState: renderingSceneState [
-	^ renderingSceneState lightingStateInViewSpaceWithMaxNumberOfLights: 8
+	^ renderingSceneState lightingStateInViewSpaceWithMaxNumberOfLights: WDAGPUSceneRenderer maxLightCapacity - 1
 ]
 
 { #category : #rendering }
@@ -347,20 +378,24 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: rend
 ]
 
 { #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
-	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState |
+WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState cameraLayer: cameraLayer isFirst: isFirst intoFramebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers [
+	| shaderSignature sampleCount hasReverseDepth initialDepth convertedCameraState convertedLightingState |
 	sampleCount := renderingSceneState sampleCount.
 	hasReverseDepth := renderingSceneState hasReverseDepth.
 	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
-	intermediateFramebuffers := self validIntermediateFramebuffersFor: framebuffer
-		sampleCount: sampleCount
-		initialDepth: initialDepth.
-	depthFunction := hasReverseDepth ifTrue: [AGPU_GREATER_EQUAL] ifFalse: [ AGPU_LESS_EQUAL ].
-	
 	shaderSignature := renderer resourceCache rendererShaderSignature.
+	depthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
+
+	convertedCameraState := self convertedCameraState: cameraLayer cameraState.
+	convertedLightingState := self makeLightingStateForRenderingSceneState: cameraLayer.
+	
+	convertedLightingState numberOfLights > 0 ifTrue: [ 
+		self uploadLightStates: convertedLightingState lights.
+	].
+	
 	stateTracker
 		resetGraphicsPipeline;
-		beginRenderPass: (renderer resourceCache hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth) framebuffer: intermediateFramebuffers hdrFramebuffer bundle_content: 0;
+		beginRenderPass: (renderer resourceCache hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: isFirst not) framebuffer: intermediateFramebuffers hdrFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
@@ -371,11 +406,35 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	depthTestingEnabled := true.
 	depthWriteMask := true.
 	alphaBlendingEnabled := false.
-	renderingSceneState cameraLayers do: [ :each |
-		self recordRenderingCommandsForCameraLayer: each
-	].
+
+	self
+		bindCameraState: convertedCameraState;
+		bindLightingState: convertedLightingState.
 		
+	cameraLayer renderingObjects do: [ :each |
+		self recordCommandsForRenderingObject: each
+	].
+
 	stateTracker endRenderPass.
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
+	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState |
+	sampleCount := renderingSceneState sampleCount.
+	hasReverseDepth := renderingSceneState hasReverseDepth.
+	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
+	intermediateFramebuffers := self validIntermediateFramebuffersFor: framebuffer
+		sampleCount: sampleCount
+		initialDepth: initialDepth.
+	shaderSignature := renderer resourceCache rendererShaderSignature.
+
+	renderingSceneState cameraLayers doWithIndex: [ :cameraLayer :index |
+		self recordRenderingCommandsFor: renderingSceneState cameraLayer: cameraLayer isFirst: index == 1 intoFramebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers
+	].
+
+	depthFunction := nil.
 	depthTestingEnabled := nil.
 	depthWriteMask := nil.
 	alphaBlendingEnabled := nil.
@@ -461,6 +520,28 @@ WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled writeMa
 		function: (enabled ifTrue: [depthFunction] ifFalse: [AGPU_ALWAYS]).
 	depthTestingEnabled := enabled.
 	depthWriteMask := writeMask
+]
+
+{ #category : #'as yet unclassified' }
+WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
+	| lightStateSize lightStateAlignment uploadAllocation destOffset |
+	lightStateSize := WDAGPULightStateUniformBufferWriter uniqueInstance instanceSize.
+	lightStateAlignment := WDAGPULightStateUniformBufferWriter uniqueInstance instanceAlignment.
+	uploadAllocation := renderer resourceCache uploadBuffer allocate: (lights size + 1) * lightStateSize alignment: lightStateAlignment.
+	
+	destOffset := 0.
+	lights doWithIndex: [ :light :index |
+		uploadAllocation writeValue: light with: WDAGPULightStateUniformBufferWriter at: destOffset.
+		destOffset := destOffset + lightStateSize
+	].
+
+	uploadAllocation writeValue: WDLightState empty with: WDAGPULightStateUniformBufferWriter at: destOffset.
+	
+	stateTracker
+		pushBufferTransitionBarrier: renderer resourceCache lightStateBuffer old_usage: AGPU_STORAGE_BUFFER new_usage: AGPU_COPY_DESTINATION_BUFFER;
+		copyBuffer: uploadAllocation allocator buffer source_offset: uploadAllocation offset dest_buffer: renderer resourceCache lightStateBuffer dest_offset: 0 copy_size: destOffset;
+		popBufferTransitionBarrier
+
 ]
 
 { #category : #handles }

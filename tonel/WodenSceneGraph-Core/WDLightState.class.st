@@ -15,6 +15,11 @@ Class {
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
 
+{ #category : #requirements }
+WDLightState class >> empty [
+	^ self new
+]
+
 { #category : #accessing }
 WDLightState >> influenceRadius [
 
@@ -30,7 +35,7 @@ WDLightState >> influenceRadius: anObject [
 { #category : #initialization }
 WDLightState >> initialize [
 	positionOrDirection := Vector4 zeros.
-	intensity := 0.0.
+	intensity := Vector3 zeros.
 	spotDirection := Vector3 zeros.
 	innerSpotCosCutoff := -1.0.
 	outerSpotCosCutoff := -1.0.

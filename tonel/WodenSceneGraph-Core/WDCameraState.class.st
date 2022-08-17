@@ -13,7 +13,10 @@ Class {
 		'exposure',
 		'hasReverseDepth',
 		'toneMappingOperator',
-		'viewMode'
+		'viewMode',
+		'lightGridColumns',
+		'lightGridRows',
+		'lightGridSlices'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -102,8 +105,47 @@ WDCameraState >> initialize [
 	currentTime := 0.0.
 	exposure := 1.0.
 	hasReverseDepth := true.
+	lightGridColumns := 1.
+	lightGridRows := 1.
+	lightGridSlices := 1.
 	self toneMappingOperator: WDLinearToneMappingOperator.
 	self viewMode: WDFullShadedViewMode.
+]
+
+{ #category : #accessing }
+WDCameraState >> lightGridColumns [
+
+	^ lightGridColumns
+]
+
+{ #category : #accessing }
+WDCameraState >> lightGridColumns: anObject [
+
+	lightGridColumns := anObject
+]
+
+{ #category : #accessing }
+WDCameraState >> lightGridRows [
+
+	^ lightGridRows
+]
+
+{ #category : #accessing }
+WDCameraState >> lightGridRows: anObject [
+
+	lightGridRows := anObject
+]
+
+{ #category : #accessing }
+WDCameraState >> lightGridSlices [
+
+	^ lightGridSlices
+]
+
+{ #category : #accessing }
+WDCameraState >> lightGridSlices: anObject [
+
+	lightGridSlices := anObject
 ]
 
 { #category : #accessing }

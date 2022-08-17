@@ -22,6 +22,16 @@ WDAGPUShaderBindingResourceSlabAllocation >> bindSampledTextureView: textureView
 ]
 
 { #category : #binding }
+WDAGPUShaderBindingResourceSlabAllocation >> bindStorageBuffer: storageBuffer inSlot: slotIndex [
+	bindingHandle bindStorageBuffer: slotIndex storage_buffer: storageBuffer
+]
+
+{ #category : #binding }
+WDAGPUShaderBindingResourceSlabAllocation >> bindUniformBuffer: uniformBuffer inSlot: slotIndex [
+	bindingHandle bindUniformBuffer: slotIndex uniform_buffer: uniformBuffer
+]
+
+{ #category : #binding }
 WDAGPUShaderBindingResourceSlabAllocation >> bindUniformBufferInSlot: slotIndex [
 	bindingHandle bindUniformBufferRange: slotIndex uniform_buffer: block buffer offset: offset size: block elementSize
 ]

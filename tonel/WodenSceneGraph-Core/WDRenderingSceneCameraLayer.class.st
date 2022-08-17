@@ -86,6 +86,24 @@ WDRenderingSceneCameraLayer >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
+WDRenderingSceneCameraLayer >> lightingState [
+	^ WDLightingState new
+		globalLightingState: globalLightingState;
+		lights: lights asArray;
+		yourself.
+]
+
+{ #category : #'as yet unclassified' }
+WDRenderingSceneCameraLayer >> lightingStateInViewSpace [
+	| viewMatrix |
+	viewMatrix := cameraState inverseTransformationMatrix.
+	^ WDLightingState new
+		globalLightingState: globalLightingState;
+		lights: (lights collect: [ :each | each transformedWithMatrix: viewMatrix ]);
+		yourself.
+]
+
+{ #category : #'as yet unclassified' }
 WDRenderingSceneCameraLayer >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLights [
 	| viewMatrix |
 	viewMatrix := cameraState inverseTransformationMatrix.
