@@ -522,7 +522,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled writeMa
 	depthWriteMask := writeMask
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
 	| lightStateSize lightStateAlignment uploadAllocation destOffset |
 	lightStateSize := WDAGPULightStateUniformBufferWriter uniqueInstance instanceSize.

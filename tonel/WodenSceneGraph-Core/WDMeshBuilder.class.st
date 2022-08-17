@@ -1016,6 +1016,11 @@ WDMeshBuilder >> texcoords1 [
 ]
 
 { #category : #transform }
+WDMeshBuilder >> transform: aTransform [
+	currentTransform := aTransform asTRSTransform3D copy
+]
+
+{ #category : #transform }
 WDMeshBuilder >> translateToX: x y: y z: z [
 	currentTransform translateToX: x y: y z: z
 ]

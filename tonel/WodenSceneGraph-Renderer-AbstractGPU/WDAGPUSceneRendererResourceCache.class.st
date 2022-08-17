@@ -156,8 +156,14 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 	mat4 inverseTransformationMatrix;
 
 	mat4 projectionMatrix;
+
 	float currentTime;
 	float exposure;
+	float nearDistance;
+	float farDistance;
+	
+	uvec3 lightGridExtent;
+
 } CameraState;
 '
 ]
@@ -181,6 +187,7 @@ WDAGPUSceneRendererResourceCache >> compileShader: sourceText type: shaderType [
 					shaderCompiler getCompilationLog: logLength + 1 buffer: logBuffer.
 					logBuffer readString.
 				] ensure: [ logBuffer free ].
+				Transcript show: 'Shader compilation error'; cr; show: compilationError.
 				self error: compilationError
 			] ifFalse: [
 				e pass
@@ -710,7 +717,6 @@ layout(set=2, binding=0, std140) uniform LightingStateBlock
 {
 	vec3 ambientLighting;
 	uint numberOfLights;
-	LightSource[8] lights;
 } LightingState;
 
 layout(set=2, binding=1, std430) buffer AllLightsBlock

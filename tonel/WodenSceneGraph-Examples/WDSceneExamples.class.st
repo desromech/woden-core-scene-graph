@@ -151,7 +151,7 @@ WDSceneExamples class >> exampleManyCubesAndLights [
 			yourself)
 	].
 
-	1 to: 100 do: [ :lightIndex |
+	1 to: 1000 do: [ :lightIndex |
 		| position |
 		position := (Vector2 x: lightIndex y: 1) signedRandomNoiseVector3 * 40.
 		scene add: ((WDPointLightSource new
@@ -162,6 +162,84 @@ WDSceneExamples class >> exampleManyCubesAndLights [
 				yourself).
 	].
 
+	scene openInWindow
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleManyCubesSingleMesh [
+	"
+	self exampleManyCubesSingleMesh
+	"
+	| scene meshBuilder |
+	scene := WDScene new.
+	
+	meshBuilder := WDMeshBuilder new
+		currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself).
+
+	1 to: 1000 do: [ :cubeIndex |
+		| position |
+		position := cubeIndex signedRandomNoiseVector3 * 40.
+		meshBuilder
+			transform: (TRSTransform3D scale: (Vector2 x: position x y: position z) randomNoiseVector3 *3 + 1.0 translation: position);
+			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0.
+	].
+
+	scene add: (meshBuilder	generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones * 0.5;
+		generateTangentSpaceFrame;
+		mesh).
+
+	scene add: (WDPointLightSource new
+		intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 300.0;
+		influenceRadius: 100.0;
+		asSceneNode).
+		
+	scene openInWindow
+]
+
+{ #category : #'basic shapes' }
+WDSceneExamples class >> exampleManyCubesSingleMeshAndLights [
+	"
+	self exampleManyCubesSingleMeshAndLights
+	"
+	| scene meshBuilder |
+	scene := WDScene new.
+	
+	meshBuilder := WDMeshBuilder new
+		currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself).
+
+	1 to: 1000 do: [ :cubeIndex |
+		| position |
+		position := cubeIndex signedRandomNoiseVector3 * 40.
+		meshBuilder
+			transform: (TRSTransform3D scale: (Vector2 x: position x y: position z) randomNoiseVector3 *3 + 1.0 translation: position);
+			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0.
+	].
+
+	scene add: (meshBuilder	generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones * 0.5;
+		generateTangentSpaceFrame;
+		mesh).
+
+	1 to: 1000 do: [ :lightIndex |
+		| position |
+		position := (Vector2 x: lightIndex y: 1) signedRandomNoiseVector3 * 40.
+		scene add: ((WDPointLightSource new
+			intensity: (Vector2 x: lightIndex y: 2) randomNoiseVector3 * 30.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				position: position;
+				yourself).
+	].
+		
 	scene openInWindow
 ]
 
