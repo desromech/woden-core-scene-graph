@@ -43,7 +43,12 @@ Class {
 		'environmentMapFragmentShader',
 		'metallicRoughnessFragmentShader',
 		'unlitFragmentShader',
-		'uploadBuffer'
+		'uploadBuffer',
+		'lightClusterBuffer',
+		'lightGridComputationShader',
+		'lightClusterListComputationShader',
+		'computeScratchStorageBuffer',
+		'lightClusterListBeginComputationShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -147,6 +152,16 @@ WDAGPUSceneRendererResourceCache >> brdfLutTexture [
 	^ brdfLutTexture
 ]
 
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> buildRendererComputePipelineWithShaderSource: shaderSource [
+	| shader |
+	shader := self compileShader: shaderSource type: AGPU_COMPUTE_SHADER.
+	^ device createComputePipelineBuilder
+		setShaderSignature: rendererShaderSignature handle;
+		attachShader: shader;
+		build
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> cameraStateBlockSource [
 	^ '
@@ -156,6 +171,7 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 	mat4 inverseTransformationMatrix;
 
 	mat4 projectionMatrix;
+	mat4 inverseProjectionMatrix;
 
 	float currentTime;
 	float exposure;
@@ -195,6 +211,11 @@ WDAGPUSceneRendererResourceCache >> compileShader: sourceText type: shaderType [
 		]
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> computeScratchStorageBuffer [
+	^ computeScratchStorageBuffer
+]
+
 { #category : #private }
 WDAGPUSceneRendererResourceCache >> convertTextureDescription: description [
 	^ AGPUTextureDescription new
@@ -219,11 +240,16 @@ WDAGPUSceneRendererResourceCache >> createStorageBufferFor: elementWriter capaci
 
 { #category : #private }
 WDAGPUSceneRendererResourceCache >> createStorageBufferForElementSize: elementSize capacity: capacity usageModes: usageModes [
+	^ self createStorageBufferWithSize: elementSize*capacity usageModes: usageModes
+]
+
+{ #category : #private }
+WDAGPUSceneRendererResourceCache >> createStorageBufferWithSize: size usageModes: usageModes [
 	^ device createBuffer: (AGPUBufferDescription new
 		heap_type: AGPU_MEMORY_HEAP_TYPE_DEVICE_LOCAL;
 		main_usage_mode: AGPU_STORAGE_BUFFER;
 		usage_modes: (AGPU_STORAGE_BUFFER bitOr: usageModes);
-		size: elementSize * capacity;
+		size: size;
 		yourself) initial_data: nil
 ]
 
@@ -625,7 +651,9 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	renderPasses := Dictionary new.
 	
 	uploadBuffer := WDAGPUShaderStackAllocator for: device capacity: UploadBufferCapacity.
-	
+
+	computeScratchStorageBuffer := self createStorageBufferWithSize: 4096 usageModes: 0.
+	lightClusterBuffer := self createStorageBufferForElementSize: 32 capacity: WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
 	lightStateBuffer := self createStorageBufferFor: WDAGPULightStateUniformBufferWriter capacity: WDAGPUSceneRenderer maxLightCapacity usageModes: AGPU_COPY_DESTINATION_BUFFER.
 	tileLightIndexListBuffer := self createStorageBufferForElementSize: 4 capacity: WDAGPUSceneRenderer maxLightCapacity * WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
 	lightGridBuffer := self createStorageBufferForElementSize: 8 capacity: WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
@@ -666,6 +694,10 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	topBottomStereoComposeMode := self compileShader: self topBottomStereoComposeShaderSource type: AGPU_FRAGMENT_SHADER.
 	redCyanAnaglyphStereoComposeMode := self compileShader: self redCyanAnaglyphComposeShaderSource type: AGPU_FRAGMENT_SHADER.
 	
+	lightGridComputationShader := self compileShader: self lightGridComputationShaderSource type: AGPU_COMPUTE_SHADER.
+	lightClusterListBeginComputationShader := self compileShader: self lightClusterListBeginComputationShaderSource type: AGPU_COMPUTE_SHADER.
+	lightClusterListComputationShader := self compileShader: self lightClusterListComputationShaderSource type: AGPU_COMPUTE_SHADER.
+	
 	stereoComposeModeShaderDictionary := Dictionary newFromPairs: {
 		WDLeftEyeStereoCompositionMode asStereoComposeMode . leftEyeStereoComposeMode.
 		WDSideBySideStereoCompositionMode asStereoComposeMode . sideBySideStereoComposeMode.
@@ -689,8 +721,147 @@ void main()
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache >> lightClusterBuffer [
+	^ lightClusterBuffer
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> lightClusterListBeginComputationShader [
+	^ lightClusterListBeginComputationShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> lightClusterListBeginComputationShaderSource [
+	^ '
+#version 450
+#line 6
+
+layout(set=1, binding=1, std430) buffer ListComputationGlobalStateBlock
+{
+	uint listSize;
+} ListComputationGlobalState;
+
+void main()
+{
+	ListComputationGlobalState.listSize = 0u;
+}
+'
+
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> lightClusterListComputationShader [
+	^ lightClusterListComputationShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> lightClusterListComputationShaderSource [
+	^ '
+#version 450
+layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+' , self cameraStateBlockSource, self lightingStateBlockSource, '
+#line 6
+
+layout(set=1, binding=1, std430) buffer ListComputationGlobalStateBlock
+{
+	uint listSize;
+} ListComputationGlobalState;
+
+const uint MaxNumberOfLightsPerTile = 100u;
+
+void main()
+{
+	uint visibleLightCount = 0;
+	uint visibleLightIndices[MaxNumberOfLightsPerTile];
+}
+'
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> lightGridBuffer [
 	^ lightGridBuffer
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> lightGridComputationShader [
+	^ lightGridComputationShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> lightGridComputationShaderSource [
+	^ '
+#version 450
+layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;
+' , self cameraStateBlockSource, self lightingStateBlockSource, '
+#line 6
+
+vec3 ndcToView(vec4 ndc)
+{
+	vec4 viewPosition4 = CameraState.inverseProjectionMatrix * ndc;
+	return viewPosition4.xyz / viewPosition4.w;
+}
+
+float depthForSliceIndex(uint sliceIndex)
+{ 
+	return -CameraState.nearDistance*pow(CameraState.farDistance/CameraState.nearDistance, float(sliceIndex) / float(CameraState.lightGridExtent.z));
+}
+
+vec3 projectNearFrustumCornerToDepth(vec3 corner, float depth)
+{
+	return corner*depth/-CameraState.nearDistance;
+}
+
+void main()
+{
+	uvec3 gridExtent = CameraState.lightGridExtent;
+
+	// Bounds check
+	if(any(greaterThanEqual(gl_GlobalInvocationID, gridExtent)))
+		return;
+		
+	vec4 ndcBottomLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy) / vec2(gridExtent.xy), 1.0, 1.0);
+	vec4 ndcBottomRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(1u, 0u)) / vec2(gridExtent.xy), 1.0, 1.0);
+	vec4 ndcTopLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(0u, 1u)) / vec2(gridExtent.xy), 1.0, 1.0);
+	vec4 ndcTopRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + 1u) / vec2(gridExtent.xy), 1.0, 1.0);
+	
+	vec3 viewBottomLeftCorner = ndcToView(ndcBottomLeftCorner);
+	vec3 viewBottomRightCorner = ndcToView(ndcBottomRightCorner);
+	vec3 viewTopLeftCorner = ndcToView(ndcTopLeftCorner);
+	vec3 viewTopRightCorner = ndcToView(ndcTopRightCorner);
+
+	float tileNearDistance = depthForSliceIndex(gl_GlobalInvocationID.z);
+	float tileFarDistance = depthForSliceIndex(gl_GlobalInvocationID.z + 1u);
+	
+	vec3 tileNearBottomLeftCorner = projectNearFrustumCornerToDepth(viewBottomLeftCorner, tileNearDistance);
+	vec3 tileNearBottomRightCorner = projectNearFrustumCornerToDepth(viewBottomRightCorner, tileNearDistance);
+	vec3 tileNearTopLeftCorner = projectNearFrustumCornerToDepth(viewTopLeftCorner, tileNearDistance);
+	vec3 tileNearTopRightCorner = projectNearFrustumCornerToDepth(viewTopRightCorner, tileNearDistance);
+
+	vec3 tileFarBottomLeftCorner = projectNearFrustumCornerToDepth(viewBottomLeftCorner, tileFarDistance);
+	vec3 tileFarBottomRightCorner = projectNearFrustumCornerToDepth(viewBottomRightCorner, tileFarDistance);
+	vec3 tileFarTopLeftCorner = projectNearFrustumCornerToDepth(viewTopLeftCorner, tileFarDistance);
+	vec3 tileFarTopRightCorner = projectNearFrustumCornerToDepth(viewTopRightCorner, tileFarDistance);
+
+	LightCluster cluster;
+	cluster.min = min(
+			min(min(tileNearBottomLeftCorner, tileNearBottomRightCorner),
+			min(tileNearTopLeftCorner, tileNearTopRightCorner)),
+
+			min(min(tileFarBottomLeftCorner, tileFarBottomRightCorner),
+			min(tileFarTopLeftCorner, tileFarTopRightCorner))
+	);
+	cluster.max = max(
+			max(max(tileNearBottomLeftCorner, tileNearBottomRightCorner),
+			max(tileNearTopLeftCorner, tileNearTopRightCorner)),
+
+			max(max(tileFarBottomLeftCorner, tileFarBottomRightCorner),
+			max(tileFarTopLeftCorner, tileFarTopRightCorner))
+	);
+
+	uint tileIndex = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y*gridExtent.x + gl_GlobalInvocationID.z*gridExtent.x*gridExtent.y;
+	LightClusters.clusters[tileIndex] = cluster;
+}
+'
 ]
 
 { #category : #accessing }
@@ -724,9 +895,30 @@ layout(set=2, binding=1, std430) buffer AllLightsBlock
 	LightSource[] lights;
 } AllLight;
 
-layout(set=2, binding=4) uniform texture2D BRDFLutTexture;
-layout(set=2, binding=5) uniform textureCube AmbientDiffuseLightProbeTexture;
-layout(set=2, binding=6) uniform textureCube AmbientSpecularLightProbeTexture;
+struct LightCluster
+{
+	vec3 min;
+	vec3 max;
+};
+
+layout(set=2, binding=2, std430) buffer LightClustersBlock
+{
+	LightCluster[] clusters;
+} LightClusters;
+
+layout(set=2, binding=3, std430) buffer TileLightIndicesBlock
+{
+	uint[] indices;
+} TileLightIndices;
+
+layout(set=2, binding=4, std430) buffer LightClusterListsBlock
+{
+	uvec2[] lists;
+} LightClusterLists;
+
+layout(set=2, binding=5) uniform texture2D BRDFLutTexture;
+layout(set=2, binding=6) uniform textureCube AmbientDiffuseLightProbeTexture;
+layout(set=2, binding=7) uniform textureCube AmbientSpecularLightProbeTexture;
 '
 ]
 
@@ -1139,7 +1331,7 @@ WDAGPUSceneRendererResourceCache >> transparentTextureCube [
 	^ transparentTextureCube
 ]
 
-{ #category : #accessing }
+{ #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> triangleVertexShaderSource [
 	^ '
 #version 450

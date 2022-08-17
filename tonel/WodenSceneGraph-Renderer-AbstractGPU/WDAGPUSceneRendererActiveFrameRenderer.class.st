@@ -324,6 +324,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateCameraStateBinding: cameraS
 		| binding |
 		binding := renderer resourceCache rendererShaderSignature allocateCameraState.
 		binding writeState: cameraState with: WDAGPUCameraStateUniformBufferWriter.
+		binding bindStorageBuffer: renderer resourceCache computeScratchStorageBuffer inSlot: 1.
 		activeSlabResource add: binding.
 		binding
 	]
@@ -338,12 +339,14 @@ WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateLightingStateBinding: light
 		binding
 			writeState: lightingState with: WDAGPUGlobalLightingStateUniformBufferWriter;
 			bindStorageBuffer: renderer resourceCache lightStateBuffer inSlot: 1;
-			bindStorageBuffer: renderer resourceCache tileLightIndexListBuffer inSlot: 2;
-			bindStorageBuffer: renderer resourceCache lightGridBuffer inSlot: 3;
+			bindStorageBuffer: renderer resourceCache lightClusterBuffer
+ inSlot: 2;
+			bindStorageBuffer: renderer resourceCache tileLightIndexListBuffer inSlot: 3;
+			bindStorageBuffer: renderer resourceCache lightGridBuffer inSlot: 4;
 			
-			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 4;
-			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientDiffuseLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 5;
-			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientSpecularLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 6.
+			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 5;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientDiffuseLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 6;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientSpecularLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 7.
 		activeSlabResource add: binding.
 		binding
 	]
@@ -378,6 +381,28 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: rend
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
+	| workgroupCountX workgroupCountY workgroupCountZ workgroupCount |
+	workgroupCountX := (WDAGPUSceneRenderer lightGridColumns + 3) // 4.
+	workgroupCountY := (WDAGPUSceneRenderer lightGridRows + 3) // 4.
+	workgroupCountZ := (WDAGPUSceneRenderer lightGridSlices + 3) // 4.
+
+	workgroupCount := (WDAGPUSceneRenderer lightGridCellCount + 31) // 32.
+
+	"Compute the per-cluster bounding boxes."
+	stateTracker
+		setComputeStage: renderer resourceCache lightGridComputationShader entryPoint: 'main';
+		dispatchCompute: workgroupCountX group_count_y: workgroupCountY group_count_z: workgroupCountZ;
+
+		setComputeStage: renderer resourceCache lightClusterListBeginComputationShader entryPoint: 'main';
+		dispatchCompute: 1 group_count_y: 1 group_count_z: 1;
+
+		setComputeStage: renderer resourceCache lightClusterListComputationShader entryPoint: 'main';
+		dispatchCompute: workgroupCount group_count_y: 1 group_count_z: 1.
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState cameraLayer: cameraLayer isFirst: isFirst intoFramebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers [
 	| shaderSignature sampleCount hasReverseDepth initialDepth convertedCameraState convertedLightingState |
 	sampleCount := renderingSceneState sampleCount.
@@ -392,6 +417,14 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	convertedLightingState numberOfLights > 0 ifTrue: [ 
 		self uploadLightStates: convertedLightingState lights.
 	].
+
+	stateTracker
+		resetComputePipeline;
+		setShaderSignature: shaderSignature handle.
+	self
+		bindComputeCameraState: convertedCameraState;
+		bindComputeLightingState: convertedLightingState.
+	self recordLightGridComputationCommands.
 	
 	stateTracker
 		resetGraphicsPipeline;
@@ -462,17 +495,6 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setPrimitiveType: AGPU_TRIANGLES;
 		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
 		endRenderPass
-]
-
-{ #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsForCameraLayer: cameraLayerState [
-	self
-		bindCameraState: (self convertedCameraState: cameraLayerState cameraState);
-		bindLightingState: (self makeLightingStateForRenderingSceneState: cameraLayerState).
-		
-	cameraLayerState renderingObjects do: [ :each |
-		self recordCommandsForRenderingObject: each
-	].
 ]
 
 { #category : #accessing }

@@ -16,7 +16,8 @@ Class {
 		'viewMode',
 		'lightGridColumns',
 		'lightGridRows',
-		'lightGridSlices'
+		'lightGridSlices',
+		'inverseProjectionMatrix'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -113,6 +114,11 @@ WDCameraState >> initialize [
 ]
 
 { #category : #accessing }
+WDCameraState >> inverseProjectionMatrix [
+	^ inverseProjectionMatrix ifNil: [inverseProjectionMatrix := projectionMatrix inverse]
+]
+
+{ #category : #accessing }
 WDCameraState >> lightGridColumns [
 
 	^ lightGridColumns
@@ -168,8 +174,8 @@ WDCameraState >> projectionMatrix [
 
 { #category : #accessing }
 WDCameraState >> projectionMatrix: anObject [
-
-	projectionMatrix := anObject
+	projectionMatrix := anObject.
+	inverseProjectionMatrix := nil.
 ]
 
 { #category : #accessing }
