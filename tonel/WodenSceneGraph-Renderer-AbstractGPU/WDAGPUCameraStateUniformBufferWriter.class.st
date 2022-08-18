@@ -15,10 +15,12 @@ WDAGPUCameraStateUniformBufferWriter class >> fieldsDesc [
 		float exposure
 		float nearDistance
 		float farDistance
-
-		uint lightGridColumns
-		uint lightGridRows
-		uint lightGridSlices
+		
+		vec2 framebufferExtent
+		vec2 framebufferReciprocalExtent
+		
+		vec2 lightGridDepthSliceScaleOffset
+		uvec3 lightGridExtent
 	)
 ]
 
@@ -29,7 +31,7 @@ WDAGPUCameraStateUniformBufferWriter >> instanceAlignment [
 
 { #category : #accessing }
 WDAGPUCameraStateUniformBufferWriter >> instanceSize [
-	^ 288
+	^ 320
 ]
 
 { #category : #writing }
@@ -42,7 +44,8 @@ WDAGPUCameraStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeFloat: data exposure onto: pointer at: offset + 260.
 	self writeFloat: data nearDistance onto: pointer at: offset + 264.
 	self writeFloat: data farDistance onto: pointer at: offset + 268.
-	self writeUint: data lightGridColumns onto: pointer at: offset + 272.
-	self writeUint: data lightGridRows onto: pointer at: offset + 276.
-	self writeUint: data lightGridSlices onto: pointer at: offset + 280.
+	self writeVec2: data framebufferExtent onto: pointer at: offset + 272.
+	self writeVec2: data framebufferReciprocalExtent onto: pointer at: offset + 280.
+	self writeVec2: data lightGridDepthSliceScaleOffset onto: pointer at: offset + 288.
+	self writeUvec3: data lightGridExtent onto: pointer at: offset + 304.
 ]

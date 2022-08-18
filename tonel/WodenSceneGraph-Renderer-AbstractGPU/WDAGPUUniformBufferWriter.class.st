@@ -195,6 +195,21 @@ WDAGPUUniformBufferWriter >> writeUint: data onto: pointer at: offset [
 ]
 
 { #category : #writing }
+WDAGPUUniformBufferWriter >> writeUvec2: data onto: pointer at: offset [
+	pointer
+		unsignedLongAt: offset + 1 put: data x asInteger;
+		unsignedLongAt: offset + 5 put: data y asInteger
+]
+
+{ #category : #writing }
+WDAGPUUniformBufferWriter >> writeUvec3: data onto: pointer at: offset [
+	pointer
+		unsignedLongAt: offset + 1 put: data x asInteger;
+		unsignedLongAt: offset + 5 put: data y asInteger;
+		unsignedLongAt: offset + 9 put: data z asInteger
+]
+
+{ #category : #writing }
 WDAGPUUniformBufferWriter >> writeVec2: data onto: pointer at: offset [
 	pointer
 		floatAt: offset + 1 put: data x asFloat;

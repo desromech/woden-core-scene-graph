@@ -14,6 +14,8 @@ Class {
 		'hasReverseDepth',
 		'toneMappingOperator',
 		'viewMode',
+		'framebufferWidth',
+		'framebufferHeight',
 		'lightGridColumns',
 		'lightGridRows',
 		'lightGridSlices',
@@ -74,6 +76,52 @@ WDCameraState >> farDistance: anObject [
 	farDistance := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+WDCameraState >> framebufferExtent [
+	^ Vector2 x: framebufferWidth y: framebufferHeight
+]
+
+{ #category : #accessing }
+WDCameraState >> framebufferHeight [
+
+	^ framebufferHeight
+]
+
+{ #category : #accessing }
+WDCameraState >> framebufferHeight: anObject [
+
+	framebufferHeight := anObject
+]
+
+{ #category : #'as yet unclassified' }
+WDCameraState >> framebufferReciprocalExtent [
+	^ Vector2 x: framebufferWidth reciprocal y: framebufferHeight reciprocal
+]
+
+{ #category : #accessing }
+WDCameraState >> framebufferReciprocalHeight [
+
+	^ framebufferHeight reciprocal
+]
+
+{ #category : #accessing }
+WDCameraState >> framebufferReciprocalWidth [
+
+	^ framebufferWidth reciprocal
+]
+
+{ #category : #accessing }
+WDCameraState >> framebufferWidth [
+
+	^ framebufferWidth
+]
+
+{ #category : #accessing }
+WDCameraState >> framebufferWidth: anObject [
+
+	framebufferWidth := anObject
+]
+
 { #category : #accessing }
 WDCameraState >> frustum [
 
@@ -128,6 +176,28 @@ WDCameraState >> lightGridColumns [
 WDCameraState >> lightGridColumns: anObject [
 
 	lightGridColumns := anObject
+]
+
+{ #category : #'as yet unclassified' }
+WDCameraState >> lightGridDepthSliceOffset [
+	"Formula from: http://www.aortiz.me/2018/12/21/CG.html#building-a-cluster-grid [August 2022]"
+	^ lightGridSlices negated * nearDistance ln / (farDistance / nearDistance) ln
+]
+
+{ #category : #'as yet unclassified' }
+WDCameraState >> lightGridDepthSliceScale [
+	"Formula from: http://www.aortiz.me/2018/12/21/CG.html#building-a-cluster-grid [August 2022]"
+	^ lightGridSlices / (farDistance / nearDistance) ln
+]
+
+{ #category : #'as yet unclassified' }
+WDCameraState >> lightGridDepthSliceScaleOffset [
+	^ Vector2 x: self lightGridDepthSliceScale y: self lightGridDepthSliceOffset
+]
+
+{ #category : #'as yet unclassified' }
+WDCameraState >> lightGridExtent [
+	^ Vector3 x: lightGridColumns y: lightGridRows z: lightGridSlices
 ]
 
 { #category : #accessing }

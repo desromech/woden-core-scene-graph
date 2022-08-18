@@ -178,6 +178,11 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 	float nearDistance;
 	float farDistance;
 	
+	vec2 framebufferExtent;
+	vec2 framebufferReciprocalExtent;
+	
+	vec2 lightGridDepthSliceScaleOffset;
+
 	uvec3 lightGridExtent;
 
 } CameraState;
@@ -759,7 +764,7 @@ WDAGPUSceneRendererResourceCache >> lightClusterListComputationShaderSource [
 	"Clustered forward rendering list shader is heavily based in the one from http://www.aortiz.me/2018/12/21/CG.html by Ángel Ortiz"
 	^ '
 #version 450
-layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 ' , self cameraStateBlockSource, self lightingStateBlockSource, '
 #line 6
 
@@ -769,7 +774,7 @@ layout(set=1, binding=1, std430) buffer ListComputationGlobalStateBlock
 } ListComputationGlobalState;
 
 const uint MaxNumberOfLightsPerTile = 100u;
-const uint BatchSize = 32u;
+const uint BatchSize = 64u;
 
 shared bool[BatchSize] SharedLightIsVisible;
 shared vec4[BatchSize] SharedLightPositionOrDirection;
@@ -777,7 +782,7 @@ shared float[BatchSize] SharedLightRadius;
 
 float computeBoundingBoxPointDistance2(vec3 bboxCenter, vec3 bboxHalfExtent, vec3 sphereCenter)
 {
-	vec3 delta = max(abs(sphereCenter - bboxCenter) / bboxHalfExtent, 0.0);
+	vec3 delta = max(abs(sphereCenter - bboxCenter) - bboxHalfExtent, 0.0);
 	return dot(delta, delta);
 }
 
@@ -805,37 +810,48 @@ void main()
 	
 	uint lightCount = LightingState.numberOfLights;
 	
-	for(uint i = 0u; i < lightCount; i += BatchSize)
+	for(uint batchStartLightIndex = 0u; batchStartLightIndex < lightCount; batchStartLightIndex += BatchSize)
 	{
-		uint lightIndex = min(i + gl_LocalInvocationIndex, lightCount);
+		// Fetch the lights.
 		{ 
-#define ThisLight AllLight.lights[lightIndex]
-			vec3 intensity = ThisLight.intensity;
+			uint lightIndex = min(batchStartLightIndex + gl_LocalInvocationIndex, lightCount);
+#define thisLight AllLight.lights[lightIndex]
+			vec3 intensity = thisLight.intensity;
 
-			SharedLightIsVisible[gl_LocalInvocationIndex] = intensity.r > 0.0 || intensity.g > 0.0 || intensity.b > 0.0;
-			SharedLightPositionOrDirection[gl_LocalInvocationIndex] = ThisLight.positionOrDirection;
-			SharedLightRadius[gl_LocalInvocationIndex] = ThisLight.influenceRadius;
-#undef ThisLight
+			SharedLightIsVisible[gl_LocalInvocationIndex] = lightIndex < lightCount
+				&& thisLight.influenceRadius > 0
+				&& (intensity.r > 0.0 || intensity.g > 0.0 || intensity.b > 0.0);
+			SharedLightPositionOrDirection[gl_LocalInvocationIndex] = thisLight.positionOrDirection;
+			SharedLightRadius[gl_LocalInvocationIndex] = thisLight.influenceRadius;
+#undef thisLight
 		}
 		
+		memoryBarrierShared();
 		barrier();
 		
-		if(SharedLightIsVisible[gl_LocalInvocationIndex] &&
-			visibleLightCount < MaxNumberOfLightsPerTile &&
-			gl_GlobalInvocationID.x < tileCount &&
-			testBoundingBoxWithSphere(tileCenter, tileHalfExtent, SharedLightPositionOrDirection[gl_LocalInvocationIndex], SharedLightRadius[gl_LocalInvocationIndex]))
-			visibleLightIndices[visibleLightCount++] = lightIndex;
+		for(uint i = 0u; i < BatchSize; ++i)
+		{
+			if(visibleLightCount < MaxNumberOfLightsPerTile &&
+				SharedLightIsVisible[i] &&
+				tileIndex < tileCount &&
+				testBoundingBoxWithSphere(tileCenter, tileHalfExtent, SharedLightPositionOrDirection[i], SharedLightRadius[i]))
+			{
+				uint lightIndex = batchStartLightIndex + i;
+				visibleLightIndices[visibleLightCount++] = lightIndex;
+			}
+		}
 	}
 	
 	barrier();
 
-	uint destinationIndex = atomicAdd(ListComputationGlobalState.listSize, visibleLightCount);
-	
-	for(uint i = 0u; i < visibleLightCount; ++i)
-		TileLightIndices.indices[destinationIndex] = visibleLightIndices[i];
-
 	if(tileIndex < tileCount)
+	{ 
+		uint destinationIndex = visibleLightCount > 0 ? atomicAdd(ListComputationGlobalState.listSize, visibleLightCount) : 0;
+		for(uint i = 0u; i < visibleLightCount; ++i)
+			TileLightIndices.indices[destinationIndex + i] = visibleLightIndices[i];
+
 		LightClusterLists.lists[tileIndex] = uvec2(destinationIndex, visibleLightCount);
+	}
 }
 '
 ]
@@ -882,10 +898,10 @@ void main()
 	if(any(greaterThanEqual(gl_GlobalInvocationID, gridExtent)))
 		return;
 		
-	vec4 ndcBottomLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy) / vec2(gridExtent.xy), 1.0, 1.0);
-	vec4 ndcBottomRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(1u, 0u)) / vec2(gridExtent.xy), 1.0, 1.0);
-	vec4 ndcTopLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(0u, 1u)) / vec2(gridExtent.xy), 1.0, 1.0);
-	vec4 ndcTopRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + 1u) / vec2(gridExtent.xy), 1.0, 1.0);
+	vec4 ndcBottomLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy) / vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
+	vec4 ndcBottomRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(1u, 0u))/ vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
+	vec4 ndcTopLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(0u, 1u))/ vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
+	vec4 ndcTopRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + 1u) / vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
 	
 	vec3 viewBottomLeftCorner = ndcToView(ndcBottomLeftCorner);
 	vec3 viewBottomRightCorner = ndcToView(ndcBottomRightCorner);
@@ -1117,6 +1133,29 @@ float computeLightAttenuation(float distance, float influenceRadius)
     return num*num / (distance*distance + 1.0);
 }
 
+uint computeLightTileSliceIndexForLinearDepth(float depth)
+{
+	vec2 scaleAndOffset = CameraState.lightGridDepthSliceScaleOffset;
+	return uint(log(-depth)*scaleAndOffset.x + scaleAndOffset.y);
+}
+
+uvec3 computeLightTileCoordinateForCurrentScreenCoordinateWithLinearDepth(float depth)
+{
+	uvec3 gridExtent = CameraState.lightGridExtent;
+	vec2 normalizedScreenCoordinate = vec2(gl_FragCoord.xy * CameraState.framebufferReciprocalExtent);
+	
+	return min(uvec3(uvec2(normalizedScreenCoordinate * vec2(gridExtent.xy)),
+		computeLightTileSliceIndexForLinearDepth(depth)), gridExtent - 1u);
+}
+
+uint computeLightTileIndexForCurrentScreenCoordinateWithLinearDepth(float depth)
+{
+	uvec3 gridExtent = CameraState.lightGridExtent;
+	uvec3 gridCoordinate = computeLightTileCoordinateForCurrentScreenCoordinateWithLinearDepth(depth);
+	
+	return gridCoordinate.x + gridCoordinate.y * gridExtent.x + gridCoordinate.z*gridExtent.x*gridExtent.y;
+}
+
 vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParameters)
 {
 	vec3 dielectricF0 = vec3(0.04);
@@ -1159,10 +1198,14 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	lightedColor += surfaceParameters.emissiveFactor;
 	
 	// Direct light accumulation.
-	uint lightCount = LightingState.numberOfLights;
-	for(uint i = 0u; i < lightCount; ++i)
+	uint tileIndex = computeLightTileIndexForCurrentScreenCoordinateWithLinearDepth(surfaceParameters.P.z);
+
+	uvec2 tileLightList = LightClusterLists.lists[tileIndex];
+	for(uint i = 0u; i < tileLightList.y; ++i)
 	{
-#define currentLightSource AllLight.lights[i]
+		uint lightIndex = TileLightIndices.indices[tileLightList.x + i];
+		
+#define currentLightSource AllLight.lights[lightIndex]
 		vec4 lightSourcePosition = currentLightSource.positionOrDirection;
 		vec3 L = lightSourcePosition.xyz;
 		float attenuation = 1.0;
@@ -1201,6 +1244,29 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	}
 	
 	return vec4(lightedColor, surfaceParameters.baseColor.a);
+	//return vec4(vec3(computeLightTileCoordinateForCurrentScreenCoordinateWithLinearDepth(surfaceParameters.P.z)) / vec3(CameraState.lightGridExtent)*vec3(1.0, 1.0, 0.0), 1.0);
+
+	/*vec4[14] colorWheel = vec4[14](
+		vec4(0.4, 0.4, 0.4, 1.0),
+
+		vec4(0.4, 0.0, 0.0, 1.0),
+		vec4(0.0, 0.4, 0.0, 1.0),
+		vec4(0.0, 0.0, 0.4, 1.0),
+
+		vec4(0.4, 0.4, 0.0, 1.0),
+		vec4(0.4, 0.0, 0.4, 1.0),
+		vec4(0.0, 0.4, 0.4, 1.0),
+
+		vec4(1.0, 0.0, 0.0, 1.0),
+		vec4(0.0, 1.0, 0.0, 1.0),
+		vec4(0.0, 0.0, 1.0, 1.0),
+
+		vec4(1.0, 1.0, 0.0, 1.0),
+		vec4(1.0, 0.0, 1.0, 1.0),
+		vec4(0.0, 1.0, 1.0, 1.0),
+
+		vec4(1.0, 1.0, 1.0, 1.0));
+	return colorWheel[tileIndex % 13u];*/
 }
 '
 ]

@@ -169,12 +169,14 @@ WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer 
 ]
 
 { #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState [
+WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState framebufferExtent: framebufferExtent [
 	^ aCameraState shallowCopy
 		projectionMatrix: renderer resourceCache projectionNDCAdjustMatrix * aCameraState projectionMatrix;
 		lightGridColumns: WDAGPUSceneRenderer lightGridColumns;
 		lightGridRows: WDAGPUSceneRenderer lightGridRows;
 		lightGridSlices: WDAGPUSceneRenderer lightGridSlices;
+		framebufferWidth: framebufferExtent x;
+		framebufferHeight: framebufferExtent y;
 		yourself
 ]
 
@@ -387,19 +389,21 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
 	workgroupCountY := (WDAGPUSceneRenderer lightGridRows + 3) // 4.
 	workgroupCountZ := (WDAGPUSceneRenderer lightGridSlices + 3) // 4.
 
-	workgroupCount := (WDAGPUSceneRenderer lightGridCellCount + 31) // 32.
+	workgroupCount := (WDAGPUSceneRenderer lightGridCellCount + 63) // 64.
 
 	"Compute the per-cluster bounding boxes."
 	stateTracker
 		setComputeStage: renderer resourceCache lightGridComputationShader entryPoint: 'main';
 		dispatchCompute: workgroupCountX group_count_y: workgroupCountY group_count_z: workgroupCountZ;
+		memoryBarrier: AGPU_PIPELINE_STAGE_COMPUTE_SHADER dest_stage: AGPU_PIPELINE_STAGE_COMPUTE_SHADER source_accesses: AGPU_ACCESS_SHADER_WRITE dest_accesses: AGPU_ACCESS_SHADER_READ;
 
 		setComputeStage: renderer resourceCache lightClusterListBeginComputationShader entryPoint: 'main';
 		dispatchCompute: 1 group_count_y: 1 group_count_z: 1;
+		memoryBarrier: AGPU_PIPELINE_STAGE_COMPUTE_SHADER dest_stage: AGPU_PIPELINE_STAGE_COMPUTE_SHADER source_accesses: AGPU_ACCESS_SHADER_WRITE dest_accesses: AGPU_ACCESS_SHADER_READ;
 
 		setComputeStage: renderer resourceCache lightClusterListComputationShader entryPoint: 'main';
-		dispatchCompute: workgroupCount group_count_y: 1 group_count_z: 1.
-
+		dispatchCompute: workgroupCount group_count_y: 1 group_count_z: 1;
+		memoryBarrier: AGPU_PIPELINE_STAGE_COMPUTE_SHADER dest_stage: AGPU_PIPELINE_STAGE_FRAGMENT_SHADER source_accesses: AGPU_ACCESS_SHADER_WRITE dest_accesses: AGPU_ACCESS_SHADER_READ.
 ]
 
 { #category : #rendering }
@@ -411,7 +415,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	depthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
 
-	convertedCameraState := self convertedCameraState: cameraLayer cameraState.
+	convertedCameraState := self convertedCameraState: cameraLayer cameraState framebufferExtent: framebuffer extent.
 	convertedLightingState := self makeLightingStateForRenderingSceneState: cameraLayer.
 	
 	convertedLightingState numberOfLights > 0 ifTrue: [ 
@@ -473,7 +477,10 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	alphaBlendingEnabled := nil.
 	
 	"For the exposure level."
-	mainCameraState := renderingSceneState mainCameraState ifNil: [WDCameraState new].
+	mainCameraState := (renderingSceneState mainCameraState ifNil: [WDCameraState new]) copy
+		framebufferWidth: framebuffer width;
+		framebufferHeight: framebuffer height;
+		yourself.
 	outputFramebufferHandle := self validFramebufferFor: framebuffer.
 	stateTracker
 		resetGraphicsPipeline;
