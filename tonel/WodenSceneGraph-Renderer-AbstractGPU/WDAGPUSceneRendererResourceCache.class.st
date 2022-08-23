@@ -69,7 +69,7 @@ WDAGPUSceneRendererResourceCache class >> for: aDevice [
 	^ self for: aDevice withTextureUploader: (AGPUTextureUploader for: aDevice)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 WDAGPUSceneRendererResourceCache class >> for: device withTextureUploader: textureUploader [
 	^ self basicNew initializeWithDevice: device withTextureUploader: textureUploader
 ]

@@ -69,6 +69,7 @@ WDAGPUShaderStackAllocator >> initializeWithDevice: aDevice capacity: initialCap
 		heap_type: AGPU_MEMORY_HEAP_TYPE_HOST;
 		main_usage_mode: AGPU_COPY_SOURCE_BUFFER;
 		usage_modes: AGPU_COPY_SOURCE_BUFFER;
+		mapping_flags: AGPU_MAP_WRITE_BIT | AGPU_MAP_PERSISTENT_BIT | AGPU_MAP_COHERENT_BIT;
 		yourself) initial_data: nil.
 	size := 0.
 	capacity := initialCapacity.
