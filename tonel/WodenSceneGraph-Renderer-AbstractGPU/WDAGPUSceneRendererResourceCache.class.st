@@ -182,8 +182,11 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 	vec2 framebufferReciprocalExtent;
 	
 	vec2 lightGridDepthSliceScaleOffset;
+	bool hasTopLeftNDCOrigin;
+	bool hasBottomLeftTextureCoordinates;
 
 	uvec3 lightGridExtent;
+	bool hasReverseDepth;
 
 } CameraState;
 '
@@ -898,16 +901,26 @@ void main()
 	if(any(greaterThanEqual(gl_GlobalInvocationID, gridExtent)))
 		return;
 		
-	vec4 ndcBottomLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy) / vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
-	vec4 ndcBottomRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(1u, 0u))/ vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
-	vec4 ndcTopLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(0u, 1u))/ vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
-	vec4 ndcTopRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + 1u) / vec2(gridExtent.xy)*2.0 - 1.0, 1.0, 1.0);
+	float nearDistanceDepth = CameraState.hasReverseDepth ? 1.0 : 0.0;
+		
+	vec4 ndcBottomLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy) / vec2(gridExtent.xy)*2.0 - 1.0, nearDistanceDepth, 1.0);
+	vec4 ndcBottomRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(1u, 0u))/ vec2(gridExtent.xy)*2.0 - 1.0, nearDistanceDepth, 1.0);
+	vec4 ndcTopLeftCorner = vec4(vec2(gl_GlobalInvocationID.xy + uvec2(0u, 1u))/ vec2(gridExtent.xy)*2.0 - 1.0, nearDistanceDepth, 1.0);
+	vec4 ndcTopRightCorner = vec4(vec2(gl_GlobalInvocationID.xy + 1u) / vec2(gridExtent.xy)*2.0 - 1.0, nearDistanceDepth, 1.0);
+	
+	if(!CameraState.hasTopLeftNDCOrigin)
+	{ 
+		ndcBottomLeftCorner.y = -ndcBottomLeftCorner.y;
+		ndcBottomRightCorner.y = -ndcBottomRightCorner.y;
+		ndcTopLeftCorner.y = -ndcTopLeftCorner.y;
+		ndcTopRightCorner.y = -ndcTopRightCorner.y;
+	}
 	
 	vec3 viewBottomLeftCorner = ndcToView(ndcBottomLeftCorner);
 	vec3 viewBottomRightCorner = ndcToView(ndcBottomRightCorner);
 	vec3 viewTopLeftCorner = ndcToView(ndcTopLeftCorner);
 	vec3 viewTopRightCorner = ndcToView(ndcTopRightCorner);
-
+	
 	float tileNearDistance = depthForSliceIndex(gl_GlobalInvocationID.z);
 	float tileFarDistance = depthForSliceIndex(gl_GlobalInvocationID.z + 1u);
 	

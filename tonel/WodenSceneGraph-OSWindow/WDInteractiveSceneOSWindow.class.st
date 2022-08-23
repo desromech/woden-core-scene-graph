@@ -31,8 +31,7 @@ WDInteractiveSceneOSWindow >> onMouseMove: event [
 	| delta |
 	delta := event delta.
 	renderMutex critical: [
-		event buttons button1 ifTrue: [ 
-			Transcript show: delta; cr.
+		event buttons button1 ifTrue: [
 			cameraAngles := cameraAngles + (Vector3 x: delta y negated degreesToRadians y: delta x negated degreesToRadians z: 0.0).
 			camera orientation: self computeCameraOrientation.
 			self changed.

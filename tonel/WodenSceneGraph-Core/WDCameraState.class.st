@@ -19,7 +19,9 @@ Class {
 		'lightGridColumns',
 		'lightGridRows',
 		'lightGridSlices',
-		'inverseProjectionMatrix'
+		'inverseProjectionMatrix',
+		'hasTopLeftNDCOrigin',
+		'hasBottomLeftTextureCoordinates'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -135,6 +137,18 @@ WDCameraState >> frustum: anObject [
 ]
 
 { #category : #accessing }
+WDCameraState >> hasBottomLeftTextureCoordinates [
+
+	^ hasBottomLeftTextureCoordinates
+]
+
+{ #category : #accessing }
+WDCameraState >> hasBottomLeftTextureCoordinates: anObject [
+
+	hasBottomLeftTextureCoordinates := anObject
+]
+
+{ #category : #accessing }
 WDCameraState >> hasReverseDepth [
 
 	^ hasReverseDepth
@@ -146,6 +160,18 @@ WDCameraState >> hasReverseDepth: anObject [
 	hasReverseDepth := anObject
 ]
 
+{ #category : #accessing }
+WDCameraState >> hasTopLeftNDCOrigin [
+
+	^ hasTopLeftNDCOrigin
+]
+
+{ #category : #accessing }
+WDCameraState >> hasTopLeftNDCOrigin: anObject [
+
+	hasTopLeftNDCOrigin := anObject
+]
+
 { #category : #initialization }
 WDCameraState >> initialize [
 	super initialize.
@@ -154,6 +180,8 @@ WDCameraState >> initialize [
 	currentTime := 0.0.
 	exposure := 1.0.
 	hasReverseDepth := true.
+	hasTopLeftNDCOrigin := true.
+	hasBottomLeftTextureCoordinates := false.
 	lightGridColumns := 1.
 	lightGridRows := 1.
 	lightGridSlices := 1.

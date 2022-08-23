@@ -175,6 +175,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState fra
 		lightGridColumns: WDAGPUSceneRenderer lightGridColumns;
 		lightGridRows: WDAGPUSceneRenderer lightGridRows;
 		lightGridSlices: WDAGPUSceneRenderer lightGridSlices;
+		hasTopLeftNDCOrigin: renderer device hasTopLeftNdcOrigin;
+		hasBottomLeftTextureCoordinates: renderer device hasBottomLeftTextureCoordinates;
 		framebufferWidth: framebufferExtent x;
 		framebufferHeight: framebufferExtent y;
 		yourself

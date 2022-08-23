@@ -20,7 +20,11 @@ WDAGPUCameraStateUniformBufferWriter class >> fieldsDesc [
 		vec2 framebufferReciprocalExtent
 		
 		vec2 lightGridDepthSliceScaleOffset
+		uint hasTopLeftNDCOrigin
+		uint hasBottomLeftTextureCoordinates
+
 		uvec3 lightGridExtent
+		uint hasReverseDepth
 	)
 ]
 
@@ -47,5 +51,8 @@ WDAGPUCameraStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeVec2: data framebufferExtent onto: pointer at: offset + 272.
 	self writeVec2: data framebufferReciprocalExtent onto: pointer at: offset + 280.
 	self writeVec2: data lightGridDepthSliceScaleOffset onto: pointer at: offset + 288.
+	self writeUint: data hasTopLeftNDCOrigin onto: pointer at: offset + 296.
+	self writeUint: data hasBottomLeftTextureCoordinates onto: pointer at: offset + 300.
 	self writeUvec3: data lightGridExtent onto: pointer at: offset + 304.
+	self writeUint: data hasReverseDepth onto: pointer at: offset + 316.
 ]
