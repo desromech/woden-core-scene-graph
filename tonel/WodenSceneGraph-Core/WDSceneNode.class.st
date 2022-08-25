@@ -11,7 +11,9 @@ Class {
 		'lights',
 		'cameras',
 		'transform',
-		'visible'
+		'visible',
+		'localBoundingBox',
+		'boundingBox'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
@@ -72,6 +74,11 @@ WDSceneNode >> asSceneNode [
 	^ self
 ]
 
+{ #category : #'as yet unclassified' }
+WDSceneNode >> boundingBox [
+	^ boundingBox ifNil: [ boundingBox := self localBoundingBox transformedWith: self transform ]
+]
+
 { #category : #accessing }
 WDSceneNode >> cameras [
 
@@ -98,7 +105,26 @@ WDSceneNode >> initialize [
 	lights := #().
 	cameras := #().
 	visible := true.
+	localBoundingBox := nil.
+	boundingBox := nil.
 	transform := TRSTransform3D new.
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneNode >> invalidateBoundingBox [
+	boundingBox := nil.
+	parent ifNotNil: [ parent invalidateChildBoundingBox ]
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneNode >> invalidateChildBoundingBox [
+	self invalidateLocalBoundingBox
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneNode >> invalidateLocalBoundingBox [
+	localBoundingBox := nil.
+	self invalidateBoundingBox
 ]
 
 { #category : #testing }
@@ -116,6 +142,25 @@ WDSceneNode >> lights [
 WDSceneNode >> lights: anObject [
 
 	lights := anObject
+]
+
+{ #category : #accessing }
+WDSceneNode >> localBoundingBox [
+	localBoundingBox ifNotNil: [ ^ localBoundingBox ].
+	localBoundingBox := AABox empty.
+	renderables do: [ :each |
+		localBoundingBox insertBox: each boundingBox
+	].
+
+	lights do: [ :each |
+		localBoundingBox insertBox: each boundingBox		
+	].
+
+	children do: [ :each |
+		localBoundingBox insertBox: each boundingBox		
+	].
+
+	^ localBoundingBox
 ]
 
 { #category : #accessing }
@@ -157,32 +202,38 @@ WDSceneNode >> renderables: anObject [
 
 { #category : #transforming }
 WDSceneNode >> rotateDegreesOnX: rotation [
-	transform rotateDegreesOnX: rotation
+	transform rotateDegreesOnX: rotation.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> rotateDegreesOnY: rotation [
-	transform rotateDegreesOnY: rotation
+	transform rotateDegreesOnY: rotation.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> rotateDegreesOnZ: rotation [
-	transform rotateDegreesOnZ: rotation
+	transform rotateDegreesOnZ: rotation.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> rotateRadiansOnX: rotation [
-	transform rotateRadiansOnX: rotation
+	transform rotateRadiansOnX: rotation.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> rotateRadiansOnY: rotation [
-	transform rotateRadiansOnY: rotation
+	transform rotateRadiansOnY: rotation.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> rotateRadiansOnZ: rotation [
-	transform rotateRadiansOnZ: rotation
+	transform rotateRadiansOnZ: rotation.
+	self transformChanged
 ]
 
 { #category : #accessing }
@@ -207,28 +258,38 @@ WDSceneNode >> transform: aTransform [
 ]
 
 { #category : #transforming }
+WDSceneNode >> transformChanged [
+	self invalidateBoundingBox
+]
+
+{ #category : #transforming }
 WDSceneNode >> translateBy: aVector [
-	transform translateBy: aVector
+	transform translateBy: aVector.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> translateByX: amount [
-	transform translateByX: amount
+	transform translateByX: amount.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> translateByY: amount [
-	transform translateByY: amount
+	transform translateByY: amount.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> translateByZ: amount [
-	transform translateByZ: amount
+	transform translateByZ: amount.
+	self transformChanged
 ]
 
 { #category : #transforming }
 WDSceneNode >> translateToX: x y: y z: z [
-	transform translateToX: x y: y z: z
+	transform translateToX: x y: y z: z.
+	self transformChanged
 ]
 
 { #category : #accessing }

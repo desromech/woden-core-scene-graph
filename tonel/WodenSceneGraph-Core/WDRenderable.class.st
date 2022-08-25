@@ -32,6 +32,11 @@ WDRenderable >> asSceneNode [
 		yourself
 ]
 
+{ #category : #accessing }
+WDRenderable >> boundingBox [
+	^ AABox originPoint
+]
+
 { #category : #copying }
 WDRenderable >> copyTransformingMaterialsWith: aBlock [
 	self subclassResponsibility

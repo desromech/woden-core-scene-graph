@@ -30,6 +30,7 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		nearDistance: nearDistance;
 		farDistance: farDistance;
 		projectionMatrix: (self projectionMatrixWithAspect: aspectRatio);
+		frustum: (self frustumWithAspect: aspectRatio);
 		currentTime: currentTime;
 		exposure: exposure;
 		toneMappingOperator: toneMappingOperator;
@@ -44,6 +45,7 @@ WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeT
 		nearDistance: nearDistance;
 		farDistance: farDistance;
 		projectionMatrix: (self projectionMatrixWithFrustumTangents: frustumTangents);
+		frustum: (self frustumWithTangents: frustumTangents);
 		currentTime: currentTime;
 		exposure: exposure;
 		toneMappingOperator: toneMappingOperator;
@@ -135,6 +137,11 @@ WDCamera >> frustumWithAspect: aspectRatio [
 		hw := hh * aspectRatio.
 		^ Frustum new makeOrthoLeft: hw negated right: hw bottom: hh negated top: hh near: nearDistance far: farDistance	
 	]
+]
+
+{ #category : #converting }
+WDCamera >> frustumWithTangents: tangents [
+	^ Frustum new makeWithTangents: tangents near: nearDistance far: farDistance
 ]
 
 { #category : #accessing }

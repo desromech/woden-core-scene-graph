@@ -14,6 +14,13 @@ WDRenderableWithViewModeAlternatives >> addToRenderingScene: renderingScene with
 	]
 ]
 
+{ #category : #accessing }
+WDRenderableWithViewModeAlternatives >> boundingBox [
+	^ self defaultAlternative
+		ifNil: [ AABox originPoint ]
+		ifNotNil: [ :alternative | alternative boundingBox ]
+]
+
 { #category : #copying }
 WDRenderableWithViewModeAlternatives >> copyTransformingMaterialsWith: aBlock [
 	^ self

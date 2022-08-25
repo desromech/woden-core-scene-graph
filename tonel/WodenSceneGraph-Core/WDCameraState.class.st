@@ -21,7 +21,8 @@ Class {
 		'lightGridSlices',
 		'inverseProjectionMatrix',
 		'hasTopLeftNDCOrigin',
-		'hasBottomLeftTextureCoordinates'
+		'hasBottomLeftTextureCoordinates',
+		'worldFrustum'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -131,9 +132,9 @@ WDCameraState >> frustum [
 ]
 
 { #category : #accessing }
-WDCameraState >> frustum: anObject [
-
-	frustum := anObject
+WDCameraState >> frustum: aFrustum [
+	frustum := aFrustum.
+	worldFrustum := nil
 ]
 
 { #category : #accessing }
@@ -288,6 +289,12 @@ WDCameraState >> toneMappingOperator: aToneMapOperator [
 ]
 
 { #category : #accessing }
+WDCameraState >> transformation: aTransform [
+	super transformation: aTransform.
+	worldFrustum := nil
+]
+
+{ #category : #accessing }
 WDCameraState >> viewMode [
 
 	^ viewMode
@@ -296,4 +303,9 @@ WDCameraState >> viewMode [
 { #category : #accessing }
 WDCameraState >> viewMode: aViewMode [
 	viewMode := aViewMode asViewMode
+]
+
+{ #category : #accessing }
+WDCameraState >> worldFrustum [
+	^ worldFrustum ifNil: [ worldFrustum := frustum transformedWith: transformation ]
 ]

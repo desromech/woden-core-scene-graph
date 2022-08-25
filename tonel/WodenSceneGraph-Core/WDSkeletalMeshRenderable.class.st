@@ -26,6 +26,11 @@ WDSkeletalMeshRenderable >> addToRenderingScene: renderingScene withObjectState:
 	]
 ]
 
+{ #category : #accessing }
+WDSkeletalMeshRenderable >> boundingBox [
+	^ referenceMesh boundingBox scaledBy: 3
+]
+
 { #category : #copying }
 WDSkeletalMeshRenderable >> copyTransformingMaterialsWith: aBlock [
 	^ self

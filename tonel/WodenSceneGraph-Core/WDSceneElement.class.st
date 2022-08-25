@@ -35,6 +35,11 @@ WDSceneElement >> globalTransform [
 	^ ReversibleAffineTransform3D identity
 ]
 
+{ #category : #hook }
+WDSceneElement >> invalidateChildBoundingBox [
+	
+]
+
 { #category : #testing }
 WDSceneElement >> isBackgroundSceneLayer [
 	^ false

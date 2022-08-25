@@ -20,6 +20,18 @@ WDSceneLayer class >> isAbstract [
 	^ self == WDSceneLayer
 ]
 
+{ #category : #converting }
+WDSceneLayer >> addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: renderingSceneCameraLayer [
+	| parentGlobalTransform worldFrustum |
+	parentGlobalTransform := ReversibleAffineTransform3D identity.
+	worldFrustum := renderingSceneCameraLayer cameraState worldFrustum.
+	children do: [ :each |
+		(worldFrustum intersectsOrContainsBox: each boundingBox) ifTrue: [ 
+			each addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform
+		].
+	]
+]
+
 { #category : #adding }
 WDSceneLayer >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
 	self shouldNotImplement
@@ -53,7 +65,7 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	result
 		globalLightingState: globalLightingState;
 		cameraState: adjustedCameraState.
-	self addChildrenRecursivelyIntoRenderingSceneCameraLayer: result parentGlobalTransform: ReversibleAffineTransform3D identity.
+	self addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: result.
 	^ result
 ]
 

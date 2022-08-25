@@ -32,6 +32,11 @@ WDLightSource >> asSceneNode [
 		yourself
 ]
 
+{ #category : #accessing }
+WDLightSource >> boundingBox [
+	^ AABox fullSpace
+]
+
 { #category : #initialization }
 WDLightSource >> initialize [
 	super initialize.

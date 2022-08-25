@@ -22,6 +22,11 @@ WDPointLightSource >> asLightStateWithTransform: renderingTransform [
 ]
 
 { #category : #accessing }
+WDPointLightSource >> boundingBox [
+	^ AABox halfExtent: influenceRadius asVector3
+]
+
+{ #category : #accessing }
 WDPointLightSource >> influenceRadius [
 
 	^ influenceRadius
