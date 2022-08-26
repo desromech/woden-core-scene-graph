@@ -350,7 +350,12 @@ void main()
 		texture(sampler2D(NormalTexture, TextureSampler), texcoord0),
 		texture(sampler2D(NormalTexture, TextureSampler), texcoord1),
 		MaterialState.mixAlpha).rgb*2.0 - 1.0;
-	lightingParameters.N = normalize(mat3(StageInput.tangent, StageInput.bitangent, StageInput.normal) * tangentSpaceN);
+		
+	vec3 surfaceTangent = normalize(StageInput.tangent4.xyz);
+	vec3 surfaceNormal = normalize(StageInput.normal);
+	vec3 surfaceBitangent = cross(surfaceNormal, surfaceTangent)*StageInput.tangent4.w;
+	mat3 TBN = mat3(surfaceTangent, surfaceBitangent, surfaceNormal);
+	lightingParameters.N = normalize(TBN * tangentSpaceN);
 	lightingParameters.P = StageInput.viewPosition;
 	lightingParameters.V = normalize(-StageInput.viewPosition);
 
@@ -504,8 +509,7 @@ layout(location=0) in StageInputBlock
 	vec2 texcoord0;
 	vec2 texcoord1;
 	vec3 normal;
-	vec3 tangent;
-	vec3 bitangent;
+	vec4 tangent4;
 	vec3 worldPosition;
 	vec3 viewPosition;
 } StageInput;
@@ -529,8 +533,7 @@ layout(location=0) out StageOutputBlock
 	vec2 texcoord0;
 	vec2 texcoord1;
 	vec3 normal;
-	vec3 tangent;
-	vec3 bitangent;
+	vec4 tangent4;
 	vec3 worldPosition;
 	vec3 viewPosition;
 } StageOutput;
@@ -579,17 +582,14 @@ void main()
 #ifdef HAS_PER_VERTEX_NORMAL
 	StageOutput.normal = transformNormalToView(inNormal);
 #	ifdef HAS_PER_VERTEX_TANGENT4
-	StageOutput.tangent = transformNormalToView(inTangent4.xyz);
-	StageOutput.bitangent = cross(StageOutput.normal, StageOutput.tangent)*inTangent4.w;
+	StageOutput.tangent4 = vec4(transformNormalToView(inTangent4.xyz), inTangent4.w);
 #	else
 	vec3 upVector = vec3(0.0, 1.0, 0.0);
-	StageOutput.tangent = cross(upVector, StageOutput.normal);
-	StageOutput.bitangent = cross(StageOutput.normal, StageOutput.tangent);
+	StageOutput.tangent4 = vec4(cross(upVector, StageOutput.normal), 1.0);
 #	endif
 #else
 	StageOutput.normal = vec3(0.0, 0.0, 1.0);
-	StageOutput.tangent = vec3(1.0, 0.0, 0.0);
-	StageOutput.bitangent = vec3(0.0, 1.0, 0.0);
+	StageOutput.tangent4 = vec4(1.0, 0.0, 0.0, 1.0);
 #endif
 
 	vec4 worldPosition = ObjectState.transformationMatrix * vec4(inPosition, 1.0);
@@ -1060,7 +1060,12 @@ void main()
 
 	lightingParameters.emissiveFactor = StageInput.color.rgb * MaterialState.emissiveFactor.rgb * texture(sampler2D(EmissiveTexture, TextureSampler), texcoord0).rgb;
 	vec3 tangentSpaceN = texture(sampler2D(NormalTexture, TextureSampler), texcoord0).rgb*2.0 - 1.0;
-	lightingParameters.N = normalize(mat3(StageInput.tangent, StageInput.bitangent, StageInput.normal) * tangentSpaceN);
+	
+	vec3 surfaceTangent = normalize(StageInput.tangent4.xyz);
+	vec3 surfaceNormal = normalize(StageInput.normal);
+	vec3 surfaceBitangent = cross(surfaceNormal, surfaceTangent)*StageInput.tangent4.w;
+	mat3 TBN = mat3(surfaceTangent, surfaceBitangent, surfaceNormal);
+	lightingParameters.N = normalize(TBN * tangentSpaceN);
 	lightingParameters.P = StageInput.viewPosition;
 	lightingParameters.V = normalize(-StageInput.viewPosition);
 
