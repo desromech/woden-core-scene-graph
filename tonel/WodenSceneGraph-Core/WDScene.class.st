@@ -111,6 +111,16 @@ WDScene >> parent [
 	^ nil
 ]
 
+{ #category : #copying }
+WDScene >> postCopy [
+	super postCopy.
+	updateBlock := [ :delta | false ].
+	backgroundLayer := backgroundLayer copy copiedIntoScene: self; yourself.
+	normalLayer := normalLayer copy copiedIntoScene: self; yourself.
+	foregroundLayer := foregroundLayer copy copiedIntoScene: self; yourself.
+	
+]
+
 { #category : #adding }
 WDScene >> remove: aNode [
 	normalLayer remove: aNode

@@ -12,6 +12,13 @@ Class {
 	#category : #'WodenSceneGraph-Core-Lighting'
 }
 
+{ #category : #adding }
+WDPointLightSource >> addToRenderingScene: renderingScene withGlobalTransform: globalTransform [
+	(renderingScene shouldRenderWorldSphereWithCenter: globalTransform translation radius: influenceRadius) ifTrue: [
+		renderingScene addLight: (self asLightStateWithTransform: globalTransform)
+	].
+]
+
 { #category : #converting }
 WDPointLightSource >> asLightStateWithTransform: renderingTransform [
 	^ WDLightState new

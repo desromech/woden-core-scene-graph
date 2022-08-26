@@ -9,6 +9,11 @@ Class {
 	#category : #'WodenSceneGraph-Core-Lighting'
 }
 
+{ #category : #adding }
+WDDirectionalLightSource >> addToRenderingScene: renderingScene withGlobalTransform: globalTransform [
+	renderingScene addLight: (self asLightStateWithTransform: globalTransform)
+]
+
 { #category : #converting }
 WDDirectionalLightSource >> asLightStateWithTransform: renderingTransform [
 	^ WDLightState new

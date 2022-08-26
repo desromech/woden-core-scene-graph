@@ -25,7 +25,9 @@ WDMeshPrimitive >> addIntoModelAssetWithDependencies: modelAsset [
 
 { #category : #adding }
 WDMeshPrimitive >> addToRenderingScene: renderingScene withObjectState: anObjectState [
-	renderingScene addMeshPrimitive: self withMaterial: material objectState: anObjectState
+	(renderingScene shouldRenderBoundingBox: self boundingBox withObjectState: anObjectState) ifTrue: [ 
+		renderingScene addMeshPrimitive: self withMaterial: material objectState: anObjectState
+	]
 ]
 
 { #category : #accessing }

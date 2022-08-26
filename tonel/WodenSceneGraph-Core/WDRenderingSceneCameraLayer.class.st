@@ -11,7 +11,8 @@ Class {
 		'cameraState',
 		'renderingObjects',
 		'globalLightingState',
-		'lights'
+		'lights',
+		'usesFrustumCulling'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -19,6 +20,11 @@ Class {
 { #category : #adding }
 WDRenderingSceneCameraLayer >> addLight: aLightState [
 	lights add: aLightState
+]
+
+{ #category : #adding }
+WDRenderingSceneCameraLayer >> addLight: light withGlobalTransform: globalTransform [
+	light addToRenderingScene: self withGlobalTransform: globalTransform
 ]
 
 { #category : #adding }
@@ -71,7 +77,7 @@ WDRenderingSceneCameraLayer >> globalLightingState: anObject [
 	globalLightingState := anObject
 ]
 
-{ #category : #testing }
+{ #category : #accessing }
 WDRenderingSceneCameraLayer >> hasReverseDepth [
 	^ cameraState hasReverseDepth
 ]
@@ -83,9 +89,10 @@ WDRenderingSceneCameraLayer >> initialize [
 	globalLightingState := WDGlobalLightingState new.
 	lights := OrderedCollection new.
 	renderingObjects := OrderedCollection new.
+	usesFrustumCulling := true
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDRenderingSceneCameraLayer >> lightingState [
 	^ WDLightingState new
 		globalLightingState: globalLightingState;
@@ -93,7 +100,7 @@ WDRenderingSceneCameraLayer >> lightingState [
 		yourself.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDRenderingSceneCameraLayer >> lightingStateInViewSpace [
 	| viewMatrix |
 	viewMatrix := cameraState inverseTransformationMatrix.
@@ -103,7 +110,7 @@ WDRenderingSceneCameraLayer >> lightingStateInViewSpace [
 		yourself.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDRenderingSceneCameraLayer >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLights [
 	| viewMatrix |
 	viewMatrix := cameraState inverseTransformationMatrix.
@@ -115,7 +122,7 @@ WDRenderingSceneCameraLayer >> lightingStateInViewSpaceWithMaxNumberOfLights: ma
 		yourself.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDRenderingSceneCameraLayer >> lightingStateWithMaxNumberOfLights: maxNumberOfLights [
 	^ WDLightingState new
 		globalLightingState: globalLightingState;
@@ -134,9 +141,42 @@ WDRenderingSceneCameraLayer >> renderingObjects [
 	^ renderingObjects
 ]
 
-{ #category : #testing }
+{ #category : #accessing }
 WDRenderingSceneCameraLayer >> sampleCount [
 	^ 1
+]
+
+{ #category : #testing }
+WDRenderingSceneCameraLayer >> shouldRenderBoundingBox: boundingBoxToTest withObjectState: objectState [
+	^ usesFrustumCulling
+		ifTrue: [ self cameraState worldFrustum intersectsOrContainsBox: (boundingBoxToTest transformedWith: objectState transformation) ]
+		ifFalse: [ true ]
+]
+
+{ #category : #testing }
+WDRenderingSceneCameraLayer >> shouldRenderWorldBoundingBox: boundingBoxToText [
+	^ usesFrustumCulling
+		ifTrue: [ self cameraState worldFrustum intersectsOrContainsBox: boundingBoxToText ]
+		ifFalse: [ true ]
+]
+
+{ #category : #testing }
+WDRenderingSceneCameraLayer >> shouldRenderWorldSphereWithCenter: sphereCenter radius: sphereRadius [
+	^ usesFrustumCulling
+		ifTrue: [ self cameraState worldFrustum intersectsOrContainsSphereWithCenter: sphereCenter radius: sphereRadius ]
+		ifFalse: [ true ]
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> usesFrustumCulling [
+
+	^ usesFrustumCulling
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> usesFrustumCulling: anObject [
+
+	usesFrustumCulling := anObject
 ]
 
 { #category : #accessing }

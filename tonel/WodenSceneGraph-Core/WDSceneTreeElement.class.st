@@ -93,6 +93,18 @@ WDSceneTreeElement >> parent: anObject [
 	parent := anObject
 ]
 
+{ #category : #copying }
+WDSceneTreeElement >> postCopy [
+	| oldChildren |
+	super postCopy.
+	parent := nil.
+	oldChildren := children.
+	children := OrderedCollection new.
+	oldChildren do: [ :each |
+		self add: each copy
+	].
+]
+
 { #category : #adding }
 WDSceneTreeElement >> remove: aNode [
 	self removeSceneElement: aNode

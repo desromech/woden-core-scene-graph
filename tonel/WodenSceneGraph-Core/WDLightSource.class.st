@@ -16,6 +16,11 @@ WDLightSource class >> isAbstract [
 ]
 
 { #category : #converting }
+WDLightSource >> addToRenderingScene: renderingScene withGlobalTransform: globalTransform [
+	self subclassResponsibility
+]
+
+{ #category : #converting }
 WDLightSource >> asLightStateWithTransform: renderingTransform [
 	self subclassResponsibility
 ]

@@ -22,11 +22,10 @@ WDSceneLayer class >> isAbstract [
 
 { #category : #converting }
 WDSceneLayer >> addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: renderingSceneCameraLayer [
-	| parentGlobalTransform worldFrustum |
+	| parentGlobalTransform |
 	parentGlobalTransform := ReversibleAffineTransform3D identity.
-	worldFrustum := renderingSceneCameraLayer cameraState worldFrustum.
 	children do: [ :each |
-		(worldFrustum intersectsOrContainsBox: each boundingBox) ifTrue: [ 
+		(renderingSceneCameraLayer shouldRenderWorldBoundingBox: each boundingBox) ifTrue: [ 
 			each addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform
 		].
 	]
@@ -81,6 +80,11 @@ WDSceneLayer >> asRenderingSceneWithCameraState: baseCameraState [
 		 
 ]
 
+{ #category : #initialization }
+WDSceneLayer >> copiedIntoScene: aScene [
+	parent := aScene.
+]
+
 { #category : #accessing }
 WDSceneLayer >> globalLightingState [
 
@@ -108,6 +112,12 @@ WDSceneLayer >> initializeWithScene: aScene [
 { #category : #testing }
 WDSceneLayer >> isSceneLayer [
 	^ true
+]
+
+{ #category : #copying }
+WDSceneLayer >> postCopy [
+	super postCopy.
+	globalLightingState := globalLightingState copy.
 ]
 
 { #category : #accessing }

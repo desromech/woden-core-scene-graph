@@ -32,7 +32,7 @@ WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withT
 	].
 
 	lights do: [ :eachLight |
-		renderingSceneCameraLayer addLight: (eachLight asLightStateWithTransform: renderingGlobalTransform)
+		renderingSceneCameraLayer addLight: eachLight withGlobalTransform: renderingGlobalTransform
 	].
 ]
 
@@ -181,6 +181,12 @@ WDSceneNode >> position [
 { #category : #accessing }
 WDSceneNode >> position: aPosition [
 	transform translation: aPosition
+]
+
+{ #category : #copying }
+WDSceneNode >> postCopy [
+	super postCopy.
+	transform := transform copy.
 ]
 
 { #category : #removing }
