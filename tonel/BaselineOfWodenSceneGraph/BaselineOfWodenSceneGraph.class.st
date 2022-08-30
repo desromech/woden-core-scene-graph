@@ -15,12 +15,12 @@ BaselineOfWodenSceneGraph >> baseline: spec [
 BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 	spec postLoadDoIt: #postLoadActions.
 	spec
-		baseline: #'AbstractGPU' with: [ spec repository: 'github://ronsaldo/abstract-gpu' ];
-		baseline: #'WodenMath' with: [ spec repository: 'github://ronsaldo/woden-core-math' ];
-		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://ronsaldo/form-procedural-library' ];
+		baseline: #'AbstractGPU' with: [ spec repository: 'github://desromech/abstract-gpu' ];
+		baseline: #'WodenMath' with: [ spec repository: 'github://desromech/woden-core-math' ];
+		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://desromech/form-procedural-library' ];
 		baseline: #'FormSceneGraph' with: [
 			spec
-				repository: 'github://ronsaldo/form-scene-graph';
+				repository: 'github://desromech/form-scene-graph';
 				loads: #('AcceleratedAbstractGPU')
 		];
 	
@@ -56,12 +56,12 @@ BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 { #category : #baselines }
 BaselineOfWodenSceneGraph >> baselineForSqueak: spec [
 	spec
-		baseline: #'AbstractGPU' with: [ spec repository: 'github://ronsaldo/abstract-gpu' ];
-		baseline: #'WodenMath' with: [ spec repository: 'github://ronsaldo/woden-core-math' ];
-		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://ronsaldo/form-procedural-library' ];
+		baseline: #'AbstractGPU' with: [ spec repository: 'github://desromech/abstract-gpu' ];
+		baseline: #'WodenMath' with: [ spec repository: 'github://desromech/woden-core-math' ];
+		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://desromech/form-procedural-library' ];
 		baseline: #'FormSceneGraph' with: [
 			spec
-				repository: 'github://ronsaldo/form-scene-graph';
+				repository: 'github://desromech/form-scene-graph';
 				loads: #('AcceleratedAbstractGPU')
 		];
 	
