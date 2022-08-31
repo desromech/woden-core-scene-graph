@@ -5,7 +5,8 @@ Class {
 	#name : #WDLightSource,
 	#superclass : #Object,
 	#instVars : [
-		'intensity'
+		'intensity',
+		'castShadows'
 	],
 	#category : #'WodenSceneGraph-Core-Lighting'
 }
@@ -42,10 +43,23 @@ WDLightSource >> boundingBox [
 	^ AABox fullSpace
 ]
 
+{ #category : #accessing }
+WDLightSource >> castShadows [
+
+	^ castShadows
+]
+
+{ #category : #accessing }
+WDLightSource >> castShadows: anObject [
+
+	castShadows := anObject
+]
+
 { #category : #initialization }
 WDLightSource >> initialize [
 	super initialize.
 	intensity := Vector3 ones.
+	castShadows := false.
 ]
 
 { #category : #accessing }

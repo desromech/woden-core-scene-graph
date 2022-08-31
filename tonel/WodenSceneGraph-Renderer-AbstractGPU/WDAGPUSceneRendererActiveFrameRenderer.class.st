@@ -17,7 +17,8 @@ Class {
 		'depthFunction',
 		'depthTestingEnabled',
 		'depthWriteMask',
-		'alphaBlendingEnabled'
+		'alphaBlendingEnabled',
+		'isInDepthOnlyPass'
 	],
 	#classVars : [
 		'PrimitiveTopologyMap'
@@ -65,6 +66,57 @@ WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexB
 
 	^ validMaterial emitActivationCommandsOn: self
 
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowMapCameraLayer [
+	| shadowCastingLightSource convertedCameraState hasReverseDepth initialDepth shaderSignature shadowMapExtent |
+
+	shadowCastingLightSource := shadowMapCameraLayer shadowCastingLightSource.
+	shadowCastingLightSource
+		shadowMapViewportScale: (Vector2 x: 0.5 y: 0.5);
+		shadowMapViewportOffset: (Vector2 x: 0.5 y: 0.5).
+		
+	renderer device hasTopLeftNdcOrigin = renderer device hasBottomLeftTextureCoordinates ifTrue: [ 
+		shadowCastingLightSource shadowMapViewportScale y: shadowCastingLightSource shadowMapViewportScale y negated
+	].
+		
+	hasReverseDepth := shadowMapCameraLayer hasReverseDepth.
+	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
+	shaderSignature := renderer resourceCache rendererShaderSignature.
+	depthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
+
+	shadowMapExtent := renderer resourceCache shadowMapAtlasExtent.
+	convertedCameraState := self convertedCameraState: shadowMapCameraLayer cameraState framebufferExtent: shadowMapExtent.
+
+	depthTestingEnabled := true.
+	depthWriteMask := true.
+	alphaBlendingEnabled := false.
+
+	stateTracker
+		resetGraphicsPipeline;
+		beginRenderPass: renderer resourceCache shadowMapRenderPass
+			framebuffer: renderer resourceCache shadowMapAtlasFramebuffer bundle_content: 0;
+		setViewport: 0 y: 0 w: shadowMapExtent x h: shadowMapExtent y;
+		setScissor: 0 y: 0 w: shadowMapExtent x h: shadowMapExtent y;
+		setShaderSignature: shaderSignature handle;
+		useShaderResources: shaderSignature samplersBinding;
+		useShaderResources: renderer resourceCache emptyLightingStateBinding bindingHandle;
+		setFrontFace: AGPU_COUNTER_CLOCKWISE;
+		setDepthState: true writeMask: true function: depthFunction.
+
+	depthTestingEnabled := true.
+	depthWriteMask := true.
+	alphaBlendingEnabled := false.
+	isInDepthOnlyPass := true.
+
+	self bindCameraState: convertedCameraState.
+		
+	shadowMapCameraLayer renderingObjects do: [ :each |
+		self recordCommandsForRenderingObject: each
+	].
+
+	stateTracker endRenderPass.
 ]
 
 { #category : #rendering }
@@ -182,9 +234,26 @@ WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState fra
 		yourself
 ]
 
-{ #category : #rendering }
+{ #category : #material }
+WDAGPUSceneRendererActiveFrameRenderer >> emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material [
+	| locationMask |
+	material hasAlphaBlending ifTrue: [ ^ false ].
+	locationMask := currentObjectVertexBinding locationMask bitAnd: renderer resourceCache depthOnlyVertexAttributesForMask.
+	
+	stateTracker
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
+		setFragmentStage: renderer resourceCache genericDepthOnlySurfaceFragmentShader entryPoint: 'main';
+		setCullMode: (material doubleSided
+			ifTrue: [ AGPU_CULL_MODE_NONE ]
+			ifFalse: [ AGPU_CULL_MODE_BACK ]).
+	^ true
+]
+
+{ #category : #material }
 WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidMaterialActivationCommands: material [
 	| locationMask |
+	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
+	
 	locationMask := currentObjectVertexBinding locationMask.
 	
 	stateTracker
@@ -209,9 +278,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidM
 	^ true
 ]
 
-{ #category : #rendering }
+{ #category : #material }
 WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCommands: material [
 	| locationMask |
+	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
+	
 	locationMask := currentObjectVertexBinding locationMask.
 	
 	stateTracker
@@ -233,9 +304,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 	^ true
 ]
 
-{ #category : #rendering }
+{ #category : #material }
 WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivationCommands: material [
 	| locationMask |
+	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
+	
 	locationMask := currentObjectVertexBinding locationMask.
 	
 	stateTracker
@@ -280,9 +353,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive:
 
 ]
 
-{ #category : #rendering }
+{ #category : #material }
 WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: material [
 	| locationMask |
+	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
+
 	locationMask := currentObjectVertexBinding locationMask.
 	
 	stateTracker
@@ -348,12 +423,18 @@ WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateLightingStateBinding: light
 			bindStorageBuffer: renderer resourceCache tileLightIndexListBuffer inSlot: 3;
 			bindStorageBuffer: renderer resourceCache lightGridBuffer inSlot: 4;
 			
-			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 5;
-			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientDiffuseLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 6;
-			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientSpecularLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 7.
+			bindSampledTextureView: renderer resourceCache shadowMapAtlasTextureSamplingView inSlot: 5;
+			bindSampledTextureView: renderer resourceCache brdfLutTexture getOrCreateFullView inSlot: 6;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientDiffuseLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 7;
+			bindSampledTextureView: (self validTextureViewHandleFor: lightingState ambientSpecularLightProbeTexture fallbackTextureWith: [renderer resourceCache transparentTextureCube ]) inSlot: 8.
 		activeSlabResource add: binding.
 		binding
 	]
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererActiveFrameRenderer >> isInDepthOnlyPass [
+	^ isInDepthOnlyPass
 ]
 
 { #category : #rendering }
@@ -445,6 +526,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	depthTestingEnabled := true.
 	depthWriteMask := true.
 	alphaBlendingEnabled := false.
+	isInDepthOnlyPass := false.
 
 	self
 		bindCameraState: convertedCameraState;
@@ -468,6 +550,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		sampleCount: sampleCount
 		initialDepth: initialDepth.
 	shaderSignature := renderer resourceCache rendererShaderSignature.
+	
+	renderingSceneState cameraLayers do: [ :cameraLayer |
+		cameraLayer shadowMapCameraLayers do: [ :shadowMapCameraLayer |
+			self allocateAndRenderShadowMapFor: shadowMapCameraLayer
+		]
+	].
 
 	renderingSceneState cameraLayers doWithIndex: [ :cameraLayer :index |
 		self recordRenderingCommandsFor: renderingSceneState cameraLayer: cameraLayer isFirst: index == 1 intoFramebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers
@@ -562,7 +650,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
 	
 	destOffset := 0.
 	lights doWithIndex: [ :light :index |
-		uploadAllocation writeValue: light with: WDAGPULightStateUniformBufferWriter at: destOffset.
+		| adjustedLight |
+		adjustedLight := light copy.
+		adjustedLight castShadows ifTrue: [ 
+			adjustedLight shadowMapProjectionMatrix: renderer resourceCache projectionNDCAdjustMatrix * adjustedLight shadowMapProjectionMatrix
+		].
+	
+		uploadAllocation writeValue: adjustedLight with: WDAGPULightStateUniformBufferWriter at: destOffset.
 		destOffset := destOffset + lightStateSize
 	].
 

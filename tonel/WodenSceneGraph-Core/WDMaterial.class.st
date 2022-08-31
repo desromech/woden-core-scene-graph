@@ -72,6 +72,11 @@ WDMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ false
 ]
 
+{ #category : #'double dispatch' }
+WDMaterial >> emitDepthOnlyActivationCommandsOn: frameRenderer [
+	^ false
+]
+
 { #category : #serialization }
 WDMaterial >> encodeJsonKeyValues [
 	^ {

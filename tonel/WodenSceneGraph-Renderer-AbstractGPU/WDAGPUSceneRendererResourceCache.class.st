@@ -48,10 +48,18 @@ Class {
 		'lightGridComputationShader',
 		'lightClusterListComputationShader',
 		'computeScratchStorageBuffer',
-		'lightClusterListBeginComputationShader'
+		'lightClusterListBeginComputationShader',
+		'shadowMapAtlasTexture',
+		'shadowMapAtlasTextureDepthStencilView',
+		'shadowMapAtlasFramebuffer',
+		'shadowMapRenderPass',
+		'emptyLightingStateBinding',
+		'genericDepthOnlySurfaceFragmentShader',
+		'shadowMapAtlasTextureSamplingView'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
+		'ShadowMapAtlasExtent',
 		'TextureFormatMap',
 		'TextureMainUsageModeMap',
 		'TextureTypeMap',
@@ -76,6 +84,8 @@ WDAGPUSceneRendererResourceCache class >> for: device withTextureUploader: textu
 
 { #category : #initialization }
 WDAGPUSceneRendererResourceCache class >> initialize [
+	ShadowMapAtlasExtent := 4192@4192.
+	
 	TextureFormatMap := Dictionary newFromPairs: {
 		WDTextureFormatUnknown uniqueInstance . AGPU_TEXTURE_FORMAT_UNKNOWN.
 		WDTextureFormatR8G8B8A8UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM.
@@ -242,6 +252,29 @@ WDAGPUSceneRendererResourceCache >> convertTextureDescription: description [
 ]
 
 { #category : #private }
+WDAGPUSceneRendererResourceCache >> createShadowMapTextureWithExtent: extent clearDepth: clearDepth [
+	| result |
+	result := device createTexture: (AGPUTextureDescription new
+			type: AGPU_TEXTURE_2D;
+			width: extent x;
+			height: extent y;
+			depth: 1;
+			layers: 1;
+			miplevels: 1;
+			format: AGPU_TEXTURE_FORMAT_R32_TYPELESS;
+			usage_modes: (AGPU_TEXTURE_USAGE_SAMPLED bitOr: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT);
+			main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+			sample_count: 1;
+			clear_value: (AGPUTextureClearValue new
+				depth_stencil: (AGPUDepthStencilValue new
+					depth: clearDepth;
+					yourself);
+				yourself);
+			yourself).
+	^ result
+]
+
+{ #category : #private }
 WDAGPUSceneRendererResourceCache >> createStorageBufferFor: elementWriter capacity: capacity usageModes: usageModes [
 	^ self createStorageBufferForElementSize: elementWriter uniqueInstance instanceSize capacity: capacity usageModes: usageModes
 ]
@@ -311,6 +344,13 @@ WDAGPUSceneRendererResourceCache >> depthFormat [
 	^ depthFormat
 ]
 
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> depthOnlyVertexAttributesForMask [
+	^ ((1 bitShift: 0)
+		bitOr: (1 bitShift: 5))
+		bitOr: (1 bitShift: 6)
+]
+
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> device [
 	^ device
@@ -358,6 +398,8 @@ void main()
 	lightingParameters.N = normalize(TBN * tangentSpaceN);
 	lightingParameters.P = StageInput.viewPosition;
 	lightingParameters.V = normalize(-StageInput.viewPosition);
+	lightingParameters.worldP = StageInput.worldPosition;
+	lightingParameters.worldSurfaceN = normalize(StageInput.worldNormal);
 
 	lightingParameters.occlusionFactor = MaterialState.occlusionFactor *
 		mix(texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r,
@@ -408,6 +450,11 @@ layout(set=4, binding=3) uniform texture2D NormalTexture;
 layout(set=4, binding=4) uniform texture2D OcclusionTexture;
 layout(set=4, binding=5) uniform texture2D MetallicRoughnessTexture;
 '
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> emptyLightingStateBinding [
+	^ emptyLightingStateBinding
 ]
 
 { #category : #'private shaders' }
@@ -500,6 +547,23 @@ layout(location=0) out vec4 FragmentOutputColor;
 '
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> genericDepthOnlySurfaceFragmentShader [
+	^ genericDepthOnlySurfaceFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> genericDepthOnlySurfaceFragmentShaderSource [
+	^ '
+#version 450
+#line 6
+
+void main()
+{
+}
+'
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialFragmentShaderInputs [
 	^ '
@@ -510,6 +574,7 @@ layout(location=0) in StageInputBlock
 	vec2 texcoord1;
 	vec3 normal;
 	vec4 tangent4;
+	vec3 worldNormal;
 	vec3 worldPosition;
 	vec3 viewPosition;
 } StageInput;
@@ -534,6 +599,7 @@ layout(location=0) out StageOutputBlock
 	vec2 texcoord1;
 	vec3 normal;
 	vec4 tangent4;
+	vec3 worldNormal;
 	vec3 worldPosition;
 	vec3 viewPosition;
 } StageOutput;
@@ -580,6 +646,7 @@ void main()
 #endif
 
 #ifdef HAS_PER_VERTEX_NORMAL
+	StageOutput.worldNormal = transformNormalToWorld(inNormal);
 	StageOutput.normal = transformNormalToView(inNormal);
 #	ifdef HAS_PER_VERTEX_TANGENT4
 	StageOutput.tangent4 = vec4(transformNormalToView(inTangent4.xyz), inTangent4.w);
@@ -588,6 +655,7 @@ void main()
 	StageOutput.tangent4 = vec4(cross(upVector, StageOutput.normal), 1.0);
 #	endif
 #else
+	StageOutput.worldNormal = vec3(0.0, 0.0, 1.0);
 	StageOutput.normal = vec3(0.0, 0.0, 1.0);
 	StageOutput.tangent4 = vec4(1.0, 0.0, 0.0, 1.0);
 #endif
@@ -647,6 +715,7 @@ WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount in
 
 { #category : #initialization }
 WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUploader: aTextureUploader [
+	| shadowMapAtlasTextureDepthStencilViewDescription shadowMapAtlasTextureSamplingViewDescription |
 	device := aDevice.
 	textureUploader := aTextureUploader.
 	textures := WeakKeyDictionary new.
@@ -671,7 +740,26 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	neutralNormalTexture := self createTexture2DWithSingleColor: #[128 128 255 255].
 	transparentTextureCube := self createTextureCubeWithSingleColor: #[0 0 0 0].
 	
+	shadowMapAtlasTexture := self createShadowMapTextureWithExtent: ShadowMapAtlasExtent clearDepth: 1.0.
+	shadowMapAtlasTextureSamplingViewDescription := AGPUTextureViewDescription new.
+	shadowMapAtlasTexture getFullViewDescription: shadowMapAtlasTextureSamplingViewDescription.
+	shadowMapAtlasTextureSamplingViewDescription
+		format: AGPU_TEXTURE_FORMAT_R32_FLOAT;
+		usage_mode: AGPU_TEXTURE_USAGE_SAMPLED.
+	shadowMapAtlasTextureSamplingView := shadowMapAtlasTexture createView: shadowMapAtlasTextureSamplingViewDescription.
+	
+	shadowMapAtlasTextureDepthStencilViewDescription := AGPUTextureViewDescription new.
+	shadowMapAtlasTexture getFullViewDescription: shadowMapAtlasTextureDepthStencilViewDescription.
+	shadowMapAtlasTextureDepthStencilViewDescription
+		format: AGPU_TEXTURE_FORMAT_D32_FLOAT;
+		usage_mode: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT.
+
+	shadowMapAtlasTextureDepthStencilView := shadowMapAtlasTexture createView: shadowMapAtlasTextureDepthStencilViewDescription.
+	shadowMapAtlasFramebuffer := device createFrameBuffer: ShadowMapAtlasExtent x height: ShadowMapAtlasExtent y colorCount: 0 colorViews: nil depthStencilView: shadowMapAtlasTextureDepthStencilView.
+	
 	genericSurfaceMaterialVertexShaders := Dictionary new.
+	genericDepthOnlySurfaceFragmentShader := self compileShader: self genericDepthOnlySurfaceFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	
 	metallicRoughnessFragmentShader := self compileShader: self metallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	unlitFragmentShader := self compileShader: self unlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	environmentMapFragmentShader  := self compileShader: self environmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -712,6 +800,8 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 		WDTopBottomStereoCompositionMode asStereoComposeMode . topBottomStereoComposeMode.
 		WDRedCyanAnaglyphStereoCompositionMode asStereoComposeMode . redCyanAnaglyphStereoComposeMode.
 	}.
+	
+	emptyLightingStateBinding := rendererShaderSignature allocateLightingState
 ]
 
 { #category : #'private shaders' }
@@ -968,12 +1058,23 @@ WDAGPUSceneRendererResourceCache >> lightingStateBlockSource [
 struct LightSource
 {
 	vec4 positionOrDirection;
+
 	vec3 intensity;
 	float influenceRadius;
 
 	vec3 spotDirection;
 	float innerSpotCosCutoff;
+
 	float outerSpotCosCutoff;
+	bool castShadows;
+	
+	mat4 shadowMapTransformationMatrix;
+	mat4 shadowMapInverseTransformationMatrix;
+
+	mat4 shadowMapProjectionMatrix;
+
+	vec2 shadowMapViewportScale;
+	vec2 shadowMapViewportOffset;
 };
 
 layout(set=2, binding=0, std140) uniform LightingStateBlock
@@ -1008,9 +1109,10 @@ layout(set=2, binding=4, std430) buffer LightClusterListsBlock
 	uvec2[] lists;
 } LightClusterLists;
 
-layout(set=2, binding=5) uniform texture2D BRDFLutTexture;
-layout(set=2, binding=6) uniform textureCube AmbientDiffuseLightProbeTexture;
-layout(set=2, binding=7) uniform textureCube AmbientSpecularLightProbeTexture;
+layout(set=2, binding=5) uniform texture2D ShadowMapTextureAtlas;
+layout(set=2, binding=6) uniform texture2D BRDFLutTexture;
+layout(set=2, binding=7) uniform textureCube AmbientDiffuseLightProbeTexture;
+layout(set=2, binding=8) uniform textureCube AmbientSpecularLightProbeTexture;
 '
 ]
 
@@ -1068,6 +1170,8 @@ void main()
 	lightingParameters.N = normalize(TBN * tangentSpaceN);
 	lightingParameters.P = StageInput.viewPosition;
 	lightingParameters.V = normalize(-StageInput.viewPosition);
+	lightingParameters.worldP = StageInput.worldPosition;
+	lightingParameters.worldSurfaceN = normalize(StageInput.worldNormal);
 
 	lightingParameters.occlusionFactor = MaterialState.occlusionFactor * texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r;
 	vec2 roughnessMetallicFactor = vec2(MaterialState.roughnessFactor, MaterialState.metallicFactor) * texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord0).gb;
@@ -1081,7 +1185,7 @@ void main()
 
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessLightingModel [
-^ self lightingStateBlockSource , self fragmentShaderOutputs , '
+^ self lightingStateBlockSource , self fragmentShaderOutputs , self shadowMappingSamplingSource , '
 #line 4
 const float DistanceEpsilon = 0.00001;
 
@@ -1102,6 +1206,9 @@ struct SurfaceLightingParameters
 	float roughnessFactor;
 
 	vec3 P;
+	
+	vec3 worldP;
+	vec3 worldSurfaceN;
 };
 
 vec3 fresnelSchlick(vec3 F0, float cosTheta)
@@ -1200,6 +1307,8 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	mat3 viewToWorld = mat3(CameraState.inverseTransformationMatrix[0].xyz, CameraState.inverseTransformationMatrix[1].xyz, CameraState.inverseTransformationMatrix[2].xyz);
 	vec3 worldN = surfaceParameters.N * viewToWorld;
 	vec3 worldR = R * viewToWorld;
+	vec3 worldSurfaceN = surfaceParameters.worldSurfaceN;
+	vec3 worldP = surfaceParameters.worldP;
 
 	vec3 diffuseLightProbeSample = textureLod(samplerCube(AmbientDiffuseLightProbeTexture, BrdfLutSampler), worldN, 0.0).rgb;
 
@@ -1222,8 +1331,9 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	for(uint i = 0u; i < tileLightList.y; ++i)
 	{
 		uint lightIndex = TileLightIndices.indices[tileLightList.x + i];
-		
+	
 #define currentLightSource AllLight.lights[lightIndex]
+
 		vec4 lightSourcePosition = currentLightSource.positionOrDirection;
 		vec3 L = lightSourcePosition.xyz;
 		float attenuation = 1.0;
@@ -1245,6 +1355,16 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 			attenuation *= smoothstep(currentLightSource.outerSpotCosCutoff, currentLightSource.innerSpotCosCutoff, spotCos);
 		}
 		
+		// Sample the shadow map, if available.
+		if (currentLightSource.castShadows)
+		{
+			float shadowFactor = sampleShadowMapForLightWithIndex(lightIndex, worldP, worldSurfaceN);
+			if(shadowFactor <= 0.0)
+				continue;
+				
+			attenuation *= shadowFactor;
+		}
+
 		float NdotL = max(0.0, dot(surfaceParameters.N, L));
 		if(NdotL > 0.0 && attenuation > 0.0)
 		{
@@ -1262,29 +1382,6 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	}
 	
 	return vec4(lightedColor, surfaceParameters.baseColor.a);
-	//return vec4(vec3(computeLightTileCoordinateForCurrentScreenCoordinateWithLinearDepth(surfaceParameters.P.z)) / vec3(CameraState.lightGridExtent)*vec3(1.0, 1.0, 0.0), 1.0);
-
-	/*vec4[14] colorWheel = vec4[14](
-		vec4(0.4, 0.4, 0.4, 1.0),
-
-		vec4(0.4, 0.0, 0.0, 1.0),
-		vec4(0.0, 0.4, 0.0, 1.0),
-		vec4(0.0, 0.0, 0.4, 1.0),
-
-		vec4(0.4, 0.4, 0.0, 1.0),
-		vec4(0.4, 0.0, 0.4, 1.0),
-		vec4(0.0, 0.4, 0.4, 1.0),
-
-		vec4(1.0, 0.0, 0.0, 1.0),
-		vec4(0.0, 1.0, 0.0, 1.0),
-		vec4(0.0, 0.0, 1.0, 1.0),
-
-		vec4(1.0, 1.0, 0.0, 1.0),
-		vec4(1.0, 0.0, 1.0, 1.0),
-		vec4(0.0, 1.0, 1.0, 1.0),
-
-		vec4(1.0, 1.0, 1.0, 1.0));
-	return colorWheel[tileIndex % 13u];*/
 }
 '
 ]
@@ -1382,13 +1479,87 @@ WDAGPUSceneRendererResourceCache >> rendererShaderSignature [
 WDAGPUSceneRendererResourceCache >> samplerStateSource [
 	^ '
 layout(set=0, binding=0) uniform sampler TextureSampler;
-layout(set=0, binding=1) uniform sampler BrdfLutSampler;
+layout(set=0, binding=1) uniform sampler ShadowMapSampler;
+layout(set=0, binding=2) uniform sampler BrdfLutSampler;
 '
 ]
 
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> screenQuadVertexShader [
 	^ screenQuadVertexShader
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> shadowMapAtlasExtent [
+	^ ShadowMapAtlasExtent
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> shadowMapAtlasFramebuffer [
+	^ shadowMapAtlasFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> shadowMapAtlasTexture [
+	^ shadowMapAtlasTexture
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> shadowMapAtlasTextureSamplingView [
+	^ shadowMapAtlasTextureSamplingView
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> shadowMapRenderPass [
+	| renderpassDescription depthStencilAttachment |
+	shadowMapRenderPass ifNotNil: [ ^ shadowMapRenderPass ].
+	
+	^ [
+		depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
+			format: AGPU_TEXTURE_FORMAT_D32_FLOAT;
+			begin_action: AGPU_ATTACHMENT_CLEAR;
+			end_action: AGPU_ATTACHMENT_KEEP;
+			stencil_begin_action: AGPU_ATTACHMENT_CLEAR;
+			stencil_end_action: AGPU_ATTACHMENT_KEEP;
+			clear_value: (AGPUDepthStencilValue new
+				depth: 0.0;
+				yourself);
+			sample_count: 1;
+			yourself.
+		renderpassDescription := AGPURenderpassDescription new.
+		renderpassDescription depth_stencil_attachment: depthStencilAttachment.
+		shadowMapRenderPass := device createRenderPass: renderpassDescription.
+	] ensure: [ depthStencilAttachment free ]
+
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> shadowMappingSamplingSource [
+	^ '
+#line 4
+
+float sampleShadowMapForLightWithIndex(uint lightIndex, vec3 worldPosition, vec3 worldNormal)
+{
+#define lightSource AllLight.lights[lightIndex]
+	vec3 worldSamplePosition = worldPosition + worldNormal*0.01;
+	vec4 lightNdcPosition = lightSource.shadowMapProjectionMatrix * (lightSource.shadowMapInverseTransformationMatrix * vec4(worldSamplePosition, 1.0));
+	
+	// Avoid division by zero
+	if (lightNdcPosition.w == 0.0) 
+		return 0.0;
+
+	// Clip to unit cube.
+	vec3 samplePosition = lightNdcPosition.xyz / lightNdcPosition.w;
+	if(samplePosition.x < -1.0 || samplePosition.x > 1.0
+		|| samplePosition.y < -1.0 || samplePosition.y > 1.0)
+		return 0.0;
+		
+	vec3 atlasSamplePosition = vec3(samplePosition.xy*lightSource.shadowMapViewportScale + lightSource.shadowMapViewportOffset, samplePosition.z);
+
+	return textureLod(sampler2DShadow(ShadowMapTextureAtlas, ShadowMapSampler), atlasSamplePosition, 0.0);
+}
+
+'
 ]
 
 { #category : #'private shaders' }

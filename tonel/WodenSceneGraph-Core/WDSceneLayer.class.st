@@ -65,6 +65,21 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 		globalLightingState: globalLightingState;
 		cameraState: adjustedCameraState.
 	self addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: result.
+	
+	result shadowCastingLightsDo: [ :eachLight |
+		| shadowMapCameraLayer |
+		shadowMapCameraLayer := WDRenderingSceneCameraLayer new.
+		shadowMapCameraLayer
+			shadowCastingLightSource: eachLight;
+			cameraState: eachLight shadowMappingCameraState.
+		self addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: shadowMapCameraLayer.
+		shadowMapCameraLayer renderingObjects ifEmpty: [
+			eachLight castShadows: false
+		] ifNotEmpty: [ 
+			result addShadowMapCameraLayer: shadowMapCameraLayer
+		]
+	].
+
 	^ result
 ]
 

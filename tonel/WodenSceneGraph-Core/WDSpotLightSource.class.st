@@ -18,6 +18,8 @@ WDSpotLightSource >> asLightStateWithTransform: renderingTransform [
 		spotDirection: renderingTransform matrix thirdColumn normalized;
 		innerSpotCosCutoff: innerCutoff degreeCos;
 		outerSpotCosCutoff: outerCutoff degreeCos;
+		castShadows: castShadows;
+		shadowMappingCameraState: (self shadowMapCameraStateWithTransform: renderingTransform);
 		yourself.
 ]
 
@@ -50,4 +52,25 @@ WDSpotLightSource >> outerCutoff [
 WDSpotLightSource >> outerCutoff: anObject [
 
 	outerCutoff := anObject
+]
+
+{ #category : #accessing }
+WDSpotLightSource >> shadowMapCameraStateWithTransform: worldRenderingTransform [
+	| nearDistance farDistance aspect fovy |
+	castShadows ifFalse: [ ^ nil ].
+	
+	nearDistance := 0.01.
+	farDistance := influenceRadius.
+	aspect := 1.0.
+	fovy := outerCutoff*2.
+	
+	^ WDCameraState new
+		nearDistance: nearDistance;
+		farDistance: influenceRadius;
+		projectionMatrix: (Matrix4x4 reverseDepthPerspectiveFovY: fovy aspect: aspect near: nearDistance far: farDistance);
+		frustum: (Frustum new makePerspectiveFovY: fovy aspect: aspect near: nearDistance far: farDistance);
+		hasReverseDepth: true;
+		transformation: worldRenderingTransform;
+		yourself
+		
 ]

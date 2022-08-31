@@ -10,7 +10,12 @@ Class {
 		'spotDirection',
 		'innerSpotCosCutoff',
 		'outerSpotCosCutoff',
-		'influenceRadius'
+		'influenceRadius',
+		'castShadows',
+		'shadowMappingCameraState',
+		'shadowMapViewportScale',
+		'shadowMapViewportOffset',
+		'shadowMapProjectionMatrix'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -18,6 +23,18 @@ Class {
 { #category : #requirements }
 WDLightState class >> empty [
 	^ self new
+]
+
+{ #category : #accessing }
+WDLightState >> castShadows [
+
+	^ castShadows
+]
+
+{ #category : #accessing }
+WDLightState >> castShadows: anObject [
+
+	castShadows := anObject
 ]
 
 { #category : #accessing }
@@ -40,6 +57,11 @@ WDLightState >> initialize [
 	innerSpotCosCutoff := -1.0.
 	outerSpotCosCutoff := -1.0.
 	influenceRadius := 1.0.
+	castShadows := false.
+	shadowMappingCameraState := nil.
+	
+	shadowMapViewportScale := Vector2 x: 0.5 y: 0.5.
+	shadowMapViewportOffset := Vector2 x: 0.5 y: 0.5.
 ]
 
 { #category : #accessing }
@@ -88,6 +110,69 @@ WDLightState >> positionOrDirection [
 WDLightState >> positionOrDirection: anObject [
 
 	positionOrDirection := anObject
+]
+
+{ #category : #'as yet unclassified' }
+WDLightState >> shadowMapInverseTransformationMatrix [
+	^ shadowMappingCameraState
+		ifNil: [ Matrix4x4 identity ]
+		ifNotNil: [ shadowMappingCameraState inverseTransformationMatrix ]
+]
+
+{ #category : #'as yet unclassified' }
+WDLightState >> shadowMapProjectionMatrix [
+	^ shadowMapProjectionMatrix ifNil: [shadowMappingCameraState
+			ifNil: [ Matrix4x4 identity ]
+			ifNotNil: [ shadowMappingCameraState projectionMatrix ]
+	]
+]
+
+{ #category : #'as yet unclassified' }
+WDLightState >> shadowMapProjectionMatrix: aMatrix [
+	shadowMapProjectionMatrix := aMatrix
+]
+
+{ #category : #'as yet unclassified' }
+WDLightState >> shadowMapTransformationMatrix [
+	^ shadowMappingCameraState
+		ifNil: [ Matrix4x4 identity ]
+		ifNotNil: [ shadowMappingCameraState transformationMatrix ]
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapViewportOffset [
+
+	^ shadowMapViewportOffset
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapViewportOffset: anObject [
+
+	shadowMapViewportOffset := anObject
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapViewportScale [
+
+	^ shadowMapViewportScale
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapViewportScale: anObject [
+
+	shadowMapViewportScale := anObject
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMappingCameraState [
+
+	^ shadowMappingCameraState
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMappingCameraState: anObject [
+
+	shadowMappingCameraState := anObject
 ]
 
 { #category : #accessing }

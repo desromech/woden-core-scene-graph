@@ -13,7 +13,8 @@ Class {
 		'objectStateAllocator',
 		'materialStateAllocator',
 		'lightingStateAllocator',
-		'bdrfSampler'
+		'bdrfSampler',
+		'shadowMapSampler'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -80,6 +81,7 @@ WDAGPURendererShaderSignature >> buildHandle [
 		beginBindingBank: 1;
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLER bindingPointCount: 1;
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLER bindingPointCount: 1;
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLER bindingPointCount: 1;
 
 		"Camera state"
 		beginBindingBank: 100;
@@ -94,6 +96,7 @@ WDAGPURendererShaderSignature >> buildHandle [
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_STORAGE_BUFFER bindingPointCount: 1; "Tile Light Index List"
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_STORAGE_BUFFER bindingPointCount: 1; "Light Grid"
 
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "Shadow Map atlas texture"
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "BRDF LUT"
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "IBL Diffuse Light Probe"
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLED_IMAGE bindingPointCount: 1; "IBL Specular Light Probe"
@@ -135,6 +138,17 @@ WDAGPURendererShaderSignature >> buildSamplersBinding [
 	samplersBinding := handle createShaderResourceBinding: 0.
 	samplersBinding bindSampler: 0 sampler: sampler.
 
+	shadowMapSampler := device createSampler: (AGPUSamplerDescription new
+		filter: AGPU_FILTER_MIN_LINEAR_MAG_LINEAR_MIPMAP_NEAREST;
+		address_u: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
+		address_v: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
+		address_w: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
+		comparison_enabled: 1;
+		comparison_function: AGPU_GREATER_EQUAL;
+		max_lod: 0.0;
+		yourself).
+	samplersBinding bindSampler: 1 sampler: shadowMapSampler.
+
 	bdrfSampler := device createSampler: (AGPUSamplerDescription new
 		filter: AGPU_FILTER_MIN_LINEAR_MAG_LINEAR_MIPMAP_LINEAR;
 		address_u: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
@@ -142,7 +156,7 @@ WDAGPURendererShaderSignature >> buildSamplersBinding [
 		address_w: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
 		max_lod: 32.0;
 		yourself).
-	samplersBinding bindSampler: 1 sampler: bdrfSampler.
+	samplersBinding bindSampler: 2 sampler: bdrfSampler.
 
 ]
 

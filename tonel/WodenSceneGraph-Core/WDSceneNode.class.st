@@ -31,9 +31,12 @@ WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withT
 		]
 	].
 
-	lights do: [ :eachLight |
-		renderingSceneCameraLayer addLight: eachLight withGlobalTransform: renderingGlobalTransform
+	renderingSceneCameraLayer isDepthOnly ifFalse: [ 
+		lights do: [ :eachLight |
+			renderingSceneCameraLayer addLight: eachLight withGlobalTransform: renderingGlobalTransform
+		].
 	].
+
 ]
 
 { #category : #adding }

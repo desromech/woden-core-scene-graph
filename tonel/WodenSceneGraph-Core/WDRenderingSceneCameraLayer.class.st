@@ -12,7 +12,10 @@ Class {
 		'renderingObjects',
 		'globalLightingState',
 		'lights',
-		'usesFrustumCulling'
+		'usesFrustumCulling',
+		'isShadowMap',
+		'shadowMapCameraLayers',
+		'shadowCastingLightSource'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -47,6 +50,11 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: ren
 { #category : #adding }
 WDRenderingSceneCameraLayer >> addRenderable: renderable withObjectState: anObjectState [
 	renderable addToRenderingScene: self withObjectState: anObjectState
+]
+
+{ #category : #adding }
+WDRenderingSceneCameraLayer >> addShadowMapCameraLayer: aCameraLayer [
+	shadowMapCameraLayers add: aCameraLayer
 ]
 
 { #category : #converting }
@@ -89,7 +97,27 @@ WDRenderingSceneCameraLayer >> initialize [
 	globalLightingState := WDGlobalLightingState new.
 	lights := OrderedCollection new.
 	renderingObjects := OrderedCollection new.
-	usesFrustumCulling := true
+	shadowMapCameraLayers := OrderedCollection new.
+	usesFrustumCulling := true.
+	isShadowMap := false.
+
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> isDepthOnly [
+	^ isShadowMap
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> isShadowMap [
+
+	^ isShadowMap
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> isShadowMap: anObject [
+
+	isShadowMap := anObject
 ]
 
 { #category : #accessing }
@@ -144,6 +172,32 @@ WDRenderingSceneCameraLayer >> renderingObjects [
 { #category : #accessing }
 WDRenderingSceneCameraLayer >> sampleCount [
 	^ 1
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> shadowCastingLightSource [
+
+	^ shadowCastingLightSource
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> shadowCastingLightSource: anObject [
+
+	shadowCastingLightSource := anObject
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> shadowCastingLightsDo: aBlock [
+	lights do: [ :each |
+		each castShadows ifTrue: [
+			aBlock value: each
+		]
+	]
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> shadowMapCameraLayers [
+	^ shadowMapCameraLayers
 ]
 
 { #category : #testing }
