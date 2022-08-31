@@ -5,7 +5,7 @@ The minimalistic scene graph and associated renderer component be loaded in a st
 ```smalltalk
 Metacello new
    baseline: 'WodenSceneGraph';
-   repository: 'github://ronsaldo/woden-core-scene-graph';
+   repository: 'github://desromech/woden-core-scene-graph';
    onConflictUseIncoming;
    load
 ```
