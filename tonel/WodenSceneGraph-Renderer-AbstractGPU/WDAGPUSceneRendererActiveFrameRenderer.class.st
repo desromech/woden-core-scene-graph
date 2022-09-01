@@ -271,7 +271,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidM
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache duplicatedMetallicRoughnessLiquidFragmentShader entryPoint: 'main';
+		setFragmentStage: (material hasAlphaBlending
+			ifTrue: [ renderer resourceCache duplicatedMetallicRoughnessLiquidTranslucentFragmentShader ]
+			ifFalse: [renderer resourceCache duplicatedMetallicRoughnessLiquidOpaqueFragmentShader]) entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -297,7 +299,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache environmentMapFragmentShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache environmentMapOpaqueFragmentShader entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -326,7 +328,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivatio
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache metallicRoughnessFragmentShader entryPoint: 'main';
+		setFragmentStage: (material hasAlphaBlending
+			ifTrue: [ renderer resourceCache metallicRoughnessTranslucentFragmentShader ]
+			ifFalse: [renderer resourceCache metallicRoughnessOpaqueFragmentShader]) entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -372,7 +376,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache unlitFragmentShader entryPoint: 'main';
+		setFragmentStage: (material hasAlphaBlending
+			ifTrue: [ renderer resourceCache unlitTranslucentFragmentShader ]
+			ifFalse: [renderer resourceCache unlitOpaqueFragmentShader]) entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).

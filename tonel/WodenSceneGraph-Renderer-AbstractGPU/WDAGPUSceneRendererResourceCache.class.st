@@ -39,10 +39,6 @@ Class {
 		'lightStateBuffer',
 		'tileLightIndexListBuffer',
 		'lightGridBuffer',
-		'duplicatedMetallicRoughnessLiquidFragmentShader',
-		'environmentMapFragmentShader',
-		'metallicRoughnessFragmentShader',
-		'unlitFragmentShader',
 		'uploadBuffer',
 		'lightClusterBuffer',
 		'lightGridComputationShader',
@@ -55,7 +51,15 @@ Class {
 		'shadowMapRenderPass',
 		'emptyLightingStateBinding',
 		'genericDepthOnlySurfaceFragmentShader',
-		'shadowMapAtlasTextureSamplingView'
+		'shadowMapAtlasTextureSamplingView',
+		'metallicRoughnessOpaqueFragmentShader',
+		'metallicRoughnessTranslucentFragmentShader',
+		'duplicatedMetallicRoughnessLiquidOpaqueFragmentShader',
+		'duplicatedMetallicRoughnessLiquidTranslucentFragmentShader',
+		'unlitOpaqueFragmentShader',
+		'unlitTranslucentFragmentShader',
+		'environmentMapOpaqueFragmentShader',
+		'environmentMapTranslucentFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -356,16 +360,11 @@ WDAGPUSceneRendererResourceCache >> device [
 	^ device
 ]
 
-{ #category : #initialization }
-WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShader [
-	^ duplicatedMetallicRoughnessLiquidFragmentShader
-]
-
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , self fragmentShaderOutputs , '
 #line 6
 
 void main()
@@ -413,7 +412,7 @@ void main()
 	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
 	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
 	
-	FragmentOutputColor = performLightingModelComputation(lightingParameters);
+	FragmentOutputColor = performLightingModelComputation(lightingParameters, FragmentOutputNormal, FragmentOutputSpecularity);
 }
 '
 ]
@@ -452,14 +451,19 @@ layout(set=4, binding=5) uniform texture2D MetallicRoughnessTexture;
 '
 ]
 
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidOpaqueFragmentShader [
+	^ duplicatedMetallicRoughnessLiquidOpaqueFragmentShader
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidTranslucentFragmentShader [
+	^ duplicatedMetallicRoughnessLiquidTranslucentFragmentShader
+]
+
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> emptyLightingStateBinding [
 	^ emptyLightingStateBinding
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> environmentMapFragmentShader [
-	^ environmentMapFragmentShader
 ]
 
 { #category : #'private shaders' }
@@ -492,6 +496,16 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 
 layout(set=4, binding=1) uniform textureCube ColorTexture;
 '
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> environmentMapOpaqueFragmentShader [
+	^ environmentMapOpaqueFragmentShader
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> environmentMapTranslucentFragmentShader [
+	^ environmentMapTranslucentFragmentShader
 ]
 
 { #category : #'private shaders' }
@@ -544,6 +558,8 @@ void main()
 WDAGPUSceneRendererResourceCache >> fragmentShaderOutputs [
 	^ '
 layout(location=0) out vec4 FragmentOutputColor;
+layout(location=1) out vec2 FragmentOutputNormal;
+layout(location=2) out vec4 FragmentOutputSpecularity;
 '
 ]
 
@@ -760,10 +776,13 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	genericSurfaceMaterialVertexShaders := Dictionary new.
 	genericDepthOnlySurfaceFragmentShader := self compileShader: self genericDepthOnlySurfaceFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	
-	metallicRoughnessFragmentShader := self compileShader: self metallicRoughnessFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	unlitFragmentShader := self compileShader: self unlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	environmentMapFragmentShader  := self compileShader: self environmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	duplicatedMetallicRoughnessLiquidFragmentShader := self compileShader: self duplicatedMetallicRoughnessLiquidFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	metallicRoughnessOpaqueFragmentShader := self compileShader: (self metallicRoughnessFragmentShaderSourceForOpaquePass: true) type: AGPU_FRAGMENT_SHADER.
+	metallicRoughnessTranslucentFragmentShader := self compileShader: (self metallicRoughnessFragmentShaderSourceForOpaquePass: false) type: AGPU_FRAGMENT_SHADER.
+
+	unlitOpaqueFragmentShader := self compileShader: self unlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	environmentMapOpaqueFragmentShader  := self compileShader: self environmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	duplicatedMetallicRoughnessLiquidOpaqueFragmentShader := self compileShader: self duplicatedMetallicRoughnessLiquidFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+
 	screenQuadVertexShader := textureUploader utilityResourceCache screenQuadVertexShader.
 	defaultMaterial := WDMetallicRoughnessMaterial default.
 	projectionNDCAdjustMatrix :=
@@ -1137,16 +1156,11 @@ void main()
 '
 ]
 
-{ #category : #initialization }
-WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShader [
-	^ metallicRoughnessFragmentShader
-]
-
 { #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShaderSource [
+WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , self fragmentShaderOutputs , '
 #line 6
 
 void main()
@@ -1178,14 +1192,14 @@ void main()
 	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
 	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
 	
-	FragmentOutputColor = performLightingModelComputation(lightingParameters);
+	FragmentOutputColor = performLightingModelComputation(lightingParameters, FragmentOutputNormal, FragmentOutputSpecularity);
 }
 '
 ]
 
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessLightingModel [
-^ self lightingStateBlockSource , self fragmentShaderOutputs , self shadowMappingSamplingSource , '
+^ self lightingStateBlockSource , self shadowMappingSamplingSource , '
 #line 4
 const float DistanceEpsilon = 0.00001;
 
@@ -1281,12 +1295,15 @@ uint computeLightTileIndexForCurrentScreenCoordinateWithLinearDepth(float depth)
 	return gridCoordinate.x + gridCoordinate.y * gridExtent.x + gridCoordinate.z*gridExtent.x*gridExtent.y;
 }
 
-vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParameters)
+vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParameters, out vec2 gbufferNormal, out vec4 gbufferSpecularity)
 {
 	vec3 dielectricF0 = vec3(0.04);
 	vec3 Cdiffuse = mix(surfaceParameters.baseColor.rgb * (1.0 - dielectricF0), vec3(0.0), surfaceParameters.metallicFactor);
 	vec3 diffuse = Cdiffuse * PiReciprocal;
 	vec3 F0 = mix(dielectricF0, surfaceParameters.baseColor.rgb, surfaceParameters.metallicFactor);
+	
+	gbufferNormal = surfaceParameters.N.xy;
+	gbufferSpecularity = vec4(F0*surfaceParameters.occlusionFactor, surfaceParameters.roughnessFactor);
 
 	float directRoughness = mix(0.01, 1.0, surfaceParameters.roughnessFactor);
 	float directAlpha = directRoughness*directRoughness;
@@ -1412,6 +1429,16 @@ layout(set=4, binding=3) uniform texture2D NormalTexture;
 layout(set=4, binding=4) uniform texture2D OcclusionTexture;
 layout(set=4, binding=5) uniform texture2D MetallicRoughnessTexture;
 '
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> metallicRoughnessOpaqueFragmentShader [
+	^ metallicRoughnessOpaqueFragmentShader
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> metallicRoughnessTranslucentFragmentShader [
+	^ metallicRoughnessTranslucentFragmentShader
 ]
 
 { #category : #accessing }
@@ -1684,11 +1711,6 @@ void main()
 '
 ]
 
-{ #category : #initialization }
-WDAGPUSceneRendererResourceCache >> unlitFragmentShader [
-	^ unlitFragmentShader
-]
-
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> unlitFragmentShaderSource [
 	^ '
@@ -1706,6 +1728,8 @@ void main()
 		discard;
 		
 	FragmentOutputColor = color;
+	FragmentOutputNormal = vec2(0.0);
+	FragmentOutputSpecularity = vec4(0.0);
 }
 '
 ]
@@ -1726,6 +1750,16 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 
 layout(set=4, binding=1) uniform texture2D ColorTexture;
 '
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> unlitOpaqueFragmentShader [
+	^ unlitOpaqueFragmentShader
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> unlitTranslucentFragmentShader [
+	^ unlitTranslucentFragmentShader
 ]
 
 { #category : #accessing }
