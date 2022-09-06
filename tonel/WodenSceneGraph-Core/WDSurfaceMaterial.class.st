@@ -97,6 +97,11 @@ WDSurfaceMaterial >> hasDepthTesting [
 	^ xray not
 ]
 
+{ #category : #testing }
+WDSurfaceMaterial >> hasOpaqueRendering [
+	^ self hasAlphaBlending not
+]
+
 { #category : #initialization }
 WDSurfaceMaterial >> initialize [
 	super initialize.

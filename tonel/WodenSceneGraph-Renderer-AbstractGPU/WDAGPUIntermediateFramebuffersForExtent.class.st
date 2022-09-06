@@ -8,7 +8,10 @@ Class {
 		'initialDepth',
 		'depthStencilBuffer',
 		'colorBufferTexture',
-		'hdrFramebuffer'
+		'normalGBufferTexture',
+		'specularGBufferTexture',
+		'hdrTranslucentFramebuffer',
+		'hdrOpaqueFramebuffer'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -49,7 +52,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format [
 
 { #category : #initialization }
 WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
-	| viewDesc colorBufferAttachmentView depthStencilBufferView |
+	| viewDesc colorBufferAttachmentView normalGBufferAttachmentView specularGBufferAttachmentView depthStencilBufferView |
 	colorBufferTexture := device createTexture: (AGPUTextureDescription new
 		type: AGPU_TEXTURE_2D;
 		width: extent x;
@@ -62,11 +65,47 @@ WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
 		sample_count: sampleCount;
 		yourself).
+
+	normalGBufferTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: extent x;
+		height: extent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R16G16_SNORM;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: sampleCount;
+		yourself).
+
+	specularGBufferTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: extent x;
+		height: extent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: sampleCount;
+		yourself).
 		
 	viewDesc := AGPUTextureViewDescription new.
 	colorBufferTexture getFullViewDescription: viewDesc.
 	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
 	colorBufferAttachmentView := colorBufferTexture createView: viewDesc.
+
+	viewDesc := AGPUTextureViewDescription new.
+	normalGBufferTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	normalGBufferAttachmentView := normalGBufferTexture createView: viewDesc.
+
+	viewDesc := AGPUTextureViewDescription new.
+	specularGBufferTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	specularGBufferAttachmentView := specularGBufferTexture createView: viewDesc.
 	
 	viewDesc := AGPUTextureViewDescription new.
 	depthStencilBuffer getFullViewDescription: viewDesc.
@@ -74,7 +113,10 @@ WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 		(viewDesc usage_mode bitAnd: (AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_STENCIL_ATTACHMENT)).
 	depthStencilBufferView := depthStencilBuffer createView: viewDesc.
 	
-	hdrFramebuffer := device createFrameBuffer: extent x height: extent y
+	hdrOpaqueFramebuffer := device createFrameBuffer: extent x height: extent y
+		colorCount: 3 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView . normalGBufferAttachmentView . specularGBufferAttachmentView})
+		depthStencilView: depthStencilBufferView.
+	hdrTranslucentFramebuffer := device createFrameBuffer: extent x height: extent y
 		colorCount: 1 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView})
 		depthStencilView: depthStencilBufferView
 ]
@@ -91,14 +133,19 @@ WDAGPUIntermediateFramebuffersForExtent >> extent [
 	^ extent
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> hdrColorBufferTexture [
 	^ colorBufferTexture
 ]
 
 { #category : #accessing }
-WDAGPUIntermediateFramebuffersForExtent >> hdrFramebuffer [
-	^ hdrFramebuffer
+WDAGPUIntermediateFramebuffersForExtent >> hdrOpaqueFramebuffer [
+	^ hdrOpaqueFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> hdrTranslucentFramebuffer [
+	^ hdrTranslucentFramebuffer
 ]
 
 { #category : #accessing }
@@ -118,6 +165,16 @@ WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourc
 ]
 
 { #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> normalGBufferTexture [
+	^ normalGBufferTexture
+]
+
+{ #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> sampleCount [
 	^ sampleCount
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> specularGBufferTexture [
+	^ specularGBufferTexture
 ]

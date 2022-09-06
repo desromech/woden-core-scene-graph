@@ -95,6 +95,11 @@ WDMaterial >> hasDepthTesting [
 	^ true
 ]
 
+{ #category : #testing }
+WDMaterial >> hasOpaqueRendering [
+	^ true
+]
+
 { #category : #serialization }
 WDMaterial >> loadFromJson: jsonData [
 	name := jsonData at: #name ifAbsent: [ name ].

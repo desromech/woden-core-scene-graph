@@ -73,7 +73,7 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 			shadowCastingLightSource: eachLight;
 			cameraState: eachLight shadowMappingCameraState.
 		self addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: shadowMapCameraLayer.
-		shadowMapCameraLayer renderingObjects ifEmpty: [
+		shadowMapCameraLayer opaqueRenderingObjects ifEmpty: [
 			eachLight castShadows: false
 		] ifNotEmpty: [ 
 			result addShadowMapCameraLayer: shadowMapCameraLayer

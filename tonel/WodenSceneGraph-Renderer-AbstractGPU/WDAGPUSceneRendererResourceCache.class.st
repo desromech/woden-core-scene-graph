@@ -59,7 +59,11 @@ Class {
 		'unlitOpaqueFragmentShader',
 		'unlitTranslucentFragmentShader',
 		'environmentMapOpaqueFragmentShader',
-		'environmentMapTranslucentFragmentShader'
+		'environmentMapTranslucentFragmentShader',
+		'metallicRoughnessDepthOnlyFragmentShader',
+		'unlitDepthOnlyFragmentShader',
+		'duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader',
+		'environmentMapDepthOnlyFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -360,11 +364,41 @@ WDAGPUSceneRendererResourceCache >> device [
 	^ device
 ]
 
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader [
+	^ duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader
+]
+
 { #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShaderSource [
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , self fragmentShaderOutputs , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self duplicatedMetallicRoughnessLiquidMaterialStateSource , '
+#line 6
+
+void main()
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+
+	vec2 texcoord1 = StageInput.texcoord0;
+	texcoord1 = texcoord1*MaterialState.duplicatedTexcoordScale + MaterialState.duplicatedTexcoordOffset + MaterialState.duplicatedTexcoordOffsetVelocity*CameraState.currentTime;
+	
+	vec4 baseColor = StageInput.color * MaterialState.baseColorFactor *
+		mix(texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0),
+			texture(sampler2D(BaseColorTexture, TextureSampler), texcoord1),
+			MaterialState.mixAlpha);
+	if(baseColor.a < MaterialState.alphaCutoff)
+		discard;
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShaderSourceForOpaquePass: isOpaquePass [
+	^ '
+#version 450
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass) , '
 #line 6
 
 void main()
@@ -412,6 +446,7 @@ void main()
 	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
 	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
 	
+	DefineRenderPassDummyOutputs();
 	FragmentOutputColor = performLightingModelComputation(lightingParameters, FragmentOutputNormal, FragmentOutputSpecularity);
 }
 '
@@ -466,11 +501,32 @@ WDAGPUSceneRendererResourceCache >> emptyLightingStateBinding [
 	^ emptyLightingStateBinding
 ]
 
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> environmentMapDepthOnlyFragmentShader [
+	^ environmentMapDepthOnlyFragmentShader
+]
+
 { #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> environmentMapFragmentShaderSource [
+WDAGPUSceneRendererResourceCache >> environmentMapDepthOnlyFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self cameraStateBlockSource , self genericSurfaceMaterialFragmentShaderInputs, self fragmentShaderOutputs, self environmentMapMaterialStateSource , '
+' , self samplerStateSource, self cameraStateBlockSource , self genericSurfaceMaterialFragmentShaderInputs, self environmentMapMaterialStateSource , '
+#line 6
+
+void main()
+{ 
+	vec4 color = StageInput.color * MaterialState.colorFactor * texture(samplerCube(ColorTexture, TextureSampler), StageInput.worldPosition - CameraState.transformationMatrix[3].xyz);
+	if(color.a < MaterialState.alphaCutoff)
+		discard;
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> environmentMapFragmentShaderSourceForOpaquePass: isOpaquePass [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , self genericSurfaceMaterialFragmentShaderInputs, (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass), self environmentMapMaterialStateSource , '
 #line 6
 
 void main()
@@ -479,7 +535,10 @@ void main()
 	if(color.a < MaterialState.alphaCutoff)
 		discard;
 		
+	DefineRenderPassDummyOutputs();
 	FragmentOutputColor = color;
+	FragmentOutputNormal = vec2(0.0);
+	FragmentOutputSpecularity = vec4(0.0);
 }
 '
 ]
@@ -551,15 +610,6 @@ void main()
 	vec3 ldrColor = filmicCurve(hdrColor);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
 }
-'
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> fragmentShaderOutputs [
-	^ '
-layout(location=0) out vec4 FragmentOutputColor;
-layout(location=1) out vec2 FragmentOutputNormal;
-layout(location=2) out vec4 FragmentOutputSpecularity;
 '
 ]
 
@@ -693,19 +743,38 @@ WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocati
 ]
 
 { #category : #initialization }
-WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: keepBegin [
-	^ renderPasses at: {#hdrRenderPass . sampleCount . initialDepth . keepBegin} ifAbsentPut: [
-		| colorAttachment depthStencilAttachment |
+WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: keepBegin [
+	^ renderPasses at: {#hdrOpaqueRenderPass . sampleCount . initialDepth . keepBegin} ifAbsentPut: [
+		| depthStencilAttachment colorAttachmentDescriptionsPointer |
 		[
-			| renderpassDescription |
-			colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
-			colorAttachment
+			| colorAttachmentDescriptions allAttachmentsDescriptionsData renderpassDescription |
+			colorAttachmentDescriptions := {
+			AGPURenderpassColorAttachmentDescription new
 				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
 				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
 				clear_value: AGPUColor4f new;
-				sample_quality: 0.
+				sample_quality: 0;
+				yourself.
+			AGPURenderpassColorAttachmentDescription new
+				format: AGPU_TEXTURE_FORMAT_R16G16_SNORM;
+				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
+				sample_quality: 0;
+				yourself.
+			AGPURenderpassColorAttachmentDescription new
+				format: AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM;
+				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
+				sample_quality: 0;
+				yourself
+			}.
+				
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
 				format: depthFormat;
 				sample_count: sampleCount;
@@ -714,6 +783,50 @@ WDAGPUSceneRendererResourceCache >> hdrRenderPassWithSampleCount: sampleCount in
 				clear_value: (AGPUDepthStencilValue new
 					depth: initialDepth;
 					yourself);
+				yourself.
+				
+			allAttachmentsDescriptionsData := ByteArray streamContents: [ :out |
+				colorAttachmentDescriptions do: [ :each |
+					out nextPutAll: each getHandle
+				]
+			].
+		
+			colorAttachmentDescriptionsPointer := ExternalAddress allocate: allAttachmentsDescriptionsData size.
+			colorAttachmentDescriptionsPointer replaceFrom: 1 to: allAttachmentsDescriptionsData size with: allAttachmentsDescriptionsData startingAt: 1.
+				
+			renderpassDescription := AGPURenderpassDescription new.
+			renderpassDescription
+				color_attachment_count: 3;
+				color_attachments: (AGPURenderpassColorAttachmentDescription fromHandle: colorAttachmentDescriptionsPointer);
+				depth_stencil_attachment: depthStencilAttachment.
+			device createRenderPass: renderpassDescription
+		] ensure: [
+			colorAttachmentDescriptionsPointer ifNotNil: [ colorAttachmentDescriptionsPointer free ].
+			depthStencilAttachment ifNotNil: [depthStencilAttachment free].
+		]
+	].
+
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> hdrTranslucentRenderPassWithSampleCount: sampleCount [
+	^ renderPasses at: {#hdrTranslucentRenderPass . sampleCount} ifAbsentPut: [
+		| colorAttachment depthStencilAttachment |
+		[
+			| renderpassDescription |
+			colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
+			colorAttachment
+				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+				begin_action: AGPU_ATTACHMENT_KEEP;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
+				sample_quality: 0.
+			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
+				format: depthFormat;
+				sample_count: sampleCount;
+				begin_action: AGPU_ATTACHMENT_KEEP;
+				end_action: AGPU_ATTACHMENT_KEEP;
 				yourself.
 			renderpassDescription := AGPURenderpassDescription new.
 			renderpassDescription
@@ -778,10 +891,19 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	
 	metallicRoughnessOpaqueFragmentShader := self compileShader: (self metallicRoughnessFragmentShaderSourceForOpaquePass: true) type: AGPU_FRAGMENT_SHADER.
 	metallicRoughnessTranslucentFragmentShader := self compileShader: (self metallicRoughnessFragmentShaderSourceForOpaquePass: false) type: AGPU_FRAGMENT_SHADER.
+	metallicRoughnessDepthOnlyFragmentShader := self compileShader: self metallicRoughnessDepthOnlyFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 
-	unlitOpaqueFragmentShader := self compileShader: self unlitFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	environmentMapOpaqueFragmentShader  := self compileShader: self environmentMapFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
-	duplicatedMetallicRoughnessLiquidOpaqueFragmentShader := self compileShader: self duplicatedMetallicRoughnessLiquidFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	unlitOpaqueFragmentShader := self compileShader: (self unlitFragmentShaderSourceForOpaquePass: true) type: AGPU_FRAGMENT_SHADER.
+	unlitTranslucentFragmentShader := self compileShader: (self unlitFragmentShaderSourceForOpaquePass: false) type: AGPU_FRAGMENT_SHADER.
+	unlitDepthOnlyFragmentShader := self compileShader: self unlitDepthOnlyFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+
+	environmentMapOpaqueFragmentShader := self compileShader: (self environmentMapFragmentShaderSourceForOpaquePass: true) type: AGPU_FRAGMENT_SHADER.
+	environmentMapTranslucentFragmentShader := self compileShader: (self environmentMapFragmentShaderSourceForOpaquePass: false) type: AGPU_FRAGMENT_SHADER.
+	environmentMapDepthOnlyFragmentShader := self compileShader: self environmentMapDepthOnlyFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+
+	duplicatedMetallicRoughnessLiquidOpaqueFragmentShader := self compileShader: (self duplicatedMetallicRoughnessLiquidFragmentShaderSourceForOpaquePass: true) type: AGPU_FRAGMENT_SHADER.
+	duplicatedMetallicRoughnessLiquidTranslucentFragmentShader := self compileShader: (self duplicatedMetallicRoughnessLiquidFragmentShaderSourceForOpaquePass: false) type: AGPU_FRAGMENT_SHADER.
+	duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader := self compileShader: self duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 
 	screenQuadVertexShader := textureUploader utilityResourceCache screenQuadVertexShader.
 	defaultMaterial := WDMetallicRoughnessMaterial default.
@@ -1156,11 +1278,35 @@ void main()
 '
 ]
 
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> metallicRoughnessDepthOnlyFragmentShader [
+	^ metallicRoughnessDepthOnlyFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> metallicRoughnessDepthOnlyFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessMaterialStateSource ,'
+#line 6
+
+void main()
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+
+	vec4 baseColor = StageInput.color * MaterialState.baseColorFactor * texture(sampler2D(BaseColorTexture, TextureSampler), texcoord0);
+	if(baseColor.a < MaterialState.alphaCutoff)
+		discard;
+}
+'
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , self fragmentShaderOutputs , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass) , '
 #line 6
 
 void main()
@@ -1192,6 +1338,7 @@ void main()
 	lightingParameters.roughnessFactor = roughnessMetallicFactor.x;
 	lightingParameters.metallicFactor = roughnessMetallicFactor.y;
 	
+	DefineRenderPassDummyOutputs();
 	FragmentOutputColor = performLightingModelComputation(lightingParameters, FragmentOutputNormal, FragmentOutputSpecularity);
 }
 '
@@ -1497,6 +1644,36 @@ void main()
 '
 ]
 
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> renderFragmentShaderOutputs [
+	^ '
+layout(location=0) out vec4 FragmentOutputColor;
+layout(location=1) out vec2 FragmentOutputNormal;
+layout(location=2) out vec4 FragmentOutputSpecularity;
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> renderFragmentShaderOutputsForOpaquePass: isOpaquePass [
+	^ isOpaquePass ifTrue: [
+'
+layout(location=0) out vec4 FragmentOutputColor;
+layout(location=1) out vec2 FragmentOutputNormal;
+layout(location=2) out vec4 FragmentOutputSpecularity;
+#define DefineRenderPassDummyOutputs()
+
+'
+] ifFalse: [ 
+'
+layout(location=0) out vec4 FragmentOutputColor;
+#define DefineRenderPassDummyOutputs() \
+vec2 FragmentOutputNormal; \
+vec4 FragmentOutputSpecularity;
+
+'
+]
+]
+
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> rendererShaderSignature [
 	^ rendererShaderSignature
@@ -1711,11 +1888,35 @@ void main()
 '
 ]
 
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> unlitDepthOnlyFragmentShader [
+	^ unlitDepthOnlyFragmentShader
+]
+
 { #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> unlitFragmentShaderSource [
+WDAGPUSceneRendererResourceCache >> unlitDepthOnlyFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self fragmentShaderOutputs, self unlitMaterialStateSource , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self unlitMaterialStateSource , '
+#line 6
+
+void main()
+{
+	vec2 texcoord0 = StageInput.texcoord0;
+	texcoord0 = texcoord0*MaterialState.texcoordScale + MaterialState.texcoordOffset + MaterialState.texcoordOffsetVelocity*CameraState.currentTime;
+	
+	vec4 color = StageInput.color * MaterialState.colorFactor * texture(sampler2D(ColorTexture, TextureSampler), texcoord0);
+	if(color.a < MaterialState.alphaCutoff)
+		discard;
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> unlitFragmentShaderSourceForOpaquePass: isOpaquePass [
+	^ '
+#version 450
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass), self unlitMaterialStateSource , '
 #line 6
 
 void main()
@@ -1727,6 +1928,7 @@ void main()
 	if(color.a < MaterialState.alphaCutoff)
 		discard;
 		
+	DefineRenderPassDummyOutputs();
 	FragmentOutputColor = color;
 	FragmentOutputNormal = vec2(0.0);
 	FragmentOutputSpecularity = vec4(0.0);

@@ -9,13 +9,14 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'cameraState',
-		'renderingObjects',
 		'globalLightingState',
 		'lights',
 		'usesFrustumCulling',
 		'isShadowMap',
 		'shadowMapCameraLayers',
-		'shadowCastingLightSource'
+		'shadowCastingLightSource',
+		'opaqueRenderingObjects',
+		'translucentRenderingObjects'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -35,16 +36,32 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: mat
 	self addMeshPrimitive: meshPrimitive
 		withPriority: (material ifNil: [ WDRenderPriority default ]
 			ifNotNil: [material renderPriority])
+		opaque: (material ifNil: [ true ] ifNotNil: [material hasOpaqueRendering])
 		objectState: anObjectState
 ]
 
 { #category : #adding }
-WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority objectState: anObjectState [
-	renderingObjects add: (WDRenderingSceneObject new
-		priority: renderPriority;
-		objectState: anObjectState;
-		renderable: meshPrimitive;
-		yourself)
+WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority opaque: isOpaque objectState: anObjectState [
+	isOpaque ifTrue: [ 
+		self addOpaqueRenderingSceneObject: (WDRenderingSceneObject new
+			priority: renderPriority;
+			objectState: anObjectState;
+			renderable: meshPrimitive;
+			yourself)
+	] ifFalse: [ 
+		self addTranslucentRenderingSceneObject: (WDRenderingSceneObject new
+			priority: renderPriority;
+			objectState: anObjectState;
+			renderable: meshPrimitive;
+			yourself)
+	].
+
+]
+
+{ #category : #adding }
+WDRenderingSceneCameraLayer >> addOpaqueRenderingSceneObject: renderingSceneObject [
+	opaqueRenderingObjects add: renderingSceneObject
+	
 ]
 
 { #category : #adding }
@@ -55,6 +72,14 @@ WDRenderingSceneCameraLayer >> addRenderable: renderable withObjectState: anObje
 { #category : #adding }
 WDRenderingSceneCameraLayer >> addShadowMapCameraLayer: aCameraLayer [
 	shadowMapCameraLayers add: aCameraLayer
+]
+
+{ #category : #adding }
+WDRenderingSceneCameraLayer >> addTranslucentRenderingSceneObject: renderingSceneObject [
+	self isDepthOnly ifFalse: [ 
+		translucentRenderingObjects add: renderingSceneObject
+	]
+	
 ]
 
 { #category : #converting }
@@ -96,7 +121,8 @@ WDRenderingSceneCameraLayer >> initialize [
 	cameraState := WDCameraState new.
 	globalLightingState := WDGlobalLightingState new.
 	lights := OrderedCollection new.
-	renderingObjects := OrderedCollection new.
+	opaqueRenderingObjects := OrderedCollection new.
+	translucentRenderingObjects := OrderedCollection new.
 	shadowMapCameraLayers := OrderedCollection new.
 	usesFrustumCulling := true.
 	isShadowMap := false.
@@ -165,8 +191,8 @@ WDRenderingSceneCameraLayer >> lights [
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayer >> renderingObjects [
-	^ renderingObjects
+WDRenderingSceneCameraLayer >> opaqueRenderingObjects [
+	^ opaqueRenderingObjects
 ]
 
 { #category : #accessing }
@@ -219,6 +245,11 @@ WDRenderingSceneCameraLayer >> shouldRenderWorldSphereWithCenter: sphereCenter r
 	^ usesFrustumCulling
 		ifTrue: [ self cameraState worldFrustum intersectsOrContainsSphereWithCenter: sphereCenter radius: sphereRadius ]
 		ifFalse: [ true ]
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> translucentRenderingObjects [
+	^ translucentRenderingObjects
 ]
 
 { #category : #accessing }

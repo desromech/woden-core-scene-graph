@@ -112,7 +112,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowM
 
 	self bindCameraState: convertedCameraState.
 		
-	shadowMapCameraLayer renderingObjects do: [ :each |
+	shadowMapCameraLayer opaqueRenderingObjects do: [ :each |
 		self recordCommandsForRenderingObject: each
 	].
 
@@ -237,7 +237,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState fra
 { #category : #material }
 WDAGPUSceneRendererActiveFrameRenderer >> emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material [
 	| locationMask |
-	material hasAlphaBlending ifTrue: [ ^ false ].
+	material hasOpaqueRendering ifFalse: [ ^ false ].
 	locationMask := currentObjectVertexBinding locationMask bitAnd: renderer resourceCache depthOnlyVertexAttributesForMask.
 	
 	stateTracker
@@ -271,9 +271,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidM
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
-		setFragmentStage: (material hasAlphaBlending
-			ifTrue: [ renderer resourceCache duplicatedMetallicRoughnessLiquidTranslucentFragmentShader ]
-			ifFalse: [renderer resourceCache duplicatedMetallicRoughnessLiquidOpaqueFragmentShader]) entryPoint: 'main';
+		setFragmentStage: (isInDepthOnlyPass
+			ifTrue: [ renderer resourceCache duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader ]
+			ifFalse: [ material hasAlphaBlending
+				ifTrue: [ renderer resourceCache duplicatedMetallicRoughnessLiquidTranslucentFragmentShader ]
+				ifFalse: [renderer resourceCache duplicatedMetallicRoughnessLiquidOpaqueFragmentShader]]) entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -299,7 +301,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache environmentMapOpaqueFragmentShader entryPoint: 'main';
+		setFragmentStage: (isInDepthOnlyPass
+			ifTrue: [ renderer resourceCache environmentMapDepthOnlyFragmentShaderSource ]
+			ifFalse: [ material hasAlphaBlending
+				ifTrue: [ renderer resourceCache environmentMapTranslucentFragmentShader ]
+				ifFalse: [ renderer resourceCache environmentMapOpaqueFragmentShader ]]) entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -328,9 +334,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivatio
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
-		setFragmentStage: (material hasAlphaBlending
-			ifTrue: [ renderer resourceCache metallicRoughnessTranslucentFragmentShader ]
-			ifFalse: [renderer resourceCache metallicRoughnessOpaqueFragmentShader]) entryPoint: 'main';
+		setFragmentStage: (isInDepthOnlyPass
+			ifTrue: [ renderer resourceCache metallicRoughnessDepthOnlyFragmentShader ]
+			ifFalse: [material hasAlphaBlending
+				ifTrue: [ renderer resourceCache metallicRoughnessTranslucentFragmentShader ]
+				ifFalse: [renderer resourceCache metallicRoughnessOpaqueFragmentShader]]) entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -376,9 +384,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 			binding
 		]) bindingHandle;
 		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
-		setFragmentStage: (material hasAlphaBlending
-			ifTrue: [ renderer resourceCache unlitTranslucentFragmentShader ]
-			ifFalse: [renderer resourceCache unlitOpaqueFragmentShader]) entryPoint: 'main';
+		setFragmentStage: (isInDepthOnlyPass
+			ifTrue: [ renderer resourceCache unlitDepthOnlyFragmentShaderSource ]
+			ifFalse: [ material hasAlphaBlending
+				ifTrue: [ renderer resourceCache unlitTranslucentFragmentShader ]
+				ifFalse: [ renderer resourceCache unlitOpaqueFragmentShader ]]) entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -521,7 +531,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	
 	stateTracker
 		resetGraphicsPipeline;
-		beginRenderPass: (renderer resourceCache hdrRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: isFirst not) framebuffer: intermediateFramebuffers hdrFramebuffer bundle_content: 0;
+		beginRenderPass: (renderer resourceCache hdrOpaqueRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: isFirst not) framebuffer: intermediateFramebuffers hdrOpaqueFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
@@ -538,8 +548,18 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		bindCameraState: convertedCameraState;
 		bindLightingState: convertedLightingState.
 		
-	cameraLayer renderingObjects do: [ :each |
+	cameraLayer opaqueRenderingObjects do: [ :each |
 		self recordCommandsForRenderingObject: each
+	].
+
+	cameraLayer translucentRenderingObjects ifNotEmpty: [ 
+		stateTracker
+			endRenderPass;
+			beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0.
+
+		cameraLayer translucentRenderingObjects do: [ :each |
+			self recordCommandsForRenderingObject: each
+		].
 	].
 
 	stateTracker endRenderPass.

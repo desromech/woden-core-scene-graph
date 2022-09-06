@@ -250,7 +250,7 @@ WDSceneExamples class >> examplePool [
 	"
 	| tilesMaterial concreteMaterial waterMaterial borderThickness |
 	tilesMaterial := WDSceneExamplesProceduralAssets uniqueInstance tileMaterial.
-	concreteMaterial := WDMetallicRoughnessMaterial new.
+	concreteMaterial := WDMetallicRoughnessMaterial default.
 	waterMaterial := WDSceneExamplesProceduralAssets uniqueInstance poolWaterMaterial.
 
 	borderThickness := 0.5.
@@ -342,6 +342,34 @@ WDSceneExamples class >> exampleShadowCastingSpotLight [
 			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
 
 			translateToX: -2.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+			generateTangentSpaceFrame;
+			mesh);
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorFactor: (Vector4 x: 1.0 y: 1.0 z: 1.0 w: 0.8);
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.1;
+				metallicFactor: 0.0;
+				alphaMode: #BLEND;
+				yourself);
+
+			translateToX: 2.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 0.25 z: 1.0;
 			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
 
 			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;

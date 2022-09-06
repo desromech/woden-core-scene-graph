@@ -30,12 +30,14 @@ WDRenderingSceneCameraLayerStateTest >> testAddRenderable [
 	objectState := WDRenderingObjectState new.
 
 	renderingScene := WDRenderingSceneCameraLayer new.
-	renderingScene renderingObjects isEmpty.
+	renderingScene opaqueRenderingObjects isEmpty.
+	renderingScene translucentRenderingObjects isEmpty.
 	
 	renderingScene addRenderable: renderable withObjectState: objectState.
 	
-	self assert: renderingScene renderingObjects size equals: 1.
-	renderingObject := renderingScene renderingObjects first.
+	self assert: renderingScene opaqueRenderingObjects size equals: 1.
+	self assert: renderingScene translucentRenderingObjects isEmpty.
+	renderingObject := renderingScene opaqueRenderingObjects first.
 	
 	self assert: renderingObject priority equals: WDRenderPriority default.
 	self assert: renderingObject renderable equals: renderable primitives first.
