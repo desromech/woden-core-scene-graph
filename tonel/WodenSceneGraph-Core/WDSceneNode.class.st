@@ -173,7 +173,8 @@ WDSceneNode >> orientation [
 
 { #category : #accessing }
 WDSceneNode >> orientation: anOrientation [
-	transform rotation: anOrientation
+	transform rotation: anOrientation.
+	self transformChanged
 ]
 
 { #category : #accessing }
@@ -183,7 +184,8 @@ WDSceneNode >> position [
 
 { #category : #accessing }
 WDSceneNode >> position: aPosition [
-	transform translation: aPosition
+	transform translation: aPosition.
+	self transformChanged
 ]
 
 { #category : #copying }
@@ -252,7 +254,8 @@ WDSceneNode >> scale [
 
 { #category : #accessing }
 WDSceneNode >> scale: aScale [
-	transform scale: aScale
+	transform scale: aScale.
+	self transformChanged
 ]
 
 { #category : #accessing }
@@ -263,7 +266,8 @@ WDSceneNode >> transform [
 
 { #category : #accessing }
 WDSceneNode >> transform: aTransform [
-	transform := aTransform asTRSTransform3D
+	transform := aTransform asTRSTransform3D.
+	self transformChanged
 ]
 
 { #category : #transforming }
