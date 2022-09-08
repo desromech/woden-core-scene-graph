@@ -527,11 +527,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
-	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState convertedLightingState |
+	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState convertedLightingState normalDepthFunction |
 	sampleCount := renderingSceneState sampleCount.
 	hasReverseDepth := renderingSceneState hasReverseDepth.
 	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
-	depthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
+	normalDepthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
+
+	depthFunction := normalDepthFunction.
 	intermediateFramebuffers := self validIntermediateFramebuffersFor: framebuffer
 		sampleCount: sampleCount
 		initialDepth: initialDepth.
@@ -553,14 +555,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	stateTracker
 		resetComputePipeline;
 		setShaderSignature: shaderSignature handle.
-	self
-		bindComputeCameraState: mainCameraState;
-		bindComputeLightingState: convertedLightingState.
-	self recordLightGridComputationCommands.
 
+	"Depth-only prepass."
 	stateTracker
 		resetGraphicsPipeline;
-		beginRenderPass: (renderer resourceCache hdrOpaqueRenderPassWithSampleCount: sampleCount initialDepth: initialDepth) framebuffer: intermediateFramebuffers hdrOpaqueFramebuffer bundle_content: 0;
+		beginRenderPass: (renderer resourceCache depthOnlyRenderPassWithSampleCount: sampleCount initialDepth: initialDepth) framebuffer: intermediateFramebuffers depthOnlyFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
@@ -571,15 +570,43 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	depthTestingEnabled := true.
 	depthWriteMask := true.
 	alphaBlendingEnabled := false.
+	isInDepthOnlyPass := true.
+
+	self
+		recordCommandsForRenderingOpaqueObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
+
+	stateTracker
+		endRenderPass.
+		
+	self
+		bindComputeCameraState: mainCameraState;
+		bindComputeLightingState: convertedLightingState.
+	self recordLightGridComputationCommands.
+
+	"Opaque render pass"
+	depthFunction := AGPU_EQUAL.
 	isInDepthOnlyPass := false.
+	stateTracker
+		beginRenderPass: (renderer resourceCache hdrOpaqueRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrOpaqueFramebuffer bundle_content: 0;
+		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setDepthState: true writeMask: true function: depthFunction.
 
 	self
 		bindLightingState: convertedLightingState;
 		recordCommandsForRenderingOpaqueObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
 		
+	stateTracker endRenderPass.
+		
+	"Translucent render pass."
+	depthTestingEnabled := true.
+	depthWriteMask := false.
+	depthFunction := normalDepthFunction.
 	stateTracker
-		endRenderPass;
-		beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0.
+		beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0;
+		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setDepthState: true writeMask: false function: depthFunction.
 	self recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
 	stateTracker endRenderPass.
 

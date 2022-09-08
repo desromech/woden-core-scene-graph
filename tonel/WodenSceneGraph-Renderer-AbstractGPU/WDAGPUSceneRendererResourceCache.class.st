@@ -352,6 +352,33 @@ WDAGPUSceneRendererResourceCache >> depthFormat [
 	^ depthFormat
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> depthOnlyRenderPassWithSampleCount: sampleCount initialDepth: initialDepth [
+	^ renderPasses at: {#depthOnlyRenderPassWithSampleCount . sampleCount . initialDepth} ifAbsentPut: [
+		| depthStencilAttachment |
+		[
+			| renderpassDescription |
+			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
+				format: depthFormat;
+				sample_count: sampleCount;
+				begin_action: AGPU_ATTACHMENT_CLEAR;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				clear_value: (AGPUDepthStencilValue new
+					depth: initialDepth;
+					yourself);
+				yourself.
+				
+			renderpassDescription := AGPURenderpassDescription new.
+			renderpassDescription
+				depth_stencil_attachment: depthStencilAttachment.
+			device createRenderPass: renderpassDescription
+		] ensure: [
+			depthStencilAttachment ifNotNil: [depthStencilAttachment free].
+		]
+	].
+
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> depthOnlyVertexAttributesForMask [
 	^ ((1 bitShift: 0)
@@ -740,6 +767,69 @@ WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocati
 	^ genericSurfaceMaterialVertexShaders at: mask ifAbsentPut: [
 		self compileShader: (self genericSurfaceMaterialVertexShaderSourceWithMask: mask) type: AGPU_VERTEX_SHADER
 	]
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCount [
+	^ renderPasses at: {#hdrOpaqueRenderPass . sampleCount} ifAbsentPut: [
+		| depthStencilAttachment colorAttachmentDescriptionsPointer |
+		[
+			| colorAttachmentDescriptions allAttachmentsDescriptionsData renderpassDescription |
+			colorAttachmentDescriptions := {
+			AGPURenderpassColorAttachmentDescription new
+				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+				begin_action: AGPU_ATTACHMENT_CLEAR;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
+				sample_quality: 0;
+				yourself.
+			AGPURenderpassColorAttachmentDescription new
+				format: AGPU_TEXTURE_FORMAT_R16G16_SNORM;
+				begin_action: AGPU_ATTACHMENT_CLEAR;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
+				sample_quality: 0;
+				yourself.
+			AGPURenderpassColorAttachmentDescription new
+				format: AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM;
+				begin_action: AGPU_ATTACHMENT_CLEAR;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
+				sample_quality: 0;
+				yourself
+			}.
+				
+			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
+				format: depthFormat;
+				sample_count: sampleCount;
+				begin_action: AGPU_ATTACHMENT_KEEP;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				yourself.
+				
+			allAttachmentsDescriptionsData := ByteArray streamContents: [ :out |
+				colorAttachmentDescriptions do: [ :each |
+					out nextPutAll: each getHandle
+				]
+			].
+		
+			colorAttachmentDescriptionsPointer := ExternalAddress allocate: allAttachmentsDescriptionsData size.
+			colorAttachmentDescriptionsPointer replaceFrom: 1 to: allAttachmentsDescriptionsData size with: allAttachmentsDescriptionsData startingAt: 1.
+				
+			renderpassDescription := AGPURenderpassDescription new.
+			renderpassDescription
+				color_attachment_count: 3;
+				color_attachments: (AGPURenderpassColorAttachmentDescription fromHandle: colorAttachmentDescriptionsPointer);
+				depth_stencil_attachment: depthStencilAttachment.
+			device createRenderPass: renderpassDescription
+		] ensure: [
+			colorAttachmentDescriptionsPointer ifNotNil: [ colorAttachmentDescriptionsPointer free ].
+			depthStencilAttachment ifNotNil: [depthStencilAttachment free].
+		]
+	].
+
 ]
 
 { #category : #initialization }
