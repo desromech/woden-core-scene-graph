@@ -62,7 +62,6 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	adjustedCameraState := self adjustBaseCameraState: baseCameraState.
 	result := WDRenderingSceneCameraLayer new.
 	result
-		globalLightingState: globalLightingState;
 		cameraState: adjustedCameraState.
 	self addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: result.
 	
@@ -87,6 +86,7 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 WDSceneLayer >> asRenderingSceneWithCameraState: baseCameraState [
 	^ WDRenderingScene new
 		mainCameraState: baseCameraState;
+		globalLightingState: WDGlobalLightingState defaultForInspector;
 		cameraLayers: { 
 			self asRenderingSceneCameraLayerWithCameraState: baseCameraState
 		};
@@ -98,24 +98,6 @@ WDSceneLayer >> asRenderingSceneWithCameraState: baseCameraState [
 { #category : #initialization }
 WDSceneLayer >> copiedIntoScene: aScene [
 	parent := aScene.
-]
-
-{ #category : #accessing }
-WDSceneLayer >> globalLightingState [
-
-	^ globalLightingState
-]
-
-{ #category : #accessing }
-WDSceneLayer >> globalLightingState: aWDGlobalLightingState [
-	self assert: aWDGlobalLightingState class == WDGlobalLightingState.
-	globalLightingState := aWDGlobalLightingState copy.
-]
-
-{ #category : #initialization }
-WDSceneLayer >> initialize [
-	super initialize.
-	globalLightingState := WDGlobalLightingState default
 ]
 
 { #category : #initialization }

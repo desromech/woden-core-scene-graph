@@ -16,6 +16,7 @@ Class {
 		'LightGridColumns',
 		'LightGridRows',
 		'LightGridSlices',
+		'MaxClusterLightCapacity',
 		'MaxLightCapacity'
 	],
 	#pools : [
@@ -27,6 +28,7 @@ Class {
 { #category : #initialization }
 WDAGPUSceneRenderer class >> initialize [
 	MaxLightCapacity := 1024.
+	MaxClusterLightCapacity := 1000.
 	LightGridRows := 9.
 	LightGridColumns := 16.
 	LightGridSlices := 24.
@@ -56,6 +58,11 @@ WDAGPUSceneRenderer class >> lightGridRows [
 { #category : #initialization }
 WDAGPUSceneRenderer class >> lightGridSlices [
 	^ LightGridSlices
+]
+
+{ #category : #initialization }
+WDAGPUSceneRenderer class >> maxClusterLightCapacity [
+	^ MaxClusterLightCapacity
 ]
 
 { #category : #initialization }

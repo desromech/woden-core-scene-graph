@@ -10,7 +10,8 @@ Class {
 		'backgroundLayer',
 		'normalLayer',
 		'foregroundLayer',
-		'updateBlock'
+		'updateBlock',
+		'globalLightingState'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
@@ -49,6 +50,7 @@ WDScene >> ambientLighting: anAmbientLightingFactor [
 WDScene >> asRenderingSceneWithCameraState: baseCameraState [
 	^ WDRenderingScene new
 		mainCameraState: baseCameraState;
+		globalLightingState: globalLightingState copy;
 		cameraLayers: { 
 			backgroundLayer asRenderingSceneCameraLayerWithCameraState: baseCameraState.
 			normalLayer asRenderingSceneCameraLayerWithCameraState: baseCameraState.
@@ -78,17 +80,18 @@ WDScene >> foregroundLayer [
 
 { #category : #accessing }
 WDScene >> globalLightingState [
-	^ normalLayer globalLightingState
+	^ globalLightingState
 ]
 
 { #category : #accessing }
 WDScene >> globalLightingState: aGlobalLightingState [
-	normalLayer globalLightingState: aGlobalLightingState
+	globalLightingState := aGlobalLightingState
 ]
 
 { #category : #initialization }
 WDScene >> initialize [
 	super initialize.
+	globalLightingState := WDGlobalLightingState default.
 	backgroundLayer := WDBackgroundSceneLayer for: self.
 	normalLayer := WDNormalSceneLayer for: self.
 	foregroundLayer := WDForegroundSceneLayer for: self.

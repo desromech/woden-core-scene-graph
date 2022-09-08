@@ -455,7 +455,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> isInDepthOnlyPass [
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> makeLightingStateForRenderingSceneState: renderingSceneState [
-	^ renderingSceneState lightingStateInViewSpaceWithMaxNumberOfLights: WDAGPUSceneRenderer maxLightCapacity - 1
+	^ renderingSceneState lightingStateInViewSpaceWithMaxNumberOfLights: WDAGPUSceneRenderer maxLightCapacity
 ]
 
 { #category : #rendering }
@@ -479,6 +479,26 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderable: renderabl
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: renderingObject [
 	self bindObjectState: renderingObject objectState.
 	self recordCommandsForRenderable: renderingObject renderable
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingOpaqueObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
+	renderingSceneState cameraLayers reverseDo: [ :eachCameraLayer |
+		self bindCameraState: (self convertedCameraState: eachCameraLayer cameraState framebufferExtent: framebufferExtent).
+		eachCameraLayer opaqueRenderingObjects do: [ :each |
+			self recordCommandsForRenderingObject: each
+		]
+	]
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
+	renderingSceneState cameraLayers do: [ :eachCameraLayer |
+		self bindCameraState: (self convertedCameraState: eachCameraLayer cameraState framebufferExtent: framebufferExtent).
+		eachCameraLayer translucentRenderingObjects do: [ :each |
+			self recordCommandsForRenderingObject: each
+		]
+	]
 ]
 
 { #category : #rendering }
@@ -506,17 +526,26 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
 ]
 
 { #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState cameraLayer: cameraLayer isFirst: isFirst intoFramebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers [
-	| shaderSignature sampleCount hasReverseDepth initialDepth convertedCameraState convertedLightingState |
+WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
+	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState convertedLightingState |
 	sampleCount := renderingSceneState sampleCount.
 	hasReverseDepth := renderingSceneState hasReverseDepth.
 	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
-	shaderSignature := renderer resourceCache rendererShaderSignature.
 	depthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
-
-	convertedCameraState := self convertedCameraState: cameraLayer cameraState framebufferExtent: framebuffer extent.
-	convertedLightingState := self makeLightingStateForRenderingSceneState: cameraLayer.
+	intermediateFramebuffers := self validIntermediateFramebuffersFor: framebuffer
+		sampleCount: sampleCount
+		initialDepth: initialDepth.
+	shaderSignature := renderer resourceCache rendererShaderSignature.
 	
+	renderingSceneState cameraLayers do: [ :cameraLayer |
+		cameraLayer shadowMapCameraLayers do: [ :shadowMapCameraLayer |
+			self allocateAndRenderShadowMapFor: shadowMapCameraLayer
+		]
+	].
+
+	mainCameraState := self convertedCameraState: (renderingSceneState mainCameraState ifNil: [WDCameraState new]) framebufferExtent: framebuffer extent.
+
+	convertedLightingState := self makeLightingStateForRenderingSceneState: renderingSceneState.
 	convertedLightingState numberOfLights > 0 ifTrue: [ 
 		self uploadLightStates: convertedLightingState lights.
 	].
@@ -525,13 +554,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		resetComputePipeline;
 		setShaderSignature: shaderSignature handle.
 	self
-		bindComputeCameraState: convertedCameraState;
+		bindComputeCameraState: mainCameraState;
 		bindComputeLightingState: convertedLightingState.
 	self recordLightGridComputationCommands.
-	
+
 	stateTracker
 		resetGraphicsPipeline;
-		beginRenderPass: (renderer resourceCache hdrOpaqueRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: isFirst not) framebuffer: intermediateFramebuffers hdrOpaqueFramebuffer bundle_content: 0;
+		beginRenderPass: (renderer resourceCache hdrOpaqueRenderPassWithSampleCount: sampleCount initialDepth: initialDepth) framebuffer: intermediateFramebuffers hdrOpaqueFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
@@ -545,47 +574,14 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	isInDepthOnlyPass := false.
 
 	self
-		bindCameraState: convertedCameraState;
-		bindLightingState: convertedLightingState.
+		bindLightingState: convertedLightingState;
+		recordCommandsForRenderingOpaqueObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
 		
-	cameraLayer opaqueRenderingObjects do: [ :each |
-		self recordCommandsForRenderingObject: each
-	].
-
-	cameraLayer translucentRenderingObjects ifNotEmpty: [ 
-		stateTracker
-			endRenderPass;
-			beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0.
-
-		cameraLayer translucentRenderingObjects do: [ :each |
-			self recordCommandsForRenderingObject: each
-		].
-	].
-
+	stateTracker
+		endRenderPass;
+		beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0.
+	self recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
 	stateTracker endRenderPass.
-
-]
-
-{ #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
-	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState |
-	sampleCount := renderingSceneState sampleCount.
-	hasReverseDepth := renderingSceneState hasReverseDepth.
-	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
-	intermediateFramebuffers := self validIntermediateFramebuffersFor: framebuffer
-		sampleCount: sampleCount
-		initialDepth: initialDepth.
-	shaderSignature := renderer resourceCache rendererShaderSignature.
-	
-	renderingSceneState cameraLayers do: [ :cameraLayer |
-		cameraLayer shadowMapCameraLayers do: [ :shadowMapCameraLayer |
-			self allocateAndRenderShadowMapFor: shadowMapCameraLayer
-		]
-	].
-
-	renderingSceneState cameraLayers doWithIndex: [ :cameraLayer :index |
-		self recordRenderingCommandsFor: renderingSceneState cameraLayer: cameraLayer isFirst: index == 1 intoFramebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers
-	].
 
 	depthFunction := nil.
 	depthTestingEnabled := nil.
@@ -593,10 +589,6 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	alphaBlendingEnabled := nil.
 	
 	"For the exposure level."
-	mainCameraState := (renderingSceneState mainCameraState ifNil: [WDCameraState new]) copy
-		framebufferWidth: framebuffer width;
-		framebufferHeight: framebuffer height;
-		yourself.
 	outputFramebufferHandle := self validFramebufferFor: framebuffer.
 	stateTracker
 		resetGraphicsPipeline;
@@ -687,6 +679,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
 	].
 
 	uploadAllocation writeValue: WDLightState empty with: WDAGPULightStateUniformBufferWriter at: destOffset.
+	destOffset := destOffset + lightStateSize.
 	
 	stateTracker
 		pushBufferTransitionBarrier: renderer resourceCache lightStateBuffer old_usage: AGPU_STORAGE_BUFFER new_usage: AGPU_COPY_DESTINATION_BUFFER;

@@ -713,11 +713,11 @@ void main()
 
 #ifdef HAS_PER_VERTEX_NORMAL
 	StageOutput.worldNormal = transformNormalToWorld(inNormal);
-	StageOutput.normal = transformNormalToView(inNormal);
+	StageOutput.normal = transformNormalWorldToView(StageOutput.worldNormal);
 #	ifdef HAS_PER_VERTEX_TANGENT4
 	StageOutput.tangent4 = vec4(transformNormalToView(inTangent4.xyz), inTangent4.w);
 #	else
-	vec3 upVector = vec3(0.0, 1.0, 0.0);
+	vec3 upVector = abs(StageOutput.normal.y) > 0.9 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
 	StageOutput.tangent4 = vec4(cross(upVector, StageOutput.normal), 1.0);
 #	endif
 #else
@@ -743,15 +743,15 @@ WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocati
 ]
 
 { #category : #initialization }
-WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCount initialDepth: initialDepth keepBegin: keepBegin [
-	^ renderPasses at: {#hdrOpaqueRenderPass . sampleCount . initialDepth . keepBegin} ifAbsentPut: [
+WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCount initialDepth: initialDepth [
+	^ renderPasses at: {#hdrOpaqueRenderPass . sampleCount . initialDepth} ifAbsentPut: [
 		| depthStencilAttachment colorAttachmentDescriptionsPointer |
 		[
 			| colorAttachmentDescriptions allAttachmentsDescriptionsData renderpassDescription |
 			colorAttachmentDescriptions := {
 			AGPURenderpassColorAttachmentDescription new
 				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
-				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
+				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
 				clear_value: AGPUColor4f new;
@@ -759,7 +759,7 @@ WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCo
 				yourself.
 			AGPURenderpassColorAttachmentDescription new
 				format: AGPU_TEXTURE_FORMAT_R16G16_SNORM;
-				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
+				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
 				clear_value: AGPUColor4f new;
@@ -767,7 +767,7 @@ WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCo
 				yourself.
 			AGPURenderpassColorAttachmentDescription new
 				format: AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM;
-				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
+				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
 				clear_value: AGPUColor4f new;
@@ -778,7 +778,7 @@ WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCo
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
 				format: depthFormat;
 				sample_count: sampleCount;
-				begin_action: (keepBegin ifTrue: [AGPU_ATTACHMENT_KEEP] ifFalse: [AGPU_ATTACHMENT_CLEAR]);
+				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
 				clear_value: (AGPUDepthStencilValue new
 					depth: initialDepth;
@@ -860,8 +860,8 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 
 	computeScratchStorageBuffer := self createStorageBufferWithSize: 4096 usageModes: 0.
 	lightClusterBuffer := self createStorageBufferForElementSize: 32 capacity: WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
-	lightStateBuffer := self createStorageBufferFor: WDAGPULightStateUniformBufferWriter capacity: WDAGPUSceneRenderer maxLightCapacity usageModes: AGPU_COPY_DESTINATION_BUFFER.
-	tileLightIndexListBuffer := self createStorageBufferForElementSize: 4 capacity: WDAGPUSceneRenderer maxLightCapacity * WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
+	lightStateBuffer := self createStorageBufferFor: WDAGPULightStateUniformBufferWriter capacity: WDAGPUSceneRenderer maxLightCapacity + 1 usageModes: AGPU_COPY_DESTINATION_BUFFER.
+	tileLightIndexListBuffer := self createStorageBufferForElementSize: 4 capacity: WDAGPUSceneRenderer maxClusterLightCapacity * WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
 	lightGridBuffer := self createStorageBufferForElementSize: 8 capacity: WDAGPUSceneRenderer lightGridCellCount usageModes: 0.
 	
 	whiteTexture2D := self createTexture2DWithSingleColor: #[255 255 255 255].

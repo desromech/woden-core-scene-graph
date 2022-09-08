@@ -58,6 +58,7 @@ WDSceneTreeElement >> asRenderingSceneCameraLayerWithCameraState: baseCameraStat
 WDSceneTreeElement >> asRenderingSceneWithCameraState: baseCameraState [
 	^ WDRenderingScene new
 		mainCameraState: baseCameraState;
+		globalLightingState: WDGlobalLightingState defaultForInspector;
 		cameraLayers: { 
 			self asRenderingSceneCameraLayerWithCameraState: baseCameraState
 		};

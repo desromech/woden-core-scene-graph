@@ -11,7 +11,8 @@ Class {
 		'normalGBufferTexture',
 		'specularGBufferTexture',
 		'hdrTranslucentFramebuffer',
-		'hdrOpaqueFramebuffer'
+		'hdrOpaqueFramebuffer',
+		'depthOnlyFramebuffer'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -112,13 +113,21 @@ WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 	viewDesc usage_mode:
 		(viewDesc usage_mode bitAnd: (AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_STENCIL_ATTACHMENT)).
 	depthStencilBufferView := depthStencilBuffer createView: viewDesc.
-	
+
+	depthOnlyFramebuffer := device createFrameBuffer: extent x height: extent y
+		colorCount: 0 colorViews: nil
+		depthStencilView: depthStencilBufferView.	
 	hdrOpaqueFramebuffer := device createFrameBuffer: extent x height: extent y
 		colorCount: 3 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView . normalGBufferAttachmentView . specularGBufferAttachmentView})
 		depthStencilView: depthStencilBufferView.
 	hdrTranslucentFramebuffer := device createFrameBuffer: extent x height: extent y
 		colorCount: 1 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView})
 		depthStencilView: depthStencilBufferView
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> depthOnlyFramebuffer [
+	^ depthOnlyFramebuffer
 ]
 
 { #category : #accessing }

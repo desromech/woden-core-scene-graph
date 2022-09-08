@@ -9,7 +9,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'cameraState',
-		'globalLightingState',
 		'lights',
 		'usesFrustumCulling',
 		'isShadowMap',
@@ -100,17 +99,6 @@ WDRenderingSceneCameraLayer >> cameraState: anObject [
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayer >> globalLightingState [
-	^ globalLightingState
-]
-
-{ #category : #accessing }
-WDRenderingSceneCameraLayer >> globalLightingState: anObject [
-
-	globalLightingState := anObject
-]
-
-{ #category : #accessing }
 WDRenderingSceneCameraLayer >> hasReverseDepth [
 	^ cameraState hasReverseDepth
 ]
@@ -119,7 +107,6 @@ WDRenderingSceneCameraLayer >> hasReverseDepth [
 WDRenderingSceneCameraLayer >> initialize [
 	super initialize.
 	cameraState := WDCameraState new.
-	globalLightingState := WDGlobalLightingState new.
 	lights := OrderedCollection new.
 	opaqueRenderingObjects := OrderedCollection new.
 	translucentRenderingObjects := OrderedCollection new.
@@ -144,44 +131,6 @@ WDRenderingSceneCameraLayer >> isShadowMap [
 WDRenderingSceneCameraLayer >> isShadowMap: anObject [
 
 	isShadowMap := anObject
-]
-
-{ #category : #accessing }
-WDRenderingSceneCameraLayer >> lightingState [
-	^ WDLightingState new
-		globalLightingState: globalLightingState;
-		lights: lights asArray;
-		yourself.
-]
-
-{ #category : #accessing }
-WDRenderingSceneCameraLayer >> lightingStateInViewSpace [
-	| viewMatrix |
-	viewMatrix := cameraState inverseTransformationMatrix.
-	^ WDLightingState new
-		globalLightingState: globalLightingState;
-		lights: (lights collect: [ :each | each transformedWithMatrix: viewMatrix ]);
-		yourself.
-]
-
-{ #category : #accessing }
-WDRenderingSceneCameraLayer >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLights [
-	| viewMatrix |
-	viewMatrix := cameraState inverseTransformationMatrix.
-	^ WDLightingState new
-		globalLightingState: globalLightingState;
-		lights: ((lights first: (lights size min: maxNumberOfLights)) asArray collect: [ :each |
-			each transformedWithMatrix: viewMatrix
-		]);
-		yourself.
-]
-
-{ #category : #accessing }
-WDRenderingSceneCameraLayer >> lightingStateWithMaxNumberOfLights: maxNumberOfLights [
-	^ WDLightingState new
-		globalLightingState: globalLightingState;
-		lights: (lights first: (lights size min: maxNumberOfLights)) asArray;
-		yourself.
 ]
 
 { #category : #accessing }
