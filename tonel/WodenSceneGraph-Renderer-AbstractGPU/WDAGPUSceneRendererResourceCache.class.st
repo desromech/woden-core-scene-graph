@@ -1577,11 +1577,16 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	
 	lightedColor *= surfaceParameters.occlusionFactor;
 	lightedColor += surfaceParameters.emissiveFactor;
-	
+
 	// Direct light accumulation.
 	uint tileIndex = computeLightTileIndexForCurrentScreenCoordinateWithLinearDepth(surfaceParameters.P.z);
-
 	uvec2 tileLightList = LightClusterLists.lists[tileIndex];
+	
+	// Shadow mapping sampling data
+	ShadowMappingSamplingData shadowMappingSamplingData;
+	if(tileLightList.y > 0u)
+		computeShadowMappingSamplingData(shadowMappingSamplingData, worldP, worldSurfaceN);
+	
 	for(uint i = 0u; i < tileLightList.y; ++i)
 	{
 		uint lightIndex = TileLightIndices.indices[tileLightList.x + i];
@@ -1590,12 +1595,15 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 
 		vec4 lightSourcePosition = currentLightSource.positionOrDirection;
 		vec3 L = lightSourcePosition.xyz;
+		float lightDistance = 0.0;
 		float attenuation = 1.0;
+		float lightMaxDistance = 1.0;
 		if(lightSourcePosition.w != 0)
 		{ 
 			L = L - surfaceParameters.P;
-			float lightDistance = length(L);
+			lightDistance = length(L);
 			L = L/ max(lightDistance, DistanceEpsilon);
+			lightMaxDistance = currentLightSource.influenceRadius;
 			attenuation = computeLightAttenuation(lightDistance, currentLightSource.influenceRadius);
 		}
 		else
@@ -1612,7 +1620,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 		// Sample the shadow map, if available.
 		if (currentLightSource.castShadows)
 		{
-			float shadowFactor = sampleShadowMapForLightWithIndex(lightIndex, worldP, worldSurfaceN);
+			float shadowFactor = sampleShadowMapForLightWithIndex(shadowMappingSamplingData, lightIndex, L, lightDistance, lightMaxDistance);
 			if(shadowFactor <= 0.0)
 				continue;
 				
@@ -1832,10 +1840,32 @@ WDAGPUSceneRendererResourceCache >> shadowMappingSamplingSource [
 	^ '
 #line 4
 
-float sampleShadowMapForLightWithIndex(uint lightIndex, vec3 worldPosition, vec3 worldNormal)
+const uint PcfMinSampleCount = 5u;
+const uint PcfMaxSampleCount = 16u;
+const uint PcfMaxAvailableSampleCount = 16u;
+
+const vec2[PcfMaxAvailableSampleCount] PcfSamplingDisk = vec2[PcfMaxAvailableSampleCount](
+	vec2(0.0, 0.0),
+	vec2(0.5112106443900664, -0.08269973615310144),
+	vec2(-0.9059107675710277, 0.3577294337366379),
+	vec2(0.35859281167322443, 0.8693857918816552),
+	vec2(-0.23316869849021016, -0.8663155249628777),
+	vec2(0.0655344748243385, -0.5620816273438193),
+	vec2(-0.16502805108438623, 0.37354542472099217),
+	vec2(0.8206416609793163, 0.5243960793709364),
+	vec2(-0.45458006647163074, -0.12717718869781924),
+	vec2(0.9732842240358164, -0.012046630034244887),
+	vec2(-0.4458363994238136, 0.8276348839642642),
+	vec2(0.6556346005087879, -0.7492692488009433),
+	vec2(-0.6804649548979779, -0.5744969703138326),
+	vec2(0.3779618262210682, 0.4044132974950658),
+	vec2(-0.8987948111718497, -0.04439136527683185),
+	vec2(-0.032797453474624705, 0.773199451981671)
+);
+
+float sampleShadowMapForLightWithIndexAtPoint(uint lightIndex, vec3 worldSamplePosition)
 {
 #define lightSource AllLight.lights[lightIndex]
-	vec3 worldSamplePosition = worldPosition + worldNormal*0.01;
 	vec4 lightNdcPosition = lightSource.shadowMapProjectionMatrix * (lightSource.shadowMapInverseTransformationMatrix * vec4(worldSamplePosition, 1.0));
 	
 	// Avoid division by zero
@@ -1851,6 +1881,66 @@ float sampleShadowMapForLightWithIndex(uint lightIndex, vec3 worldPosition, vec3
 	vec3 atlasSamplePosition = vec3(samplePosition.xy*lightSource.shadowMapViewportScale + lightSource.shadowMapViewportOffset, samplePosition.z);
 
 	return textureLod(sampler2DShadow(ShadowMapTextureAtlas, ShadowMapSampler), atlasSamplePosition, 0.0);
+}
+
+struct ShadowMappingSamplingData
+{ 
+	vec3 position;
+	vec3 normal;
+	vec3 tangent;
+	vec3 bitangent;
+};
+
+void computeShadowMappingSamplingData(out ShadowMappingSamplingData samplingData, vec3 worldPosition, vec3 worldNormal)
+{
+	samplingData.position = worldPosition;
+	samplingData.normal = worldNormal;
+	
+	float randomFloat = fract(sin(dot(worldPosition, vec3(12.9898, 78.233, 217.179))) * 43758.5453);
+	float s = randomFloat*2.0 - 1.0;
+	float c = sqrt(1.0 - s*s);
+	vec3 upVector = vec3(c, s, 0.0);
+	if(abs(dot(upVector, samplingData.normal)) > 0.9)
+		upVector = vec3(-s, c, 0.0);
+
+	samplingData.tangent = normalize(cross(upVector, samplingData.normal));
+	samplingData.bitangent = cross(samplingData.normal, samplingData.tangent);
+}
+
+float sampleShadowMapForLightWithIndex(in ShadowMappingSamplingData samplingData, uint lightIndex, vec3 lightVector, float lightDistance, float lightMaxDistance)
+{
+	vec3 sampleCenterPoint = samplingData.position + samplingData.normal*0.01;
+
+	float sampleSum = 0.0;
+	uint sampleCount = 0u;
+	
+	float diskRadius = mix(0.002, 0.02, lightDistance / lightMaxDistance);
+
+	// Perform an initial number of samples for fully in shadow
+	for(; sampleCount < PcfMinSampleCount; ++sampleCount)
+	{
+		vec2 sampleVector = PcfSamplingDisk[sampleCount]*diskRadius;
+		vec3 samplePosition = sampleCenterPoint + samplingData.tangent*sampleVector.x + samplingData.bitangent*sampleVector.y;
+
+		sampleSum += sampleShadowMapForLightWithIndexAtPoint(lightIndex, samplePosition);
+	}
+	
+	// Check for fully shadowed or in light zones.
+	if(sampleSum == 0.0)
+		return 0.0;
+	else if(sampleSum == float(PcfMinSampleCount))
+		return 1.0;
+
+	// Perform the remaining samples.
+	for(; sampleCount < PcfMaxSampleCount; ++sampleCount)
+	{
+		vec2 sampleVector = PcfSamplingDisk[sampleCount]*diskRadius;
+		vec3 samplePosition = sampleCenterPoint + samplingData.tangent*sampleVector.x + samplingData.bitangent*sampleVector.y;
+
+		sampleSum += sampleShadowMapForLightWithIndexAtPoint(lightIndex, samplePosition);
+	}
+
+	return sampleSum / float(PcfMaxSampleCount);
 }
 
 '
