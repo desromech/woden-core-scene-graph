@@ -193,6 +193,20 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindObjectState: objectState [
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBufferView normalGBuffer: normalGBuffer [
+	stateTracker useShaderResources: (activeResourceDictionary at: {opaqueDepthBufferView . normalGBuffer} ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+		binding
+			bindSampledTextureView: opaqueDepthBufferView inSlot: 1;
+			bindSampledTextureView: normalGBuffer getOrCreateFullView inSlot: 2.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer right: rightEyeFramebuffer into: framebuffer mode: composeMode [
 
 	| outputFramebufferHandle shaderSignature leftEyeTexture rightEyeTexture |
@@ -502,6 +516,34 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingTranslucentO
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcclusionGenerationFor: intermediateFramebuffers cameraState: mainCameraState [
+	| shaderSignature ssaoExtent |
+
+	shaderSignature := renderer resourceCache rendererShaderSignature.
+	ssaoExtent := intermediateFramebuffers ssaoExtent.
+	stateTracker
+		resetGraphicsPipeline;
+		beginRenderPass: renderer resourceCache ssaoRenderPass framebuffer: intermediateFramebuffers ssaoPingFramebuffer  bundle_content: 0;
+		setViewport: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
+		setScissor: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
+		setShaderSignature: shaderSignature handle;
+		useShaderResources: shaderSignature samplersBinding;
+		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+		setFragmentStage: (renderer resourceCache ssaoComputationFragmentShader) entryPoint: 'main'.
+
+	self
+		bindCameraState: mainCameraState;
+		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView normalGBuffer: intermediateFramebuffers normalGBufferTexture.
+
+	stateTracker
+		setCullMode: AGPU_CULL_MODE_NONE;
+		setDepthState: false writeMask: false function: AGPU_ALWAYS;
+		setPrimitiveType: AGPU_TRIANGLES;
+		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+		endRenderPass
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
 	| workgroupCountX workgroupCountY workgroupCountZ workgroupCount |
 	workgroupCountX := (WDAGPUSceneRenderer lightGridColumns + 3) // 4.
@@ -597,15 +639,21 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		recordCommandsForRenderingOpaqueObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
 		
 	stateTracker endRenderPass.
+	
+	self
+		recordCommandsForScreenSpaceAmbientOcclusionGenerationFor: intermediateFramebuffers cameraState: mainCameraState.
 		
 	"Translucent render pass."
 	depthTestingEnabled := true.
 	depthWriteMask := false.
 	depthFunction := normalDepthFunction.
 	stateTracker
+		resetGraphicsPipeline;
 		beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setShaderSignature: shaderSignature handle;
+		useShaderResources: shaderSignature samplersBinding;
 		setDepthState: true writeMask: false function: depthFunction.
 	self recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
 	stateTracker endRenderPass.

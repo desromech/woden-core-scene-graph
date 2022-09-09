@@ -63,7 +63,11 @@ Class {
 		'metallicRoughnessDepthOnlyFragmentShader',
 		'unlitDepthOnlyFragmentShader',
 		'duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader',
-		'environmentMapDepthOnlyFragmentShader'
+		'environmentMapDepthOnlyFragmentShader',
+		'depthTypelessFormat',
+		'depthSampledFormat',
+		'ssaoRenderPass',
+		'ssaoComputationFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -387,6 +391,16 @@ WDAGPUSceneRendererResourceCache >> depthOnlyVertexAttributesForMask [
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache >> depthSampledFormat [
+	^ depthSampledFormat
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> depthTypelessFormat [
+	^ depthTypelessFormat
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> device [
 	^ device
 ]
@@ -604,7 +618,7 @@ WDAGPUSceneRendererResourceCache >> exponentialToneMappingOperatorShaderSource [
 
 void main()
 {
-	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = 1.0 - exp(-hdrColor);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
@@ -632,7 +646,7 @@ vec3 filmicCurve(vec3 x)
 
 void main()
 {
-	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = filmicCurve(hdrColor);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
@@ -1003,6 +1017,10 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 			ifFalse: [ Matrix4x4 identity ].
 	brdfLutTexture := textureUploader createAndComputeBRDFLut.
 	depthFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT.
+	depthTypelessFormat := AGPU_TEXTURE_FORMAT_R32_TYPELESS.
+	depthSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT.
+	
+	ssaoComputationFragmentShader := self compileShader: self ssaoComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 
 	linearToneMappingOperator := self compileShader: self linearToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
 	reinhardToneMappingOperator := self compileShader: self reinhardToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -1044,7 +1062,7 @@ WDAGPUSceneRendererResourceCache >> leftEyeStereoComposeShaderSource [
 
 void main()
 {
-	FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord);
+	FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord);
 }
 '
 ]
@@ -1362,7 +1380,7 @@ WDAGPUSceneRendererResourceCache >> linearToneMappingOperatorShaderSource [
 
 void main()
 {
-	vec4 hdrColor = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	vec4 hdrColor = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
 	FragmentOutputColor = vec4(hdrColor.rgb * CameraState.exposure, hdrColor.a);
 }
 '
@@ -1717,8 +1735,8 @@ WDAGPUSceneRendererResourceCache >> redCyanAnaglyphComposeShaderSource [
 
 void main()
 {
-	vec4 leftEyeColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord);
-	vec4 rightEyeColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord);
+	vec4 leftEyeColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord);
+	vec4 rightEyeColor = texture(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord);
 	FragmentOutputColor = vec4(leftEyeColor.r, rightEyeColor.gb, (leftEyeColor.a + rightEyeColor.a) * 0.5);
 }
 '
@@ -1734,7 +1752,7 @@ WDAGPUSceneRendererResourceCache >> reinhardToneMappingOperatorShaderSource [
 
 void main()
 {
-	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = hdrColor / (hdrColor + 1.0);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
@@ -1783,6 +1801,7 @@ WDAGPUSceneRendererResourceCache >> samplerStateSource [
 layout(set=0, binding=0) uniform sampler TextureSampler;
 layout(set=0, binding=1) uniform sampler ShadowMapSampler;
 layout(set=0, binding=2) uniform sampler BrdfLutSampler;
+layout(set=0, binding=3) uniform sampler ScreenTextureSampler;
 '
 ]
 
@@ -1956,11 +1975,62 @@ WDAGPUSceneRendererResourceCache >> sideBySideStereoComposeShaderSource [
 void main()
 {
 	if(inTexcoord.x < 0.5)
-		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord * vec2(2.0, 1.0));
+		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(2.0, 1.0));
 	else
-		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, TextureSampler), inTexcoord * vec2(2.0, 1.0) - vec2(1.0, 0.0));
+		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(2.0, 1.0) - vec2(1.0, 0.0));
 }
 '
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> ssaoComputationFragmentShader [
+	^ ssaoComputationFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> ssaoComputationFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , '
+#line 6
+
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out float FragmentOutputSSAO;
+
+layout(set=4, binding=1) uniform texture2D DepthBuffer;
+layout(set=4, binding=2) uniform texture2D NormalGBuffer;
+
+void main()
+{
+	//vec4 hdrColor = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
+	//FragmentOutputColor = vec4(hdrColor.rgb * CameraState.exposure, hdrColor.a);
+	FragmentOutputSSAO = 0.5;
+}
+'
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> ssaoRenderPass [
+	| colorAttachment |
+	ssaoRenderPass ifNotNil: [ ^ ssaoRenderPass ].
+	
+	^ [
+		| renderpassDescription |
+		colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
+		colorAttachment
+			format: AGPU_TEXTURE_FORMAT_R8_UNORM;
+			begin_action: AGPU_ATTACHMENT_DISCARD;
+			end_action: AGPU_ATTACHMENT_KEEP;
+			clear_value: AGPUColor4f new;
+			sample_count: 1;
+			sample_quality: 0.
+		renderpassDescription := AGPURenderpassDescription new.
+		renderpassDescription
+			color_attachment_count: 1;
+			color_attachments: colorAttachment.
+		ssaoRenderPass := device createRenderPass: renderpassDescription.
+	] ensure: [colorAttachment free].
+
 ]
 
 { #category : #accessing }
@@ -2016,9 +2086,9 @@ WDAGPUSceneRendererResourceCache >> topBottomStereoComposeShaderSource [
 void main()
 {
 	if(inTexcoord.x < 0.5)
-		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, TextureSampler), inTexcoord * vec2(1.0, 2.0));
+		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(1.0, 2.0));
 	else
-		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, TextureSampler), inTexcoord * vec2(0.0, 2.0) - vec2(0.0, 1.0));
+		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(0.0, 2.0) - vec2(0.0, 1.0));
 }
 '
 ]

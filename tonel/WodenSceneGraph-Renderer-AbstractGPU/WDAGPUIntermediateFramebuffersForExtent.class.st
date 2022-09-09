@@ -12,7 +12,16 @@ Class {
 		'specularGBufferTexture',
 		'hdrTranslucentFramebuffer',
 		'hdrOpaqueFramebuffer',
-		'depthOnlyFramebuffer'
+		'depthOnlyFramebuffer',
+		'depthStencilBufferSamplingView',
+		'depthStencilBufferAttachmentView',
+		'ssaoExtent',
+		'ssaoPingTexture',
+		'ssaoPongTexture',
+		'ssaoPingTextureAttachmentView',
+		'ssaoPingFramebuffer',
+		'ssaoPongTextureAttachmentView',
+		'ssaoPongFramebuffer'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -31,7 +40,8 @@ WDAGPUIntermediateFramebuffersForExtent >> colorBufferTexture [
 ]
 
 { #category : #initialization }
-WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format [
+WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format attachmentFormat: attachmentFormat samplingFormat: samplingFormat [
+	| depthStencilBufferSamplingViewDescription depthStencilBufferAttachmentViewDescription |
 	depthStencilBuffer := device createTexture: (AGPUTextureDescription new
 		type: AGPU_TEXTURE_2D;
 		width: extent x;
@@ -40,20 +50,34 @@ WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format [
 		layers: 1;
 		miplevels: 1;
 		format: format;
-		usage_modes: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT;
-		main_usage_mode: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT;
+		usage_modes: (AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
 		sample_count: sampleCount;
 		clear_value: (AGPUTextureClearValue new
 			depth_stencil: (AGPUDepthStencilValue new
 				depth: initialDepth;
 				yourself);
 			yourself);
-		yourself)
+		yourself).
+		
+	depthStencilBufferSamplingViewDescription := AGPUTextureViewDescription new.
+	depthStencilBuffer getFullViewDescription: depthStencilBufferSamplingViewDescription.
+	depthStencilBufferSamplingViewDescription
+		format: samplingFormat;
+		usage_mode: AGPU_TEXTURE_USAGE_SAMPLED.
+	depthStencilBufferSamplingView := depthStencilBuffer createView: depthStencilBufferSamplingViewDescription.
+	
+	depthStencilBufferAttachmentViewDescription := AGPUTextureViewDescription new.
+	depthStencilBuffer getFullViewDescription: depthStencilBufferAttachmentViewDescription.
+	depthStencilBufferAttachmentViewDescription
+		format: attachmentFormat;
+		usage_mode: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT.
+	depthStencilBufferAttachmentView := depthStencilBuffer createView: depthStencilBufferAttachmentViewDescription
 ]
 
 { #category : #initialization }
 WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
-	| viewDesc colorBufferAttachmentView normalGBufferAttachmentView specularGBufferAttachmentView depthStencilBufferView |
+	| viewDesc colorBufferAttachmentView normalGBufferAttachmentView specularGBufferAttachmentView |
 	colorBufferTexture := device createTexture: (AGPUTextureDescription new
 		type: AGPU_TEXTURE_2D;
 		width: extent x;
@@ -108,26 +132,76 @@ WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
 	specularGBufferAttachmentView := specularGBufferTexture createView: viewDesc.
 	
-	viewDesc := AGPUTextureViewDescription new.
-	depthStencilBuffer getFullViewDescription: viewDesc.
-	viewDesc usage_mode:
-		(viewDesc usage_mode bitAnd: (AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_STENCIL_ATTACHMENT)).
-	depthStencilBufferView := depthStencilBuffer createView: viewDesc.
-
 	depthOnlyFramebuffer := device createFrameBuffer: extent x height: extent y
 		colorCount: 0 colorViews: nil
-		depthStencilView: depthStencilBufferView.	
+		depthStencilView: depthStencilBufferAttachmentView.	
 	hdrOpaqueFramebuffer := device createFrameBuffer: extent x height: extent y
 		colorCount: 3 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView . normalGBufferAttachmentView . specularGBufferAttachmentView})
-		depthStencilView: depthStencilBufferView.
+		depthStencilView: depthStencilBufferAttachmentView.
 	hdrTranslucentFramebuffer := device createFrameBuffer: extent x height: extent y
 		colorCount: 1 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView})
-		depthStencilView: depthStencilBufferView
+		depthStencilView: depthStencilBufferAttachmentView
+]
+
+{ #category : #initialization }
+WDAGPUIntermediateFramebuffersForExtent >> createSSAOFramebuffer [
+	| ssaoWidth ssaoHeight viewDesc |
+	ssaoWidth := (extent x / 2) floor max: 1.
+	ssaoHeight := (extent y / 2) floor max: 1.
+	ssaoExtent := ssaoWidth @ ssaoHeight.
+	ssaoPingTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: ssaoExtent x;
+		height: ssaoExtent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R8_UNORM;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: 1;
+		yourself).
+		
+	ssaoPongTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: ssaoExtent x;
+		height: ssaoExtent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R8_UNORM;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: 1;
+		yourself).
+
+	viewDesc := AGPUTextureViewDescription new.
+	ssaoPingTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	ssaoPingTextureAttachmentView := ssaoPingTexture createView: viewDesc.
+
+	viewDesc := AGPUTextureViewDescription new.
+	ssaoPongTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	ssaoPongTextureAttachmentView := ssaoPongTexture createView: viewDesc.
+
+	ssaoPingFramebuffer := device createFrameBuffer: ssaoWidth height: ssaoHeight
+		colorCount: 1 colorViews: (AGPU packListOfReferences: {ssaoPingTextureAttachmentView})
+		depthStencilView: nil.
+	ssaoPongFramebuffer := device createFrameBuffer: ssaoWidth height: ssaoHeight
+		colorCount: 1 colorViews: (AGPU packListOfReferences: {ssaoPongTextureAttachmentView})
+		depthStencilView: nil.
+
 ]
 
 { #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> depthOnlyFramebuffer [
 	^ depthOnlyFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> depthStencilBufferSamplingView [
+	^ depthStencilBufferSamplingView
 ]
 
 { #category : #accessing }
@@ -169,8 +243,9 @@ WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourc
 	sampleCount := aSampleCount.
 	initialDepth := anInitialDepth.
 	self
-		createDepthStencilBuffer: aResourceCache depthFormat;
-		createHdrFramebuffer
+		createDepthStencilBuffer: aResourceCache depthTypelessFormat attachmentFormat: aResourceCache depthFormat samplingFormat: aResourceCache depthSampledFormat;
+		createHdrFramebuffer;
+		createSSAOFramebuffer
 ]
 
 { #category : #accessing }
@@ -186,4 +261,29 @@ WDAGPUIntermediateFramebuffersForExtent >> sampleCount [
 { #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> specularGBufferTexture [
 	^ specularGBufferTexture
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> ssaoExtent [
+	^ ssaoExtent
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> ssaoPingFramebuffer [
+	^ ssaoPingFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> ssaoPingTexture [
+	^ ssaoPingTexture
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> ssaoPongFramebuffer [
+	^ ssaoPongFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> ssaoPongTexture [
+	^ ssaoPongTexture
 ]
