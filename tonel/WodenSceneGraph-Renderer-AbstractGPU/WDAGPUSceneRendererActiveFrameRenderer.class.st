@@ -222,6 +222,23 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBuff
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBufferView normalGBuffer: normalGBuffer specularGBuffer: specularGBuffer glossColorBuffer: glossColorBuffer roughColorBuffer: roughColorBuffer [
+	stateTracker useShaderResources: (activeResourceDictionary at: {opaqueDepthBufferView . normalGBuffer . specularGBuffer . glossColorBuffer . roughColorBuffer} ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+		binding
+			bindSampledTextureView: opaqueDepthBufferView inSlot: 1;
+			bindSampledTextureView: normalGBuffer getOrCreateFullView inSlot: 2;
+			bindSampledTextureView: specularGBuffer getOrCreateFullView inSlot: 3;
+			bindSampledTextureView: glossColorBuffer getOrCreateFullView inSlot: 4;
+			bindSampledTextureView: roughColorBuffer getOrCreateFullView inSlot: 5.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBufferView opaqueColorBuffer: opaqueColorBuffer ssaoTexture: ssaoTexture staticReflectionTexture: staticReflectionTexture screenSpaceReflectionTexture: screenSpaceReflectionTexture [
 	stateTracker useShaderResources: (activeResourceDictionary at: {opaqueDepthBufferView . opaqueColorBuffer . ssaoTexture . staticReflectionTexture . screenSpaceReflectionTexture} ifAbsentPut: [ 
 		| binding |
@@ -629,7 +646,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflection
 
 	self
 		bindCameraState: mainCameraState;
-		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView normalGBuffer: intermediateFramebuffers normalGBufferTexture specularGBuffer: intermediateFramebuffers specularGBufferTexture.
+		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView normalGBuffer: intermediateFramebuffers normalGBufferTexture specularGBuffer: intermediateFramebuffers specularGBufferTexture glossColorBuffer: intermediateFramebuffers hdrOpaqueColorBuffer roughColorBuffer: intermediateFramebuffers hdrOpaqueColorBuffer.
 
 	stateTracker
 		setCullMode: AGPU_CULL_MODE_NONE;

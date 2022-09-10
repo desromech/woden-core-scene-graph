@@ -2029,9 +2029,68 @@ layout(set=4, binding=1) uniform texture2D DepthBuffer;
 layout(set=4, binding=2) uniform texture2D NormalGBuffer;
 layout(set=4, binding=3) uniform texture2D SpecularGBuffer;
 
+layout(set=4, binding=4) uniform texture2D GlossColorBuffer;
+layout(set=4, binding=5) uniform texture2D RoughColorBuffer;
+
+const float ReflectionMaxDistance = 15.0;
+
 void main()
 {
-	FragmentOutputScreenSpaceReflection = vec4(0.2, 0.4, 0.6, 0.0);
+	vec4 specularColor = textureLod(sampler2D(SpecularGBuffer, ScreenTextureSampler), inTexcoord, 0.0);
+	if(specularColor == vec4(0.0, 0.0, 0.0, 0.0))
+	{
+		FragmentOutputScreenSpaceReflection = vec4(0.0);
+		return;
+	}
+
+	vec3 F0 = specularColor.xyz;
+	float roughnessFactor = specularColor.w;
+
+	float depth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), inTexcoord, 0.0).r;
+	vec2 screenNormal = textureLod(sampler2D(NormalGBuffer, ScreenTextureSampler), inTexcoord, 0.0).xy;
+	vec3 N = vec3(screenNormal, sqrt(max(1.0 - (screenNormal.x*screenNormal.x + screenNormal.y*screenNormal.y), 0.0)));
+
+	vec4 ndcPosition = vec4(inTexcoord*2.0 - 1.0, depth, 1.0);
+	if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
+		ndcPosition.y = -ndcPosition.y;
+	
+	vec4 clipSpacePosition = CameraState.inverseProjectionMatrix*ndcPosition;
+	vec3 viewPosition = clipSpacePosition.xyz / clipSpacePosition.w;
+	vec3 V = normalize(-viewPosition);
+	vec3 R = reflect(-V, N);
+	
+	float targetReflectionDistance = 10.0;
+	vec3 targetReflectionViewPoint = viewPosition + R*ReflectionMaxDistance;
+	
+	vec4 targetReflectionProjectedPoint = CameraState.projectionMatrix * vec4(targetReflectionViewPoint, 1.0);
+	if(targetReflectionProjectedPoint.w == 0.0)
+	{ 
+		FragmentOutputScreenSpaceReflection = vec4(0.0);
+		return;
+	}
+	
+	vec3 targetReflectionNDCPoint = targetReflectionProjectedPoint.xyz / targetReflectionProjectedPoint.w;
+	if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
+		targetReflectionNDCPoint.y = -targetReflectionNDCPoint.y;
+		
+	vec3 targetReflectionScreenPoint = targetReflectionNDCPoint*0.5 + 0.5;
+	if(targetReflectionScreenPoint.x < 0.0 || targetReflectionScreenPoint.x > 1.0 ||
+		targetReflectionScreenPoint.y < 0.0 || targetReflectionScreenPoint.y > 1.0)
+	{ 
+		FragmentOutputScreenSpaceReflection = vec4(0.0);
+		return;
+	}
+
+	vec3 startReflectionScreenPoint = vec3(inTexcoord, depth);
+	
+	vec3 reflectionPoint = targetReflectionScreenPoint;
+	vec2 reflectionTexcoord = reflectionPoint.xy;
+	vec3 reflectionColor = mix(
+		textureLod(sampler2D(GlossColorBuffer, ScreenTextureSampler), reflectionTexcoord, 0.0).rgb,
+		textureLod(sampler2D(RoughColorBuffer, ScreenTextureSampler), reflectionTexcoord, 0.0).rgb,
+		specularColor.a)*specularColor.rgb;
+
+	FragmentOutputScreenSpaceReflection = vec4(reflectionColor, 1.0);
 }
 '
 ]
