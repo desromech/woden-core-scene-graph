@@ -2078,7 +2078,8 @@ void main()
 		
 		reflectionScreenPoint = rayMarchNDCPoint.xy*0.5 + 0.5;
 		if(reflectionScreenPoint.x < 0.0 || reflectionScreenPoint.x > 1.0 ||
-			reflectionScreenPoint.y < 0.0 || reflectionScreenPoint.y > 1.0)
+			reflectionScreenPoint.y < 0.0 || reflectionScreenPoint.y > 1.0 ||
+			rayMarchNDCPoint.z < 0.0)
 			break;
 		
 		float rayMarchDepth = rayMarchNDCPoint.z;
