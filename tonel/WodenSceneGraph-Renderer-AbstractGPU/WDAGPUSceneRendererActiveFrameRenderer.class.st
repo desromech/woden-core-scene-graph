@@ -812,7 +812,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	depthFunction := normalDepthFunction.
 	stateTracker
 		setDepthState: true writeMask: false function: depthFunction.
-	self recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
+	self
+		bindLightingState: convertedLightingState;
+		recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
 	stateTracker endRenderPass.
 
 	depthFunction := nil.
