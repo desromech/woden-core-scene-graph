@@ -591,13 +591,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcc
 	ssaoExtent := intermediateFramebuffers ssaoExtent.
 	stateTracker
 		resetGraphicsPipeline;
-		beginRenderPass: renderer resourceCache ssaoRenderPass framebuffer: intermediateFramebuffers ssaoPingFramebuffer  bundle_content: 0;
+		beginRenderPass: renderer resourceCache screenSpaceAmbientOcclusionRenderPass framebuffer: intermediateFramebuffers ssaoPingFramebuffer  bundle_content: 0;
 		setViewport: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
 		setScissor: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
 		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: (renderer resourceCache ssaoComputationFragmentShader) entryPoint: 'main'.
+		setFragmentStage: (renderer resourceCache screenSpaceAmbientOcclusionComputationFragmentShader) entryPoint: 'main'.
 
 	self
 		bindCameraState: mainCameraState;

@@ -66,12 +66,12 @@ Class {
 		'environmentMapDepthOnlyFragmentShader',
 		'depthTypelessFormat',
 		'depthSampledFormat',
-		'ssaoRenderPass',
-		'ssaoComputationFragmentShader',
 		'staticReflectionComputationFragmentShader',
 		'screenSpaceReflectionComputationFragmentShader',
 		'reflectionRenderPass',
-		'opaqueReflectionCombinationFragmentShader'
+		'opaqueReflectionCombinationFragmentShader',
+		'screenSpaceAmbientOcclusionComputationFragmentShader',
+		'screenSpaceAmbientOcclusionRenderPass'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -1024,7 +1024,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	depthTypelessFormat := AGPU_TEXTURE_FORMAT_R32_TYPELESS.
 	depthSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT.
 	
-	ssaoComputationFragmentShader := self compileShader: self ssaoComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	screenSpaceAmbientOcclusionComputationFragmentShader := self compileShader: self screenSpaceAmbientOcclusionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	staticReflectionComputationFragmentShader := self compileShader: self staticReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	screenSpaceReflectionComputationFragmentShader := self compileShader: self screenSpaceReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	opaqueReflectionCombinationFragmentShader := self compileShader: self opaqueReflectionCombinationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -1770,7 +1770,7 @@ void main()
 	vec4 staticReflection = textureLod(sampler2D(StaticReflectionTexture, ScreenTextureSampler), inTexcoord, 0.0);
 	vec4 screenSpaceReflection = textureLod(sampler2D(ScreenSpaceReflectionTexture, ScreenTextureSampler), inTexcoord, 0.0);
 	
-	float occlusionFactor = cavity*ssaoFactor;
+	float occlusionFactor = sqrt(cavity*ssaoFactor);
 
 	vec3 reflection = mix(staticReflection.rgb, screenSpaceReflection.rgb, screenSpaceReflection.a);
 
@@ -1892,6 +1892,122 @@ layout(set=0, binding=3) uniform sampler ScreenTextureSampler;
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> screenQuadVertexShader [
 	^ screenQuadVertexShader
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionComputationFragmentShader [
+	^ screenSpaceAmbientOcclusionComputationFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionComputationFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , '
+#line 6
+
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out float FragmentOutputSSAO;
+
+layout(set=4, binding=1) uniform texture2D DepthBuffer;
+layout(set=4, binding=2) uniform texture2D NormalGBuffer;
+
+const uint SamplingDistributionSize = 8u;
+const vec3[SamplingDistributionSize] SamplingDistribution = vec3[SamplingDistributionSize](
+    vec3( -0.6877715587615967, -0.506843626499176, 0.5196920037269592 ),
+    vec3( -0.34024709463119507, 0.2696249485015869, 0.9008519649505615 ),
+    vec3( 0.8366008996963501, -0.2242094725370407, 0.4998289942741394 ),
+    vec3( 0.5788835287094116, -0.8140687346458435, 0.04675422981381416 ),
+    vec3( 0.1709364503622055, 0.9850329756736755, 0.022153066471219063 ),
+    vec3( 0.8136236667633057, 0.519911527633667, 0.2602085471153259 ),
+    vec3( -0.8440455198287964, 0.44032758474349976, 0.3061026632785797 ),
+    vec3( 0.1833304911851883, -0.7002113461494446, 0.6899957060813904 )
+);
+
+float sampleAmbientOcclusionAt(float eyeDepth, vec3 position)
+{
+	vec4 projectedPosition = CameraState.projectionMatrix * vec4(position, 1.0);
+	if(projectedPosition.w == 0.0)
+		return 1.0;
+
+	vec3 samplePoint = projectedPosition.xyz / projectedPosition.w;
+	float sampleDepth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), samplePoint.xy*0.5 + 0.5, 0.0).r;
+
+	// Large variations of depth can introduce some false positives.
+	// TODO: Find the place where this thesholding function was originally found.
+	float threshold = abs(eyeDepth - samplePoint.z)*10.0;
+	float attenuation = 1.0 - smoothstep(threshold, threshold*2.0, abs(sampleDepth - samplePoint.z));
+	return (sampleDepth - 0.00001 < samplePoint.z ? 0.0 : 1.0)*attenuation;
+}
+
+float signedRandomNoise(vec2 coord)
+{
+	return fract(sin(dot(coord, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+mat3 rotationMatrixFor(float s)
+{
+	float c = sqrt(1.0 - s*s);
+	return mat3(
+		vec3(c, s, 0.0),
+		vec3(-s, c, 0.0),
+		vec3(0.0, 0.0, 1.0)
+	);
+}
+
+void main()
+{
+	float depth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), inTexcoord, 0.0).r;
+	vec2 screenNormal = textureLod(sampler2D(NormalGBuffer, ScreenTextureSampler), inTexcoord, 0.0).xy;
+	vec3 N = normalize(vec3(screenNormal, sqrt(max(1.0 - (screenNormal.x*screenNormal.x + screenNormal.y*screenNormal.y), 0.0))));
+
+	vec4 ndcPosition = vec4(inTexcoord*2.0 - 1.0, depth, 1.0);
+	if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
+		ndcPosition.y = -ndcPosition.y;
+	
+	vec4 clipSpacePosition = CameraState.inverseProjectionMatrix*ndcPosition;
+	vec3 viewPosition = clipSpacePosition.xyz / clipSpacePosition.w;
+	
+	vec3 upVector = abs(N.y) >= 0.9 ? vec3(1.0, 0.0, 1.0) : vec3(0.0, 1.0, 1.0);
+	vec3 tangent = normalize(cross(upVector, N));
+	vec3 bitangent = cross(N, tangent);
+	
+	mat3 tbn = mat3(tangent, bitangent, N) * rotationMatrixFor(signedRandomNoise(inTexcoord*123456.0f));
+
+	float outputSampleCount = 0.0;
+	for(uint i = 0u; i < SamplingDistributionSize; ++i)
+	{ 
+		vec3 delta = tbn * SamplingDistribution[i];
+		outputSampleCount += sampleAmbientOcclusionAt(depth, viewPosition + delta);
+	}
+	
+	FragmentOutputSSAO = 1.0 - outputSampleCount / float(SamplingDistributionSize);
+}
+'
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionRenderPass [
+	| colorAttachment |
+	screenSpaceAmbientOcclusionRenderPass ifNotNil: [ ^ screenSpaceAmbientOcclusionRenderPass ].
+	
+	^ [
+		| renderpassDescription |
+		colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
+		colorAttachment
+			format: AGPU_TEXTURE_FORMAT_R8_UNORM;
+			begin_action: AGPU_ATTACHMENT_DISCARD;
+			end_action: AGPU_ATTACHMENT_KEEP;
+			clear_value: AGPUColor4f new;
+			sample_count: 1;
+			sample_quality: 0.
+		renderpassDescription := AGPURenderpassDescription new.
+		renderpassDescription
+			color_attachment_count: 1;
+			color_attachments: colorAttachment.
+		screenSpaceAmbientOcclusionRenderPass := device createRenderPass: renderpassDescription.
+	] ensure: [colorAttachment free].
+
 ]
 
 { #category : #accessing }
@@ -2090,57 +2206,6 @@ void main()
 		FragmentOutputColor = textureLod(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(2.0, 1.0) - vec2(1.0, 0.0), 0.0);
 }
 '
-]
-
-{ #category : #'accessing shaders' }
-WDAGPUSceneRendererResourceCache >> ssaoComputationFragmentShader [
-	^ ssaoComputationFragmentShader
-]
-
-{ #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> ssaoComputationFragmentShaderSource [
-	^ '
-#version 450
-' , self samplerStateSource, self cameraStateBlockSource , '
-#line 6
-
-layout(location=0) in vec2 inTexcoord;
-layout(location=0) out float FragmentOutputSSAO;
-
-layout(set=4, binding=1) uniform texture2D DepthBuffer;
-layout(set=4, binding=2) uniform texture2D NormalGBuffer;
-
-void main()
-{
-	//vec4 hdrColor = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
-	//FragmentOutputColor = vec4(hdrColor.rgb * CameraState.exposure, hdrColor.a);
-	FragmentOutputSSAO = 1.0;
-}
-'
-]
-
-{ #category : #initialization }
-WDAGPUSceneRendererResourceCache >> ssaoRenderPass [
-	| colorAttachment |
-	ssaoRenderPass ifNotNil: [ ^ ssaoRenderPass ].
-	
-	^ [
-		| renderpassDescription |
-		colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
-		colorAttachment
-			format: AGPU_TEXTURE_FORMAT_R8_UNORM;
-			begin_action: AGPU_ATTACHMENT_DISCARD;
-			end_action: AGPU_ATTACHMENT_KEEP;
-			clear_value: AGPUColor4f new;
-			sample_count: 1;
-			sample_quality: 0.
-		renderpassDescription := AGPURenderpassDescription new.
-		renderpassDescription
-			color_attachment_count: 1;
-			color_attachments: colorAttachment.
-		ssaoRenderPass := device createRenderPass: renderpassDescription.
-	] ensure: [colorAttachment free].
-
 ]
 
 { #category : #accessing }
