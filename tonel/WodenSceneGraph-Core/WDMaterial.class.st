@@ -91,6 +91,11 @@ WDMaterial >> hasAlphaBlending [
 ]
 
 { #category : #testing }
+WDMaterial >> hasBackgroundRendering [
+	^ false
+]
+
+{ #category : #testing }
 WDMaterial >> hasDepthTesting [
 	^ true
 ]

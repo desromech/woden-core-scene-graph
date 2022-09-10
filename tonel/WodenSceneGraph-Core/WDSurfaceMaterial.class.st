@@ -93,6 +93,11 @@ WDSurfaceMaterial >> hasAlphaMasking [
 ]
 
 { #category : #testing }
+WDSurfaceMaterial >> hasBackgroundRendering [
+	^ background
+]
+
+{ #category : #testing }
 WDSurfaceMaterial >> hasDepthTesting [
 	^ xray not
 ]

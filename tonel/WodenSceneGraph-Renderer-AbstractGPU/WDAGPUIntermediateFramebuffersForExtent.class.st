@@ -21,7 +21,12 @@ Class {
 		'ssaoPingTextureAttachmentView',
 		'ssaoPingFramebuffer',
 		'ssaoPongTextureAttachmentView',
-		'ssaoPongFramebuffer'
+		'ssaoPongFramebuffer',
+		'screenSpaceReflectionTexture',
+		'screenSpaceReflectionFramebuffer',
+		'staticReflectionTexture',
+		'staticReflectionFramebuffer',
+		'opaqueColorBufferTexture'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -77,7 +82,20 @@ WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format atta
 
 { #category : #initialization }
 WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
-	| viewDesc colorBufferAttachmentView normalGBufferAttachmentView specularGBufferAttachmentView |
+	| viewDesc opaqueColorBufferAttachmentView colorBufferAttachmentView normalGBufferAttachmentView specularGBufferAttachmentView |
+	opaqueColorBufferTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: extent x;
+		height: extent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: sampleCount;
+		yourself).
+
 	colorBufferTexture := device createTexture: (AGPUTextureDescription new
 		type: AGPU_TEXTURE_2D;
 		width: extent x;
@@ -116,6 +134,11 @@ WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
 		sample_count: sampleCount;
 		yourself).
+
+	viewDesc := AGPUTextureViewDescription new.
+	opaqueColorBufferTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	opaqueColorBufferAttachmentView := opaqueColorBufferTexture createView: viewDesc.
 		
 	viewDesc := AGPUTextureViewDescription new.
 	colorBufferTexture getFullViewDescription: viewDesc.
@@ -136,7 +159,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 		colorCount: 0 colorViews: nil
 		depthStencilView: depthStencilBufferAttachmentView.	
 	hdrOpaqueFramebuffer := device createFrameBuffer: extent x height: extent y
-		colorCount: 3 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView . normalGBufferAttachmentView . specularGBufferAttachmentView})
+		colorCount: 3 colorViews: (AGPU packListOfReferences: {opaqueColorBufferAttachmentView . normalGBufferAttachmentView . specularGBufferAttachmentView})
 		depthStencilView: depthStencilBufferAttachmentView.
 	hdrTranslucentFramebuffer := device createFrameBuffer: extent x height: extent y
 		colorCount: 1 colorViews: (AGPU packListOfReferences: {colorBufferAttachmentView})
@@ -194,6 +217,60 @@ WDAGPUIntermediateFramebuffersForExtent >> createSSAOFramebuffer [
 
 ]
 
+{ #category : #initialization }
+WDAGPUIntermediateFramebuffersForExtent >> createScreenSpaceReflectionFramebuffer [
+	| viewDesc screenSpaceReflectionTextureAttachmentView |
+	screenSpaceReflectionTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: extent x;
+		height: extent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: 1;
+		yourself).
+
+	viewDesc := AGPUTextureViewDescription new.
+	screenSpaceReflectionTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	screenSpaceReflectionTextureAttachmentView := screenSpaceReflectionTexture createView: viewDesc.
+
+	screenSpaceReflectionFramebuffer := device createFrameBuffer: extent x height: extent y
+		colorCount: 1 colorViews: (AGPU packListOfReferences: {screenSpaceReflectionTextureAttachmentView})
+		depthStencilView: nil.
+
+]
+
+{ #category : #initialization }
+WDAGPUIntermediateFramebuffersForExtent >> createStaticReflectionFramebuffer [
+	| viewDesc staticReflectionTextureAttachmentView |
+	staticReflectionTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: extent x;
+		height: extent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: 1;
+		yourself).
+
+	viewDesc := AGPUTextureViewDescription new.
+	staticReflectionTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	staticReflectionTextureAttachmentView := staticReflectionTexture createView: viewDesc.
+
+	staticReflectionFramebuffer := device createFrameBuffer: extent x height: extent y
+		colorCount: 1 colorViews: (AGPU packListOfReferences: {staticReflectionTextureAttachmentView})
+		depthStencilView: nil.
+
+]
+
 { #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> depthOnlyFramebuffer [
 	^ depthOnlyFramebuffer
@@ -222,6 +299,11 @@ WDAGPUIntermediateFramebuffersForExtent >> hdrColorBufferTexture [
 ]
 
 { #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> hdrOpaqueColorBuffer [
+	^ opaqueColorBufferTexture
+]
+
+{ #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> hdrOpaqueFramebuffer [
 	^ hdrOpaqueFramebuffer
 ]
@@ -245,7 +327,9 @@ WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourc
 	self
 		createDepthStencilBuffer: aResourceCache depthTypelessFormat attachmentFormat: aResourceCache depthFormat samplingFormat: aResourceCache depthSampledFormat;
 		createHdrFramebuffer;
-		createSSAOFramebuffer
+		createSSAOFramebuffer;
+		createStaticReflectionFramebuffer;
+		createScreenSpaceReflectionFramebuffer
 ]
 
 { #category : #accessing }
@@ -254,8 +338,23 @@ WDAGPUIntermediateFramebuffersForExtent >> normalGBufferTexture [
 ]
 
 { #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> opaqueColorBufferTexture [
+	^ opaqueColorBufferTexture
+]
+
+{ #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> sampleCount [
 	^ sampleCount
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> screenSpaceReflectionFramebuffer [
+	^ screenSpaceReflectionFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> screenSpaceReflectionTexture [
+	^ screenSpaceReflectionTexture
 ]
 
 { #category : #accessing }
@@ -286,4 +385,14 @@ WDAGPUIntermediateFramebuffersForExtent >> ssaoPongFramebuffer [
 { #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> ssaoPongTexture [
 	^ ssaoPongTexture
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> staticReflectionFramebuffer [
+	^ staticReflectionFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> staticReflectionTexture [
+	^ staticReflectionTexture
 ]

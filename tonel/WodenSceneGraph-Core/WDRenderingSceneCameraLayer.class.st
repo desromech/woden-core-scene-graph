@@ -15,10 +15,17 @@ Class {
 		'shadowMapCameraLayers',
 		'shadowCastingLightSource',
 		'opaqueRenderingObjects',
-		'translucentRenderingObjects'
+		'translucentRenderingObjects',
+		'backgroundObjects'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
+
+{ #category : #adding }
+WDRenderingSceneCameraLayer >> addBackgroundRenderingSceneObject: renderingSceneObject [
+	backgroundObjects add: renderingSceneObject
+	
+]
 
 { #category : #adding }
 WDRenderingSceneCameraLayer >> addLight: aLightState [
@@ -36,7 +43,34 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: mat
 		withPriority: (material ifNil: [ WDRenderPriority default ]
 			ifNotNil: [material renderPriority])
 		opaque: (material ifNil: [ true ] ifNotNil: [material hasOpaqueRendering])
+		background: (material ifNil: [ false ] ifNotNil: [material hasBackgroundRendering])
 		objectState: anObjectState
+]
+
+{ #category : #adding }
+WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority opaque: isOpaque background: isBackground objectState: anObjectState [
+	isOpaque ifTrue: [ 
+		isBackground ifTrue: [ 
+			self addBackgroundRenderingSceneObject: (WDRenderingSceneObject new
+				priority: renderPriority;
+				objectState: anObjectState;
+				renderable: meshPrimitive;
+				yourself)
+		] ifFalse: [ 
+			self addOpaqueRenderingSceneObject: (WDRenderingSceneObject new
+				priority: renderPriority;
+				objectState: anObjectState;
+				renderable: meshPrimitive;
+				yourself)
+		].
+	] ifFalse: [ 
+		self addTranslucentRenderingSceneObject: (WDRenderingSceneObject new
+			priority: renderPriority;
+			objectState: anObjectState;
+			renderable: meshPrimitive;
+			yourself)
+	].
+
 ]
 
 { #category : #adding }
@@ -87,6 +121,11 @@ WDRenderingSceneCameraLayer >> asRenderingScene [
 ]
 
 { #category : #accessing }
+WDRenderingSceneCameraLayer >> backgroundObjects [
+	^ backgroundObjects
+]
+
+{ #category : #accessing }
 WDRenderingSceneCameraLayer >> cameraState [
 
 	^ cameraState
@@ -108,6 +147,7 @@ WDRenderingSceneCameraLayer >> initialize [
 	super initialize.
 	cameraState := WDCameraState new.
 	lights := OrderedCollection new.
+	backgroundObjects := OrderedCollection new.
 	opaqueRenderingObjects := OrderedCollection new.
 	translucentRenderingObjects := OrderedCollection new.
 	shadowMapCameraLayers := OrderedCollection new.

@@ -33,17 +33,17 @@ WDScene >> addForeground: aNode [
 
 { #category : #accessing }
 WDScene >> ambientLightProbe: aWDLightProbe [
-	normalLayer ambientLightProbe: aWDLightProbe
+	globalLightingState ambientLightProbe: aWDLightProbe
 ]
 
 { #category : #accessing }
 WDScene >> ambientLighting [
-	^ normalLayer ambientLighting
+	^ globalLightingState ambientLighting
 ]
 
 { #category : #accessing }
-WDScene >> ambientLighting: anAmbientLightingFactor [
-	normalLayer ambientLighting: anAmbientLightingFactor
+WDScene >> ambientLighting: aLightingColor [
+	globalLightingState ambientLighting: aLightingColor
 ]
 
 { #category : #converting }

@@ -67,7 +67,11 @@ Class {
 		'depthTypelessFormat',
 		'depthSampledFormat',
 		'ssaoRenderPass',
-		'ssaoComputationFragmentShader'
+		'ssaoComputationFragmentShader',
+		'staticReflectionComputationFragmentShader',
+		'screenSpaceReflectionComputationFragmentShader',
+		'reflectionRenderPass',
+		'opaqueReflectionCombinationFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -439,7 +443,7 @@ void main()
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass) , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass), self cameraStateBlockSource, self metallicRoughnessLightingModel, self duplicatedMetallicRoughnessLiquidMaterialStateSource , '
 #line 6
 
 void main()
@@ -618,7 +622,7 @@ WDAGPUSceneRendererResourceCache >> exponentialToneMappingOperatorShaderSource [
 
 void main()
 {
-	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
+	vec4 hdrTexel = textureLod(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord, 0.0);
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = 1.0 - exp(-hdrColor);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
@@ -646,7 +650,7 @@ vec3 filmicCurve(vec3 x)
 
 void main()
 {
-	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
+	vec4 hdrTexel = textureLod(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord, 0.0);
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = filmicCurve(hdrColor);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
@@ -921,7 +925,7 @@ WDAGPUSceneRendererResourceCache >> hdrTranslucentRenderPassWithSampleCount: sam
 			colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
 			colorAttachment
 				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
-				begin_action: AGPU_ATTACHMENT_KEEP;
+				begin_action: AGPU_ATTACHMENT_DISCARD;
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
 				clear_value: AGPUColor4f new;
@@ -1021,6 +1025,9 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	depthSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT.
 	
 	ssaoComputationFragmentShader := self compileShader: self ssaoComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	staticReflectionComputationFragmentShader := self compileShader: self staticReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	screenSpaceReflectionComputationFragmentShader := self compileShader: self screenSpaceReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	opaqueReflectionCombinationFragmentShader := self compileShader: self opaqueReflectionCombinationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 
 	linearToneMappingOperator := self compileShader: self linearToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
 	reinhardToneMappingOperator := self compileShader: self reinhardToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -1062,7 +1069,7 @@ WDAGPUSceneRendererResourceCache >> leftEyeStereoComposeShaderSource [
 
 void main()
 {
-	FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord);
+	FragmentOutputColor = textureLod(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord, 0.0);
 }
 '
 ]
@@ -1380,7 +1387,7 @@ WDAGPUSceneRendererResourceCache >> linearToneMappingOperatorShaderSource [
 
 void main()
 {
-	vec4 hdrColor = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
+	vec4 hdrColor = textureLod(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord, 0.0);
 	FragmentOutputColor = vec4(hdrColor.rgb * CameraState.exposure, hdrColor.a);
 }
 '
@@ -1414,7 +1421,7 @@ void main()
 WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, self metallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass) , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass), self cameraStateBlockSource, self metallicRoughnessLightingModel, self metallicRoughnessMaterialStateSource , '
 #line 6
 
 void main()
@@ -1558,7 +1565,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	vec3 F0 = mix(dielectricF0, surfaceParameters.baseColor.rgb, surfaceParameters.metallicFactor);
 	
 	gbufferNormal = surfaceParameters.N.xy;
-	gbufferSpecularity = vec4(F0*surfaceParameters.occlusionFactor, surfaceParameters.roughnessFactor);
+	gbufferSpecularity = vec4(F0, surfaceParameters.roughnessFactor);
 
 	float directRoughness = mix(0.01, 1.0, surfaceParameters.roughnessFactor);
 	float directAlpha = directRoughness*directRoughness;
@@ -1569,21 +1576,27 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	float NdotV = max(0.0, dot(surfaceParameters.N, surfaceParameters.V));
 			
 	vec3 lightedColor = vec3(0);
+
+	mat3 viewToWorld = mat3(CameraState.inverseTransformationMatrix[0].xyz, CameraState.inverseTransformationMatrix[1].xyz, CameraState.inverseTransformationMatrix[2].xyz);
+	vec3 worldN = surfaceParameters.N * viewToWorld;
+	vec3 worldSurfaceN = surfaceParameters.worldSurfaceN;
+	vec3 worldP = surfaceParameters.worldP;
+
+	vec3 R = reflect(-surfaceParameters.V, surfaceParameters.N);
+	vec3 worldR = R * viewToWorld;
+
+	// Add the diffuse light probe lighting.
+	vec3 diffuseLightProbeSample = textureLod(samplerCube(AmbientDiffuseLightProbeTexture, BrdfLutSampler), worldN, 0.0).rgb;
+	lightedColor += diffuseLightProbeSample*diffuse;
 	
+#ifdef IsInFragmentOpaquePass
+	lightedColor += Cdiffuse*LightingState.ambientLighting;
+
+#else
 	// Ambient lighting accumulation.
 	lightedColor += surfaceParameters.baseColor.rgb*LightingState.ambientLighting;
 
 	// Add the lighting cube.
-	vec3 R = reflect(-surfaceParameters.V, surfaceParameters.N);
-
-	mat3 viewToWorld = mat3(CameraState.inverseTransformationMatrix[0].xyz, CameraState.inverseTransformationMatrix[1].xyz, CameraState.inverseTransformationMatrix[2].xyz);
-	vec3 worldN = surfaceParameters.N * viewToWorld;
-	vec3 worldR = R * viewToWorld;
-	vec3 worldSurfaceN = surfaceParameters.worldSurfaceN;
-	vec3 worldP = surfaceParameters.worldP;
-
-	vec3 diffuseLightProbeSample = textureLod(samplerCube(AmbientDiffuseLightProbeTexture, BrdfLutSampler), worldN, 0.0).rgb;
-
 	float specularLightProbeLevel = float(textureQueryLevels(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler)) - 1) * surfaceParameters.roughnessFactor;
 	vec3 specularLightProbeSample = textureLod(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler), worldR, specularLightProbeLevel).rgb;
 
@@ -1591,8 +1604,9 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	vec3 specularFactor = F0*ambientReflectionFactors.x + ambientReflectionFactors.y;
 
 	// Add the light probe.
-	lightedColor += diffuseLightProbeSample*diffuse + specularLightProbeSample*specularFactor;
-	
+	lightedColor += specularLightProbeSample*specularFactor;
+
+#endif
 	lightedColor *= surfaceParameters.occlusionFactor;
 	lightedColor += surfaceParameters.emissiveFactor;
 
@@ -1661,7 +1675,11 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 #undef currentLightSource
 	}
 	
+#ifdef IsInFragmentOpaquePass
+	return vec4(lightedColor, surfaceParameters.occlusionFactor);
+#else
 	return vec4(lightedColor, surfaceParameters.baseColor.a);
+#endif
 }
 '
 ]
@@ -1721,6 +1739,47 @@ layout(set=3, binding=0, std140) uniform ObjectStateBlock
 '
 ]
 
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> opaqueReflectionCombinationFragmentShader [
+	^ opaqueReflectionCombinationFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> opaqueReflectionCombinationFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , '
+#line 6
+
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputColor;
+
+layout(set=4, binding=1) uniform texture2D DepthBuffer;
+layout(set=4, binding=2) uniform texture2D OpaqueColorBuffer;
+layout(set=4, binding=3) uniform texture2D ScreenSpaceAmbientOcclusionTexture;
+layout(set=4, binding=4) uniform texture2D StaticReflectionTexture;
+layout(set=4, binding=5) uniform texture2D ScreenSpaceReflectionTexture;
+
+void main()
+{
+	vec4 opaqueColorAndCavity = textureLod(sampler2D(OpaqueColorBuffer, ScreenTextureSampler), inTexcoord, 0.0);
+	vec3 opaqueColor = opaqueColorAndCavity.rgb;
+	float cavity = opaqueColorAndCavity.a;
+	
+	float ssaoFactor = textureLod(sampler2D(ScreenSpaceAmbientOcclusionTexture, ScreenTextureSampler), inTexcoord, 0.0).r;
+	vec4 staticReflection = textureLod(sampler2D(StaticReflectionTexture, ScreenTextureSampler), inTexcoord, 0.0);
+	vec4 screenSpaceReflection = textureLod(sampler2D(ScreenSpaceReflectionTexture, ScreenTextureSampler), inTexcoord, 0.0);
+	
+	float occlusionFactor = cavity*ssaoFactor;
+
+	vec3 reflection = mix(staticReflection.rgb, screenSpaceReflection.rgb, screenSpaceReflection.a);
+
+	vec3 color = opaqueColor + reflection*occlusionFactor;
+	FragmentOutputColor = vec4(color, 1.0);
+}
+'
+]
+
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> projectionNDCAdjustMatrix [
 	^ projectionNDCAdjustMatrix
@@ -1735,11 +1794,35 @@ WDAGPUSceneRendererResourceCache >> redCyanAnaglyphComposeShaderSource [
 
 void main()
 {
-	vec4 leftEyeColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord);
-	vec4 rightEyeColor = texture(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord);
+	vec4 leftEyeColor = textureLod(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord, 0.0);
+	vec4 rightEyeColor = textureLod(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord, 0.0);
 	FragmentOutputColor = vec4(leftEyeColor.r, rightEyeColor.gb, (leftEyeColor.a + rightEyeColor.a) * 0.5);
 }
 '
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> reflectionRenderPass [
+	| colorAttachment |
+	reflectionRenderPass ifNotNil: [ ^ reflectionRenderPass ].
+	
+	^ [
+		| renderpassDescription |
+		colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
+		colorAttachment
+			format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+			begin_action: AGPU_ATTACHMENT_DISCARD;
+			end_action: AGPU_ATTACHMENT_KEEP;
+			clear_value: AGPUColor4f new;
+			sample_count: 1;
+			sample_quality: 0.
+		renderpassDescription := AGPURenderpassDescription new.
+		renderpassDescription
+			color_attachment_count: 1;
+			color_attachments: colorAttachment.
+		reflectionRenderPass := device createRenderPass: renderpassDescription.
+	] ensure: [colorAttachment free].
+
 ]
 
 { #category : #'private shaders' }
@@ -1752,7 +1835,7 @@ WDAGPUSceneRendererResourceCache >> reinhardToneMappingOperatorShaderSource [
 
 void main()
 {
-	vec4 hdrTexel = texture(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord);
+	vec4 hdrTexel = textureLod(sampler2D(HDRColorBuffer, ScreenTextureSampler), inTexcoord, 0.0);
 	vec3 hdrColor = hdrTexel.rgb * CameraState.exposure;
 	vec3 ldrColor = hdrColor / (hdrColor + 1.0);
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
@@ -1777,6 +1860,7 @@ layout(location=0) out vec4 FragmentOutputColor;
 layout(location=1) out vec2 FragmentOutputNormal;
 layout(location=2) out vec4 FragmentOutputSpecularity;
 #define DefineRenderPassDummyOutputs()
+#define IsInFragmentOpaquePass
 
 '
 ] ifFalse: [ 
@@ -1808,6 +1892,32 @@ layout(set=0, binding=3) uniform sampler ScreenTextureSampler;
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> screenQuadVertexShader [
 	^ screenQuadVertexShader
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> screenSpaceReflectionComputationFragmentShader [
+	^ screenSpaceReflectionComputationFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> screenSpaceReflectionComputationFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , '
+#line 6
+
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputScreenSpaceReflection;
+
+layout(set=4, binding=1) uniform texture2D DepthBuffer;
+layout(set=4, binding=2) uniform texture2D NormalGBuffer;
+layout(set=4, binding=3) uniform texture2D SpecularGBuffer;
+
+void main()
+{
+	FragmentOutputScreenSpaceReflection = vec4(0.2, 0.4, 0.6, 0.0);
+}
+'
 ]
 
 { #category : #accessing }
@@ -1975,9 +2085,9 @@ WDAGPUSceneRendererResourceCache >> sideBySideStereoComposeShaderSource [
 void main()
 {
 	if(inTexcoord.x < 0.5)
-		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(2.0, 1.0));
+		FragmentOutputColor = textureLod(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(2.0, 1.0), 0.0);
 	else
-		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(2.0, 1.0) - vec2(1.0, 0.0));
+		FragmentOutputColor = textureLod(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(2.0, 1.0) - vec2(1.0, 0.0), 0.0);
 }
 '
 ]
@@ -2004,7 +2114,7 @@ void main()
 {
 	//vec4 hdrColor = texture(sampler2D(HDRColorBuffer, TextureSampler), inTexcoord);
 	//FragmentOutputColor = vec4(hdrColor.rgb * CameraState.exposure, hdrColor.a);
-	FragmentOutputSSAO = 0.5;
+	FragmentOutputSSAO = 1.0;
 }
 '
 ]
@@ -2031,6 +2141,75 @@ WDAGPUSceneRendererResourceCache >> ssaoRenderPass [
 		ssaoRenderPass := device createRenderPass: renderpassDescription.
 	] ensure: [colorAttachment free].
 
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> staticReflectionComputationFragmentShader [
+	^ staticReflectionComputationFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> staticReflectionComputationFragmentShaderSource [
+	^ '
+#version 450
+' , self lightingStateBlockSource , self samplerStateSource, self cameraStateBlockSource , '
+#line 6
+
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputStaticReflection;
+
+layout(set=4, binding=1) uniform texture2D DepthBuffer;
+layout(set=4, binding=2) uniform texture2D NormalGBuffer;
+layout(set=4, binding=3) uniform texture2D SpecularGBuffer;
+
+void main()
+{
+	vec4 specularColor = textureLod(sampler2D(SpecularGBuffer, ScreenTextureSampler), inTexcoord, 0.0);
+	if(specularColor == vec4(0.0, 0.0, 0.0, 0.0))
+	{
+		FragmentOutputStaticReflection = vec4(0.0);
+		return;
+	}
+
+	vec3 F0 = specularColor.xyz;
+	float roughnessFactor = specularColor.w;
+
+
+	float depth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), inTexcoord, 0.0).r;
+	vec2 screenNormal = textureLod(sampler2D(NormalGBuffer, ScreenTextureSampler), inTexcoord, 0.0).xy;
+	vec3 N = vec3(screenNormal, sqrt(max(1.0 - (screenNormal.x*screenNormal.x + screenNormal.y*screenNormal.y), 0.0)));
+
+	vec4 ndcPosition = vec4(inTexcoord*2.0 - 1.0, depth, 1.0);
+	if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
+		ndcPosition.y = -ndcPosition.y;
+	
+	vec4 clipSpacePosition = CameraState.inverseProjectionMatrix*ndcPosition;
+	vec3 viewP = clipSpacePosition.xyz / clipSpacePosition.w;
+	vec3 V = normalize(-viewP);
+	float NdotV = max(0.0, dot(N, V));
+
+
+	// Add the ambient lighting.
+	vec3 specularLightedColor = F0*LightingState.ambientLighting;
+
+	// Common factors for adding the different light probes samples.
+	vec3 R = reflect(-V, N);
+
+	mat3 viewToWorld = mat3(CameraState.inverseTransformationMatrix[0].xyz, CameraState.inverseTransformationMatrix[1].xyz, CameraState.inverseTransformationMatrix[2].xyz);
+	vec3 worldR = R * viewToWorld;
+
+	vec2 ambientReflectionFactors = textureLod(sampler2D(BRDFLutTexture, BrdfLutSampler), vec2(NdotV, roughnessFactor), 0.0).rg;
+	vec3 iblSpecularFactor = F0*ambientReflectionFactors.x + ambientReflectionFactors.y;
+
+	// Add the global light probe
+	{
+		float specularLightProbeLevel = float(textureQueryLevels(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler)) - 1) * roughnessFactor;
+		specularLightedColor += textureLod(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler), worldR, specularLightProbeLevel).rgb*iblSpecularFactor;
+	}
+	
+	FragmentOutputStaticReflection = vec4(specularLightedColor, 0.0);
+}
+'
 ]
 
 { #category : #accessing }
@@ -2086,9 +2265,9 @@ WDAGPUSceneRendererResourceCache >> topBottomStereoComposeShaderSource [
 void main()
 {
 	if(inTexcoord.x < 0.5)
-		FragmentOutputColor = texture(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(1.0, 2.0));
+		FragmentOutputColor = textureLod(sampler2D(RightEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(1.0, 2.0), 0.0);
 	else
-		FragmentOutputColor = texture(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(0.0, 2.0) - vec2(0.0, 1.0));
+		FragmentOutputColor = textureLod(sampler2D(LeftEyeBuffer, ScreenTextureSampler), inTexcoord * vec2(0.0, 2.0) - vec2(0.0, 1.0), 0.0);
 }
 '
 ]
