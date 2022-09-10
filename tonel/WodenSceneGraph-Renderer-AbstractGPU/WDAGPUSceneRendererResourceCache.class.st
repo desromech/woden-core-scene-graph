@@ -1589,7 +1589,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 	vec3 diffuseLightProbeSample = textureLod(samplerCube(AmbientDiffuseLightProbeTexture, BrdfLutSampler), worldN, 0.0).rgb;
 	lightedColor += diffuseLightProbeSample*diffuse;
 	
-#ifdef IsInFragmentOpaquePass
+#if defined(IsInFragmentOpaquePass) && 0
 	lightedColor += Cdiffuse*LightingState.ambientLighting;
 
 #else
@@ -2032,7 +2032,9 @@ layout(set=4, binding=3) uniform texture2D SpecularGBuffer;
 layout(set=4, binding=4) uniform texture2D GlossColorBuffer;
 layout(set=4, binding=5) uniform texture2D RoughColorBuffer;
 
-const float ReflectionMaxDistance = 15.0;
+const uint SampleCount = 20u;
+const float StepDistance = 0.5;
+const float HitDepthThreshold = 0.001;
 
 void main()
 {
@@ -2059,38 +2061,49 @@ void main()
 	vec3 V = normalize(-viewPosition);
 	vec3 R = reflect(-V, N);
 	
-	float targetReflectionDistance = 10.0;
-	vec3 targetReflectionViewPoint = viewPosition + R*ReflectionMaxDistance;
+	vec3 rayMarchDelta = R*StepDistance;
+	vec3 rayMarchPoint = viewPosition + rayMarchDelta;
+	vec2 reflectionScreenPoint = vec2(0.0);
+	bool hasHit = false;
 	
-	vec4 targetReflectionProjectedPoint = CameraState.projectionMatrix * vec4(targetReflectionViewPoint, 1.0);
-	if(targetReflectionProjectedPoint.w == 0.0)
-	{ 
-		FragmentOutputScreenSpaceReflection = vec4(0.0);
-		return;
-	}
-	
-	vec3 targetReflectionNDCPoint = targetReflectionProjectedPoint.xyz / targetReflectionProjectedPoint.w;
-	if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
-		targetReflectionNDCPoint.y = -targetReflectionNDCPoint.y;
+	for(uint i = 0u; i < SampleCount; ++i, rayMarchPoint += rayMarchDelta)
+	{
+		vec4 rayMarchProjectedPoint = CameraState.projectionMatrix * vec4(rayMarchPoint, 1.0);
+		if(rayMarchProjectedPoint.w == 0.0)
+			break;
 		
-	vec3 targetReflectionScreenPoint = targetReflectionNDCPoint*0.5 + 0.5;
-	if(targetReflectionScreenPoint.x < 0.0 || targetReflectionScreenPoint.x > 1.0 ||
-		targetReflectionScreenPoint.y < 0.0 || targetReflectionScreenPoint.y > 1.0)
+		vec3 rayMarchNDCPoint = rayMarchProjectedPoint.xyz / rayMarchProjectedPoint.w;
+		if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
+			rayMarchNDCPoint.y = -rayMarchNDCPoint.y;
+		
+		reflectionScreenPoint = rayMarchNDCPoint.xy*0.5 + 0.5;
+		if(reflectionScreenPoint.x < 0.0 || reflectionScreenPoint.x > 1.0 ||
+			reflectionScreenPoint.y < 0.0 || reflectionScreenPoint.y > 1.0)
+			break;
+		
+		float rayMarchDepth = rayMarchNDCPoint.z;
+		float sampleDepth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), reflectionScreenPoint, 0.0).r;
+		
+		float depthDelta = rayMarchDepth - sampleDepth;
+		hasHit = CameraState.hasReverseDepth ? depthDelta <= HitDepthThreshold : depthDelta >= HitDepthThreshold;
+		//hasHit = CameraState.hasReverseDepth ? depthDelta >= HitDepthThreshold : depthDelta <= HitDepthThreshold;
+		if(hasHit)
+			break;
+	}
+	
+	if(hasHit)
+	{
+		vec3 reflectionColor = mix(
+			textureLod(sampler2D(GlossColorBuffer, ScreenTextureSampler), reflectionScreenPoint, 0.0).rgb,
+			textureLod(sampler2D(RoughColorBuffer, ScreenTextureSampler), reflectionScreenPoint, 0.0).rgb,
+			specularColor.a)*specularColor.rgb;
+
+		FragmentOutputScreenSpaceReflection = vec4(reflectionColor, 1.0);
+	}
+	else
 	{ 
 		FragmentOutputScreenSpaceReflection = vec4(0.0);
-		return;
-	}
-
-	vec3 startReflectionScreenPoint = vec3(inTexcoord, depth);
-	
-	vec3 reflectionPoint = targetReflectionScreenPoint;
-	vec2 reflectionTexcoord = reflectionPoint.xy;
-	vec3 reflectionColor = mix(
-		textureLod(sampler2D(GlossColorBuffer, ScreenTextureSampler), reflectionTexcoord, 0.0).rgb,
-		textureLod(sampler2D(RoughColorBuffer, ScreenTextureSampler), reflectionTexcoord, 0.0).rgb,
-		specularColor.a)*specularColor.rgb;
-
-	FragmentOutputScreenSpaceReflection = vec4(reflectionColor, 1.0);
+	}	
 }
 '
 ]
@@ -2326,11 +2339,13 @@ void main()
 	vec3 iblSpecularFactor = F0*ambientReflectionFactors.x + ambientReflectionFactors.y;
 
 	// Add the global light probe
+#if 0
 	{
 		float specularLightProbeLevel = float(textureQueryLevels(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler)) - 1) * roughnessFactor;
 		specularLightedColor += textureLod(samplerCube(AmbientSpecularLightProbeTexture, BrdfLutSampler), worldR, specularLightProbeLevel).rgb*iblSpecularFactor;
 	}
-	
+#endif
+
 	FragmentOutputStaticReflection = vec4(specularLightedColor, 0.0);
 }
 '

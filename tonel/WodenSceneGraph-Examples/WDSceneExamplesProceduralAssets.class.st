@@ -9,7 +9,8 @@ Class {
 		'checkboardMaterial',
 		'checkboardTexture',
 		'checkboardNormalTexture',
-		'poolWaterMaterial'
+		'poolWaterMaterial',
+		'poolWaterOpaqueMaterial'
 	],
 	#classInstVars : [
 		'uniqueInstance'
@@ -117,6 +118,37 @@ WDSceneExamplesProceduralAssets >> poolWaterMaterial [
 		roughnessFactor: 0.02;
 		metallicFactor: 0.0;
 		baseColorFactor: (Vector4 x: 0.0 y: 0.0 z: 0.0 w: 0.05);
+		normalTexture: (WDTexture forNormalMapForm: normalMapForm);
+		texcoordOffsetVelocity: (Vector2 withAll: 0.3);
+		duplicatedTexcoordOffsetVelocity: (Vector2 withAll: -0.3);
+		yourself
+]
+
+{ #category : #accessing }
+WDSceneExamplesProceduralAssets >> poolWaterOpaqueMaterial [
+	<script: 'self uniqueInstance poolWaterMaterial inspect'>
+	| extent height normalMapForm |
+	poolWaterOpaqueMaterial ifNotNil: [ ^ poolWaterOpaqueMaterial ].
+
+	extent := 256@256.
+
+	height := [ :x :y |
+		| position |
+		position := Vector2 x: x y: y.
+		(position * 5) voronoiTurbulenceScales: 3 tiledWith: 5 asVector2
+	].
+
+
+	normalMapForm := (FPLFormRenderer extent: extent)
+		renderGray: height;
+		intoNormalMapWithScale: 2.0 gradientOperator: FPLGradientOperator sobel3x3;
+		form.
+
+	^ poolWaterOpaqueMaterial := WDDuplicatedMetallicRoughnessLiquidMaterial new
+		doubleSided: true;
+		roughnessFactor: 0.02;
+		metallicFactor: 0.0;
+		baseColorFactor: (Vector4 x: 0.0 y: 0.0 z: 0.0 w: 1.0);
 		normalTexture: (WDTexture forNormalMapForm: normalMapForm);
 		texcoordOffsetVelocity: (Vector2 withAll: 0.3);
 		duplicatedTexcoordOffsetVelocity: (Vector2 withAll: -0.3);

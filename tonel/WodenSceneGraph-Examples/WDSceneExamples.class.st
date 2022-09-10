@@ -244,6 +244,72 @@ WDSceneExamples class >> exampleManyCubesSingleMeshAndLights [
 ]
 
 { #category : #'sample scenes' }
+WDSceneExamples class >> exampleOpaquePool [
+	"
+	self exampleOpaquePool
+	"
+	| tilesMaterial concreteMaterial waterMaterial borderThickness |
+	tilesMaterial := WDSceneExamplesProceduralAssets uniqueInstance tileMaterial.
+	concreteMaterial := WDMetallicRoughnessMaterial default.
+	waterMaterial := WDSceneExamplesProceduralAssets uniqueInstance poolWaterOpaqueMaterial.
+
+	borderThickness := 0.5.
+	WDScene new
+		add:(WDMeshBuilder new
+			currentMaterial: tilesMaterial;
+
+			translateToX: (borderThickness*0.5) negated - 4.5 y: -1.0 z: 0.0;
+			addCubeWithWidth: 4.0 - borderThickness height: 2.0 depth: 5.0 + (borderThickness*2.0);
+		
+			translateToX: (borderThickness*0.5)+ 4.5 y: -1.0 z: 0.0;
+			addCubeWithWidth: 4.0 - borderThickness height: 2.0 depth: 5.0 + (borderThickness*2.0);
+		
+			translateToX: 0.0 y: -1.0 z: borderThickness + 4.5;
+			addCubeWithWidth: 13.0 height: 2.0 depth: 4.0;
+		
+			translateToX: 0.0 y: -1.0 z: borderThickness negated - 4.5;
+			addCubeWithWidth: 13.0 height: 2.0 depth: 4.0;
+
+			"Bottom"
+			currentMaterial: concreteMaterial;
+			translateToX: 0.0 y: -2.05 z: 0.0;
+			addCubeWithWidth: 5.0 height: 0.1 depth: 5.0;
+
+			"Border"
+			translateToX: -2.5 - (borderThickness*0.5) y: -1.0 z: 0.0;
+			addCubeWithWidth: borderThickness height: 2.2 depth: 5.0 + (borderThickness*2.0);
+		
+			translateToX: 2.5 + (borderThickness*0.5) y: -1.0 z: 0.0;
+			addCubeWithWidth: borderThickness height: 2.2 depth: 5.0 + (borderThickness*2.0);
+		
+			translateToX: 0.0 y: -1.0 z: 2.5 + (borderThickness*0.5);
+			addCubeWithWidth: 5.0 height: 2.2 depth: borderThickness;
+		
+			translateToX: 0.0 y: -1.0 z: -2.5 - (borderThickness*0.5);
+			addCubeWithWidth: 5.0 height: 2.2 depth: borderThickness;
+			
+			generateTexcoords0WithFacePlanarTransformWithScale: 4 asVector2;
+			generateTangentSpaceFrame;
+			mesh);
+		add: ((WDMeshBuilder new
+			currentMaterial: waterMaterial;
+			addPlaneWithWidth: 5 height: 5;
+			generateTexcoords0WithFacePlanarTransformWithScale: 1 asVector2;
+			generateTangentSpaceFrame;
+			mesh
+		) asSceneNode
+			translateToX: 0.0 y: -0.3 z: 0.0;
+			yourself);
+		add: ((WDDirectionalLightSource new
+			intensity: (Vector3 x: 1.0 y: 1.0 z: 0.8) normalized * 0.7;
+			asSceneNode)
+				rotateDegreesOnX: -35;
+				translateToX: 0.0 y: 1.5 z: 2.5;
+				yourself);
+		openInWindow
+]
+
+{ #category : #'sample scenes' }
 WDSceneExamples class >> examplePool [
 	"
 	self examplePool
