@@ -166,6 +166,7 @@ WDAbstractRenderingSceneStateOSWindow >> open [
 	eventHandler := self class eventHandlerClass new window: self.
 	attributes := OSWindowAttributes new
 		extent: extent;
+		windowCentered: true;
 		visible: false;
 		yourself.
 	osWindow := OSWindow createWithAttributes: attributes eventHandler: eventHandler.

@@ -70,9 +70,16 @@ WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexB
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowMapCameraLayer [
-	| shadowCastingLightSource convertedCameraState hasReverseDepth initialDepth shaderSignature shadowMapExtent |
+	| shadowCastingLightSource convertedCameraState hasReverseDepth initialDepth shaderSignature atlasElement atlasExtent viewportOffset viewportExtent viewportExtentScale |
 
+	atlasElement := renderer resourceCache shadowMapAtlasAllocator allocate.
 	shadowCastingLightSource := shadowMapCameraLayer shadowCastingLightSource.
+
+	atlasElement ifNil: [
+		shadowMapCameraLayer castShadows: false.
+		^ self
+	].
+
 	shadowCastingLightSource
 		shadowMapViewportScale: (Vector2 x: 0.5 y: 0.5);
 		shadowMapViewportOffset: (Vector2 x: 0.5 y: 0.5).
@@ -80,14 +87,21 @@ WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowM
 	renderer device hasTopLeftNdcOrigin = renderer device hasBottomLeftTextureCoordinates ifTrue: [ 
 		shadowCastingLightSource shadowMapViewportScale y: shadowCastingLightSource shadowMapViewportScale y negated
 	].
+
+	atlasExtent := atlasElement atlasExtent.
+	viewportOffset := atlasElement offset.
+	viewportExtent := atlasElement extent.
+	viewportExtentScale := viewportExtent / atlasExtent.
+	shadowCastingLightSource
+		shadowMapViewportScale: shadowCastingLightSource shadowMapViewportScale * viewportExtentScale;
+		shadowMapViewportOffset: shadowCastingLightSource shadowMapViewportOffset * viewportExtentScale + (viewportOffset/atlasExtent).
 		
 	hasReverseDepth := shadowMapCameraLayer hasReverseDepth.
 	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	depthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
 
-	shadowMapExtent := renderer resourceCache shadowMapAtlasExtent.
-	convertedCameraState := self convertedCameraState: shadowMapCameraLayer cameraState framebufferExtent: shadowMapExtent.
+	convertedCameraState := self convertedCameraState: shadowMapCameraLayer cameraState framebufferExtent: viewportExtent.
 
 	depthTestingEnabled := true.
 	depthWriteMask := true.
@@ -97,11 +111,21 @@ WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowM
 		resetGraphicsPipeline;
 		beginRenderPass: renderer resourceCache shadowMapRenderPass
 			framebuffer: renderer resourceCache shadowMapAtlasFramebuffer bundle_content: 0;
-		setViewport: 0 y: 0 w: shadowMapExtent x h: shadowMapExtent y;
-		setScissor: 0 y: 0 w: shadowMapExtent x h: shadowMapExtent y;
+		setViewport: viewportOffset x y: viewportOffset y w: viewportExtent x h: viewportExtent y;
+		setScissor: viewportOffset x y: viewportOffset y w: viewportExtent x h: viewportExtent y;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
 		useShaderResources: renderer resourceCache emptyLightingStateBinding bindingHandle;
+
+		"Clear the depth buffer"
+		setCullMode: AGPU_CULL_MODE_NONE;
+		setDepthState: true writeMask: true function: AGPU_ALWAYS;
+		setPrimitiveType: AGPU_TRIANGLES;
+		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache clearReverseDepthFragmentShader entryPoint: 'main';
+		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+
+		"Setup normal rendering"
 		setFrontFace: AGPU_COUNTER_CLOCKWISE;
 		setDepthState: true writeMask: true function: depthFunction.
 
@@ -722,6 +746,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		initialDepth: initialDepth.
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	
+	renderer resourceCache shadowMapAtlasAllocator reset.	
 	renderingSceneState cameraLayers do: [ :cameraLayer |
 		cameraLayer shadowMapCameraLayers do: [ :shadowMapCameraLayer |
 			self allocateAndRenderShadowMapFor: shadowMapCameraLayer

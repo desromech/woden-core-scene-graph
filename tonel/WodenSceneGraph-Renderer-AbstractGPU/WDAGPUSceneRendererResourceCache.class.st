@@ -71,7 +71,9 @@ Class {
 		'reflectionRenderPass',
 		'opaqueReflectionCombinationFragmentShader',
 		'screenSpaceAmbientOcclusionComputationFragmentShader',
-		'screenSpaceAmbientOcclusionRenderPass'
+		'screenSpaceAmbientOcclusionRenderPass',
+		'shadowMapAtlasAllocator',
+		'clearReverseDepthFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -174,6 +176,11 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache class >> shadowMapAtlasExtent [
+	^ ShadowMapAtlasExtent
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> brdfLutTexture [
 	^ brdfLutTexture
 ]
@@ -216,6 +223,24 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 
 } CameraState;
 '
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> clearReverseDepthFragmentShader [
+	^ clearReverseDepthFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> clearReverseDepthFragmentShaderSource [
+	^ '
+#version 450
+
+void main()
+{ 
+	gl_FragDepth = 0.0;
+}
+'
+
 ]
 
 { #category : #initialization }
@@ -994,6 +1019,8 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	shadowMapAtlasTextureDepthStencilView := shadowMapAtlasTexture createView: shadowMapAtlasTextureDepthStencilViewDescription.
 	shadowMapAtlasFramebuffer := device createFrameBuffer: ShadowMapAtlasExtent x height: ShadowMapAtlasExtent y colorCount: 0 colorViews: nil depthStencilView: shadowMapAtlasTextureDepthStencilView.
 	
+	shadowMapAtlasAllocator := WDAGPUShadowMapTextureAtlasAllocator forAtlasWithExtent: ShadowMapAtlasExtent.
+	
 	genericSurfaceMaterialVertexShaders := Dictionary new.
 	genericDepthOnlySurfaceFragmentShader := self compileShader: self genericDepthOnlySurfaceFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	
@@ -1028,6 +1055,8 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	staticReflectionComputationFragmentShader := self compileShader: self staticReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	screenSpaceReflectionComputationFragmentShader := self compileShader: self screenSpaceReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	opaqueReflectionCombinationFragmentShader := self compileShader: self opaqueReflectionCombinationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	
+	clearReverseDepthFragmentShader := self compileShader: self clearReverseDepthFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 
 	linearToneMappingOperator := self compileShader: self linearToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
 	reinhardToneMappingOperator := self compileShader: self reinhardToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -2110,6 +2139,11 @@ void main()
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache >> shadowMapAtlasAllocator [
+	^ shadowMapAtlasAllocator
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> shadowMapAtlasExtent [
 	^ ShadowMapAtlasExtent
 ]
@@ -2137,13 +2171,10 @@ WDAGPUSceneRendererResourceCache >> shadowMapRenderPass [
 	^ [
 		depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
 			format: AGPU_TEXTURE_FORMAT_D32_FLOAT;
-			begin_action: AGPU_ATTACHMENT_CLEAR;
+			begin_action: AGPU_ATTACHMENT_KEEP;
 			end_action: AGPU_ATTACHMENT_KEEP;
-			stencil_begin_action: AGPU_ATTACHMENT_CLEAR;
+			stencil_begin_action: AGPU_ATTACHMENT_KEEP;
 			stencil_end_action: AGPU_ATTACHMENT_KEEP;
-			clear_value: (AGPUDepthStencilValue new
-				depth: 0.0;
-				yourself);
 			sample_count: 1;
 			yourself.
 		renderpassDescription := AGPURenderpassDescription new.

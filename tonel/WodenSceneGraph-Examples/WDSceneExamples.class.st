@@ -454,6 +454,93 @@ WDSceneExamples class >> exampleShadowCastingSpotLight [
 ]
 
 { #category : #'basic shapes' }
+WDSceneExamples class >> exampleShadowCastingSpotLight2 [
+	"
+	self exampleShadowCastingSpotLight2
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+
+			translateToX: 0 y: -0.125 z: 0;
+			addCubeWithWidth: 10.0 height: 0.25 depth: 10.0;
+
+			translateToX: 0 y: 0.5 z: 0;
+			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+
+			translateToX: 2.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+			generateTangentSpaceFrame;
+			mesh);
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorFactor: (Vector4 x: 1.0 y: 1.0 z: 1.0 w: 0.8);
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.1;
+				metallicFactor: 0.0;
+				alphaMode: #BLEND;
+				yourself);
+
+			translateToX: 2.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+			generateTangentSpaceFrame;
+			mesh);
+		add: ((WDSpotLightSource new
+			castShadows: true;
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 20.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				rotateDegreesOnX: -45;
+				rotateDegreesOnY: -135;
+				position: (Vector3 x: -1.0 y: 2.0 z: -2.0);
+				yourself);
+		add: ((WDSpotLightSource new
+			castShadows: true;
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 20.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				rotateDegreesOnX: -45;
+				rotateDegreesOnY: 135;
+				position: (Vector3 x: 1.0 y: 2.0 z: -2.0);
+				yourself);
+		openInWindow
+]
+
+{ #category : #'basic shapes' }
 WDSceneExamples class >> exampleTexturedCube [
 	"
 	self exampleTexturedCube
