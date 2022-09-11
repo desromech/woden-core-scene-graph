@@ -521,7 +521,7 @@ WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 			mesh);
 		add: ((WDSpotLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 20.0;
+			intensity: (Vector3 x: 0.8 y: 0.6 z: 0.6) * 5.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				rotateDegreesOnX: -45;
@@ -530,12 +530,20 @@ WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 				yourself);
 		add: ((WDSpotLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 20.0;
+			intensity: (Vector3 x: 0.6 y: 0.8 z: 0.6) * 5.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				rotateDegreesOnX: -45;
 				rotateDegreesOnY: 135;
 				position: (Vector3 x: 1.0 y: 2.0 z: -2.0);
+				yourself);
+		add: ((WDSpotLightSource new
+			castShadows: true;
+			intensity: (Vector3 x: 0.6 y: 0.6 z: 0.8) * 5.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				rotateDegreesOnX: -45;
+				position: (Vector3 x: 0.0 y: 2.0 z: 4.0);
 				yourself);
 		openInWindow
 ]
