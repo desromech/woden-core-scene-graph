@@ -1097,7 +1097,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	neutralNormalTexture := self createTexture2DWithSingleColor: #[128 128 255 255].
 	transparentTextureCube := self createTextureCubeWithSingleColor: #[0 0 0 0].
 	
-	shadowMapAtlasTexture := self createShadowMapTextureWithExtent: ShadowMapAtlasExtent clearDepth: 1.0.
+	shadowMapAtlasTexture := self createShadowMapTextureWithExtent: ShadowMapAtlasExtent clearDepth: 0.0.
 	shadowMapAtlasTextureSamplingViewDescription := AGPUTextureViewDescription new.
 	shadowMapAtlasTexture getFullViewDescription: shadowMapAtlasTextureSamplingViewDescription.
 	shadowMapAtlasTextureSamplingViewDescription
