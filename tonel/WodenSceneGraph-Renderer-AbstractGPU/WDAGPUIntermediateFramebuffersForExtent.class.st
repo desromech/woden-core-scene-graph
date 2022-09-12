@@ -26,7 +26,10 @@ Class {
 		'screenSpaceReflectionFramebuffer',
 		'staticReflectionTexture',
 		'staticReflectionFramebuffer',
-		'opaqueColorBufferTexture'
+		'opaqueColorBufferTexture',
+		'screenRoughExtents',
+		'screenRoughTextures',
+		'screenRoughFramebuffers'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -218,6 +221,42 @@ WDAGPUIntermediateFramebuffersForExtent >> createSSAOFramebuffer [
 ]
 
 { #category : #initialization }
+WDAGPUIntermediateFramebuffersForExtent >> createScreenRoughFramebuffer [
+	screenRoughExtents := {256@256 . 128@128 . 64@64 . 64@64}.
+	screenRoughTextures := Array new: screenRoughExtents size.
+	screenRoughFramebuffers := Array new: screenRoughExtents size.
+	
+	screenRoughExtents doWithIndex: [ :fbExtent :index |
+		| texture viewDesc attachmentView framebuffer |
+		texture := device createTexture: (AGPUTextureDescription new
+			type: AGPU_TEXTURE_2D;
+			width: fbExtent x;
+			height: fbExtent y;
+			depth: 1;
+			layers: 1;
+			miplevels: 1;
+			format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+			usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+			main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+			sample_count: 1;
+			yourself).
+
+		viewDesc := AGPUTextureViewDescription new.
+		texture getFullViewDescription: viewDesc.
+		viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+		attachmentView := texture createView: viewDesc.
+
+		framebuffer := device createFrameBuffer: fbExtent x height: fbExtent y
+			colorCount: 1 colorViews: (AGPU packListOfReferences: {attachmentView})
+			depthStencilView: nil.
+
+		screenRoughTextures at: index put: texture.
+		screenRoughFramebuffers at: index put: framebuffer.
+	].
+
+]
+
+{ #category : #initialization }
 WDAGPUIntermediateFramebuffersForExtent >> createScreenSpaceReflectionFramebuffer [
 	| viewDesc screenSpaceReflectionTextureAttachmentView |
 	screenSpaceReflectionTexture := device createTexture: (AGPUTextureDescription new
@@ -329,6 +368,7 @@ WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourc
 		createHdrFramebuffer;
 		createSSAOFramebuffer;
 		createStaticReflectionFramebuffer;
+		createScreenRoughFramebuffer;
 		createScreenSpaceReflectionFramebuffer
 ]
 
@@ -345,6 +385,21 @@ WDAGPUIntermediateFramebuffersForExtent >> opaqueColorBufferTexture [
 { #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> sampleCount [
 	^ sampleCount
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> screenRoughExtents [
+	^ screenRoughExtents
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> screenRoughFramebuffers [
+	^ screenRoughFramebuffers
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> screenRoughTextures [
+	^ screenRoughTextures
 ]
 
 { #category : #accessing }

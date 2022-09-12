@@ -21,6 +21,7 @@ Class {
 		'isInDepthOnlyPass'
 	],
 	#classVars : [
+		'BlurPasses',
 		'PrimitiveTopologyMap'
 	],
 	#pools : [
@@ -31,6 +32,8 @@ Class {
 
 { #category : #initialization }
 WDAGPUSceneRendererActiveFrameRenderer class >> initialize [
+	BlurPasses := 2.
+	
 	PrimitiveTopologyMap := Dictionary newFromPairs: { 
 		WDPrimitiveTopologyPoints uniqueInstance . AGPU_POINTS.
 		WDPrimitiveTopologyLines uniqueInstance . AGPU_LINES.
@@ -152,6 +155,18 @@ WDAGPUSceneRendererActiveFrameRenderer >> beginRecordingCommandsOn: aStateTracke
 	activeResourceDictionary := Dictionary new.
 	stateTracker beginRecordingCommands.
 	self resetCurrentActiveState.
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindBlurTextureSource: sourceTexture [
+	stateTracker useShaderResources: (activeResourceDictionary at: {sourceTexture} ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+		binding bindSampledTextureView: sourceTexture getOrCreateFullView inSlot: 1.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
 ]
 
 { #category : #rendering }
@@ -625,6 +640,81 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingTranslucentO
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenRoughComputationFor: intermediateFramebuffers [
+	| shaderSignature screenRoughExtents screenRoughTextures screenRoughFramebuffers previousTexture pingTextureIndex blurExtent pingTexture pingFramebuffer pongTexture pongFramebuffer |
+
+	shaderSignature := renderer resourceCache rendererShaderSignature.
+	screenRoughExtents := intermediateFramebuffers screenRoughExtents.
+	screenRoughTextures := intermediateFramebuffers screenRoughTextures.
+	screenRoughFramebuffers := intermediateFramebuffers screenRoughFramebuffers.
+	
+	previousTexture := intermediateFramebuffers hdrOpaqueColorBuffer.
+	pingTextureIndex := screenRoughExtents size - 1.
+	
+	"Downsample the color output."	
+	1 to: pingTextureIndex do: [ :index |
+		| extent |
+		extent := screenRoughExtents at: index.
+
+		stateTracker
+			resetGraphicsPipeline;
+			beginRenderPass: renderer resourceCache hdrBlurRenderPass framebuffer: (screenRoughFramebuffers at: index) bundle_content: 0;
+			setViewport: 0 y: 0 w: extent x h: extent y;
+			setScissor: 0 y: 0 w: extent x h: extent y;
+			setShaderSignature: shaderSignature handle;
+			useShaderResources: shaderSignature samplersBinding;
+			setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+			setFragmentStage: renderer resourceCache downsampleFragmentShader entryPoint: 'main'.
+
+		self bindBlurTextureSource: previousTexture.
+
+		stateTracker
+			setCullMode: AGPU_CULL_MODE_NONE;
+			setDepthState: false writeMask: false function: AGPU_ALWAYS;
+			setPrimitiveType: AGPU_TRIANGLES;
+			drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+			endRenderPass.
+			
+		previousTexture := screenRoughTextures at: index
+	].
+
+	blurExtent := intermediateFramebuffers screenRoughExtents at: pingTextureIndex.
+	pingTexture := intermediateFramebuffers screenRoughTextures at: pingTextureIndex.
+	pingFramebuffer := intermediateFramebuffers screenRoughFramebuffers at: pingTextureIndex.
+
+	pongTexture := intermediateFramebuffers screenRoughTextures last.
+	pongFramebuffer := intermediateFramebuffers screenRoughFramebuffers last.
+
+	1 to: BlurPasses do: [ :blurPass |
+		"Blur horizontal pass."
+		stateTracker
+			beginRenderPass: renderer resourceCache hdrBlurRenderPass framebuffer: pongFramebuffer bundle_content: 0;
+			setViewport: 0 y: 0 w: blurExtent x h: blurExtent y;
+			setScissor: 0 y: 0 w: blurExtent x h: blurExtent y;
+			setFragmentStage: renderer resourceCache blurHorizontalPassFragmentShader entryPoint: 'main'.
+
+		self bindBlurTextureSource: pingTexture.
+
+		stateTracker
+			drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+			endRenderPass.
+			
+		"Blur vertical pass."		
+		stateTracker
+			beginRenderPass: renderer resourceCache hdrBlurRenderPass framebuffer: pingFramebuffer bundle_content: 0;
+			setViewport: 0 y: 0 w: blurExtent x h: blurExtent y;
+			setScissor: 0 y: 0 w: blurExtent x h: blurExtent y;
+			setFragmentStage: renderer resourceCache blurVerticalPassFragmentShader entryPoint: 'main'.
+
+		self bindBlurTextureSource: pongTexture.
+
+		stateTracker
+			drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+			endRenderPass.
+	]
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcclusionComputationFor: intermediateFramebuffers cameraState: mainCameraState [
 	| shaderSignature ssaoExtent |
 
@@ -638,7 +728,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcc
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
 		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: (renderer resourceCache screenSpaceAmbientOcclusionComputationFragmentShader) entryPoint: 'main'.
+		setFragmentStage: renderer resourceCache screenSpaceAmbientOcclusionComputationFragmentShader entryPoint: 'main'.
 
 	self
 		bindCameraState: mainCameraState;
@@ -649,12 +739,45 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcc
 		setDepthState: false writeMask: false function: AGPU_ALWAYS;
 		setPrimitiveType: AGPU_TRIANGLES;
 		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
-		endRenderPass
+		endRenderPass.
+
+	1 to: BlurPasses do: [ :blurPass |
+		"Blur horizontal pass."		
+		stateTracker
+			beginRenderPass: renderer resourceCache screenSpaceAmbientOcclusionRenderPass framebuffer: intermediateFramebuffers ssaoPongFramebuffer bundle_content: 0;
+			setViewport: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
+			setScissor: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
+			setFragmentStage: renderer resourceCache blurHorizontalPassFragmentShader entryPoint: 'main'.
+
+		self bindBlurTextureSource: intermediateFramebuffers ssaoPingTexture.
+
+		stateTracker
+			drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+			endRenderPass.
+			
+		"Blur vertical pass."		
+		stateTracker
+			beginRenderPass: renderer resourceCache screenSpaceAmbientOcclusionRenderPass framebuffer: intermediateFramebuffers ssaoPingFramebuffer bundle_content: 0;
+			setViewport: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
+			setScissor: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
+			setFragmentStage: renderer resourceCache blurVerticalPassFragmentShader entryPoint: 'main'.
+
+		self bindBlurTextureSource: intermediateFramebuffers ssaoPongTexture.
+
+		stateTracker
+			drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+			endRenderPass.
+	]
 ]
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState [
-	| shaderSignature extent |
+	| shaderSignature extent screenRoughTextures screenRoughTexture |
+	
+	self recordCommandsForScreenRoughComputationFor: intermediateFramebuffers.
+	
+	screenRoughTextures := intermediateFramebuffers screenRoughTextures.
+	screenRoughTexture := screenRoughTextures at: screenRoughTextures size - 1.
 
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	extent := intermediateFramebuffers extent.
@@ -670,7 +793,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflection
 
 	self
 		bindCameraState: mainCameraState;
-		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView normalGBuffer: intermediateFramebuffers normalGBufferTexture specularGBuffer: intermediateFramebuffers specularGBufferTexture glossColorBuffer: intermediateFramebuffers hdrOpaqueColorBuffer roughColorBuffer: intermediateFramebuffers hdrOpaqueColorBuffer.
+		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView normalGBuffer: intermediateFramebuffers normalGBufferTexture specularGBuffer: intermediateFramebuffers specularGBufferTexture glossColorBuffer: intermediateFramebuffers hdrOpaqueColorBuffer roughColorBuffer: screenRoughTexture.
 
 	stateTracker
 		setCullMode: AGPU_CULL_MODE_NONE;

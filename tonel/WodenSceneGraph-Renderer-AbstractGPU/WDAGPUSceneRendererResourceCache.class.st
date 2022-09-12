@@ -73,7 +73,10 @@ Class {
 		'screenSpaceAmbientOcclusionComputationFragmentShader',
 		'screenSpaceAmbientOcclusionRenderPass',
 		'shadowMapAtlasAllocator',
-		'clearReverseDepthFragmentShader'
+		'clearReverseDepthFragmentShader',
+		'blurHorizontalPassFragmentShader',
+		'blurVerticalPassFragmentShader',
+		'downsampleFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -178,6 +181,70 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache class >> shadowMapAtlasExtent [
 	^ ShadowMapAtlasExtent
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> blurHorizontalPassFragmentShader [
+	^ blurHorizontalPassFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> blurHorizontalPassFragmentShaderSource [
+	^ '
+#version 450
+#extension GL_EXT_samplerless_texture_functions : require
+' , self samplerStateSource, '
+#line 6
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputColor;
+
+layout(set=4, binding=1) uniform texture2D SourceTexture;
+
+void main()
+{
+	vec2 filterScale = 1.5 / vec2(textureSize(SourceTexture, 0));
+	
+	FragmentOutputColor = (
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(-2.0, 0.0)*filterScale, 0.0) +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(-1.0, 0.0)*filterScale, 0.0)*4.0 +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord, 0.0)*6.0 +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(1.0, 0.0)*filterScale, 0.0)*4.0 +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(2.0, 0.0)*filterScale, 0.0)
+	)*0.0625;
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> blurVerticalPassFragmentShader [
+	^ blurVerticalPassFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> blurVerticalPassFragmentShaderSource [
+	^ '
+#version 450
+#extension GL_EXT_samplerless_texture_functions : require
+' , self samplerStateSource, '
+#line 6
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputColor;
+
+layout(set=4, binding=1) uniform texture2D SourceTexture;
+
+void main()
+{
+	vec2 filterScale = 1.5 / vec2(textureSize(SourceTexture, 0));
+	
+	FragmentOutputColor = (
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(0.0, -2.0)*filterScale, 0.0) +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(0.0, -1.0)*filterScale, 0.0)*4.0 +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord, 0.0)*6.0 +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(0.0, 1.0)*filterScale, 0.0)*4.0 +
+		textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord + vec2(0.0, 2.0)*filterScale, 0.0)
+	)*0.0625;
+}
+'
 ]
 
 { #category : #accessing }
@@ -432,6 +499,29 @@ WDAGPUSceneRendererResourceCache >> depthTypelessFormat [
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> device [
 	^ device
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> downsampleFragmentShader [
+	^ downsampleFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> downsampleFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, '
+#line 6
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputColor;
+
+layout(set=4, binding=1) uniform texture2D SourceTexture;
+
+void main()
+{
+	FragmentOutputColor = textureLod(sampler2D(SourceTexture, ScreenTextureSampler), inTexcoord, 0.0);
+}
+'
 ]
 
 { #category : #'accessing shaders' }
@@ -813,6 +903,11 @@ WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocati
 ]
 
 { #category : #initialization }
+WDAGPUSceneRendererResourceCache >> hdrBlurRenderPass [
+	^ self reflectionRenderPass
+]
+
+{ #category : #initialization }
 WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCount [
 	^ renderPasses at: {#hdrOpaqueRenderPass . sampleCount} ifAbsentPut: [
 		| depthStencilAttachment colorAttachmentDescriptionsPointer |
@@ -1057,6 +1152,10 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	opaqueReflectionCombinationFragmentShader := self compileShader: self opaqueReflectionCombinationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	
 	clearReverseDepthFragmentShader := self compileShader: self clearReverseDepthFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+
+	downsampleFragmentShader := self compileShader: self downsampleFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	blurHorizontalPassFragmentShader := self compileShader: self blurHorizontalPassFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	blurVerticalPassFragmentShader := self compileShader: self blurVerticalPassFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 
 	linearToneMappingOperator := self compileShader: self linearToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
 	reinhardToneMappingOperator := self compileShader: self reinhardToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
