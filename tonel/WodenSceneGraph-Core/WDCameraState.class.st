@@ -207,7 +207,7 @@ WDCameraState >> initialize [
 	currentTime := 0.0.
 	exposure := 1.0.
 	bloomThreshold := 1.0.
-	bloomStrength := 0.2.
+	bloomStrength := 0.1.
 	hasReverseDepth := true.
 	hasTopLeftNDCOrigin := true.
 	hasBottomLeftTextureCoordinates := false.
