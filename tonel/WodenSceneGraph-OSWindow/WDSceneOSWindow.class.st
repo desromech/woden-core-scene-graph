@@ -6,7 +6,9 @@ Class {
 	#superclass : #WDAbstractRenderingSceneStateOSWindow,
 	#instVars : [
 		'scene',
-		'camera'
+		'camera',
+		'hasSceneUpdateRequested',
+		'lastSceneUpdateTime'
 	],
 	#category : #'WodenSceneGraph-OSWindow'
 }
@@ -23,10 +25,23 @@ WDSceneOSWindow >> camera: anObject [
 	camera := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+WDSceneOSWindow >> doUpdate [
+	| currentTime deltaTime |
+	currentTime := Time monotonicMicrosecondClockValue.
+	lastSceneUpdateTime ifNil: [ lastSceneUpdateTime := Time monotonicMicrosecondClockValue ].
+	deltaTime := lastSceneUpdateTime - currentTime.
+	
+	hasSceneUpdateRequested := scene updateWithDeltaTime: deltaTime*1e-6.
+	
+	lastSceneUpdateTime := currentTime.
+]
+
 { #category : #initialization }
 WDSceneOSWindow >> initialize [
 	super initialize.
 	self camera: WDCamera new.
+	hasSceneUpdateRequested := false.
 ]
 
 { #category : #accessing }
@@ -38,6 +53,11 @@ WDSceneOSWindow >> leftEyeRenderingSceneState [
 	aspectRatio := displayExtent x asFloat / displayExtent y.
 	^ (camera asCameraStateWithFrustumTangents: (vrSystem leftEyeFrustumTangentsWithFovY: camera asCameraFovY aspect: aspectRatio) eyeTransform: vrSystem leftEyeTransform)
 		ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
+]
+
+{ #category : #accessing }
+WDSceneOSWindow >> needsToRender [
+	^ super needsToRender or: [ hasSceneUpdateRequested ]
 ]
 
 { #category : #accessing }
@@ -70,5 +90,6 @@ WDSceneOSWindow >> scene [
 { #category : #accessing }
 WDSceneOSWindow >> scene: anObject [
 
-	scene := anObject
+	scene := anObject.
+	hasSceneUpdateRequested := true
 ]
