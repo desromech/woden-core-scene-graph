@@ -44,6 +44,126 @@ WDSceneExamples class >> exampleAnimatedCube [
 ]
 
 { #category : #'basic shapes' }
+WDSceneExamples class >> exampleAnimatedShadowCastingSpotLight2 [
+	"
+	self exampleShadowCastingSpotLight2
+	"
+	| scene firstLight secondLight thirdLight currentTime |
+	scene := WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: WDSceneExamples checkboardTexture;
+				normalTexture: WDSceneExamples checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+
+			translateToX: 0 y: -0.125 z: 0;
+			addCubeWithWidth: 10.0 height: 0.25 depth: 10.0;
+
+			translateToX: 0 y: 0.5 z: 0;
+			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+
+			translateToX: 2.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+			generateTangentSpaceFrame;
+			mesh);
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorFactor: (Vector4 x: 1.0 y: 1.0 z: 1.0 w: 0.8);
+				baseColorTexture: WDSceneExamples checkboardTexture;
+				normalTexture: WDSceneExamples checkboardNormalTexture;
+				roughnessFactor: 0.1;
+				metallicFactor: 0.0;
+				alphaMode: #BLEND;
+				yourself);
+
+			translateToX: 2.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+			generateTangentSpaceFrame;
+			mesh);
+		yourself.
+
+	firstLight := (WDSpotLightSource new
+			castShadows: true;
+			intensity: (Vector3 x: 0.8 y: 0.6 z: 0.6) * 10.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				rotateDegreesOnX: -45;
+				rotateDegreesOnY: -135;
+				position: (Vector3 x: -1.0 y: 2.0 z: -2.0);
+				yourself.
+
+	secondLight := (WDSpotLightSource new
+			castShadows: true;
+			intensity: (Vector3 x: 0.6 y: 0.8 z: 0.6) * 10.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				rotateDegreesOnX: -45;
+				rotateDegreesOnY: 135;
+				position: (Vector3 x: 1.0 y: 2.0 z: -2.0);
+				yourself.
+				
+	thirdLight := (WDSpotLightSource new
+			castShadows: true;
+			intensity: (Vector3 x: 0.6 y: 0.6 z: 0.8) * 10.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				rotateDegreesOnX: -45;
+				position: (Vector3 x: 0.0 y: 2.0 z: 4.0);
+				yourself.
+
+	currentTime := 0.
+	scene
+		add: firstLight;
+		add: secondLight;
+		add: thirdLight;
+		updateBlock: [ :delta |
+			| theta |
+			currentTime := currentTime + delta.
+			
+			theta := currentTime.
+			firstLight position: (Vector3 x: -1.0 y: 2.0 z: -2.0) + ((Vector3 x: theta cos y: 0.0 z: theta sin) * 0.5).
+
+			theta := currentTime*1.15 + 0.5.
+			secondLight position: (Vector3 x: 1.0 y: 2.0 z: -2.0) + ((Vector3 x: theta cos y: 0.0 z: theta sin) * 0.5).
+
+			theta := currentTime*1.3 + 1.3.
+			thirdLight position: (Vector3 x: 0.0 y: 2.0 z: 4.0) + ((Vector3 x: theta cos y: 0.0 z: theta sin) * 0.5)
+
+		];
+		openInWindow
+]
+
+{ #category : #'basic shapes' }
 WDSceneExamples class >> exampleCube [
 	"
 	self exampleCube
