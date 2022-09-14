@@ -29,7 +29,14 @@ Class {
 		'opaqueColorBufferTexture',
 		'screenRoughExtents',
 		'screenRoughTextures',
-		'screenRoughFramebuffers'
+		'screenRoughFramebuffers',
+		'bloomExtent',
+		'bloomPingTexture',
+		'bloomPongTexture',
+		'bloomPingTextureAttachmentView',
+		'bloomPongTextureAttachmentView',
+		'bloomPingFramebuffer',
+		'bloomPongFramebuffer'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -43,8 +50,89 @@ WDAGPUIntermediateFramebuffersForExtent class >> for: device resourceCache: reso
 ]
 
 { #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> bloomExtent [
+
+	^ bloomExtent
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> bloomPingFramebuffer [
+
+	^ bloomPingFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> bloomPingTexture [
+
+	^ bloomPingTexture
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> bloomPongFramebuffer [
+
+	^ bloomPongFramebuffer
+]
+
+{ #category : #accessing }
+WDAGPUIntermediateFramebuffersForExtent >> bloomPongTexture [
+
+	^ bloomPongTexture
+]
+
+{ #category : #accessing }
 WDAGPUIntermediateFramebuffersForExtent >> colorBufferTexture [
 	^ colorBufferTexture
+]
+
+{ #category : #initialization }
+WDAGPUIntermediateFramebuffersForExtent >> createBloomFramebuffer [
+	| bloomWidth bloomHeight viewDesc |
+	bloomWidth := (extent x / 4) floor max: 1.
+	bloomHeight := (extent y / 4) floor max: 1.
+	bloomExtent := bloomWidth @ bloomHeight.
+	bloomPingTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: bloomExtent x;
+		height: bloomExtent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: 1;
+		yourself).
+		
+	bloomPongTexture := device createTexture: (AGPUTextureDescription new
+		type: AGPU_TEXTURE_2D;
+		width: bloomExtent x;
+		height: bloomExtent y;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+		usage_modes: (AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+		sample_count: 1;
+		yourself).
+
+	viewDesc := AGPUTextureViewDescription new.
+	bloomPingTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	bloomPingTextureAttachmentView := bloomPingTexture createView: viewDesc.
+
+	viewDesc := AGPUTextureViewDescription new.
+	bloomPongTexture getFullViewDescription: viewDesc.
+	viewDesc usage_mode: AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT.
+	bloomPongTextureAttachmentView := bloomPongTexture createView: viewDesc.
+
+	bloomPingFramebuffer := device createFrameBuffer: bloomWidth height: bloomHeight
+		colorCount: 1 colorViews: (AGPU packListOfReferences: {bloomPingTextureAttachmentView})
+		depthStencilView: nil.
+	bloomPongFramebuffer := device createFrameBuffer: bloomWidth height: bloomHeight
+		colorCount: 1 colorViews: (AGPU packListOfReferences: {bloomPongTextureAttachmentView})
+		depthStencilView: nil.
+
 ]
 
 { #category : #initialization }
@@ -369,7 +457,8 @@ WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourc
 		createSSAOFramebuffer;
 		createStaticReflectionFramebuffer;
 		createScreenRoughFramebuffer;
-		createScreenSpaceReflectionFramebuffer
+		createScreenSpaceReflectionFramebuffer;
+		createBloomFramebuffer
 ]
 
 { #category : #accessing }

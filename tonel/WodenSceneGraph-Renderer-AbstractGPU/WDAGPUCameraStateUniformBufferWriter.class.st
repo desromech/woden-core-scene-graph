@@ -13,6 +13,9 @@ WDAGPUCameraStateUniformBufferWriter class >> fieldsDesc [
 
 		float currentTime
 		float exposure
+		float bloomThreshold
+		float bloomStrength
+
 		float nearDistance
 		float farDistance
 		
@@ -35,7 +38,7 @@ WDAGPUCameraStateUniformBufferWriter >> instanceAlignment [
 
 { #category : #accessing }
 WDAGPUCameraStateUniformBufferWriter >> instanceSize [
-	^ 320
+	^ 336
 ]
 
 { #category : #writing }
@@ -46,13 +49,15 @@ WDAGPUCameraStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeMat4: data inverseProjectionMatrix onto: pointer at: offset + 192.
 	self writeFloat: data currentTime onto: pointer at: offset + 256.
 	self writeFloat: data exposure onto: pointer at: offset + 260.
-	self writeFloat: data nearDistance onto: pointer at: offset + 264.
-	self writeFloat: data farDistance onto: pointer at: offset + 268.
-	self writeVec2: data framebufferExtent onto: pointer at: offset + 272.
-	self writeVec2: data framebufferReciprocalExtent onto: pointer at: offset + 280.
-	self writeVec2: data lightGridDepthSliceScaleOffset onto: pointer at: offset + 288.
-	self writeUint: data hasTopLeftNDCOrigin onto: pointer at: offset + 296.
-	self writeUint: data hasBottomLeftTextureCoordinates onto: pointer at: offset + 300.
-	self writeUvec3: data lightGridExtent onto: pointer at: offset + 304.
-	self writeUint: data hasReverseDepth onto: pointer at: offset + 316.
+	self writeFloat: data bloomThreshold onto: pointer at: offset + 264.
+	self writeFloat: data bloomStrength onto: pointer at: offset + 268.
+	self writeFloat: data nearDistance onto: pointer at: offset + 272.
+	self writeFloat: data farDistance onto: pointer at: offset + 276.
+	self writeVec2: data framebufferExtent onto: pointer at: offset + 280.
+	self writeVec2: data framebufferReciprocalExtent onto: pointer at: offset + 288.
+	self writeVec2: data lightGridDepthSliceScaleOffset onto: pointer at: offset + 296.
+	self writeUint: data hasTopLeftNDCOrigin onto: pointer at: offset + 304.
+	self writeUint: data hasBottomLeftTextureCoordinates onto: pointer at: offset + 308.
+	self writeUvec3: data lightGridExtent onto: pointer at: offset + 320.
+	self writeUint: data hasReverseDepth onto: pointer at: offset + 332.
 ]

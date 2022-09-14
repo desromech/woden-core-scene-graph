@@ -14,7 +14,9 @@ Class {
 		'currentTime',
 		'exposure',
 		'toneMappingOperator',
-		'viewMode'
+		'viewMode',
+		'bloomThreshold',
+		'bloomStrength'
 	],
 	#category : #'WodenSceneGraph-Core-Camera'
 }
@@ -33,6 +35,8 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		frustum: (self frustumWithAspect: aspectRatio);
 		currentTime: currentTime;
 		exposure: exposure;
+		bloomThreshold: bloomThreshold;
+		bloomStrength: bloomStrength;
 		toneMappingOperator: toneMappingOperator;
 		viewMode: viewMode;
 		hasReverseDepth: hasReverseDepth;
@@ -48,6 +52,8 @@ WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeT
 		frustum: (self frustumWithTangents: frustumTangents);
 		currentTime: currentTime;
 		exposure: exposure;
+		bloomThreshold: bloomThreshold;
+		bloomStrength: bloomStrength;
 		toneMappingOperator: toneMappingOperator;
 		viewMode: viewMode;
 		hasReverseDepth: hasReverseDepth;
@@ -65,6 +71,30 @@ WDCamera >> asSceneNode [
 	^ WDSceneNode new
 		cameras: { self };
 		yourself
+]
+
+{ #category : #accessing }
+WDCamera >> bloomStrength [
+
+	^ bloomStrength
+]
+
+{ #category : #accessing }
+WDCamera >> bloomStrength: anObject [
+
+	bloomStrength := anObject
+]
+
+{ #category : #accessing }
+WDCamera >> bloomThreshold [
+
+	^ bloomThreshold
+]
+
+{ #category : #accessing }
+WDCamera >> bloomThreshold: anObject [
+
+	bloomThreshold := anObject
 ]
 
 { #category : #accessing }
@@ -167,6 +197,8 @@ WDCamera >> initialize [
 	hasReverseDepth := true.
 	currentTime := 0.0.
 	exposure := 1.0.
+	bloomThreshold := 1.0.
+	bloomStrength := 0.2.
 	self toneMappingOperator: WDLinearToneMappingOperator.
 	self viewMode: WDFullShadedViewMode.
 ]

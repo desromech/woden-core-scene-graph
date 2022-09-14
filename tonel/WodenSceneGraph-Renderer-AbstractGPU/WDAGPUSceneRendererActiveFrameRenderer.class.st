@@ -21,8 +21,10 @@ Class {
 		'isInDepthOnlyPass'
 	],
 	#classVars : [
-		'BlurPasses',
-		'PrimitiveTopologyMap'
+		'BloomBlurPasses',
+		'PrimitiveTopologyMap',
+		'SSAOBlurPasses',
+		'ScreenRoughnessBlurPasses'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -32,7 +34,9 @@ Class {
 
 { #category : #initialization }
 WDAGPUSceneRendererActiveFrameRenderer class >> initialize [
-	BlurPasses := 2.
+	SSAOBlurPasses := 2.
+	ScreenRoughnessBlurPasses := 2.
+	BloomBlurPasses := 4.
 	
 	PrimitiveTopologyMap := Dictionary newFromPairs: { 
 		WDPrimitiveTopologyPoints uniqueInstance . AGPU_POINTS.
@@ -573,6 +577,82 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordAndFlushCommandsOn: aStateTracke
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderingScene: renderingSceneState framebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers cameraState: mainCameraState [
+	| shaderSignature bloomExtent |
+	
+	mainCameraState bloomStrength <= 0.0 ifTrue: [ ^ self ].
+
+	shaderSignature := renderer resourceCache rendererShaderSignature.
+	bloomExtent := intermediateFramebuffers bloomExtent.
+	stateTracker
+		resetGraphicsPipeline;
+		beginRenderPass: renderer resourceCache bloomRenderPass framebuffer: intermediateFramebuffers bloomPingFramebuffer  bundle_content: 0;
+		setViewport: 0 y: 0 w: bloomExtent x h: bloomExtent y;
+		setScissor: 0 y: 0 w: bloomExtent x h: bloomExtent y;
+		setShaderSignature: shaderSignature handle;
+		useShaderResources: shaderSignature samplersBinding;
+		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache bloomSelectionFragmentShader entryPoint: 'main'.
+
+	self
+		bindCameraState: mainCameraState;
+		bindBlurTextureSource: intermediateFramebuffers hdrColorBufferTexture.
+
+	stateTracker
+		setCullMode: AGPU_CULL_MODE_NONE;
+		setDepthState: false writeMask: false function: AGPU_ALWAYS;
+		setPrimitiveType: AGPU_TRIANGLES;
+		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+		endRenderPass.
+
+	1 to: BloomBlurPasses do: [ :blurPass |
+		"Blur horizontal pass."		
+		stateTracker
+			beginRenderPass: renderer resourceCache bloomRenderPass framebuffer: intermediateFramebuffers bloomPongFramebuffer bundle_content: 0;
+			setViewport: 0 y: 0 w: bloomExtent x h: bloomExtent y;
+			setScissor: 0 y: 0 w: bloomExtent x h: bloomExtent y;
+			setFragmentStage: renderer resourceCache blurHorizontalPassFragmentShader entryPoint: 'main'.
+
+		self bindBlurTextureSource: intermediateFramebuffers bloomPingTexture.
+
+		stateTracker
+			drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+			endRenderPass.
+			
+		"Blur vertical pass."		
+		stateTracker
+			beginRenderPass: renderer resourceCache bloomRenderPass framebuffer: intermediateFramebuffers bloomPingFramebuffer bundle_content: 0;
+			setViewport: 0 y: 0 w: bloomExtent x h: bloomExtent y;
+			setScissor: 0 y: 0 w: bloomExtent x h: bloomExtent y;
+			setFragmentStage: renderer resourceCache blurVerticalPassFragmentShader entryPoint: 'main'.
+
+		self bindBlurTextureSource: intermediateFramebuffers bloomPongTexture.
+
+		stateTracker
+			drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+			endRenderPass.
+	].
+
+	stateTracker
+		beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: renderingSceneState sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0;
+		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache downsampleFragmentShader entryPoint: 'main';
+		setBlendState: 1 enabled: 1;
+		setBlendFunction: 1
+			sourceFactor: AGPU_BLENDING_ONE destFactor: AGPU_BLENDING_ONE colorOperation: AGPU_BLENDING_OPERATION_ADD
+			sourceAlphaFactor: AGPU_BLENDING_ZERO destAlphaFactor: AGPU_BLENDING_ONE alphaOperation: AGPU_BLENDING_OPERATION_ADD.
+
+	self bindBlurTextureSource: intermediateFramebuffers bloomPingTexture.
+	
+	stateTracker
+		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
+		endRenderPass
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForCombiningOpaqueReflections: intermediateFramebuffers cameraState: mainCameraState [
 	| extent |
 
@@ -685,7 +765,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenRoughComputatio
 	pongTexture := intermediateFramebuffers screenRoughTextures last.
 	pongFramebuffer := intermediateFramebuffers screenRoughFramebuffers last.
 
-	1 to: BlurPasses do: [ :blurPass |
+	1 to: ScreenRoughnessBlurPasses do: [ :blurPass |
 		"Blur horizontal pass."
 		stateTracker
 			beginRenderPass: renderer resourceCache hdrBlurRenderPass framebuffer: pongFramebuffer bundle_content: 0;
@@ -741,7 +821,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcc
 		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
 		endRenderPass.
 
-	1 to: BlurPasses do: [ :blurPass |
+	1 to: SSAOBlurPasses do: [ :blurPass |
 		"Blur horizontal pass."		
 		stateTracker
 			beginRenderPass: renderer resourceCache screenSpaceAmbientOcclusionRenderPass framebuffer: intermediateFramebuffers ssaoPongFramebuffer bundle_content: 0;
@@ -969,6 +1049,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	depthTestingEnabled := nil.
 	depthWriteMask := nil.
 	alphaBlendingEnabled := nil.
+	
+	"Bloom"
+	self recordCommandsForBloomEffectForRenderingScene: renderingSceneState framebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers cameraState: mainCameraState.
 	
 	"For the exposure level."
 	outputFramebufferHandle := self validFramebufferFor: framebuffer.

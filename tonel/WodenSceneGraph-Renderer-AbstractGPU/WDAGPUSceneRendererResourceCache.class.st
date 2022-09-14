@@ -76,7 +76,9 @@ Class {
 		'clearReverseDepthFragmentShader',
 		'blurHorizontalPassFragmentShader',
 		'blurVerticalPassFragmentShader',
-		'downsampleFragmentShader'
+		'downsampleFragmentShader',
+		'cubeMapFaceRotationMatricesShaderSource',
+		'bloomSelectionFragmentShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -183,6 +185,41 @@ WDAGPUSceneRendererResourceCache class >> shadowMapAtlasExtent [
 	^ ShadowMapAtlasExtent
 ]
 
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> bloomRenderPass [
+	^ self reflectionRenderPass
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> bloomSelectionFragmentShader [
+	^ bloomSelectionFragmentShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> bloomSelectionFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self cameraStateBlockSource , '
+#line 6
+
+layout(location=0) in vec2 inTexcoord;
+layout(location=0) out vec4 FragmentOutputColor;
+
+layout(set=4, binding=1) uniform texture2D ColorBuffer;
+
+void main()
+{
+	vec3 color = textureLod(sampler2D(ColorBuffer, ScreenTextureSampler), inTexcoord, 0.0).rgb;
+	// Relative luminance: https://en.wikipedia.org/wiki/Relative_luminance
+	float relativeLuminance = dot(color.rgb, vec3(0.2126 , 0.7152, 0.0722));
+	if(relativeLuminance >= CameraState.bloomThreshold)
+		FragmentOutputColor = vec4(color*CameraState.bloomStrength, 0.0);
+	else
+		FragmentOutputColor = vec4(0.0);
+}
+'
+]
+
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> blurHorizontalPassFragmentShader [
 	^ blurHorizontalPassFragmentShader
@@ -275,6 +312,9 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 
 	float currentTime;
 	float exposure;
+	float bloomThreshold;
+	float bloomStrength;
+
 	float nearDistance;
 	float farDistance;
 	
@@ -440,6 +480,32 @@ WDAGPUSceneRendererResourceCache >> createTextureCubeWithSingleColor: colorData 
 		result uploadTextureData: 0 arrayIndex: i pitch: 4 slicePitch: 4 data: colorData.
 	].
 	^ result
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> cubeMapFaceRotationMatricesShaderSource [
+	^ cubeMapFaceRotationMatricesShaderSource ifNil: [cubeMapFaceRotationMatricesShaderSource := 		ByteString streamContents: [ :out |
+			out nextPutAll: 'const mat3[6] CubeMapFaceRotations = mat3[6]('; cr.
+			Matrix3x3 cubeMapFaceRotations doWithIndex: [ :each :index|
+				out tab; nextPutAll: 'mat3('; cr.
+				out tab; tab; nextPutAll: ('vec3({1}, {2}, {3}),' format: {each firstColumn x. each firstColumn y . each firstColumn z}); cr.
+				out tab; tab; nextPutAll: ('vec3({1}, {2}, {3}),' format: {each secondColumn x. each secondColumn y . each secondColumn z}); cr.
+				out tab; tab; nextPutAll: ('vec3({1}, {2}, {3})' format: {each thirdColumn x. each thirdColumn y . each thirdColumn z}); cr.
+				out tab; nextPutAll: (index = 6 ifTrue: [')'] ifFalse: ['),']); cr.
+			].
+			out nextPutAll: ');'; cr.
+			
+			out nextPutAll: 'const mat3[6] CubeMapInverseFaceRotations = mat3[6]('; cr.
+			Matrix3x3 cubeMapFaceRotations doWithIndex: [ :each :index|
+				out tab; nextPutAll: 'mat3('; cr.
+				out tab; tab; nextPutAll: ('vec3({1}, {2}, {3}),' format: {each firstRow x. each firstRow y . each firstRow z}); cr.
+				out tab; tab; nextPutAll: ('vec3({1}, {2}, {3}),' format: {each secondRow x. each secondRow y . each secondRow z}); cr.
+				out tab; tab; nextPutAll: ('vec3({1}, {2}, {3})' format: {each thirdRow x. each thirdRow y . each thirdRow z}); cr.
+				out tab; nextPutAll: (index = 6 ifTrue: [')'] ifFalse: ['),']); cr.
+			].
+			out nextPutAll: ');'; cr.
+		]
+]
 ]
 
 { #category : #accessing }
@@ -1037,6 +1103,40 @@ WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCo
 ]
 
 { #category : #initialization }
+WDAGPUSceneRendererResourceCache >> hdrTranslucentContinueRenderPassWithSampleCount: sampleCount [
+	^ renderPasses at: {#hdrTranslucentContinueRenderPass . sampleCount} ifAbsentPut: [
+		| colorAttachment depthStencilAttachment |
+		[
+			| renderpassDescription |
+			colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
+			colorAttachment
+				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
+				begin_action: AGPU_ATTACHMENT_KEEP;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				sample_count: sampleCount;
+				clear_value: AGPUColor4f new;
+				sample_quality: 0.
+			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
+				format: depthFormat;
+				sample_count: sampleCount;
+				begin_action: AGPU_ATTACHMENT_KEEP;
+				end_action: AGPU_ATTACHMENT_KEEP;
+				yourself.
+			renderpassDescription := AGPURenderpassDescription new.
+			renderpassDescription
+				color_attachment_count: 1;
+				color_attachments: colorAttachment;
+				depth_stencil_attachment: depthStencilAttachment.
+			device createRenderPass: renderpassDescription
+		] ensure: [
+			colorAttachment ifNotNil: [colorAttachment free].
+			depthStencilAttachment ifNotNil: [colorAttachment free].
+		]
+	].
+
+]
+
+{ #category : #initialization }
 WDAGPUSceneRendererResourceCache >> hdrTranslucentRenderPassWithSampleCount: sampleCount [
 	^ renderPasses at: {#hdrTranslucentRenderPass . sampleCount} ifAbsentPut: [
 		| colorAttachment depthStencilAttachment |
@@ -1156,6 +1256,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	downsampleFragmentShader := self compileShader: self downsampleFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	blurHorizontalPassFragmentShader := self compileShader: self blurHorizontalPassFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	blurVerticalPassFragmentShader := self compileShader: self blurVerticalPassFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+	bloomSelectionFragmentShader := self compileShader: self bloomSelectionFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 
 	linearToneMappingOperator := self compileShader: self linearToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
 	reinhardToneMappingOperator := self compileShader: self reinhardToneMappingOperatorShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -2285,7 +2386,7 @@ WDAGPUSceneRendererResourceCache >> shadowMapRenderPass [
 
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> shadowMappingSamplingSource [
-	^ '
+	^ self cubeMapFaceRotationMatricesShaderSource , '
 #line 4
 
 const uint PcfMinSampleCount = 5u;

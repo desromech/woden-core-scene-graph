@@ -22,7 +22,9 @@ Class {
 		'inverseProjectionMatrix',
 		'hasTopLeftNDCOrigin',
 		'hasBottomLeftTextureCoordinates',
-		'worldFrustum'
+		'worldFrustum',
+		'bloomThreshold',
+		'bloomStrength'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -41,6 +43,30 @@ WDCameraState >> asCameraStateForForegroundLayer [
 	^ self copy
 		transformation: ReversibleAffineTransform3D identity;
 		yourself
+]
+
+{ #category : #accessing }
+WDCameraState >> bloomStrength [
+
+	^ bloomStrength
+]
+
+{ #category : #accessing }
+WDCameraState >> bloomStrength: anObject [
+
+	bloomStrength := anObject
+]
+
+{ #category : #accessing }
+WDCameraState >> bloomThreshold [
+
+	^ bloomThreshold
+]
+
+{ #category : #accessing }
+WDCameraState >> bloomThreshold: anObject [
+
+	bloomThreshold := anObject
 ]
 
 { #category : #accessing }
@@ -180,6 +206,8 @@ WDCameraState >> initialize [
 	frustum := Frustum new.
 	currentTime := 0.0.
 	exposure := 1.0.
+	bloomThreshold := 1.0.
+	bloomStrength := 0.2.
 	hasReverseDepth := true.
 	hasTopLeftNDCOrigin := true.
 	hasBottomLeftTextureCoordinates := false.
