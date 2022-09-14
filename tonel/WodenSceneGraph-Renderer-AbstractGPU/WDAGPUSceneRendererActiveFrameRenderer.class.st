@@ -634,7 +634,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderi
 	].
 
 	stateTracker
-		beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: renderingSceneState sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0;
+		beginRenderPass: (renderer resourceCache hdrTranslucentContinueRenderPassWithSampleCount: renderingSceneState sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
