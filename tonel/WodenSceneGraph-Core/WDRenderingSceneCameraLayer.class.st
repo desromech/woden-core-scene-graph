@@ -12,8 +12,7 @@ Class {
 		'lights',
 		'usesFrustumCulling',
 		'isShadowMap',
-		'shadowMapCameraLayers',
-		'shadowCastingLightSource',
+		'shadowMapSets',
 		'opaqueRenderingObjects',
 		'translucentRenderingObjects',
 		'backgroundObjects'
@@ -103,8 +102,8 @@ WDRenderingSceneCameraLayer >> addRenderable: renderable withObjectState: anObje
 ]
 
 { #category : #adding }
-WDRenderingSceneCameraLayer >> addShadowMapCameraLayer: aCameraLayer [
-	shadowMapCameraLayers add: aCameraLayer
+WDRenderingSceneCameraLayer >> addRenderingSceneShadowMapSet: shadowMapSet [
+	shadowMapSets add: shadowMapSet
 ]
 
 { #category : #adding }
@@ -150,7 +149,7 @@ WDRenderingSceneCameraLayer >> initialize [
 	backgroundObjects := OrderedCollection new.
 	opaqueRenderingObjects := OrderedCollection new.
 	translucentRenderingObjects := OrderedCollection new.
-	shadowMapCameraLayers := OrderedCollection new.
+	shadowMapSets := OrderedCollection new.
 	usesFrustumCulling := true.
 	isShadowMap := false.
 
@@ -190,18 +189,6 @@ WDRenderingSceneCameraLayer >> sampleCount [
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayer >> shadowCastingLightSource [
-
-	^ shadowCastingLightSource
-]
-
-{ #category : #accessing }
-WDRenderingSceneCameraLayer >> shadowCastingLightSource: anObject [
-
-	shadowCastingLightSource := anObject
-]
-
-{ #category : #accessing }
 WDRenderingSceneCameraLayer >> shadowCastingLightsDo: aBlock [
 	lights do: [ :each |
 		each castShadows ifTrue: [
@@ -211,8 +198,8 @@ WDRenderingSceneCameraLayer >> shadowCastingLightsDo: aBlock [
 ]
 
 { #category : #accessing }
-WDRenderingSceneCameraLayer >> shadowMapCameraLayers [
-	^ shadowMapCameraLayers
+WDRenderingSceneCameraLayer >> shadowMapSets [
+	^ shadowMapSets
 ]
 
 { #category : #testing }
