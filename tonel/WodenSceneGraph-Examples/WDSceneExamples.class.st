@@ -496,6 +496,127 @@ WDSceneExamples class >> examplePool [
 ]
 
 { #category : #'basic shapes' }
+WDSceneExamples class >> exampleShadowCastingPointLight [
+	"
+	self exampleShadowCastingPointLight
+	"
+	WDScene new
+		add: (WDMeshBuilder new
+
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorFactor: (Vector4 x: 0.3 y: 0.3 z: 0.3 w: 1.0);
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+
+			"Floor"
+			translateToX: 0 y: -0.125 z: 0;
+			addCubeWithWidth: 10.0 height: 0.25 depth: 10.0;
+
+			"Ceiling"
+			translateToX: 0 y: 3.0 z: 0;
+			addCubeWithWidth: 10.0 height: 0.25 depth: 10.0;
+
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.4;
+				metallicFactor: 0.0;
+				yourself);
+
+			"Front Wall"
+			translateToX: 0 y: 1.5 z: -5.0;
+			addCubeWithWidth: 10.0 height: 3.0 depth: 0.25;
+
+			"Back Wall"
+			translateToX: 0 y: 1.5 z: 5.0;
+			addCubeWithWidth: 10.0 height: 3.0 depth: 0.25;
+
+			"Left Wall"
+			translateToX: -5.0 y: 1.5 z: 0.0;
+			addCubeWithWidth: 0.25 height: 3.0 depth: 10.0;
+
+			"Right Wall"
+			translateToX: 5.0 y: 1.5 z: 0.0;
+			addCubeWithWidth: 0.25 height: 3.0 depth: 10.0;
+
+			translateToX: 0 y: 0.5 z: 0;
+			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+
+			"Cube row"
+			translateToX: 2.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 0.25 z: 2.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			"Top row"
+			translateToX: 2.0 y: 2.25 z: -1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 2.25 z: -1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 2.25 z: -1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 2.25 z: -1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 2.25 z: -1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+			generateTangentSpaceFrame;
+			mesh);
+		add: (WDMeshBuilder new
+			currentMaterial: (WDMetallicRoughnessMaterial new
+				baseColorFactor: (Vector4 x: 1.0 y: 1.0 z: 1.0 w: 0.8);
+				baseColorTexture: self checkboardTexture;
+				normalTexture: self checkboardNormalTexture;
+				roughnessFactor: 0.1;
+				metallicFactor: 0.0;
+				alphaMode: #BLEND;
+				yourself);
+
+			translateToX: 2.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: 0.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -1.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			translateToX: -2.0 y: 0.25 z: 1.0;
+			addCubeWithWidth: 0.5 height: 0.5 depth: 0.5;
+
+			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
+			generateTangentSpaceFrame;
+			mesh);
+		add: ((WDPointLightSource new
+			castShadows: true;
+			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 10.0;
+			influenceRadius: 10.0;
+			asSceneNode)
+				position: (Vector3 x: 0.0 y: 1.5 z: 0.0);
+				yourself);
+		openInWindow
+]
+
+{ #category : #'basic shapes' }
 WDSceneExamples class >> exampleShadowCastingSpotLight [
 	"
 	self exampleShadowCastingSpotLight

@@ -2294,6 +2294,7 @@ void main()
 	vec3 rayMarchPoint = viewPosition + rayMarchDelta;
 	vec2 reflectionScreenPoint = vec2(0.0);
 	bool hasHit = false;
+	float hitAlpha = 0.0;
 	
 	for(uint i = 0u; i < SampleCount; ++i, rayMarchPoint += rayMarchDelta)
 	{
@@ -2318,7 +2319,10 @@ void main()
 		hasHit = CameraState.hasReverseDepth ? depthDelta <= HitDepthThreshold : depthDelta >= HitDepthThreshold;
 		//hasHit = CameraState.hasReverseDepth ? depthDelta >= HitDepthThreshold : depthDelta <= HitDepthThreshold;
 		if(hasHit)
+		{
+			hitAlpha = 1.0 - float(i)/float(SampleCount);
 			break;
+		}
 	}
 	
 	if(hasHit)
@@ -2328,7 +2332,7 @@ void main()
 			textureLod(sampler2D(RoughColorBuffer, ScreenTextureSampler), reflectionScreenPoint, 0.0).rgb,
 			specularColor.a)*specularColor.rgb;
 
-		FragmentOutputScreenSpaceReflection = vec4(reflectionColor, 1.0);
+		FragmentOutputScreenSpaceReflection = vec4(reflectionColor, hitAlpha);
 	}
 	else
 	{ 
