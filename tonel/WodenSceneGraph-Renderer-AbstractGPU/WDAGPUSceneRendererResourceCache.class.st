@@ -1875,7 +1875,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 			L = normalize(L);
 		}
 		
-		if(currentLightSource.outerSpotCosCutoff > -1.0)
+		if(currentLightSource.innerSpotCosCutoff > -1.0)
 		{
 			float spotCos = dot(L, currentLightSource.spotDirection);
 			attenuation *= smoothstep(currentLightSource.outerSpotCosCutoff, currentLightSource.innerSpotCosCutoff, spotCos);
@@ -2422,25 +2422,83 @@ const vec2[PcfMaxAvailableSampleCount] PcfSamplingDisk = vec2[PcfMaxAvailableSam
 float sampleShadowMapForLightWithIndexAtPoint(uint lightIndex, vec3 worldSamplePosition)
 {
 #define lightSource AllLight.lights[lightIndex]
-	vec4 lightNdcPosition = lightSource.shadowMapProjectionMatrices[0] * (lightSource.shadowMapInverseTransformationMatrices[0] * vec4(worldSamplePosition, 1.0));
+	
+	vec4 lightProjectedPosition;
+	uint samplingLayer = 0u;
+	
+	// Is this a non-directional light.
+	if(lightSource.positionOrDirection.w != 0.0)
+	{ 
+		if(lightSource.innerSpotCosCutoff > -1.0)
+		{ 
+			// Spot light.
+			lightProjectedPosition = lightSource.shadowMapProjectionMatrices[0] * (lightSource.shadowMapInverseTransformationMatrices[0] * vec4(worldSamplePosition, 1.0));
+		}
+		else
+		{
+			// Omni-directional. Select the adequate cube map face.
+			vec3 lightVector = worldSamplePosition - lightSource.shadowMapTransformationMatrices[0][3].xyz;			
+			vec3 absLightVector = abs(lightVector);
+			if(absLightVector.x >= absLightVector.y)
+			{
+				if(absLightVector.x >= absLightVector.z)
+					samplingLayer = lightVector.x < 0.0 ? 1u : 0u;
+				else
+					samplingLayer = lightVector.z < 0.0 ? 5u : 4u;
+			}
+			else
+			{ 
+				if(absLightVector.y >= absLightVector.z)
+					samplingLayer = lightVector.y < 0.0 ? 3u : 2u;
+				else
+					samplingLayer = lightVector.z < 0.0 ? 5u : 4u;
+			}
+			
+			
+			lightProjectedPosition = lightSource.shadowMapProjectionMatrices[0] * vec4(CubeMapInverseFaceRotations[samplingLayer]*lightVector, 1.0); 
+		}
+	}
+	else
+	{
+		// Select the directional shadow map cascade.
+		float cascadeDistance = dot(lightSource.shadowMapCascadeDistanceWorldTransform, vec4(worldSamplePosition, 1.0));
+		vec4 cascadeOffsets = lightSource.shadowMapCascadeOffsets;
+		if(cascadeDistance <= cascadeOffsets.y)
+		{
+			if(cascadeDistance <= cascadeOffsets.x)
+				samplingLayer = 0u;
+			else
+				samplingLayer = 1u;
+		}
+		else
+		{ 
+			if(cascadeDistance <= cascadeOffsets.z)
+				samplingLayer = 2u;
+			else
+				samplingLayer = 3u;
+		}
+		
+		// Apply the transform to the corresponding cascade.
+		lightProjectedPosition = lightSource.shadowMapProjectionMatrices[samplingLayer] * (lightSource.shadowMapInverseTransformationMatrices[samplingLayer] * vec4(worldSamplePosition, 1.0));
+	}
 	
 	// Avoid division by zero
-	if (lightNdcPosition.w == 0.0) 
+	if (lightProjectedPosition.w == 0.0) 
 		return 0.0;
 
 	// Clip to unit cube.
-	vec3 samplePosition = lightNdcPosition.xyz / lightNdcPosition.w;
+	vec3 samplePosition = lightProjectedPosition.xyz / lightProjectedPosition.w;
 	if(samplePosition.x < -1.0 || samplePosition.x > 1.0
 		|| samplePosition.y < -1.0 || samplePosition.y > 1.0)
 		return 0.0;
 		
-	vec3 atlasSamplePosition = vec3(samplePosition.xy*lightSource.shadowMapViewportScale + lightSource.shadowMapViewportOffsets[0], samplePosition.z);
+	vec3 atlasSamplePosition = vec3(samplePosition.xy*lightSource.shadowMapViewportScale + lightSource.shadowMapViewportOffsets[samplingLayer], samplePosition.z);
 
 	return textureLod(sampler2DShadow(ShadowMapTextureAtlas, ShadowMapSampler), atlasSamplePosition, 0.0);
 }
 
 struct ShadowMappingSamplingData
-{ 
+{
 	vec3 position;
 	vec3 normal;
 	vec3 tangent;
