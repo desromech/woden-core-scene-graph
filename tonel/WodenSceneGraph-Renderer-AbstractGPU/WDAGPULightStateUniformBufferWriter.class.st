@@ -18,14 +18,16 @@ WDAGPULightStateUniformBufferWriter class >> fieldsDesc [
 
 		float outerSpotCosCutoff
 		bool castShadows
-	
-		mat4 shadowMapTransformationMatrix
-		mat4 shadowMapInverseTransformationMatrix
-
-		mat4 shadowMapProjectionMatrix
-
 		vec2 shadowMapViewportScale
-		vec2 shadowMapViewportOffset
+
+		vec4 shadowMapCascadeDistanceWorldTransform
+		vec4 shadowMapCascadeOffsets
+		(vec2 6) shadowMapViewportOffsets
+	
+		(mat4 4) shadowMapTransformationMatrices
+		(mat4 4) shadowMapInverseTransformationMatrices
+
+		(mat4 4) shadowMapProjectionMatrices
 	)
 ]
 
@@ -36,7 +38,7 @@ WDAGPULightStateUniformBufferWriter >> instanceAlignment [
 
 { #category : #accessing }
 WDAGPULightStateUniformBufferWriter >> instanceSize [
-	^ 272
+	^ 912
 ]
 
 { #category : #writing }
@@ -48,9 +50,11 @@ WDAGPULightStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeFloat: data innerSpotCosCutoff onto: pointer at: offset + 44.
 	self writeFloat: data outerSpotCosCutoff onto: pointer at: offset + 48.
 	self writeBool: data castShadows onto: pointer at: offset + 52.
-	self writeMat4: data shadowMapTransformationMatrix onto: pointer at: offset + 64.
-	self writeMat4: data shadowMapInverseTransformationMatrix onto: pointer at: offset + 128.
-	self writeMat4: data shadowMapProjectionMatrix onto: pointer at: offset + 192.
-	self writeVec2: data shadowMapViewportScale onto: pointer at: offset + 256.
-	self writeVec2: data shadowMapViewportOffset onto: pointer at: offset + 264.
+	self writeVec2: data shadowMapViewportScale onto: pointer at: offset + 56.
+	self writeVec4: data shadowMapCascadeDistanceWorldTransform onto: pointer at: offset + 64.
+	self writeVec4: data shadowMapCascadeOffsets onto: pointer at: offset + 80.
+	self writeVec2: data shadowMapViewportOffsets onto: pointer at: offset + 96 count: 6.
+	self writeMat4: data shadowMapTransformationMatrices onto: pointer at: offset + 144 count: 4.
+	self writeMat4: data shadowMapInverseTransformationMatrices onto: pointer at: offset + 400 count: 4.
+	self writeMat4: data shadowMapProjectionMatrices onto: pointer at: offset + 656 count: 4.
 ]

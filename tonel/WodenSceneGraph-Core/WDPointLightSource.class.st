@@ -25,6 +25,8 @@ WDPointLightSource >> asLightStateWithTransform: renderingTransform [
 		positionOrDirection: (Vector4 xyz: renderingTransform translation w: 1.0);
 		influenceRadius: influenceRadius;
 		intensity: intensity;
+		castShadows: castShadows;
+		shadowMappingCameraStates: (self shadowMapCameraStatesWithTransform: renderingTransform);
 		yourself.
 ]
 
@@ -49,4 +51,28 @@ WDPointLightSource >> influenceRadius: anObject [
 WDPointLightSource >> initialize [
 	super initialize.
 	influenceRadius := 1.0.
+]
+
+{ #category : #accessing }
+WDPointLightSource >> shadowMapCameraStatesWithTransform: worldRenderingTransform [
+	| nearDistance farDistance aspect fovy baseState |
+	castShadows ifFalse: [ ^ #() ].
+	
+	nearDistance := 0.01.
+	farDistance := influenceRadius.
+	aspect := 1.0.
+	fovy := 90.0.
+	baseState := WDCameraState new
+		nearDistance: nearDistance;
+		farDistance: influenceRadius;
+		projectionMatrix: (Matrix4x4 reverseDepthPerspectiveFovY: fovy aspect: aspect near: nearDistance far: farDistance);
+		frustum: (Frustum new makePerspectiveFovY: fovy aspect: aspect near: nearDistance far: farDistance);
+		hasReverseDepth: true;
+		yourself.
+		
+	^ Matrix3x3 cubeMapFaceRotations collect: [ :faceRotationMatrix |
+		baseState copy
+			transformation: (ReversibleAffineTransform3D orthonormal: faceRotationMatrix translation: worldRenderingTransform translation);
+			yourself
+	]
 ]

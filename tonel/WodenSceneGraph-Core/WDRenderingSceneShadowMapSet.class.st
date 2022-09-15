@@ -50,6 +50,7 @@ WDRenderingSceneShadowMapSet >> renderingSceneComputationBlock: anObject [
 WDRenderingSceneShadowMapSet >> renderingScenes [
 	^ renderingScenes ifNil: [ renderingScenes := cameraStates collect: [ :cameraState |
 		renderingSceneComputationBlock value: cameraState
-	] ]
+		] 
+	]
 
 ]

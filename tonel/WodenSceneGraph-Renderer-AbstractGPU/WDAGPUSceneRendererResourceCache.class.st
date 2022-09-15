@@ -1552,14 +1552,17 @@ struct LightSource
 
 	float outerSpotCosCutoff;
 	bool castShadows;
-	
-	mat4 shadowMapTransformationMatrix;
-	mat4 shadowMapInverseTransformationMatrix;
-
-	mat4 shadowMapProjectionMatrix;
-
 	vec2 shadowMapViewportScale;
-	vec2 shadowMapViewportOffset;
+	
+	vec4 shadowMapCascadeDistanceWorldTransform;
+	vec4 shadowMapCascadeOffsets;
+	
+	vec2[6] shadowMapViewportOffsets;
+
+	mat4[4] shadowMapTransformationMatrices;
+	mat4[4] shadowMapInverseTransformationMatrices;
+
+	mat4[4] shadowMapProjectionMatrices;
 };
 
 layout(set=2, binding=0, std140) uniform LightingStateBlock
@@ -2419,7 +2422,7 @@ const vec2[PcfMaxAvailableSampleCount] PcfSamplingDisk = vec2[PcfMaxAvailableSam
 float sampleShadowMapForLightWithIndexAtPoint(uint lightIndex, vec3 worldSamplePosition)
 {
 #define lightSource AllLight.lights[lightIndex]
-	vec4 lightNdcPosition = lightSource.shadowMapProjectionMatrix * (lightSource.shadowMapInverseTransformationMatrix * vec4(worldSamplePosition, 1.0));
+	vec4 lightNdcPosition = lightSource.shadowMapProjectionMatrices[0] * (lightSource.shadowMapInverseTransformationMatrices[0] * vec4(worldSamplePosition, 1.0));
 	
 	// Avoid division by zero
 	if (lightNdcPosition.w == 0.0) 
@@ -2431,7 +2434,7 @@ float sampleShadowMapForLightWithIndexAtPoint(uint lightIndex, vec3 worldSampleP
 		|| samplePosition.y < -1.0 || samplePosition.y > 1.0)
 		return 0.0;
 		
-	vec3 atlasSamplePosition = vec3(samplePosition.xy*lightSource.shadowMapViewportScale + lightSource.shadowMapViewportOffset, samplePosition.z);
+	vec3 atlasSamplePosition = vec3(samplePosition.xy*lightSource.shadowMapViewportScale + lightSource.shadowMapViewportOffsets[0], samplePosition.z);
 
 	return textureLod(sampler2DShadow(ShadowMapTextureAtlas, ShadowMapSampler), atlasSamplePosition, 0.0);
 }

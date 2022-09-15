@@ -53,7 +53,7 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	result shadowCastingLightsDo: [ :eachLight |
 		result addRenderingSceneShadowMapSet: (WDRenderingSceneShadowMapSet new
 			lightSource: eachLight;
-			cameraStates: {eachLight shadowMappingCameraState};
+			cameraStates: eachLight shadowMappingCameraStates;
 			renderingSceneComputationBlock: [ :lightCameraState |
 				| shadowMapCameraLayer|
 				shadowMapCameraLayer := WDRenderingSceneCameraLayer new

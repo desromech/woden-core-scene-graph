@@ -77,7 +77,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexB
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowMapSet [
-	| atlasAllocator atlasElements lightSource atlasExtent viewportOffset viewportExtent viewportExtentScale |
+	| atlasAllocator atlasElements lightSource atlasExtent viewportOffset viewportExtent  viewportScale viewportExtentScale |
 	atlasAllocator := renderer resourceCache shadowMapAtlasAllocator.
 	atlasElements := shadowMapSet cameraStates collect: [ :each | atlasAllocator allocate ].
 	((atlasElements anySatisfy: [ :each | each isNil ]) or: [
@@ -91,21 +91,22 @@ WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowM
 	].
 
 	lightSource := shadowMapSet lightSource.
-	lightSource
-		shadowMapViewportScale: (Vector2 x: 0.5 y: 0.5);
-		shadowMapViewportOffset: (Vector2 x: 0.5 y: 0.5).
+	viewportScale := (Vector2 x: 0.5 y: 0.5).
+	viewportOffset := (Vector2 x: 0.5 y: 0.5).
 		
 	renderer device hasTopLeftNdcOrigin = renderer device hasBottomLeftTextureCoordinates ifTrue: [ 
-		lightSource shadowMapViewportScale y: lightSource shadowMapViewportScale y negated
+		viewportScale y: viewportScale y negated
 	].
 
 	atlasExtent := atlasElements first atlasExtent.
-	viewportOffset := atlasElements first offset.
 	viewportExtent := atlasElements first extent.
 	viewportExtentScale := viewportExtent / atlasExtent.
+
 	lightSource
-		shadowMapViewportScale: lightSource shadowMapViewportScale * viewportExtentScale;
-		shadowMapViewportOffset: lightSource shadowMapViewportOffset * viewportExtentScale + (viewportOffset/atlasExtent)
+		shadowMapViewportScale: viewportScale * viewportExtentScale;
+		shadowMapViewportOffsets: (atlasElements collect: [:atlasElement |
+			viewportOffset * viewportExtentScale + (atlasElement offset/atlasExtent)
+		])
 ]
 
 { #category : #rendering }
@@ -1223,7 +1224,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
 		| adjustedLight |
 		adjustedLight := light copy.
 		adjustedLight castShadows ifTrue: [ 
-			adjustedLight shadowMapProjectionMatrix: renderer resourceCache projectionNDCAdjustMatrix * adjustedLight shadowMapProjectionMatrix
+			adjustedLight shadowMapProjectionMatrices: (adjustedLight shadowMapProjectionMatrices collect: [:each | renderer resourceCache projectionNDCAdjustMatrix * each])
 		].
 	
 		uploadAllocation writeValue: adjustedLight with: WDAGPULightStateUniformBufferWriter at: destOffset.

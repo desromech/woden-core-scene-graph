@@ -178,6 +178,17 @@ WDAGPUUniformBufferWriter >> writeMat4: matrix onto: pointer at: offset [
 ]
 
 { #category : #writing }
+WDAGPUUniformBufferWriter >> writeMat4: matrixArray onto: pointer at: offset count: count [
+	| writeCount destOffset |
+	writeCount := matrixArray size min: count.
+	destOffset := offset.
+	1 to: writeCount do: [ :i |
+		self writeMat4: (matrixArray at: i) onto: pointer at: destOffset.
+		destOffset := destOffset + 64
+	]
+]
+
+{ #category : #writing }
 WDAGPUUniformBufferWriter >> writeStruct: data writer: structWriter onto: pointer at: offset count: count [
 	| currentOffset elementSize writeCount |
 	currentOffset := offset.
@@ -214,6 +225,17 @@ WDAGPUUniformBufferWriter >> writeVec2: data onto: pointer at: offset [
 	pointer
 		floatAt: offset + 1 put: data x asFloat;
 		floatAt: offset + 5 put: data y asFloat
+]
+
+{ #category : #writing }
+WDAGPUUniformBufferWriter >> writeVec2: vectorArray onto: pointer at: offset count: count [
+	| writeCount destOffset |
+	writeCount := vectorArray size min: count.
+	destOffset := offset.
+	1 to: writeCount do: [ :i |
+		self writeVec2: (vectorArray at: i) onto: pointer at: destOffset.
+		destOffset := destOffset + 8
+	]
 ]
 
 { #category : #writing }

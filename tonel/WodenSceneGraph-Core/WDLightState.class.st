@@ -12,10 +12,12 @@ Class {
 		'outerSpotCosCutoff',
 		'influenceRadius',
 		'castShadows',
-		'shadowMappingCameraState',
+		'shadowMappingCameraStates',
 		'shadowMapViewportScale',
-		'shadowMapViewportOffset',
-		'shadowMapProjectionMatrix'
+		'shadowMapViewportOffsets',
+		'shadowMapProjectionMatrices',
+		'shadowMapCascadeDistanceWorldTransform',
+		'shadowMapCascadeOffsets'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -58,10 +60,12 @@ WDLightState >> initialize [
 	outerSpotCosCutoff := -1.0.
 	influenceRadius := 1.0.
 	castShadows := false.
-	shadowMappingCameraState := nil.
+	shadowMappingCameraStates := #().
+	shadowMapCascadeDistanceWorldTransform := Vector4 zeros.
+	shadowMapCascadeOffsets := Vector4 zeros.
 	
 	shadowMapViewportScale := Vector2 x: 0.5 y: 0.5.
-	shadowMapViewportOffset := Vector2 x: 0.5 y: 0.5.
+	shadowMapViewportOffsets := #().
 ]
 
 { #category : #accessing }
@@ -112,43 +116,61 @@ WDLightState >> positionOrDirection: anObject [
 	positionOrDirection := anObject
 ]
 
-{ #category : #'as yet unclassified' }
-WDLightState >> shadowMapInverseTransformationMatrix [
-	^ shadowMappingCameraState
-		ifNil: [ Matrix4x4 identity ]
-		ifNotNil: [ shadowMappingCameraState inverseTransformationMatrix ]
+{ #category : #accessing }
+WDLightState >> shadowMapCascadeDistanceWorldTransform [
+
+	^ shadowMapCascadeDistanceWorldTransform
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapCascadeDistanceWorldTransform: anObject [
+
+	shadowMapCascadeDistanceWorldTransform := anObject
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapCascadeOffsets [
+
+	^ shadowMapCascadeOffsets
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapCascadeOffsets: anObject [
+
+	shadowMapCascadeOffsets := anObject
 ]
 
 { #category : #'as yet unclassified' }
-WDLightState >> shadowMapProjectionMatrix [
-	^ shadowMapProjectionMatrix ifNil: [shadowMappingCameraState
-			ifNil: [ Matrix4x4 identity ]
-			ifNotNil: [ shadowMappingCameraState projectionMatrix ]
+WDLightState >> shadowMapInverseTransformationMatrices [
+	^ shadowMappingCameraStates collect: [:each | each inverseTransformationMatrix]
+]
+
+{ #category : #'as yet unclassified' }
+WDLightState >> shadowMapProjectionMatrices [
+	^ shadowMapProjectionMatrices ifNil: [shadowMapProjectionMatrices:= shadowMappingCameraStates collect: [ :each | each projectionMatrix  ]
 	]
 ]
 
 { #category : #'as yet unclassified' }
-WDLightState >> shadowMapProjectionMatrix: aMatrix [
-	shadowMapProjectionMatrix := aMatrix
+WDLightState >> shadowMapProjectionMatrices: anArray [
+	shadowMapProjectionMatrices := anArray
 ]
 
 { #category : #'as yet unclassified' }
-WDLightState >> shadowMapTransformationMatrix [
-	^ shadowMappingCameraState
-		ifNil: [ Matrix4x4 identity ]
-		ifNotNil: [ shadowMappingCameraState transformationMatrix ]
+WDLightState >> shadowMapTransformationMatrices [
+	^ shadowMappingCameraStates collect: [:each | each transformationMatrix]
 ]
 
 { #category : #accessing }
-WDLightState >> shadowMapViewportOffset [
+WDLightState >> shadowMapViewportOffsets [
 
-	^ shadowMapViewportOffset
+	^ shadowMapViewportOffsets
 ]
 
 { #category : #accessing }
-WDLightState >> shadowMapViewportOffset: anObject [
+WDLightState >> shadowMapViewportOffsets: anObject [
 
-	shadowMapViewportOffset := anObject
+	shadowMapViewportOffsets := anObject
 ]
 
 { #category : #accessing }
@@ -165,14 +187,25 @@ WDLightState >> shadowMapViewportScale: anObject [
 
 { #category : #accessing }
 WDLightState >> shadowMappingCameraState [
-
-	^ shadowMappingCameraState
+	^ shadowMappingCameraStates
+		ifEmpty: [ nil ]
+		ifNotEmpty: [ shadowMappingCameraStates first ]
 ]
 
 { #category : #accessing }
-WDLightState >> shadowMappingCameraState: anObject [
+WDLightState >> shadowMappingCameraState: aCameraState [
 
-	shadowMappingCameraState := anObject
+	shadowMappingCameraStates := {aCameraState}
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMappingCameraStates [
+	^ shadowMappingCameraStates
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMappingCameraStates: anArray [
+	shadowMappingCameraStates := anArray
 ]
 
 { #category : #accessing }
