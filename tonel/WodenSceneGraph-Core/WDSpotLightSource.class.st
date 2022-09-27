@@ -13,8 +13,8 @@ Class {
 }
 
 { #category : #converting }
-WDSpotLightSource >> asLightStateWithTransform: renderingTransform [
-	^ (super asLightStateWithTransform: renderingTransform)
+WDSpotLightSource >> asLightStateForRenderingScene: renderingScene withTransform: renderingTransform [
+	^ (super asLightStateForRenderingScene: renderingScene withTransform: renderingTransform)
 		spotDirection: renderingTransform matrix thirdColumn normalized;
 		innerSpotCosCutoff: innerCutoff degreeCos;
 		outerSpotCosCutoff: outerCutoff degreeCos;

@@ -16,7 +16,8 @@ Class {
 		'toneMappingOperator',
 		'viewMode',
 		'bloomThreshold',
-		'bloomStrength'
+		'bloomStrength',
+		'cascadeSplitDistributionLambda'
 	],
 	#category : #'WodenSceneGraph-Core-Camera'
 }
@@ -40,6 +41,7 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		toneMappingOperator: toneMappingOperator;
 		viewMode: viewMode;
 		hasReverseDepth: hasReverseDepth;
+		cascadeSplitDistributionLambda: cascadeSplitDistributionLambda;
 		yourself
 ]
 
@@ -58,6 +60,7 @@ WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeT
 		viewMode: viewMode;
 		hasReverseDepth: hasReverseDepth;
 		transformation: eyeTransform;
+		cascadeSplitDistributionLambda: cascadeSplitDistributionLambda;
 		yourself
 ]
 
@@ -199,6 +202,7 @@ WDCamera >> initialize [
 	exposure := 1.0.
 	bloomThreshold := 1.0.
 	bloomStrength := 0.1.
+	cascadeSplitDistributionLambda := 0.99.
 	self toneMappingOperator: WDLinearToneMappingOperator.
 	self viewMode: WDFullShadedViewMode.
 ]

@@ -15,12 +15,12 @@ Class {
 { #category : #adding }
 WDPointLightSource >> addToRenderingScene: renderingScene withGlobalTransform: globalTransform [
 	(renderingScene shouldRenderWorldSphereWithCenter: globalTransform translation radius: influenceRadius) ifTrue: [
-		renderingScene addLight: (self asLightStateWithTransform: globalTransform)
+		renderingScene addLight: (self asLightStateForRenderingScene: renderingScene withTransform: globalTransform)
 	].
 ]
 
 { #category : #converting }
-WDPointLightSource >> asLightStateWithTransform: renderingTransform [
+WDPointLightSource >> asLightStateForRenderingScene: renderingScene withTransform: renderingTransform [
 	^ WDLightState new
 		positionOrDirection: (Vector4 xyz: renderingTransform translation w: 1.0);
 		influenceRadius: influenceRadius;

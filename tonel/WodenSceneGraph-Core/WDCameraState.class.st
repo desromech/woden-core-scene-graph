@@ -24,7 +24,8 @@ Class {
 		'hasBottomLeftTextureCoordinates',
 		'worldFrustum',
 		'bloomThreshold',
-		'bloomStrength'
+		'bloomStrength',
+		'cascadeSplitDistributionLambda'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -67,6 +68,18 @@ WDCameraState >> bloomThreshold [
 WDCameraState >> bloomThreshold: anObject [
 
 	bloomThreshold := anObject
+]
+
+{ #category : #accessing }
+WDCameraState >> cascadeSplitDistributionLambda [
+
+	^ cascadeSplitDistributionLambda
+]
+
+{ #category : #accessing }
+WDCameraState >> cascadeSplitDistributionLambda: anObject [
+
+	cascadeSplitDistributionLambda := anObject
 ]
 
 { #category : #accessing }
@@ -214,6 +227,7 @@ WDCameraState >> initialize [
 	lightGridColumns := 1.
 	lightGridRows := 1.
 	lightGridSlices := 1.
+	cascadeSplitDistributionLambda := 0.99.
 	self toneMappingOperator: WDLinearToneMappingOperator.
 	self viewMode: WDFullShadedViewMode.
 ]

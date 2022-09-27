@@ -58,6 +58,7 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 				| shadowMapCameraLayer|
 				shadowMapCameraLayer := WDRenderingSceneCameraLayer new
 					cameraState: lightCameraState;
+					isShadowMap: true;
 					yourself.
 				self addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: shadowMapCameraLayer.
 				shadowMapCameraLayer

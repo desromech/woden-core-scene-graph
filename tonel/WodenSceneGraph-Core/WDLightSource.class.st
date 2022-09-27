@@ -22,7 +22,7 @@ WDLightSource >> addToRenderingScene: renderingScene withGlobalTransform: global
 ]
 
 { #category : #converting }
-WDLightSource >> asLightStateWithTransform: renderingTransform [
+WDLightSource >> asLightStateForRenderingScene: renderingScene withTransform: renderingTransform [
 	self subclassResponsibility
 ]
 
