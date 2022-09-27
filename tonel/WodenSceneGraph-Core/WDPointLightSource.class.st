@@ -26,6 +26,9 @@ WDPointLightSource >> asLightStateForRenderingScene: renderingScene withTransfor
 		influenceRadius: influenceRadius;
 		intensity: intensity;
 		castShadows: castShadows;
+		shadowMapDepthBiasConstant: shadowMapDepthBiasConstant;
+		shadowMapDepthBiasSlope: shadowMapDepthBiasSlope;
+		shadowMapNormalBiasFactor: shadowMapNormalBiasFactor;
 		shadowMappingCameraStates: (self shadowMapCameraStatesWithTransform: renderingTransform);
 		yourself.
 ]

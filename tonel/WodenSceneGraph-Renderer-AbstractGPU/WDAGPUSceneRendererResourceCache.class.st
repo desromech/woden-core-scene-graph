@@ -1554,6 +1554,8 @@ struct LightSource
 	bool castShadows;
 	vec2 shadowMapViewportScale;
 	
+	float shadowMapNormalBiasFactor;
+	
 	vec4 shadowMapCascadeDistanceWorldTransform;
 	vec4 shadowMapCascadeOffsets;
 	
@@ -2495,6 +2497,8 @@ float sampleShadowMapForLightWithIndexAtPoint(uint lightIndex, vec3 worldSampleP
 	vec3 atlasSamplePosition = vec3(samplePosition.xy*lightSource.shadowMapViewportScale + lightSource.shadowMapViewportOffsets[samplingLayer], samplePosition.z);
 
 	return textureLod(sampler2DShadow(ShadowMapTextureAtlas, ShadowMapSampler), atlasSamplePosition, 0.0);
+	
+#undef lightSource
 }
 
 struct ShadowMappingSamplingData
@@ -2523,7 +2527,7 @@ void computeShadowMappingSamplingData(out ShadowMappingSamplingData samplingData
 
 float sampleShadowMapForLightWithIndex(in ShadowMappingSamplingData samplingData, uint lightIndex, vec3 lightVector, float lightDistance, float lightMaxDistance)
 {
-	vec3 sampleCenterPoint = samplingData.position + samplingData.normal*0.01;
+	vec3 sampleCenterPoint = samplingData.position + samplingData.normal*AllLight.lights[lightIndex].shadowMapNormalBiasFactor;
 
 	float sampleSum = 0.0;
 	uint sampleCount = 0u;

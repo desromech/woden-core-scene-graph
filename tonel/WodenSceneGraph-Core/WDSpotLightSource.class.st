@@ -19,6 +19,9 @@ WDSpotLightSource >> asLightStateForRenderingScene: renderingScene withTransform
 		innerSpotCosCutoff: innerCutoff degreeCos;
 		outerSpotCosCutoff: outerCutoff degreeCos;
 		castShadows: castShadows;
+		shadowMapDepthBiasConstant: shadowMapDepthBiasConstant;
+		shadowMapDepthBiasSlope: shadowMapDepthBiasSlope;
+		shadowMapNormalBiasFactor: shadowMapNormalBiasFactor;
 		shadowMappingCameraStates: (self shadowMapCameraStatesWithTransform: renderingTransform);
 		yourself.
 ]

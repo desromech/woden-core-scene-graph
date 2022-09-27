@@ -86,11 +86,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowM
 		^ self
 	].
 
+	lightSource := shadowMapSet lightSource.
 	atlasElements doWithIndex: [ :atlasElement :index |
-		self renderShadowMapFor: (shadowMapSet renderingScenes at: index) atlasElement: atlasElement
+		self renderShadowMapFor: (shadowMapSet renderingScenes at: index) atlasElement: atlasElement lightSource: lightSource
 	].
 
-	lightSource := shadowMapSet lightSource.
 	viewportScale := (Vector2 x: 0.5 y: 0.5).
 	viewportOffset := (Vector2 x: 0.5 y: 0.5).
 		
@@ -1112,7 +1112,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLay
 ]
 
 { #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLayer atlasElement: atlasElement [
+WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLayer atlasElement: atlasElement lightSource: lightSource [
 	| convertedCameraState hasReverseDepth initialDepth shaderSignature viewportOffset viewportExtent |
 
 	viewportOffset := atlasElement offset.
@@ -1142,6 +1142,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLay
 		"Clear the depth buffer"
 		setCullMode: AGPU_CULL_MODE_NONE;
 		setDepthState: true writeMask: true function: AGPU_ALWAYS;
+		setDepthBias: lightSource shadowMapDepthBiasConstant asFloat negated clamp: 0.0 slope_factor: lightSource shadowMapDepthBiasSlope asFloat negated;
 		setPrimitiveType: AGPU_TRIANGLES;
 		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
 		setFragmentStage: renderer resourceCache clearReverseDepthFragmentShader entryPoint: 'main';

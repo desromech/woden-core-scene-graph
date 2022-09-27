@@ -17,7 +17,10 @@ Class {
 		'shadowMapViewportOffsets',
 		'shadowMapProjectionMatrices',
 		'shadowMapCascadeDistanceWorldTransform',
-		'shadowMapCascadeOffsets'
+		'shadowMapCascadeOffsets',
+		'shadowMapDepthBiasConstant',
+		'shadowMapDepthBiasSlope',
+		'shadowMapNormalBiasFactor'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -60,6 +63,11 @@ WDLightState >> initialize [
 	outerSpotCosCutoff := -1.0.
 	influenceRadius := 1.0.
 	castShadows := false.
+	
+	shadowMapDepthBiasConstant := 4.0.
+	shadowMapDepthBiasSlope := 1.5.
+	shadowMapNormalBiasFactor := 0.01.
+	
 	shadowMappingCameraStates := #().
 	shadowMapCascadeDistanceWorldTransform := Vector4 zeros.
 	shadowMapCascadeOffsets := Vector4 zeros.
@@ -140,9 +148,45 @@ WDLightState >> shadowMapCascadeOffsets: anObject [
 	shadowMapCascadeOffsets := anObject
 ]
 
+{ #category : #accessing }
+WDLightState >> shadowMapDepthBiasConstant [
+
+	^ shadowMapDepthBiasConstant
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapDepthBiasConstant: anObject [
+
+	shadowMapDepthBiasConstant := anObject
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapDepthBiasSlope [
+
+	^ shadowMapDepthBiasSlope
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapDepthBiasSlope: anObject [
+
+	shadowMapDepthBiasSlope := anObject
+]
+
 { #category : #'as yet unclassified' }
 WDLightState >> shadowMapInverseTransformationMatrices [
 	^ shadowMappingCameraStates collect: [:each | each inverseTransformationMatrix]
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapNormalBiasFactor [
+
+	^ shadowMapNormalBiasFactor
+]
+
+{ #category : #accessing }
+WDLightState >> shadowMapNormalBiasFactor: anObject [
+
+	shadowMapNormalBiasFactor := anObject
 ]
 
 { #category : #'as yet unclassified' }

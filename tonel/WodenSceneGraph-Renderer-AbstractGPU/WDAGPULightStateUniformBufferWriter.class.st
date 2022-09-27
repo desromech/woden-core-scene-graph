@@ -19,6 +19,8 @@ WDAGPULightStateUniformBufferWriter class >> fieldsDesc [
 		float outerSpotCosCutoff
 		bool castShadows
 		vec2 shadowMapViewportScale
+		
+		float shadowMapNormalBiasFactor
 
 		vec4 shadowMapCascadeDistanceWorldTransform
 		vec4 shadowMapCascadeOffsets
@@ -38,7 +40,7 @@ WDAGPULightStateUniformBufferWriter >> instanceAlignment [
 
 { #category : #accessing }
 WDAGPULightStateUniformBufferWriter >> instanceSize [
-	^ 912
+	^ 928
 ]
 
 { #category : #writing }
@@ -51,10 +53,11 @@ WDAGPULightStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeFloat: data outerSpotCosCutoff onto: pointer at: offset + 48.
 	self writeBool: data castShadows onto: pointer at: offset + 52.
 	self writeVec2: data shadowMapViewportScale onto: pointer at: offset + 56.
-	self writeVec4: data shadowMapCascadeDistanceWorldTransform onto: pointer at: offset + 64.
-	self writeVec4: data shadowMapCascadeOffsets onto: pointer at: offset + 80.
-	self writeVec2: data shadowMapViewportOffsets onto: pointer at: offset + 96 count: 6.
-	self writeMat4: data shadowMapTransformationMatrices onto: pointer at: offset + 144 count: 4.
-	self writeMat4: data shadowMapInverseTransformationMatrices onto: pointer at: offset + 400 count: 4.
-	self writeMat4: data shadowMapProjectionMatrices onto: pointer at: offset + 656 count: 4.
+	self writeFloat: data shadowMapNormalBiasFactor onto: pointer at: offset + 64.
+	self writeVec4: data shadowMapCascadeDistanceWorldTransform onto: pointer at: offset + 80.
+	self writeVec4: data shadowMapCascadeOffsets onto: pointer at: offset + 96.
+	self writeVec2: data shadowMapViewportOffsets onto: pointer at: offset + 112 count: 6.
+	self writeMat4: data shadowMapTransformationMatrices onto: pointer at: offset + 160 count: 4.
+	self writeMat4: data shadowMapInverseTransformationMatrices onto: pointer at: offset + 416 count: 4.
+	self writeMat4: data shadowMapProjectionMatrices onto: pointer at: offset + 672 count: 4.
 ]
