@@ -20,9 +20,19 @@ WDSkeletalMeshRenderable >> addIntoModelAssetWithDependencies: modelAsset [
 
 { #category : #adding }
 WDSkeletalMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
-	self flag: 'TODO: add the skin to the object state'.
-	referenceMesh ifNotNil: [ 
-		referenceMesh addToRenderingScene: renderingScene withObjectState: anObjectState
+	referenceMesh ifNotNil: [
+		(skeleton isNotNil and: [ currentPose isNotNil ]) ifTrue: [ 
+			referenceMesh addToRenderingScene: renderingScene withObjectState: anObjectState poseState: currentPose asPoseState
+		] ifFalse: [ 
+			referenceMesh addToRenderingScene: renderingScene withObjectState: anObjectState
+		]
+	]
+]
+
+{ #category : #adding }
+WDSkeletalMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState [
+	referenceMesh ifNotNil: [
+		referenceMesh addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState
 	]
 ]
 

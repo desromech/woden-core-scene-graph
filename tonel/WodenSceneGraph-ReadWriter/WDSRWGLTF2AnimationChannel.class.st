@@ -3,9 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'sampler',
-		'targetArmature',
-		'targetBoneIndex',
-		'targetProperty'
+		'targetProperty',
+		'targetName'
 	],
 	#classVars : [
 		'TargetPropertyToClassMap'
@@ -16,24 +15,28 @@ Class {
 { #category : #'class initialization' }
 WDSRWGLTF2AnimationChannel class >> initialize [
 	TargetPropertyToClassMap := Dictionary newFromPairs: { 
-		#translation . WDCSkinnedModelTranslationAnimationChannel.
-		#rotation . WDCSkinnedModelRotationAnimationChannel.
-		#scale . WDCSkinnedModelScaleAnimationChannel.
-		#weight . WDCSkinnedModelWeightsAnimationChannel.
+		#translation . WDModelAnimationTranslationChannel.
+		#rotation . WDModelAnimationRotationChannel.
+		#scale . WDModelAnimationScaleChannel.
+		#weight . WDModelAnimationWeightsChannel.
 	}.
 ]
 
 { #category : #converting }
-WDSRWGLTF2AnimationChannel >> asSkinnedModelAnimationChannel [
-	^ self skinnedModelAnimationChannelClass new
-		targetArmature: targetArmature;
-		targetBoneIndex: targetBoneIndex;
+WDSRWGLTF2AnimationChannel >> asModelAnimationChannel [
+	^ self modelAnimationChannelClass new
+		targetName: targetName;
 		inputSamples: sampler inputValues;
 		inputMinValue: sampler inputMinValue;
 		inputMaxValue: sampler inputMaxValue;
 		outputSamples: sampler outputValues;
 		interpolationMethod: sampler animationInterpolationMethod;
 		yourself
+]
+
+{ #category : #'as yet unclassified' }
+WDSRWGLTF2AnimationChannel >> modelAnimationChannelClass [
+	^ TargetPropertyToClassMap at: targetProperty
 ]
 
 { #category : #accessing }
@@ -46,31 +49,16 @@ WDSRWGLTF2AnimationChannel >> sampler: anObject [
 	sampler := anObject
 ]
 
-{ #category : #'as yet unclassified' }
-WDSRWGLTF2AnimationChannel >> skinnedModelAnimationChannelClass [
-	^ TargetPropertyToClassMap at: targetProperty
+{ #category : #accessing }
+WDSRWGLTF2AnimationChannel >> targetName [
+
+	^ targetName
 ]
 
 { #category : #accessing }
-WDSRWGLTF2AnimationChannel >> targetArmature [
+WDSRWGLTF2AnimationChannel >> targetName: anObject [
 
-	^ targetArmature
-]
-
-{ #category : #accessing }
-WDSRWGLTF2AnimationChannel >> targetArmature: anObject [
-
-	targetArmature := anObject
-]
-
-{ #category : #accessing }
-WDSRWGLTF2AnimationChannel >> targetBoneIndex [
-	^ targetBoneIndex
-]
-
-{ #category : #accessing }
-WDSRWGLTF2AnimationChannel >> targetBoneIndex: anObject [
-	targetBoneIndex := anObject
+	targetName := anObject
 ]
 
 { #category : #accessing }

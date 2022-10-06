@@ -30,6 +30,13 @@ WDMeshPrimitive >> addToRenderingScene: renderingScene withObjectState: anObject
 	]
 ]
 
+{ #category : #adding }
+WDMeshPrimitive >> addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState [
+	(renderingScene shouldRenderBoundingBox: self boundingBox withObjectState: anObjectState poseState: poseState) ifTrue: [ 
+		renderingScene addMeshPrimitive: self withMaterial: material objectState: anObjectState poseState: poseState
+	]
+]
+
 { #category : #accessing }
 WDMeshPrimitive >> boundingBox [
 

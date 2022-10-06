@@ -24,6 +24,13 @@ WDStaticMeshRenderable >> addToRenderingScene: renderingScene withObjectState: a
 	].
 ]
 
+{ #category : #adding }
+WDStaticMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState [
+	primitives do: [ :each |
+		each addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState
+	].
+]
+
 { #category : #accessing }
 WDStaticMeshRenderable >> boundingBox [
 

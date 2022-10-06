@@ -18,6 +18,18 @@ Class {
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
 
+{ #category : #accessing }
+WDSRWGLTF2Skin >> boneNames [
+
+	^ boneNames
+]
+
+{ #category : #accessing }
+WDSRWGLTF2Skin >> boneNames: anObject [
+
+	boneNames := anObject
+]
+
 { #category : #'as yet unclassified' }
 WDSRWGLTF2Skin >> fetchInverseBindMatrices [
 	^ inverseBindMatricesAccessor decodeContentAsArray

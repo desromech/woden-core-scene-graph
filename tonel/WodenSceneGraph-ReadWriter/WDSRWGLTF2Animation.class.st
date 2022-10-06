@@ -10,10 +10,10 @@ Class {
 }
 
 { #category : #converting }
-WDSRWGLTF2Animation >> asModelAssetAnimation [
-	^ WDCSkinnedModelAnimation new
+WDSRWGLTF2Animation >> asModelAnimation [
+	^ WDModelAnimation new
 		name: name;
-		channels: (channels collect: [ :each | each asSkinnedModelAnimationChannel ]);
+		channels: (channels collect: [ :each | each asModelAnimationChannel ]);
 		yourself
 ]
 

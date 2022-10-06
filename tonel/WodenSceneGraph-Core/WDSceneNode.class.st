@@ -77,7 +77,7 @@ WDSceneNode >> asSceneNode [
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'bounding volume' }
 WDSceneNode >> boundingBox [
 	^ boundingBox ifNil: [ boundingBox := self localBoundingBox transformedWith: self transform ]
 ]
@@ -113,18 +113,18 @@ WDSceneNode >> initialize [
 	transform := TRSTransform3D new.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'bounding volume' }
 WDSceneNode >> invalidateBoundingBox [
 	boundingBox := nil.
 	parent ifNotNil: [ parent invalidateChildBoundingBox ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'bounding volume' }
 WDSceneNode >> invalidateChildBoundingBox [
 	self invalidateLocalBoundingBox
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'bounding volume' }
 WDSceneNode >> invalidateLocalBoundingBox [
 	localBoundingBox := nil.
 	self invalidateBoundingBox

@@ -8,6 +8,7 @@ Class {
 		'sortKey',
 		'priority',
 		'objectState',
+		'poseState',
 		'renderable'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
@@ -23,6 +24,18 @@ WDRenderingSceneObject >> objectState [
 WDRenderingSceneObject >> objectState: anObject [
 
 	objectState := anObject
+]
+
+{ #category : #accessing }
+WDRenderingSceneObject >> poseState [
+
+	^ poseState
+]
+
+{ #category : #accessing }
+WDRenderingSceneObject >> poseState: anObject [
+
+	poseState := anObject
 ]
 
 { #category : #accessing }

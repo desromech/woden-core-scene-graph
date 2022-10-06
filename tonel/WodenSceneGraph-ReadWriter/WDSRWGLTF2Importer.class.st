@@ -17,12 +17,11 @@ Class {
 		'defaultMaterial',
 		'skins',
 		'nodeBoneStates',
-		'nodeToBoneIndices',
 		'animations',
-		'nodeToArmature',
 		'nodesUsingSkin',
 		'convertedVertexBindings',
-		'convertedVertexAttributes'
+		'convertedVertexAttributes',
+		'skeletalMeshes'
 	],
 	#classVars : [
 		'ComponentTypeMap',
@@ -178,9 +177,9 @@ WDSRWGLTF2Importer >> loadAnimationChannelFrom: channelDescription withSamplers:
 	channel := WDSRWGLTF2AnimationChannel new.
 	channel sampler: (animationSamplers at: (channelDescription at: 'sampler') + 1).
 	targetDescription := channelDescription at: 'target'.
+	
 	channel
-		targetArmature: (nodeToArmature at: (targetDescription at: 'node') + 1);
-		targetBoneIndex: (nodeToBoneIndices at: (targetDescription at: 'node') + 1);
+		targetName: (self validNodeNameForIndex:  (targetDescription at: 'node'));
 		targetProperty: (targetDescription at: 'path') asSymbol.
 	^ channel
 ]
@@ -458,13 +457,18 @@ WDSRWGLTF2Importer >> loadNodeFrom: nodeDescription [
 		mesh := meshes at: meshIndex + 1.
 		node renderables: {mesh}.
 		nodeDescription at: 'skin' ifPresent: [ :skinIndex |
-			| skin |
+			| skin skeletalMesh|
 			skin := (skins at: skinIndex + 1).
 			nodesUsingSkin at: skin put: node.
-			node renderables: {WDSkeletalMeshRenderable new
+			
+			skeletalMesh := WDSkeletalMeshRenderable new
 				referenceMesh: mesh;
 				skeleton: skin skeleton;
-				yourself}
+				yourself.
+			
+			skeletalMeshes ifNil: [ skeletalMeshes := OrderedCollection new ].
+			skeletalMeshes add: skeletalMesh.
+			node renderables: {skeletalMesh}
 		]
 	].
 
@@ -512,8 +516,6 @@ WDSRWGLTF2Importer >> loadNodesFrom: elements [
 	elements do: [ :el | self loadNodeFrom: el ].
 	elements doWithIndex: [ :el :index | self loadNode: (nodes at: index) childrenFrom: el].
 	
-	nodeToArmature := Array new: nodes size.
-	nodeToBoneIndices := (Array new: nodes size) atAllPut: -1.
 	skins ifNotNil: [
 		skins do: [ :each | self loadSkinTopology: each ]
 	]
@@ -641,11 +643,6 @@ WDSRWGLTF2Importer >> loadSkinTopology: skin [
 		]
 	].
 
-	skin jointIndices doWithIndex: [ :nodeIndex :boneIndex |
-		nodeToArmature at: nodeIndex + 1 put: skin skeleton.
-		nodeToBoneIndices at: nodeIndex + 1 put: (bones at: boneIndex) index
-	].
-
 	skin
 		jointIndexToBoneIndexPermutationTable: (bones collect: [ :each | each index ]) asArray.
 
@@ -741,8 +738,14 @@ WDSRWGLTF2Importer >> processGLTFJson: json [
 	meshes ifNotNil: [ 
 		meshes do: [ :each | asset addMesh: each ].
 	].
+	skeletalMeshes ifNotNil: [ 
+		skeletalMeshes do: [ :each | asset addSkeletalMesh: each ]
+	].
 	scenes ifNotNil: [
 		scenes do: [ :each | asset addScene: each ].
+	].
+	animations ifNotNil: [
+		animations do: [ :each | asset addAnimation: each asModelAnimation ].
 	].
 	
 	^ asset
@@ -758,4 +761,12 @@ WDSRWGLTF2Importer >> topologicalSortBoneGraphNode: boneGraphNode into: sortedBo
 	].
 
 	sortedBones add: boneGraphNode bone
+]
+
+{ #category : #'as yet unclassified' }
+WDSRWGLTF2Importer >> validNodeNameForIndex: nodeIndex [
+	| name |
+	name := (nodes at: nodeIndex + 1) name.
+	^ name isEmpty ifTrue: ['Node' , nodeIndex asString] ifFalse: [name]
+	
 ]

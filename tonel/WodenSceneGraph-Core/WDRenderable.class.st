@@ -20,6 +20,11 @@ WDRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectSta
 	self subclassResponsibility
 ]
 
+{ #category : #adding }
+WDRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState [
+	self subclassResponsibility
+]
+
 { #category : #converting }
 WDRenderable >> asSceneElement [
 	^ self asSceneNode

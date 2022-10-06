@@ -14,6 +14,13 @@ WDRenderableWithViewModeAlternatives >> addToRenderingScene: renderingScene with
 	]
 ]
 
+{ #category : #adding }
+WDRenderableWithViewModeAlternatives >> addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState [
+	(self getValidAlternativeFor: renderingScene viewMode) ifNotNil: [ :alternative |
+		alternative addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState
+	]
+]
+
 { #category : #accessing }
 WDRenderableWithViewModeAlternatives >> boundingBox [
 	^ self defaultAlternative

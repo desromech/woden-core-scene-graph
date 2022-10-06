@@ -78,7 +78,7 @@ WDBinaryBufferAccessor >> decodeContentAsArray [
 	stride := bufferView byteStride max: componentSize.
 	
 	type componentCount = 1 ifTrue: [ 
-		1 to: count do: [
+		1 to: count do: [ :i |
 		| componentCount |
 			result at: destIndex put: (componentType readFromBuffer: sourceBuffer at: sourceIndex).
 			sourceIndex := sourceIndex + stride.

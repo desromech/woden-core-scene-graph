@@ -47,7 +47,6 @@ WDSceneTreeElement >> addedTo: newParent [
 WDSceneTreeElement >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	| result |
 	result := WDRenderingSceneCameraLayer new
-		globalLightingState: WDGlobalLightingState defaultForInspector;
 		cameraState: baseCameraState;
 		yourself.
 	self addRecursivelyIntoRenderingSceneCameraLayer: result parentGlobalTransform: ReversibleAffineTransform3D identity.

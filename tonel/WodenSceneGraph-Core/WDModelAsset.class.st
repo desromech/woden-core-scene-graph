@@ -16,10 +16,18 @@ Class {
 		'textures',
 		'elementSet',
 		'nameDictionary',
-		'skeletalMeshes'
+		'skeletalMeshes',
+		'animations'
 	],
 	#category : #'WodenSceneGraph-Core-Asset'
 }
+
+{ #category : #adding }
+WDModelAsset >> addAnimation: anAnimation [
+	(elementSet includes: anAnimation) ifTrue: [ ^ self ].
+	self privateAddElement: anAnimation.
+	animations add: anAnimation
+]
 
 { #category : #adding }
 WDModelAsset >> addElementWithDependencies: anElement [
@@ -77,6 +85,8 @@ WDModelAsset >> initialize [
 	meshes := OrderedCollection new.
 	skeletalMeshes := OrderedCollection new.
 	scenes := OrderedCollection new.
+	animations := OrderedCollection new.
+	
 ]
 
 { #category : #accessing }
@@ -103,6 +113,12 @@ WDModelAsset >> privateAddElement: anElement [
 WDModelAsset >> scenes [
 
 	^ scenes
+]
+
+{ #category : #accessing }
+WDModelAsset >> skeletalMeshes [
+
+	^ skeletalMeshes
 ]
 
 { #category : #accessing }

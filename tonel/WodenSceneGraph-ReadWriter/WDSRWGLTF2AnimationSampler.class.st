@@ -24,7 +24,7 @@ WDSRWGLTF2AnimationSampler class >> initialize [
 
 { #category : #'as yet unclassified' }
 WDSRWGLTF2AnimationSampler >> animationInterpolationMethod [
-	^ InterpolationAlgorithmToInterpolationMethodMap at: interpolationAlgorithm ifAbsent: [ WDCAnimationStepInterpolationMethod uniqueInstance ]
+	^ InterpolationAlgorithmToInterpolationMethodMap at: interpolationAlgorithm ifAbsent: [ WDCurveInterpolationMethodStep uniqueInstance ]
 ]
 
 { #category : #accessing }

@@ -38,28 +38,36 @@ WDRenderingSceneCameraLayer >> addLight: light withGlobalTransform: globalTransf
 
 { #category : #adding }
 WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState [
+	self addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState poseState: nil
+]
+
+{ #category : #adding }
+WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState poseState: aPose [
 	self addMeshPrimitive: meshPrimitive
 		withPriority: (material ifNil: [ WDRenderPriority default ]
 			ifNotNil: [material renderPriority])
 		opaque: (material ifNil: [ true ] ifNotNil: [material hasOpaqueRendering])
 		background: (material ifNil: [ false ] ifNotNil: [material hasBackgroundRendering])
 		objectState: anObjectState
+		poseState: aPose
 ]
 
 { #category : #adding }
-WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority opaque: isOpaque background: isBackground objectState: anObjectState [
+WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority opaque: isOpaque background: isBackground objectState: anObjectState poseState: aPoseState [
 	isOpaque ifTrue: [ 
 		isBackground ifTrue: [ 
 			self addBackgroundRenderingSceneObject: (WDRenderingSceneObject new
 				priority: renderPriority;
 				objectState: anObjectState;
 				renderable: meshPrimitive;
+				poseState: aPoseState;
 				yourself)
 		] ifFalse: [ 
 			self addOpaqueRenderingSceneObject: (WDRenderingSceneObject new
 				priority: renderPriority;
 				objectState: anObjectState;
 				renderable: meshPrimitive;
+				poseState: aPoseState;
 				yourself)
 		].
 	] ifFalse: [ 
@@ -67,24 +75,7 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: ren
 			priority: renderPriority;
 			objectState: anObjectState;
 			renderable: meshPrimitive;
-			yourself)
-	].
-
-]
-
-{ #category : #adding }
-WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority opaque: isOpaque objectState: anObjectState [
-	isOpaque ifTrue: [ 
-		self addOpaqueRenderingSceneObject: (WDRenderingSceneObject new
-			priority: renderPriority;
-			objectState: anObjectState;
-			renderable: meshPrimitive;
-			yourself)
-	] ifFalse: [ 
-		self addTranslucentRenderingSceneObject: (WDRenderingSceneObject new
-			priority: renderPriority;
-			objectState: anObjectState;
-			renderable: meshPrimitive;
+			poseState: aPoseState;
 			yourself)
 	].
 
@@ -207,6 +198,12 @@ WDRenderingSceneCameraLayer >> shouldRenderBoundingBox: boundingBoxToTest withOb
 	^ usesFrustumCulling
 		ifTrue: [ self cameraState worldFrustum intersectsOrContainsBox: (boundingBoxToTest transformedWith: objectState transformation) ]
 		ifFalse: [ true ]
+]
+
+{ #category : #testing }
+WDRenderingSceneCameraLayer >> shouldRenderBoundingBox: boundingBoxToTest withObjectState: objectState poseState: aPoseState [
+	self flag: 'Expand the bounding box to account for deformation size increase.'.
+	^ self shouldRenderBoundingBox: boundingBoxToTest withObjectState: objectState
 ]
 
 { #category : #testing }
