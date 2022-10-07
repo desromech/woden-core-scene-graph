@@ -6,3 +6,8 @@ Class {
 	#superclass : #WDModelAnimationChannel,
 	#category : #'WodenSceneGraph-Core-Animation'
 }
+
+{ #category : #'as yet unclassified' }
+WDModelAnimationWeightsChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
+	"Do nothing here"
+]

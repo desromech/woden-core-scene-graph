@@ -6,3 +6,13 @@ Class {
 	#superclass : #WDModelAnimationChannel,
 	#category : #'WodenSceneGraph-Core-Animation'
 }
+
+{ #category : #'as yet unclassified' }
+WDModelAnimationRotationChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
+	transform rotation: interpolatedSample
+]
+
+{ #category : #hooks }
+WDModelAnimationRotationChannel >> computeInterpolatedSampleForChannelPosition: channelPosition [
+	^ interpolationMethod interpolateQuaternionSamples: outputSamples forChannelPosition: channelPosition
+]

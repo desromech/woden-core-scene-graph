@@ -22,3 +22,13 @@ WDCurveInterpolationMethod class >> isAbstract [
 WDCurveInterpolationMethod >> asCurveInterpolationMethod [
 	^ self
 ]
+
+{ #category : #interpolation }
+WDCurveInterpolationMethod >> interpolateQuaternionSamples: samples forChannelPosition: channelPosition [
+	self subclassResponsibility
+]
+
+{ #category : #interpolation }
+WDCurveInterpolationMethod >> interpolateVectorSamples: samples forChannelPosition: channelPosition [
+	self subclassResponsibility
+]

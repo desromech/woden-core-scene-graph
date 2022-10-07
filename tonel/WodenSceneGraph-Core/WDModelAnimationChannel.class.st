@@ -16,13 +16,17 @@ Class {
 	#category : #'WodenSceneGraph-Core-Animation'
 }
 
+{ #category : #'as yet unclassified' }
+WDModelAnimationChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
+	self subclassResponsibility
+]
+
 { #category : #animation }
 WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleCache: inputSampleCache toBonePose: bonePose [
-	| channelPosition |
+	| channelPosition interpolatedSample |
 	channelPosition := self computeChannelPositionFor: position looped: isLooped inputSampleCache: inputSampleCache.
-	Transcript show: channelPosition previousFrameIndex; space;
-		show: channelPosition nextFrameIndex; space;
-		show: channelPosition alpha; cr.
+	interpolatedSample := self computeInterpolatedSampleForChannelPosition: channelPosition.
+	self applyInterpolatedSample: interpolatedSample toTransform: bonePose.
 	^ channelPosition
 ]
 
@@ -31,14 +35,10 @@ WDModelAnimationChannel >> computeChannelPositionFor: position looped: isLooped 
 	| result actualPosition nextFrameIndex previousFrameIndex previousFramePosition nextFramePosition alpha |
 	result := inputSampleCache ifNil: [ WDModelAnimationChannelPosition new ].
 	(result isValidForPosition: position looped: isLooped inputMinValue: inputMinValue inputMaxValue: inputMaxValue inputSamples: inputSamples) ifTrue: [ ^ result ].
-	Transcript show: 'Recompute channel position'; cr.
 
-	actualPosition := position.
-	isLooped ifTrue: [
-		actualPosition := actualPosition floorModule: inputMaxValue
-	] ifFalse: [
-		actualPosition := actualPosition min: inputMaxValue max: inputMinValue.
-	].
+	actualPosition := isLooped
+		ifTrue: [ position floorModule: inputMaxValue ]
+		ifFalse: [ position min: inputMaxValue max: inputMinValue ].
 
 	actualPosition <= inputMinValue ifTrue: [
 		previousFrameIndex := nextFrameIndex := 1 min: inputSamples size.
@@ -55,11 +55,9 @@ WDModelAnimationChannel >> computeChannelPositionFor: position looped: isLooped 
 
 			previousFramePosition := inputSamples at: previousFrameIndex.
 			nextFramePosition := inputSamples at: nextFrameIndex.
-			(previousFramePosition closeTo: nextFramePosition) ifTrue: [ 
-				alpha := 0.0
-			] ifFalse: [ 
-				alpha := (actualPosition - previousFramePosition) / (nextFramePosition - previousFramePosition)
-			].
+			alpha := (previousFramePosition closeTo: nextFramePosition)
+				ifTrue: [ 0.0 ]
+				ifFalse: [ (actualPosition - previousFramePosition) / (nextFramePosition - previousFramePosition) ].
 		]
 	].
 
@@ -76,6 +74,11 @@ WDModelAnimationChannel >> computeChannelPositionFor: position looped: isLooped 
 		nextFramePosition: nextFramePosition;
 		alpha: alpha;
 		yourself
+]
+
+{ #category : #hooks }
+WDModelAnimationChannel >> computeInterpolatedSampleForChannelPosition: channelPosition [
+	^ interpolationMethod interpolateVectorSamples: outputSamples forChannelPosition: channelPosition
 ]
 
 { #category : #accessing }
@@ -126,9 +129,28 @@ WDModelAnimationChannel >> interpolationMethod: anObject [
 	interpolationMethod := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 WDModelAnimationChannel >> lowerBoundSearchPosition: position [
-	| bestIndex |
+	| lowerIndex upperIndex bestFound |
+	lowerIndex := 1.
+	upperIndex := inputSamples size.
+	bestFound := 1.
+	
+	[ lowerIndex <= upperIndex ] whileTrue: [ 
+		| middleIndex middleSample |
+		middleIndex := lowerIndex + ((upperIndex - lowerIndex) // 2).
+		middleSample := inputSamples at: middleIndex.
+		middleSample <= position ifTrue: [ 
+			bestFound := middleIndex.
+			lowerIndex := middleIndex + 1
+		] ifFalse: [
+			upperIndex := middleIndex - 1
+		]
+	].
+
+	^ bestFound
+	
+	"| bestIndex |
 	bestIndex := 1.
 	self flag: 'TODO: Replace this by a binary search.'.
 	inputSamples doWithIndex: [ :samplePosition :index |
@@ -139,7 +161,7 @@ WDModelAnimationChannel >> lowerBoundSearchPosition: position [
 		]
 	].
 	
-	^ inputSamples size
+	^ inputSamples size"
 ]
 
 { #category : #accessing }
