@@ -18,7 +18,8 @@ Class {
 		'depthTestingEnabled',
 		'depthWriteMask',
 		'alphaBlendingEnabled',
-		'isInDepthOnlyPass'
+		'isInDepthOnlyPass',
+		'hasSkinningState'
 	],
 	#classVars : [
 		'BloomBlurPasses',
@@ -258,6 +259,20 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBuff
 ]
 
 { #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> bindPoseState: poseState [
+	hasSkinningState := poseState notNil.
+	poseState ifNil: [ ^ self ].
+	stateTracker useShaderResources: (activeResourceDictionary at: poseState ifAbsentPut: [ 
+		| binding |
+		binding := renderer resourceCache rendererShaderSignature allocatePoseState.
+		binding writeState: poseState with: WDAGPUPoseStateUniformBufferWriter.
+		activeSlabResource add: binding.
+		binding
+	]) bindingHandle.
+
+]
+
+{ #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer right: rightEyeFramebuffer into: framebuffer mode: composeMode [
 
 	| outputFramebufferHandle shaderSignature leftEyeTexture rightEyeTexture |
@@ -306,7 +321,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDepthOnlyOpaqueSurfaceMaterialActi
 	locationMask := currentObjectVertexBinding locationMask bitAnd: renderer resourceCache depthOnlyVertexAttributesForMask.
 	
 	stateTracker
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
 		setFragmentStage: renderer resourceCache genericDepthOnlySurfaceFragmentShader entryPoint: 'main';
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
@@ -335,7 +350,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidM
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
 		setFragmentStage: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader ]
 			ifFalse: [ material hasAlphaBlending
@@ -365,7 +380,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
 		setFragmentStage: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache environmentMapDepthOnlyFragmentShaderSource ]
 			ifFalse: [ material hasAlphaBlending
@@ -398,7 +413,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivatio
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask) entryPoint: 'main';
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
 		setFragmentStage: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache metallicRoughnessDepthOnlyFragmentShader ]
 			ifFalse: [material hasAlphaBlending
@@ -448,7 +463,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask) entryPoint: 'main';
+		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
 		setFragmentStage: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache unlitDepthOnlyFragmentShaderSource ]
 			ifFalse: [ material hasAlphaBlending
@@ -650,7 +665,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingBackgroundOb
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: renderingObject [
-	self bindObjectState: renderingObject objectState.
+	self
+		bindObjectState: renderingObject objectState;
+		bindPoseState: renderingObject poseState.
 	self recordCommandsForRenderable: renderingObject renderable
 ]
 

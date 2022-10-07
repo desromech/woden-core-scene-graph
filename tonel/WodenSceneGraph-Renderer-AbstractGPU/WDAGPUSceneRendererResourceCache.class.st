@@ -205,7 +205,7 @@ WDAGPUSceneRendererResourceCache >> bloomSelectionFragmentShaderSource [
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputColor;
 
-layout(set=4, binding=1) uniform texture2D ColorBuffer;
+layout(set=5, binding=1) uniform texture2D ColorBuffer;
 
 void main()
 {
@@ -235,7 +235,7 @@ WDAGPUSceneRendererResourceCache >> blurHorizontalPassFragmentShaderSource [
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputColor;
 
-layout(set=4, binding=1) uniform texture2D SourceTexture;
+layout(set=5, binding=1) uniform texture2D SourceTexture;
 
 void main()
 {
@@ -267,7 +267,7 @@ WDAGPUSceneRendererResourceCache >> blurVerticalPassFragmentShaderSource [
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputColor;
 
-layout(set=4, binding=1) uniform texture2D SourceTexture;
+layout(set=5, binding=1) uniform texture2D SourceTexture;
 
 void main()
 {
@@ -581,7 +581,7 @@ WDAGPUSceneRendererResourceCache >> downsampleFragmentShaderSource [
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputColor;
 
-layout(set=4, binding=1) uniform texture2D SourceTexture;
+layout(set=5, binding=1) uniform texture2D SourceTexture;
 
 void main()
 {
@@ -681,7 +681,7 @@ void main()
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidMaterialStateSource [
 	^ '
-layout(set=4, binding=0, std140) uniform MaterialStateBlock	
+layout(set=5, binding=0, std140) uniform MaterialStateBlock	
 {
 	int doubleSided;
 	float alphaCutoff;
@@ -704,11 +704,11 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 	float mixAlpha;
 } MaterialState;
 
-layout(set=4, binding=1) uniform texture2D BaseColorTexture;
-layout(set=4, binding=2) uniform texture2D EmissiveTexture;
-layout(set=4, binding=3) uniform texture2D NormalTexture;
-layout(set=4, binding=4) uniform texture2D OcclusionTexture;
-layout(set=4, binding=5) uniform texture2D MetallicRoughnessTexture;
+layout(set=5, binding=1) uniform texture2D BaseColorTexture;
+layout(set=5, binding=2) uniform texture2D EmissiveTexture;
+layout(set=5, binding=3) uniform texture2D NormalTexture;
+layout(set=5, binding=4) uniform texture2D OcclusionTexture;
+layout(set=5, binding=5) uniform texture2D MetallicRoughnessTexture;
 '
 ]
 
@@ -772,14 +772,14 @@ void main()
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapMaterialStateSource [
 	^ '
-layout(set=4, binding=0, std140) uniform MaterialStateBlock
+layout(set=5, binding=0, std140) uniform MaterialStateBlock
 {
 	int doubleSided;
 	float alphaCutoff;
 	vec4 colorFactor;
 } MaterialState;
 
-layout(set=4, binding=1) uniform textureCube ColorTexture;
+layout(set=5, binding=1) uniform textureCube ColorTexture;
 '
 ]
 
@@ -875,14 +875,18 @@ layout(location=0) in StageInputBlock
 ]
 
 { #category : #'private shaders' }
-WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderSourceWithMask: mask [
+WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderSourceWithMask: mask hasSkinning: hasSkinning [
 	^ '
 #version 450
 ' ,
 (self vertexAttributesForMask: mask ),
 self cameraStateBlockSource ,
-self objectStateBlockSource ,'
+self objectStateBlockSource , (hasSkinning ifTrue: [ self poseStateBlockSource ] ifFalse: ['']) ,'
 #line 9
+
+#if defined(HAS_SKINNING) && defined(HAS_PER_VERTEX_BONE_INDICES) && defined(HAS_PER_VERTEX_BONE_WEIGHTS)
+#define HAS_VALID_SKINNING
+#endif
 
 layout(location=0) out StageOutputBlock
 { 
@@ -937,11 +941,34 @@ void main()
 	StageOutput.texcoord1 = vec2(0.0);
 #endif
 
+#ifdef HAS_VALID_SKINNING
+	mat4 skinMatrix = (
+		PoseState.skinMatrices[inBoneIndices.x]*inBoneWeights.x + 
+		PoseState.skinMatrices[inBoneIndices.y]*inBoneWeights.y +
+		PoseState.skinMatrices[inBoneIndices.z]*inBoneWeights.z +
+		PoseState.skinMatrices[inBoneIndices.w]*inBoneWeights.w
+		) / dot(inBoneWeights, vec4(1.0));
+#endif
+
 #ifdef HAS_PER_VERTEX_NORMAL
-	StageOutput.worldNormal = transformNormalToWorld(inNormal);
+	vec3 modelNormal = inNormal;
+	
+#	ifdef HAS_VALID_SKINNING
+	modelNormal = (skinMatrix * vec3(modelNormal)).xyz;
+#	endif
+
+	StageOutput.worldNormal = transformNormalToWorld(modelNormal);
 	StageOutput.normal = transformNormalWorldToView(StageOutput.worldNormal);
+
 #	ifdef HAS_PER_VERTEX_TANGENT4
-	StageOutput.tangent4 = vec4(transformNormalToView(inTangent4.xyz), inTangent4.w);
+
+	vec4 modelTangent4 = inTangent4;
+#		ifdef HAS_VALID_SKINNING
+	modelTangent4 = vec4((skinMatrix * vec3(modelTangent4.xyz)).xyz, modelTangent4.w);
+#		endif
+
+	StageOutput.tangent4 = vec4(transformNormalToView(modelTangent4.xyz), modelTangent4.w);
+
 #	else
 	vec3 upVector = abs(StageOutput.normal.y) > 0.9 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
 	StageOutput.tangent4 = vec4(cross(upVector, StageOutput.normal), 1.0);
@@ -952,7 +979,13 @@ void main()
 	StageOutput.tangent4 = vec4(1.0, 0.0, 0.0, 1.0);
 #endif
 
-	vec4 worldPosition = ObjectState.transformationMatrix * vec4(inPosition, 1.0);
+	vec4 modelPosition = vec4(inPosition, 1.0);
+
+#	ifdef HAS_VALID_SKINNING
+	modelPosition = skinMatrix * modelPosition;
+#	endif
+
+	vec4 worldPosition = ObjectState.transformationMatrix * modelPosition;
 	vec4 viewPosition = CameraState.inverseTransformationMatrix * worldPosition;
 	StageOutput.worldPosition = worldPosition.xyz;
 	StageOutput.viewPosition = viewPosition.xyz;
@@ -962,9 +995,9 @@ void main()
 ]
 
 { #category : #initialization }
-WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocationMask: mask [
-	^ genericSurfaceMaterialVertexShaders at: mask ifAbsentPut: [
-		self compileShader: (self genericSurfaceMaterialVertexShaderSourceWithMask: mask) type: AGPU_VERTEX_SHADER
+WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocationMask: mask hasSkinning: hasSkinning [
+	^ genericSurfaceMaterialVertexShaders at: {mask . hasSkinning} ifAbsentPut: [
+		self compileShader: (self genericSurfaceMaterialVertexShaderSourceWithMask: mask hasSkinning: hasSkinning) type: AGPU_VERTEX_SHADER
 	]
 ]
 
@@ -1921,7 +1954,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessMaterialStateSource [
 	^ '
-layout(set=4, binding=0, std140) uniform MaterialStateBlock	
+layout(set=5, binding=0, std140) uniform MaterialStateBlock	
 {
 	int doubleSided;
 	float alphaCutoff;
@@ -1938,11 +1971,11 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 	vec2 texcoordOffsetVelocity;
 } MaterialState;
 
-layout(set=4, binding=1) uniform texture2D BaseColorTexture;
-layout(set=4, binding=2) uniform texture2D EmissiveTexture;
-layout(set=4, binding=3) uniform texture2D NormalTexture;
-layout(set=4, binding=4) uniform texture2D OcclusionTexture;
-layout(set=4, binding=5) uniform texture2D MetallicRoughnessTexture;
+layout(set=5, binding=1) uniform texture2D BaseColorTexture;
+layout(set=5, binding=2) uniform texture2D EmissiveTexture;
+layout(set=5, binding=3) uniform texture2D NormalTexture;
+layout(set=5, binding=4) uniform texture2D OcclusionTexture;
+layout(set=5, binding=5) uniform texture2D MetallicRoughnessTexture;
 '
 ]
 
@@ -1988,11 +2021,11 @@ WDAGPUSceneRendererResourceCache >> opaqueReflectionCombinationFragmentShaderSou
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputColor;
 
-layout(set=4, binding=1) uniform texture2D DepthBuffer;
-layout(set=4, binding=2) uniform texture2D OpaqueColorBuffer;
-layout(set=4, binding=3) uniform texture2D ScreenSpaceAmbientOcclusionTexture;
-layout(set=4, binding=4) uniform texture2D StaticReflectionTexture;
-layout(set=4, binding=5) uniform texture2D ScreenSpaceReflectionTexture;
+layout(set=5, binding=1) uniform texture2D DepthBuffer;
+layout(set=5, binding=2) uniform texture2D OpaqueColorBuffer;
+layout(set=5, binding=3) uniform texture2D ScreenSpaceAmbientOcclusionTexture;
+layout(set=5, binding=4) uniform texture2D StaticReflectionTexture;
+layout(set=5, binding=5) uniform texture2D ScreenSpaceReflectionTexture;
 
 void main()
 {
@@ -2011,6 +2044,20 @@ void main()
 	vec3 color = opaqueColor + reflection*occlusionFactor;
 	FragmentOutputColor = vec4(color, 1.0);
 }
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> poseStateBlockSource [
+	^ '
+#define HAS_SKINNING
+
+const uint MaxSkinBones = 256u;
+layout(set=4, binding=0, std140) uniform PoseStateBlock
+{
+	mat4[MaxSkinBones] skinMatrices;
+} PoseState;
+
 '
 ]
 
@@ -2143,8 +2190,8 @@ WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionComputationFragme
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out float FragmentOutputSSAO;
 
-layout(set=4, binding=1) uniform texture2D DepthBuffer;
-layout(set=4, binding=2) uniform texture2D NormalGBuffer;
+layout(set=5, binding=1) uniform texture2D DepthBuffer;
+layout(set=5, binding=2) uniform texture2D NormalGBuffer;
 
 const uint SamplingDistributionSize = 8u;
 const vec3[SamplingDistributionSize] SamplingDistribution = vec3[SamplingDistributionSize](
@@ -2259,12 +2306,12 @@ WDAGPUSceneRendererResourceCache >> screenSpaceReflectionComputationFragmentShad
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputScreenSpaceReflection;
 
-layout(set=4, binding=1) uniform texture2D DepthBuffer;
-layout(set=4, binding=2) uniform texture2D NormalGBuffer;
-layout(set=4, binding=3) uniform texture2D SpecularGBuffer;
+layout(set=5, binding=1) uniform texture2D DepthBuffer;
+layout(set=5, binding=2) uniform texture2D NormalGBuffer;
+layout(set=5, binding=3) uniform texture2D SpecularGBuffer;
 
-layout(set=4, binding=4) uniform texture2D GlossColorBuffer;
-layout(set=4, binding=5) uniform texture2D RoughColorBuffer;
+layout(set=5, binding=4) uniform texture2D GlossColorBuffer;
+layout(set=5, binding=5) uniform texture2D RoughColorBuffer;
 
 const uint SampleCount = 20u;
 const float StepDistance = 0.5;
@@ -2596,9 +2643,9 @@ WDAGPUSceneRendererResourceCache >> staticReflectionComputationFragmentShaderSou
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputStaticReflection;
 
-layout(set=4, binding=1) uniform texture2D DepthBuffer;
-layout(set=4, binding=2) uniform texture2D NormalGBuffer;
-layout(set=4, binding=3) uniform texture2D SpecularGBuffer;
+layout(set=5, binding=1) uniform texture2D DepthBuffer;
+layout(set=5, binding=2) uniform texture2D NormalGBuffer;
+layout(set=5, binding=3) uniform texture2D SpecularGBuffer;
 
 void main()
 {
@@ -2663,8 +2710,8 @@ WDAGPUSceneRendererResourceCache >> stereoComposeShaderIOSource [
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputColor;
 
-layout(set=4, binding=1) uniform texture2D LeftEyeBuffer;
-layout(set=4, binding=2) uniform texture2D RightEyeBuffer;
+layout(set=5, binding=1) uniform texture2D LeftEyeBuffer;
+layout(set=5, binding=2) uniform texture2D RightEyeBuffer;
 '
 
 ]
@@ -2685,7 +2732,7 @@ WDAGPUSceneRendererResourceCache >> toneMappingOperatorIOSource [
 layout(location=0) in vec2 inTexcoord;
 layout(location=0) out vec4 FragmentOutputColor;
 
-layout(set=4, binding=1) uniform texture2D HDRColorBuffer;
+layout(set=5, binding=1) uniform texture2D HDRColorBuffer;
 '
 
 ]
@@ -2808,7 +2855,7 @@ void main()
 { #category : #'private shaders' }
 WDAGPUSceneRendererResourceCache >> unlitMaterialStateSource [
 	^ '
-layout(set=4, binding=0, std140) uniform MaterialStateBlock
+layout(set=5, binding=0, std140) uniform MaterialStateBlock
 {
 	int doubleSided;
 	float alphaCutoff;
@@ -2819,7 +2866,7 @@ layout(set=4, binding=0, std140) uniform MaterialStateBlock
 	vec2 texcoordOffsetVelocity;
 } MaterialState;
 
-layout(set=4, binding=1) uniform texture2D ColorTexture;
+layout(set=5, binding=1) uniform texture2D ColorTexture;
 '
 ]
 

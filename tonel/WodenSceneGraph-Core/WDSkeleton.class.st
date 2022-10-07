@@ -100,6 +100,14 @@ WDSkeleton >> name: anObject [
 	name := anObject
 ]
 
+{ #category : #poses }
+WDSkeleton >> restPose [
+	^ WDSkeletonPose new
+		skeleton: self;
+		setForRestPose; 
+		yourself
+]
+
 { #category : #accessing }
 WDSkeleton >> restPoseForwardMatrices [
 	^ restPoseForwardMatrices

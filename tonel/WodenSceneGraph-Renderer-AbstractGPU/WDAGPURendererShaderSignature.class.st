@@ -15,7 +15,8 @@ Class {
 		'lightingStateAllocator',
 		'bdrfSampler',
 		'shadowMapSampler',
-		'screenSampler'
+		'screenSampler',
+		'poseStateAllocator'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -58,7 +59,7 @@ WDAGPURendererShaderSignature >> allocateMaterialState [
 	result := materialStateAllocator allocate.
 	result bindingHandle ifNil: [ 
 		result
-			bindingHandle: (handle createShaderResourceBinding: 4);
+			bindingHandle: (handle createShaderResourceBinding: 5);
 			bindUniformBufferInSlot: 0.
 	].
 	^ result
@@ -71,6 +72,18 @@ WDAGPURendererShaderSignature >> allocateObjectState [
 	result bindingHandle ifNil: [ 
 		result
 			bindingHandle: (handle createShaderResourceBinding: 3);
+			bindUniformBufferInSlot: 0.
+	].
+	^ result
+]
+
+{ #category : #utility }
+WDAGPURendererShaderSignature >> allocatePoseState [
+	| result |
+	result := poseStateAllocator allocate.
+	result bindingHandle ifNil: [ 
+		result
+			bindingHandle: (handle createShaderResourceBinding: 4);
 			bindUniformBufferInSlot: 0.
 	].
 	^ result
@@ -105,6 +118,10 @@ WDAGPURendererShaderSignature >> buildHandle [
 
 		"Object state"
 		beginBindingBank: 100000;
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_UNIFORM_BUFFER bindingPointCount: 1;
+
+		"Pose state"
+		beginBindingBank: 1000;
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_UNIFORM_BUFFER bindingPointCount: 1;
 
 		"Material state"
@@ -187,6 +204,8 @@ WDAGPURendererShaderSignature >> initializeWithDevice: aDevice [
 	lightingStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: {WDAGPUGlobalLightingStateUniformBufferWriter}.
 
 	objectStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUObjectStateUniformBufferWriter }.
+
+	poseStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: { WDAGPUPoseStateUniformBufferWriter }.
 
 	materialStateAllocator := WDAGPUShaderBindingResourceSlabAllocator for: device writers: WDAGPUMaterialUniformBufferWriter allSubclasses.
 	
