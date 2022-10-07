@@ -10,10 +10,23 @@ Class {
 		'bones',
 		'restPoseInverseMatrices',
 		'jointIndexToBoneIndexPermutationTable',
-		'restPoseForwardMatrices'
+		'restPoseForwardMatrices',
+		'boneNameToIndexDictionary'
 	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
+
+{ #category : #accessing }
+WDSkeleton >> boneNameToIndexDictionary [
+	boneNameToIndexDictionary ifNil: [ 
+		boneNameToIndexDictionary := Dictionary new.
+		bones doWithIndex: [ :eachBone :index |
+			boneNameToIndexDictionary at: eachBone name put: index
+		]
+	].
+
+	^ boneNameToIndexDictionary 
+]
 
 { #category : #accessing }
 WDSkeleton >> bones [
@@ -23,8 +36,8 @@ WDSkeleton >> bones [
 
 { #category : #accessing }
 WDSkeleton >> bones: anObject [
-
-	bones := anObject
+	bones := anObject.
+	boneNameToIndexDictionary := nil.
 ]
 
 { #category : #'pose matrices' }
@@ -86,6 +99,11 @@ WDSkeleton >> jointIndexToBoneIndexPermutationTable [
 WDSkeleton >> jointIndexToBoneIndexPermutationTable: anObject [
 
 	jointIndexToBoneIndexPermutationTable := anObject
+]
+
+{ #category : #'as yet unclassified' }
+WDSkeleton >> mapBoneNameToIndexOrNil: boneName [
+	^ self boneNameToIndexDictionary at: boneName ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }

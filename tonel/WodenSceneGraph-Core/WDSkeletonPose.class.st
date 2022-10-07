@@ -46,6 +46,15 @@ WDSkeletonPose >> initialize [
 	bonePoses := #()
 ]
 
+{ #category : #scrolling }
+WDSkeletonPose >> invalidate [
+	poseMatrices := nil.
+	forwardMatrices := nil.
+	skinningMatrices := nil.
+	renderingPoseState := nil.
+
+]
+
 { #category : #converting }
 WDSkeletonPose >> poseMatrices [
 	^ poseMatrices ifNil: [ poseMatrices := bonePoses collect: [ :each | each matrix4 ] ]
@@ -54,6 +63,7 @@ WDSkeletonPose >> poseMatrices [
 { #category : #initialization }
 WDSkeletonPose >> setForRestPose [
 	bonePoses := skeleton bones collect: [ :each | each transform copy ].
+	self invalidate
 ]
 
 { #category : #accessing }

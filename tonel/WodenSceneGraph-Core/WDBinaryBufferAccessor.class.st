@@ -15,7 +15,8 @@ Class {
 		'normalized',
 		'count',
 		'min',
-		'max'
+		'max',
+		'decodedContentAsArray'
 	],
 	#category : #'WodenSceneGraph-Core-Resources'
 }
@@ -70,7 +71,9 @@ WDBinaryBufferAccessor >> count: anObject [
 { #category : #'content accessing' }
 WDBinaryBufferAccessor >> decodeContentAsArray [
 	| result destIndex sourceIndex sourceBuffer componentSize stride |
-	result := Array new: count.
+	decodedContentAsArray ifNotNil: [ ^ decodedContentAsArray ].
+	
+	result := decodedContentAsArray := Array new: count.
 	destIndex := 1.
 	sourceIndex := 1 + bufferView byteOffset + byteOffset.
 	sourceBuffer := bufferView buffer data.
@@ -79,7 +82,6 @@ WDBinaryBufferAccessor >> decodeContentAsArray [
 	
 	type componentCount = 1 ifTrue: [ 
 		1 to: count do: [ :i |
-		| componentCount |
 			result at: destIndex put: (componentType readFromBuffer: sourceBuffer at: sourceIndex).
 			sourceIndex := sourceIndex + stride.
 			destIndex := destIndex + 1
