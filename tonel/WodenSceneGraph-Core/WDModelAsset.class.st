@@ -70,6 +70,11 @@ WDModelAsset >> addTexture: aTexture [
 	textures add: aTexture
 ]
 
+{ #category : #accessing }
+WDModelAsset >> animations [
+	^ animations
+]
+
 { #category : #'lookup elements' }
 WDModelAsset >> elementNamed: aName [
 	^ nameDictionary at: aName

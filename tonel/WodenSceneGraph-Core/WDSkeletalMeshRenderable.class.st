@@ -13,6 +13,11 @@ Class {
 }
 
 { #category : #adding }
+WDSkeletalMeshRenderable >> addIntoAnimationSubtreeMap: subtreeMap [
+	subtreeMap addSkeletalMesh: self
+]
+
+{ #category : #adding }
 WDSkeletalMeshRenderable >> addIntoModelAssetWithDependencies: modelAsset [
 	modelAsset addSkeletalMesh: self.
 	referenceMesh addIntoModelAssetWithDependencies: modelAsset.

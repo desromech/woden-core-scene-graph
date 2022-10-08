@@ -11,7 +11,7 @@ Class {
 	#category : #'WodenSceneGraph-Core-Animation'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #animation }
 WDModelAnimation >> applyPosition: position looped: isLooped toSkeletonPose: skeletonPose withBoneMap: boneMap [
 	| bonePoses inputSampleCache |
 	bonePoses := skeletonPose bonePoses.
@@ -23,6 +23,19 @@ WDModelAnimation >> applyPosition: position looped: isLooped toSkeletonPose: ske
 			bonePose := bonePoses at: boneIndex.
 			channel := channels at: channelIndex.
 			inputSampleCache := channel applyPosition: position looped: isLooped inputSampleCache: inputSampleCache toBonePose: bonePose
+		]
+	]
+]
+
+{ #category : #animation }
+WDModelAnimation >> applyPosition: position looped: isLooped toSubtreeChannelMap: subtreeChannelMap [
+	| inputSampleCache |
+	inputSampleCache := nil.
+	subtreeChannelMap targets doWithIndex: [ :target :channelIndex |
+		target ifNotNil: [
+			| channel |
+			channel := channels at: channelIndex.
+			inputSampleCache := channel applyPosition: position looped: isLooped inputSampleCache: inputSampleCache toSubtreeChannel: target
 		]
 	]
 ]
@@ -39,11 +52,19 @@ WDModelAnimation >> channels: anObject [
 	channels := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #animation }
 WDModelAnimation >> makeBoneMapForSkeleton: skeleton [
 	^ WDModelAnimationBoneMap new
 		skeleton: skeleton;
 		boneIndices: (channels collect: [:each | skeleton mapBoneNameToIndexOrNil: each targetName]);
+		yourself
+]
+
+{ #category : #animation }
+WDModelAnimation >> makeSubtreeChannelMapFor: subtreeMap [
+	^ WDModelAnimationSubtreeChannelMap new
+		subtreeMap: subtreeMap;
+		targets: (channels collect: [:each | subtreeMap mapNameToTargetOrNil: each targetName]);
 		yourself
 ]
 
@@ -57,4 +78,13 @@ WDModelAnimation >> name [
 WDModelAnimation >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : #removing }
+WDModelAnimation >> removePrefixFromChannelTargets: prefix [
+	channels do: [ :each |
+		each targetName ifNotNil: [ 
+			each targetName: (each targetName withoutPrefix: prefix)
+		].
+	]
 ]

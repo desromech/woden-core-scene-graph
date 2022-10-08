@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+WDModelAnimationWeightsChannel >> applyInterpolatedSample: interpolatedSample toSubtreeChannel: subtreeChannel [
+	subtreeChannel weight: interpolatedSample
+]
+
+{ #category : #'as yet unclassified' }
 WDModelAnimationWeightsChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
 	"Do nothing here"
 ]

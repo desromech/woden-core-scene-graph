@@ -18,6 +18,12 @@ Class {
 	#category : #'WodenSceneGraph-Core-Scene'
 }
 
+{ #category : #'animation subtree map' }
+WDSceneNode >> addIntoAnimationSubtreeMap: subtreeMap [
+	subtreeMap addNode: self.
+	renderables do: [ :each | each addIntoAnimationSubtreeMap: subtreeMap ].
+]
+
 { #category : #adding }
 WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withTransform: renderingGlobalTransform [
 	visible ifFalse: [ ^ self ].
@@ -37,6 +43,12 @@ WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withT
 		].
 	].
 
+]
+
+{ #category : #'animation subtree map' }
+WDSceneNode >> addRecursivelyIntoAnimationSubtreeMap: subtreeMap [
+	self addIntoAnimationSubtreeMap: subtreeMap.
+	children do: [ :each | each addRecursivelyIntoAnimationSubtreeMap: subtreeMap ]
 ]
 
 { #category : #adding }
@@ -80,6 +92,14 @@ WDSceneNode >> asSceneNode [
 { #category : #'bounding volume' }
 WDSceneNode >> boundingBox [
 	^ boundingBox ifNil: [ boundingBox := self localBoundingBox transformedWith: self transform ]
+]
+
+{ #category : #'animation subtree map' }
+WDSceneNode >> buildAnimationSubtreeMap [
+	| result |
+	result := WDSceneAnimationSubtreeMap new.
+	self addRecursivelyIntoAnimationSubtreeMap: result.
+	^ result
 ]
 
 { #category : #accessing }

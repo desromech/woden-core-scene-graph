@@ -954,7 +954,7 @@ void main()
 	vec3 modelNormal = inNormal;
 	
 #	ifdef HAS_VALID_SKINNING
-	modelNormal = (skinMatrix * vec3(modelNormal)).xyz;
+	modelNormal = (skinMatrix * vec4(modelNormal, 0.0)).xyz;
 #	endif
 
 	StageOutput.worldNormal = transformNormalToWorld(modelNormal);
@@ -964,7 +964,7 @@ void main()
 
 	vec4 modelTangent4 = inTangent4;
 #		ifdef HAS_VALID_SKINNING
-	modelTangent4 = vec4((skinMatrix * vec3(modelTangent4.xyz)).xyz, modelTangent4.w);
+	modelTangent4 = vec4((skinMatrix * vec4(modelTangent4.xyz, 0.0)).xyz, modelTangent4.w);
 #		endif
 
 	StageOutput.tangent4 = vec4(transformNormalToView(modelTangent4.xyz), modelTangent4.w);
@@ -3097,14 +3097,19 @@ WDAGPUSceneRendererResourceCache >> vertexAttributesForMask: locationMask [
 
 { #category : #private }
 WDAGPUSceneRendererResourceCache >> vertexLayoutDescriptorFor: vertexBindingAttribute bufferIndex: bufferIndex [
-	| accessor format |
+	| accessor format stride |
 	accessor := vertexBindingAttribute accessor.
 	format := AccessorTypeIntoTextureFormatMap at: {accessor normalized . accessor type . accessor componentType }.
 
+	stride := accessor bufferView byteStride.
+	stride = 0 ifTrue: [
+		stride := accessor type componentCount * accessor componentType size
+	].
+	
 	^ WDAGPUVertexAttributeDescriptor new
 		format: format;
 		binding: vertexBindingAttribute location; 
-		stride: accessor type componentCount * accessor componentType size;
+		stride: stride;
 		buffer: bufferIndex;
 		divisor: 0;
 		yourself

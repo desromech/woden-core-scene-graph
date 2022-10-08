@@ -11,6 +11,10 @@ Class {
 }
 
 { #category : #adding }
+WDRenderable >> addIntoAnimationSubtreeMap: subtreeMap [
+]
+
+{ #category : #adding }
 WDRenderable >> addIntoModelAssetWithDependencies: modelAsset [
 	"By default do nothing"
 ]

@@ -17,6 +17,11 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+WDModelAnimationChannel >> applyInterpolatedSample: interpolatedSample toSubtreeChannel: subtreeChannel [
+	self subclassResponsibility
+]
+
+{ #category : #'as yet unclassified' }
 WDModelAnimationChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
 	self subclassResponsibility
 ]
@@ -27,6 +32,15 @@ WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleC
 	channelPosition := self computeChannelPositionFor: position looped: isLooped inputSampleCache: inputSampleCache.
 	interpolatedSample := self computeInterpolatedSampleForChannelPosition: channelPosition.
 	self applyInterpolatedSample: interpolatedSample toTransform: bonePose.
+	^ channelPosition
+]
+
+{ #category : #animation }
+WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleCache: inputSampleCache toSubtreeChannel: subtreeChannel [
+	| channelPosition interpolatedSample |
+	channelPosition := self computeChannelPositionFor: position looped: isLooped inputSampleCache: inputSampleCache.
+	interpolatedSample := self computeInterpolatedSampleForChannelPosition: channelPosition.
+	self applyInterpolatedSample: interpolatedSample toSubtreeChannel: subtreeChannel.
 	^ channelPosition
 ]
 

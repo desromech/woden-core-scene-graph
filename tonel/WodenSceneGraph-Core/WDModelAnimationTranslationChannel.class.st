@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+WDModelAnimationTranslationChannel >> applyInterpolatedSample: interpolatedSample toSubtreeChannel: subtreeChannel [
+	subtreeChannel translation: interpolatedSample
+]
+
+{ #category : #'as yet unclassified' }
 WDModelAnimationTranslationChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
 	transform translation: interpolatedSample
 ]
