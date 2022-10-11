@@ -409,7 +409,7 @@ WDAGPUSceneRendererResourceCache >> createShadowMapTextureWithExtent: extent cle
 			depth: 1;
 			layers: 1;
 			miplevels: 1;
-			format: AGPU_TEXTURE_FORMAT_R32_TYPELESS;
+			format: depthTypelessFormat;
 			usage_modes: (AGPU_TEXTURE_USAGE_SAMPLED bitOr: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT);
 			main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
 			sample_count: 1;
@@ -1217,6 +1217,15 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	vertexLayouts := Dictionary new.
 	renderPasses := Dictionary new.
 	
+	depthFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT.
+	depthTypelessFormat := AGPU_TEXTURE_FORMAT_R32_TYPELESS.
+	depthSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT.
+	
+	"Workaround Metal renderpass backend wrong format."
+	aDevice getPreferredShaderLanguage == AGPU_SHADER_LANGUAGE_METAL_AIR ifTrue:[
+		depthFormat := depthTypelessFormat := depthSampledFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT.
+	].
+
 	uploadBuffer := WDAGPUShaderStackAllocator for: device capacity: UploadBufferCapacity.
 
 	computeScratchStorageBuffer := self createStorageBufferWithSize: 4096 usageModes: 0.
@@ -1275,9 +1284,6 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 			ifTrue: [ Matrix4x4 projectionInvertYMatrix ]
 			ifFalse: [ Matrix4x4 identity ].
 	brdfLutTexture := textureUploader createAndComputeBRDFLut.
-	depthFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT.
-	depthTypelessFormat := AGPU_TEXTURE_FORMAT_R32_TYPELESS.
-	depthSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT.
 	
 	screenSpaceAmbientOcclusionComputationFragmentShader := self compileShader: self screenSpaceAmbientOcclusionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	staticReflectionComputationFragmentShader := self compileShader: self staticReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.

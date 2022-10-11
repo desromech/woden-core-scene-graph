@@ -860,7 +860,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflection
 ]
 
 { #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForStaticReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState [
+WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForStaticReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState lightingState: lightingState [
 	| shaderSignature extent |
 
 	shaderSignature := renderer resourceCache rendererShaderSignature.
@@ -877,6 +877,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForStaticReflectionCompu
 
 	self
 		bindCameraState: mainCameraState;
+		bindLightingState: lightingState;
 		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView normalGBuffer: intermediateFramebuffers normalGBufferTexture specularGBuffer: intermediateFramebuffers specularGBufferTexture.
 
 	stateTracker
@@ -997,7 +998,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	
 	self
 		recordCommandsForScreenSpaceAmbientOcclusionComputationFor: intermediateFramebuffers cameraState: mainCameraState;
-		recordCommandsForStaticReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState;
+		recordCommandsForStaticReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState lightingState: convertedLightingState;
 		recordCommandsForScreenSpaceReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState.
 		
 	"Translucent render pass."
