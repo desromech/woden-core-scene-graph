@@ -21,7 +21,13 @@ Class {
 		'nodesUsingSkin',
 		'convertedVertexBindings',
 		'convertedVertexAttributes',
-		'skeletalMeshes'
+		'skeletalMeshes',
+		'nodeParents',
+		'rootNodes',
+		'nodeChildren',
+		'lcaTreeWalkIndices',
+		'lcaTreeWalkDepths',
+		'nodeToLcaQueryIndex'
 	],
 	#classVars : [
 		'ComponentTypeMap',
@@ -80,35 +86,37 @@ WDSRWGLTF2Importer class >> initialize [
 	
 ]
 
-{ #category : #'as yet unclassified' }
-WDSRWGLTF2Importer >> extractBoneGraph: nodeToBoneGraphDictionary topologyFrom: startingNode parent: parentNode visited: visitedNodes nodeToBoneDictionary: nodeToBoneDictionary boneToNodeDictionary: boneToNodeDictionary [
-	| newParentNode boneGraphNode |
-	newParentNode := parentNode.
-	nodeToBoneGraphDictionary at: startingNode ifAbsentPut: [ 
-		| extraNonJointBone |
-		extraNonJointBone := WDSkeletonBone new
-			name: startingNode name;
-			transform: (nodeBoneStates at: (nodes indexOf: startingNode));
-			yourself.
-		nodeToBoneDictionary at: startingNode put: extraNonJointBone.
-		boneToNodeDictionary at: extraNonJointBone put: startingNode.
-		WDSRWGLTF2SkeletonGraphNode new
-			bone: extraNonJointBone;
-			yourself
+{ #category : #adding }
+WDSRWGLTF2Importer >> addNodeIndicesFrom: startingNodeIndex to: stopNodeIndex into: nodeIndices set: nodeIndicesSet [
+	| nextNodeIndex |
+	(nodeIndicesSet includes: startingNodeIndex) ifTrue: [ 
+		^ self
 	].
+
+	nodeIndices add: startingNodeIndex.
+	nodeIndicesSet add: startingNodeIndex.
+	startingNodeIndex = stopNodeIndex ifTrue: [ ^ self ].
 	
-	boneGraphNode := nodeToBoneGraphDictionary at: startingNode.
-	parentNode ifNotNil: [
-		self assert: (boneGraphNode parent isNil or: [boneGraphNode parent == parentNode]).
-		boneGraphNode parent: parentNode
+	nextNodeIndex := nodeParents at: startingNodeIndex + 1.
+	nextNodeIndex ifNil: [ ^ self ].
+	
+	self addNodeIndicesFrom: nextNodeIndex to: stopNodeIndex into: nodeIndices set: nodeIndicesSet
+]
+
+{ #category : #'as yet unclassified' }
+WDSRWGLTF2Importer >> computeNodesTopologies [
+	rootNodes := OrderedCollection new.
+	nodeParents doWithIndex: [ :parentIndex :index |
+		parentIndex ifNil: [ 
+			rootNodes add: index - 1
+		]
 	].
-	newParentNode := boneGraphNode.
 
-	(visitedNodes includes: startingNode) ifTrue: [ ^ self ].
-	visitedNodes add: startingNode.
-
-	startingNode childrenDo: [ :child |
-		self extractBoneGraph: nodeToBoneGraphDictionary topologyFrom: child parent: newParentNode visited: visitedNodes nodeToBoneDictionary: nodeToBoneDictionary boneToNodeDictionary: boneToNodeDictionary
+	nodeToLcaQueryIndex := Array new: nodes size.
+	lcaTreeWalkIndices := OrderedCollection new.
+	lcaTreeWalkDepths := OrderedCollection new.
+	rootNodes do: [ :eachIndex |
+		self lcaTreeWalk: eachIndex depth: 0
 	].
 
 ]
@@ -116,6 +124,47 @@ WDSRWGLTF2Importer >> extractBoneGraph: nodeToBoneGraphDictionary topologyFrom: 
 { #category : #loading }
 WDSRWGLTF2Importer >> getBinaryDataChunkWithIndex: binaryChunkIndex [
 	self error: 'Missing required binary data specification.'
+]
+
+{ #category : #'as yet unclassified' }
+WDSRWGLTF2Importer >> lcaForNodeIndices: nodeIndices [
+	| rangeStopIndex rangeStartIndex lcaDepth lcaResult |
+	rangeStartIndex := rangeStopIndex := nodeToLcaQueryIndex at: nodeIndices first + 1.
+	nodeIndices do: [ :nodeIndex |
+		| queryIndex |
+		queryIndex := nodeToLcaQueryIndex at: nodeIndex + 1.
+		rangeStartIndex := rangeStartIndex min: queryIndex.
+		rangeStopIndex := rangeStopIndex max: queryIndex.
+	].
+
+	"Linear algorithm for a full list of node indices to test. Since we have few skeletons, this should be enough."
+	lcaDepth := Float infinity.
+	lcaResult := nil.
+	rangeStartIndex to: rangeStopIndex do: [ :queryIndex |
+		| queryDepth |
+		queryDepth := lcaTreeWalkDepths at: queryIndex + 1.
+		queryDepth < lcaDepth ifTrue: [ 
+			lcaDepth := queryDepth.
+			lcaResult := lcaTreeWalkIndices at: queryIndex + 1
+		]
+	].
+
+	^ lcaResult
+]
+
+{ #category : #'as yet unclassified' }
+WDSRWGLTF2Importer >> lcaTreeWalk: nodeIndex depth: nodeDepth [
+	nodeToLcaQueryIndex at: nodeIndex + 1 put: lcaTreeWalkIndices size.
+	lcaTreeWalkIndices add: nodeIndex.
+	lcaTreeWalkDepths add: nodeDepth.
+	
+	(nodeChildren at: nodeIndex + 1) doWithIndex: [ :childIndex :i |
+		self lcaTreeWalk: childIndex depth: nodeDepth + 1.
+
+		lcaTreeWalkIndices add: nodeIndex.
+		lcaTreeWalkDepths add: nodeDepth.
+	].
+
 ]
 
 { #category : #loading }
@@ -438,12 +487,17 @@ WDSRWGLTF2Importer >> loadMetallicRoughnessMaterial: description commonDescripti
 ]
 
 { #category : #loading }
-WDSRWGLTF2Importer >> loadNode: node childrenFrom: nodeDescription [
-	nodeDescription at: 'children' ifPresent: [ :children |
-		children do: [ :childIndex |
-			node add: (nodes at: childIndex + 1)
-		]
-	]
+WDSRWGLTF2Importer >> loadNode: node index: index childrenFrom: nodeDescription [
+	| childrenList |
+	childrenList := (nodeDescription at: 'children' ifAbsent: [#()]).
+	nodeChildren at: index + 1 put: childrenList.
+	
+	childrenList do: [ :childIndex |
+		self assert: childIndex ~= index.
+
+		node add: (nodes at: childIndex + 1).
+		nodeParents at: childIndex + 1 put: index.
+	].
 	
 ]
 
@@ -514,7 +568,10 @@ WDSRWGLTF2Importer >> loadNodesFrom: elements [
 	nodeBoneStates := OrderedCollection new.
 	nodesUsingSkin := Dictionary new.
 	elements do: [ :el | self loadNodeFrom: el ].
-	elements doWithIndex: [ :el :index | self loadNode: (nodes at: index) childrenFrom: el].
+	nodeParents := Array new: nodes size.
+	nodeChildren := Array new: nodes size.
+	elements doWithIndex: [ :el :index | self loadNode: (nodes at: index) index: index - 1 childrenFrom: el].
+	self computeNodesTopologies.
 	
 	skins ifNotNil: [
 		skins do: [ :each | self loadSkinTopology: each ]
@@ -572,85 +629,52 @@ WDSRWGLTF2Importer >> loadSkinFrom: skinDescription [
 
 { #category : #'as yet unclassified' }
 WDSRWGLTF2Importer >> loadSkinTopology: skin [
-	| jointNodes bones visitedNodes sortedBones jointStates boneGraphNodes nodeToBoneGraphDictionary nodeToBoneDictionary boneToNodeDictionary rootMatrix |
-	jointNodes := skin jointIndices collect: [ :each | nodes at: each + 1 ].
-	jointStates := skin jointIndices collect: [ :each | nodeBoneStates at: each + 1 ].
-	nodeToBoneDictionary := IdentityDictionary new.
-	boneToNodeDictionary := IdentityDictionary new.
+	| declaredJointIndices lcaRootNodeIndex lcaRootNode nodeToBoneIndexTable bones allJointIndices allJointIndicesSet |
 	
-	bones := jointNodes collectWithIndex: [ :node :index |
-		| bone |
-		
-		bone := WDSkeletonBone new
-			name: node name;
-			transform: (jointStates at: index);
-			yourself.
-		nodeToBoneDictionary at: node put: bone.
-		boneToNodeDictionary at: bone put: node.
-		bone.
-	].
-
-	"We need to sort bone in a way such as parent bones always precede their children. This sorting
-	is required to facilitate skinning via a single linear iteration. For correctly achieving this sorting, it is required to perform a topological sort in the transpose graph."
-	
-	nodeToBoneGraphDictionary := IdentityDictionary new.
-	boneGraphNodes := jointNodes collect: [ :node |
-		| graphNode |
-		graphNode := WDSRWGLTF2SkeletonGraphNode new
-			bone: (nodeToBoneDictionary at: node);
-			yourself.
-		nodeToBoneGraphDictionary at: node put: graphNode.
-		graphNode
-	].
-
-	visitedNodes := IdentitySet new.
-	skin rootNodeIndex ifNotNil: [:nodeIndex |
-		| rootNode |
-		rootNode := nodes at: nodeIndex + 1.
-		self extractBoneGraph: nodeToBoneGraphDictionary topologyFrom: rootNode parent: nil visited: visitedNodes nodeToBoneDictionary: nodeToBoneDictionary boneToNodeDictionary: boneToNodeDictionary
-	].
-
-	jointNodes do: [ :node |
-		self extractBoneGraph: nodeToBoneGraphDictionary topologyFrom: node parent: nil visited: visitedNodes nodeToBoneDictionary: nodeToBoneDictionary boneToNodeDictionary: boneToNodeDictionary
-	].
-
-	visitedNodes := IdentitySet new.
-	sortedBones := OrderedCollection new.
-	boneGraphNodes do: [ :boneGraphNode |
-		self topologicalSortBoneGraphNode: boneGraphNode into: sortedBones visited: visitedNodes.
-	].
-	self assert: sortedBones isEmpty not.
-	skin rootNode: (boneToNodeDictionary at: sortedBones first).
-
-	rootMatrix := skin rootNode parent
-		ifNil: [ Matrix4x4 identity ]
-		ifNotNil: [ :p | p globalTransform matrix4 ].
-
-	sortedBones doWithIndex: [ :bone :index |
-		bone index: index - 1
-	].
-	
-	sortedBones do: [ :bone |
-		| node |
-		node := boneToNodeDictionary at: bone.
-		bone parentIndex: -1.
-		(nodeToBoneGraphDictionary at: node) parent ifNotNil: [ :parentBoneGraphNode |
-			| parentBone |
-			parentBone := parentBoneGraphNode bone.
-			self assert: parentBone index notNil.
-			self assert: parentBone index < bone index.
-			bone parentIndex: parentBone index
+	declaredJointIndices := skin jointIndices.
+	skin rootNodeIndex ifNotNil: [ :rootNodeIndex |
+		(declaredJointIndices includes: rootNodeIndex) ifFalse: [
+			declaredJointIndices := declaredJointIndices , { rootNodeIndex }
 		]
 	].
 
-	skin
-		jointIndexToBoneIndexPermutationTable: (bones collect: [ :each | each index ]) asArray.
+	lcaRootNodeIndex := self lcaForNodeIndices: declaredJointIndices.
+	lcaRootNode := nodes at: lcaRootNodeIndex + 1.
+	
+	allJointIndices := OrderedCollection new addAll: declaredJointIndices; yourself.
+	allJointIndicesSet := Set new addAll: allJointIndices; yourself.
 
+	1 to: 	allJointIndices size do: [ :i |
+		self addNodeIndicesFrom: (allJointIndices at: i) to: lcaRootNodeIndex into: allJointIndices set: allJointIndicesSet.
+	].
+
+	nodeToBoneIndexTable := Dictionary new.
+	allJointIndices doWithIndex: [ :nodeIndex :boneIndex |
+		nodeToBoneIndexTable at: nodeIndex put: boneIndex - 1
+	].
+	
+	bones := allJointIndices collectWithIndex: [ :nodeIndex :index |
+		| bone node nodeState parentNodeIndex parentBoneIndex |
+		node := nodes at: nodeIndex + 1.
+		nodeState := nodeBoneStates at: nodeIndex + 1.
+		parentNodeIndex := nodeParents at: nodeIndex + 1.
+		parentBoneIndex := nodeToBoneIndexTable at: parentNodeIndex ifAbsent: [-1].
+		self assert: parentBoneIndex ~= (index - 1).
+		
+		bone := WDSkeletonBone new
+			name: node name;
+			transform: nodeState;
+			index: index - 1;
+			parentIndex: parentBoneIndex;
+			yourself.
+	].
+
+	skin rootNode: lcaRootNode.
 	skin skeleton
-		rootMatrix: rootMatrix;
-		bones: sortedBones asArray;
-		restPoseInverseMatrices: skin permutatedInverseBindMatrices;
-		jointIndexToBoneIndexPermutationTable: skin jointIndexToBoneIndexPermutationTable;
+		rootMatrix: Matrix4x4 identity;
+		bones: bones asArray;
+		restPoseInverseMatrices: skin inverseBindMatrices;
+		computeSkinningOrderTable;
 		computeRestPoseForwardMatrices.
 ]
 
@@ -749,18 +773,6 @@ WDSRWGLTF2Importer >> processGLTFJson: json [
 	].
 	
 	^ asset
-]
-
-{ #category : #'as yet unclassified' }
-WDSRWGLTF2Importer >> topologicalSortBoneGraphNode: boneGraphNode into: sortedBones visited: visitedNodes [
-	(visitedNodes includes: boneGraphNode) ifTrue: [ ^ self ].
-	visitedNodes add: boneGraphNode.
-
-	boneGraphNode parent ifNotNil: [ :parent |
-		self topologicalSortBoneGraphNode: parent into: sortedBones visited: visitedNodes
-	].
-
-	sortedBones add: boneGraphNode bone
 ]
 
 { #category : #'as yet unclassified' }

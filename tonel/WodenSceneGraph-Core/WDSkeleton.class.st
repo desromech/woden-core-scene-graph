@@ -9,9 +9,9 @@ Class {
 		'rootMatrix',
 		'bones',
 		'restPoseInverseMatrices',
-		'jointIndexToBoneIndexPermutationTable',
 		'restPoseForwardMatrices',
-		'boneNameToIndexDictionary'
+		'boneNameToIndexDictionary',
+		'skinningOrderTable'
 	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
@@ -40,12 +40,28 @@ WDSkeleton >> bones: anObject [
 	boneNameToIndexDictionary := nil.
 ]
 
+{ #category : #'as yet unclassified' }
+WDSkeleton >> computeBoneSkinningOrderFrom: boneIndex into: result set: resultSet [
+	| parentIndex |
+	(resultSet includes: boneIndex) ifTrue: [ ^ self ].
+	resultSet add: boneIndex.
+	
+	parentIndex := (bones at: boneIndex) parentIndex.
+	parentIndex >= 0 ifTrue: [
+		self computeBoneSkinningOrderFrom: parentIndex + 1 into: result set: resultSet
+	].
+
+	result add: boneIndex
+]
+
 { #category : #'pose matrices' }
 WDSkeleton >> computeForwardMatricesWithPoseMatrices: poseMatrices [
 	| result matrix |
 	self assert: poseMatrices size = bones size.
 	result := Array new: bones size.
-	bones doWithIndex: [ :bone :boneIndex |
+	skinningOrderTable do: [ :boneIndex |
+		| bone |
+		bone := bones at: boneIndex.
 		matrix := poseMatrices at: boneIndex.
 		bone parentIndex >= 0 ifTrue: [
 			matrix := (result at: bone parentIndex + 1) * matrix
@@ -67,17 +83,27 @@ WDSkeleton >> computeRestPoseForwardMatrices [
 
 { #category : #'pose matrices' }
 WDSkeleton >> computeSkinningMatricesWithForwardMatrices: forwardMatrices [
-	| result permutation |
+	| result |
 	self assert: forwardMatrices size = bones size.
-	permutation := self jointIndexToBoneIndexPermutationTable.
-	result := Array new: permutation size.
-	permutation doWithIndex: [ :boneIndex :resultIndex |
-		| permuttedIndex |
-		permuttedIndex := boneIndex + 1.
-		result at: resultIndex put: (forwardMatrices at: permuttedIndex) * (restPoseInverseMatrices at: permuttedIndex)
+	result := Array new: restPoseInverseMatrices size.
+	restPoseInverseMatrices doWithIndex: [ :restPoseInverseMatrix :boneIndex |
+		result at: boneIndex put: (forwardMatrices at: boneIndex) * restPoseInverseMatrix
 	].
 
 	^ result
+]
+
+{ #category : #'as yet unclassified' }
+WDSkeleton >> computeSkinningOrderTable [
+	| result resultSet |
+	result := OrderedCollection new.
+	resultSet := Set new.
+	1 to: bones size do: [ :boneIndex |
+		self computeBoneSkinningOrderFrom: boneIndex into: result set: resultSet
+	].
+	self assert: result size = bones size.
+	skinningOrderTable := result asArray.
+
 ]
 
 { #category : #initialization }
@@ -85,20 +111,8 @@ WDSkeleton >> initialize [
 	super initialize.
 	name := ''.
 	rootMatrix := Matrix4x4 identity.
-	jointIndexToBoneIndexPermutationTable := #().
 	restPoseInverseMatrices := #().
-]
-
-{ #category : #accessing }
-WDSkeleton >> jointIndexToBoneIndexPermutationTable [
-
-	^ jointIndexToBoneIndexPermutationTable
-]
-
-{ #category : #accessing }
-WDSkeleton >> jointIndexToBoneIndexPermutationTable: anObject [
-
-	jointIndexToBoneIndexPermutationTable := anObject
+	skinningOrderTable := #().
 ]
 
 { #category : #'as yet unclassified' }

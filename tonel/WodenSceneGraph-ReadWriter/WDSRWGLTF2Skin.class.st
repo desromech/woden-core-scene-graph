@@ -8,7 +8,6 @@ Class {
 		'rootNodeIndex',
 		'inverseBindMatricesAccessor',
 		'skeleton',
-		'jointIndexToBoneIndexPermutationTable',
 		'actualBoneCount',
 		'rootNode'
 	],
@@ -17,18 +16,6 @@ Class {
 	],
 	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
 }
-
-{ #category : #accessing }
-WDSRWGLTF2Skin >> boneNames [
-
-	^ boneNames
-]
-
-{ #category : #accessing }
-WDSRWGLTF2Skin >> boneNames: anObject [
-
-	boneNames := anObject
-]
 
 { #category : #'as yet unclassified' }
 WDSRWGLTF2Skin >> fetchInverseBindMatrices [
@@ -51,16 +38,6 @@ WDSRWGLTF2Skin >> inverseBindMatricesAccessor: anObject [
 ]
 
 { #category : #accessing }
-WDSRWGLTF2Skin >> jointIndexToBoneIndexPermutationTable [
-	^ jointIndexToBoneIndexPermutationTable
-]
-
-{ #category : #accessing }
-WDSRWGLTF2Skin >> jointIndexToBoneIndexPermutationTable: anObject [
-	jointIndexToBoneIndexPermutationTable := anObject
-]
-
-{ #category : #accessing }
 WDSRWGLTF2Skin >> jointIndices [
 	^ jointIndices
 ]
@@ -78,17 +55,6 @@ WDSRWGLTF2Skin >> name [
 { #category : #accessing }
 WDSRWGLTF2Skin >> name: anObject [
 	name := anObject
-]
-
-{ #category : #'as yet unclassified' }
-WDSRWGLTF2Skin >> permutatedInverseBindMatrices [
-	| permutatedMatrices |
-	permutatedMatrices := Array new: skeleton bones size.
-	permutatedMatrices atAllPut: Matrix4x4 identity.
-	self inverseBindMatrices doWithIndex: [ :each :index |
-		permutatedMatrices at: (jointIndexToBoneIndexPermutationTable at: index) + 1 put: each
-	].
-	^ permutatedMatrices
 ]
 
 { #category : #accessing }

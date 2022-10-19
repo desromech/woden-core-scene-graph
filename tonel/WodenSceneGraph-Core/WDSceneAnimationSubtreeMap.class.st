@@ -72,3 +72,8 @@ WDSceneAnimationSubtreeMap >> mapNameToTargetOrNil: targetName [
 WDSceneAnimationSubtreeMap >> setForRestPose [
 	skeletonPoses do: [ :each | each setForRestPose ].
 ]
+
+{ #category : #accessing }
+WDSceneAnimationSubtreeMap >> skeletonPoses [
+	^ skeletonPoses
+]
