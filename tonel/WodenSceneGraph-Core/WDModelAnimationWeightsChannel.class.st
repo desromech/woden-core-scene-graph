@@ -16,3 +16,8 @@ WDModelAnimationWeightsChannel >> applyInterpolatedSample: interpolatedSample to
 WDModelAnimationWeightsChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
 	"Do nothing here"
 ]
+
+{ #category : #removing }
+WDModelAnimationWeightsChannel >> applySkeletonTargetingMapping: skeletonTargetingMapping [
+	"Nothing is required here"
+]

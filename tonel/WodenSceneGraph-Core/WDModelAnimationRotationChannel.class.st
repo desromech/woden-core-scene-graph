@@ -17,6 +17,11 @@ WDModelAnimationRotationChannel >> applyInterpolatedSample: interpolatedSample t
 	transform rotation: interpolatedSample
 ]
 
+{ #category : #removing }
+WDModelAnimationRotationChannel >> applySkeletonTargetingMapping: skeletonTargetingMapping [
+	outputSamples := outputSamples collect: [ :sample | (skeletonTargetingMapping transformBone: targetName rotation: sample asQuaternion) asVector4 ]
+]
+
 { #category : #hooks }
 WDModelAnimationRotationChannel >> computeInterpolatedSampleForChannelPosition: channelPosition [
 	^ interpolationMethod interpolateQuaternionSamples: outputSamples forChannelPosition: channelPosition

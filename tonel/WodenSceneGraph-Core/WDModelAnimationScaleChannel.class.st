@@ -16,3 +16,8 @@ WDModelAnimationScaleChannel >> applyInterpolatedSample: interpolatedSample toSu
 WDModelAnimationScaleChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
 	transform scale: interpolatedSample
 ]
+
+{ #category : #removing }
+WDModelAnimationScaleChannel >> applySkeletonTargetingMapping: skeletonTargetingMapping [
+	outputSamples := outputSamples collect: [ :sample | skeletonTargetingMapping transformBone: targetName scale: sample ]
+]

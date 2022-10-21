@@ -44,6 +44,11 @@ WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleC
 	^ channelPosition
 ]
 
+{ #category : #removing }
+WDModelAnimationChannel >> applySkeletonTargetingMapping: skeletonTargetingMapping [
+	self subclassResponsibility
+]
+
 { #category : #animation }
 WDModelAnimationChannel >> computeChannelPositionFor: position looped: isLooped inputSampleCache: inputSampleCache [
 	| result actualPosition nextFrameIndex previousFrameIndex previousFramePosition nextFramePosition alpha |

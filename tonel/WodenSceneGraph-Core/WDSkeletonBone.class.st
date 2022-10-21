@@ -8,10 +8,23 @@ Class {
 		'name',
 		'transform',
 		'parentIndex',
-		'index'
+		'index',
+		'baseGlobalTransform'
 	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
+
+{ #category : #accessing }
+WDSkeletonBone >> baseGlobalTransform [
+
+	^ baseGlobalTransform
+]
+
+{ #category : #accessing }
+WDSkeletonBone >> baseGlobalTransform: anObject [
+
+	baseGlobalTransform := anObject
+]
 
 { #category : #accessing }
 WDSkeletonBone >> index [
@@ -30,6 +43,7 @@ WDSkeletonBone >> initialize [
 	super initialize.
 	name := ''.
 	transform := TRSTransform3D identity.
+	baseGlobalTransform := TRSTransform3D identity.
 	parentIndex := -1.
 	index := -1.
 ]

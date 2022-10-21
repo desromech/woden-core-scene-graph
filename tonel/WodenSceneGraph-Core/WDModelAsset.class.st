@@ -17,7 +17,8 @@ Class {
 		'elementSet',
 		'nameDictionary',
 		'skeletalMeshes',
-		'animations'
+		'animations',
+		'skeletons'
 	],
 	#category : #'WodenSceneGraph-Core-Asset'
 }
@@ -64,6 +65,13 @@ WDModelAsset >> addSkeletalMesh: aSkeletalMesh [
 ]
 
 { #category : #adding }
+WDModelAsset >> addSkeleton: aSkeleton [
+	(elementSet includes: aSkeleton) ifTrue: [ ^ self ].
+	self privateAddElement: aSkeleton.
+	skeletons add: aSkeleton
+]
+
+{ #category : #adding }
 WDModelAsset >> addTexture: aTexture [
 	(elementSet includes: aTexture) ifTrue: [ ^ self ].
 	self privateAddElement: aTexture.
@@ -89,6 +97,7 @@ WDModelAsset >> initialize [
 	materials := OrderedCollection new.
 	meshes := OrderedCollection new.
 	skeletalMeshes := OrderedCollection new.
+	skeletons := OrderedCollection new.
 	scenes := OrderedCollection new.
 	animations := OrderedCollection new.
 	
@@ -124,6 +133,11 @@ WDModelAsset >> scenes [
 WDModelAsset >> skeletalMeshes [
 
 	^ skeletalMeshes
+]
+
+{ #category : #accessing }
+WDModelAsset >> skeletons [
+	^ skeletons
 ]
 
 { #category : #accessing }

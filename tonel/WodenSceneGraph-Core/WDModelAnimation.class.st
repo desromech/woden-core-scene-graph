@@ -40,6 +40,15 @@ WDModelAnimation >> applyPosition: position looped: isLooped toSubtreeChannelMap
 	]
 ]
 
+{ #category : #removing }
+WDModelAnimation >> applySkeletonTargetingMapping: skeletonTargetingMapping [
+	channels do: [ :each |
+		each targetName ifNotNil: [ 
+			each applySkeletonTargetingMapping: skeletonTargetingMapping
+		].
+	]
+]
+
 { #category : #accessing }
 WDModelAnimation >> channels [
 

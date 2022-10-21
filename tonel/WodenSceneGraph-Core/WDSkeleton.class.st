@@ -11,7 +11,8 @@ Class {
 		'restPoseInverseMatrices',
 		'restPoseForwardMatrices',
 		'boneNameToIndexDictionary',
-		'skinningOrderTable'
+		'skinningOrderTable',
+		'inverseRootMatrix'
 	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
@@ -65,8 +66,6 @@ WDSkeleton >> computeForwardMatricesWithPoseMatrices: poseMatrices [
 		matrix := poseMatrices at: boneIndex.
 		bone parentIndex >= 0 ifTrue: [
 			matrix := (result at: bone parentIndex + 1) * matrix
-		] ifFalse: [ 
-			matrix := rootMatrix * matrix
 		].
 	
 		result at: boneIndex put: matrix
@@ -87,7 +86,7 @@ WDSkeleton >> computeSkinningMatricesWithForwardMatrices: forwardMatrices [
 	self assert: forwardMatrices size = bones size.
 	result := Array new: restPoseInverseMatrices size.
 	restPoseInverseMatrices doWithIndex: [ :restPoseInverseMatrix :boneIndex |
-		result at: boneIndex put: (forwardMatrices at: boneIndex) * restPoseInverseMatrix
+		result at: boneIndex put: inverseRootMatrix * ((forwardMatrices at: boneIndex) * restPoseInverseMatrix)
 	].
 
 	^ result
@@ -106,6 +105,28 @@ WDSkeleton >> computeSkinningOrderTable [
 
 ]
 
+{ #category : #'as yet unclassified' }
+WDSkeleton >> constructSkeletonTargetingMappingInto: targetSkeleton [
+	| mapping |
+	mapping := WDSkeletonTargetingMapping new.
+	bones do:[ :sourceBone |
+		| boneName |
+		boneName := sourceBone name.
+		(targetSkeleton getBoneNamedOrNil: boneName) ifNotNil: [ :targetBone |
+			| transform |
+			transform := targetBone baseGlobalTransform inverseTransformTransform: sourceBone baseGlobalTransform.
+			mapping setBone: boneName restPoseTransform: transform asTRSTransform3D
+		]
+	].
+	
+	^ mapping
+]
+
+{ #category : #'as yet unclassified' }
+WDSkeleton >> getBoneNamedOrNil: boneName [
+	^ (self mapBoneNameToIndexOrNil: boneName) ifNotNil: [ :boneIndex | bones at: boneIndex ]
+]
+
 { #category : #initialization }
 WDSkeleton >> initialize [
 	super initialize.
@@ -113,6 +134,11 @@ WDSkeleton >> initialize [
 	rootMatrix := Matrix4x4 identity.
 	restPoseInverseMatrices := #().
 	skinningOrderTable := #().
+]
+
+{ #category : #accessing }
+WDSkeleton >> inverseRootMatrix [
+	^ inverseRootMatrix
 ]
 
 { #category : #'as yet unclassified' }
@@ -130,6 +156,12 @@ WDSkeleton >> name [
 WDSkeleton >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : #removing }
+WDSkeleton >> removePrefixFromBoneNames: prefixToRemove [
+	bones do: [ :each | each name: (each name withoutPrefix: prefixToRemove) ].
+	boneNameToIndexDictionary := nil.
 ]
 
 { #category : #poses }
@@ -171,6 +203,6 @@ WDSkeleton >> rootMatrix [
 
 { #category : #accessing }
 WDSkeleton >> rootMatrix: anObject [
-
-	rootMatrix := anObject
+	rootMatrix := anObject.
+	inverseRootMatrix := rootMatrix inverse.
 ]

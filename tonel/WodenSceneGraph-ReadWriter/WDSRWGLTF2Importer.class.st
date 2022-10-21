@@ -27,7 +27,8 @@ Class {
 		'nodeChildren',
 		'lcaTreeWalkIndices',
 		'lcaTreeWalkDepths',
-		'nodeToLcaQueryIndex'
+		'nodeToLcaQueryIndex',
+		'nodeGlobalTransforms'
 	],
 	#classVars : [
 		'ComponentTypeMap',
@@ -101,6 +102,21 @@ WDSRWGLTF2Importer >> addNodeIndicesFrom: startingNodeIndex to: stopNodeIndex in
 	nextNodeIndex ifNil: [ ^ self ].
 	
 	self addNodeIndicesFrom: nextNodeIndex to: stopNodeIndex into: nodeIndices set: nodeIndicesSet
+]
+
+{ #category : #loading }
+WDSRWGLTF2Importer >> computeNodeGlobalTransform: nodeIndex [
+	| parentTransform result |
+	(nodeGlobalTransforms at: nodeIndex + 1) ifNotNil: [ :cachedResult | ^ cachedResult ].
+
+	parentTransform := ReversibleAffineTransform3D identity.
+	(nodeParents at: nodeIndex + 1) ifNotNil: [ :parentIndex |
+		parentTransform := self computeNodeGlobalTransform: parentIndex
+	].
+
+	result := parentTransform transformTransform: (nodes at: nodeIndex + 1) transform asReversibleAffineTransform.
+	nodeGlobalTransforms at: nodeIndex + 1 put: result.
+	^ result
 ]
 
 { #category : #'as yet unclassified' }
@@ -571,7 +587,9 @@ WDSRWGLTF2Importer >> loadNodesFrom: elements [
 	nodeParents := Array new: nodes size.
 	nodeChildren := Array new: nodes size.
 	elements doWithIndex: [ :el :index | self loadNode: (nodes at: index) index: index - 1 childrenFrom: el].
+	nodeGlobalTransforms := Array new: nodes size.
 	self computeNodesTopologies.
+	0 to: nodes size - 1 do: [ :nodeIndex | self computeNodeGlobalTransform: nodeIndex ].
 	
 	skins ifNotNil: [
 		skins do: [ :each | self loadSkinTopology: each ]
@@ -654,16 +672,20 @@ WDSRWGLTF2Importer >> loadSkinTopology: skin [
 	].
 	
 	bones := allJointIndices collectWithIndex: [ :nodeIndex :index |
-		| bone node nodeState parentNodeIndex parentBoneIndex |
+		| bone node nodeState parentNodeIndex parentBoneIndex baseGlobalTransform |
 		node := nodes at: nodeIndex + 1.
 		nodeState := nodeBoneStates at: nodeIndex + 1.
 		parentNodeIndex := nodeParents at: nodeIndex + 1.
 		parentBoneIndex := nodeToBoneIndexTable at: parentNodeIndex ifAbsent: [-1].
 		self assert: parentBoneIndex ~= (index - 1).
+		baseGlobalTransform := parentNodeIndex >= 0
+			ifTrue: [ nodeGlobalTransforms at: parentNodeIndex + 1 ]
+			ifFalse: [ ReversibleAffineTransform3D identity ].
 		
 		bone := WDSkeletonBone new
 			name: node name;
 			transform: nodeState;
+			baseGlobalTransform: baseGlobalTransform;
 			index: index - 1;
 			parentIndex: parentBoneIndex;
 			yourself.
@@ -761,6 +783,9 @@ WDSRWGLTF2Importer >> processGLTFJson: json [
 	].
 	meshes ifNotNil: [ 
 		meshes do: [ :each | asset addMesh: each ].
+	].
+	skins ifNotNil: [ 
+		skins do: [ :each | asset addSkeleton: each skeleton ]
 	].
 	skeletalMeshes ifNotNil: [ 
 		skeletalMeshes do: [ :each | asset addSkeletalMesh: each ]
