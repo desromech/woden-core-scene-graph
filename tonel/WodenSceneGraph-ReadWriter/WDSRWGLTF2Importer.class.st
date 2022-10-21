@@ -694,6 +694,7 @@ WDSRWGLTF2Importer >> loadSkinTopology: skin [
 	skin rootNode: lcaRootNode.
 	skin skeleton
 		rootMatrix: Matrix4x4 identity;
+		rootBoneIndex: (nodeToBoneIndexTable at: lcaRootNodeIndex);
 		bones: bones asArray;
 		restPoseInverseMatrices: skin inverseBindMatrices;
 		computeSkinningOrderTable;

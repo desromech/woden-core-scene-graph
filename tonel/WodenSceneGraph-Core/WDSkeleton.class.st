@@ -8,6 +8,7 @@ Class {
 		'name',
 		'rootMatrix',
 		'bones',
+		'rootBoneIndex',
 		'restPoseInverseMatrices',
 		'restPoseForwardMatrices',
 		'boneNameToIndexDictionary',
@@ -106,9 +107,9 @@ WDSkeleton >> computeSkinningOrderTable [
 ]
 
 { #category : #'as yet unclassified' }
-WDSkeleton >> constructSkeletonTargetingMappingInto: targetSkeleton [
+WDSkeleton >> constructPerBoneSkeletonTargetingMappingInto: targetSkeleton [
 	| mapping |
-	mapping := WDSkeletonTargetingMapping new.
+	mapping := WDPerBoneSkeletonTargetingMapping new.
 	bones do:[ :sourceBone |
 		| boneName |
 		boneName := sourceBone name.
@@ -119,6 +120,25 @@ WDSkeleton >> constructSkeletonTargetingMappingInto: targetSkeleton [
 		]
 	].
 	
+	^ mapping
+]
+
+{ #category : #'as yet unclassified' }
+WDSkeleton >> constructScaleRotationSkeletonTargetingMappingInto: targetSkeleton [
+	| mapping |
+	mapping := WDScaleRotationSkeletonTargetingMapping new.
+	targetSkeleton rootBone ifNotNil: [ :targetRootBone |
+		mapping rootBoneName: targetRootBone name.
+		(self getBoneNamedOrNil: targetRootBone name) ifNotNil: [ :sourceRootBone |
+			| transform trsTransform |
+			transform := targetRootBone baseGlobalTransform inverseTransformTransform: sourceRootBone baseGlobalTransform.
+			trsTransform := transform asTRSTransform3D.
+			mapping
+				scale: trsTransform scale;
+				rotation: trsTransform rotation
+		]
+	].
+
 	^ mapping
 ]
 
@@ -193,6 +213,23 @@ WDSkeleton >> restPoseInverseMatrices [
 WDSkeleton >> restPoseInverseMatrices: anObject [
 
 	restPoseInverseMatrices := anObject
+]
+
+{ #category : #accessing }
+WDSkeleton >> rootBone [
+	^ rootBoneIndex ifNotNil: [ bones at: rootBoneIndex + 1 ]
+]
+
+{ #category : #accessing }
+WDSkeleton >> rootBoneIndex [
+
+	^ rootBoneIndex
+]
+
+{ #category : #accessing }
+WDSkeleton >> rootBoneIndex: anObject [
+
+	rootBoneIndex := anObject
 ]
 
 { #category : #accessing }
