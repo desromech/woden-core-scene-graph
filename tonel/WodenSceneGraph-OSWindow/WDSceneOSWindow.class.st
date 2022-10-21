@@ -30,7 +30,7 @@ WDSceneOSWindow >> doUpdate [
 	| currentTime deltaTime |
 	currentTime := Time monotonicMicrosecondClockValue.
 	lastSceneUpdateTime ifNil: [ lastSceneUpdateTime := Time monotonicMicrosecondClockValue ].
-	deltaTime := lastSceneUpdateTime - currentTime.
+	deltaTime := currentTime - lastSceneUpdateTime.
 	
 	hasSceneUpdateRequested := scene updateWithDeltaTime: deltaTime*1e-6.
 	
