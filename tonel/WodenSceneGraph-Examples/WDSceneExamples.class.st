@@ -30,7 +30,8 @@ WDSceneExamples class >> exampleAnimatedCube [
 	WDScene new
 		add: cube;
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -113,7 +114,7 @@ WDSceneExamples class >> exampleAnimatedShadowCastingDirectionalLight [
 		yourself.
 	lightSource := (WDDirectionalLightSource new
 		castShadows: true;
-		intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7);
+		color: (Vector3 x: 0.8 y: 0.8 z: 0.7);
 		asSceneNode)
 			rotateDegreesOnX: 0;
 			rotateDegreesOnY: -135;
@@ -252,7 +253,8 @@ WDSceneExamples class >> exampleAnimatedShadowCastingPointLight [
 	
 	lightSource := (WDPointLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 10.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.7);
+			intensity: 10.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				position: (Vector3 x: 0.0 y: 1.5 z: 0.0);
@@ -341,7 +343,8 @@ WDSceneExamples class >> exampleAnimatedShadowCastingSpotLight2 [
 
 	firstLight := (WDSpotLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.6 z: 0.6) * 10.0;
+			color: (Vector3 x: 0.8 y: 0.6 z: 0.6);
+			intensity: 10.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				rotateDegreesOnX: -45;
@@ -400,7 +403,8 @@ WDSceneExamples class >> exampleCube [
 			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -418,7 +422,8 @@ WDSceneExamples class >> exampleCubeSphere [
 			addCubeSphereWithRadius: 0.5 subdivisions: 2;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -463,7 +468,8 @@ WDSceneExamples class >> exampleManyCubes [
 	].
 
 	scene add: (WDPointLightSource new
-		intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 300.0;
+		color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+		intensity: 300.0;
 		influenceRadius: 100.0;
 		asSceneNode).
 		
@@ -502,7 +508,8 @@ WDSceneExamples class >> exampleManyCubesAndLights [
 		| position |
 		position := (Vector2 x: lightIndex y: 1) signedRandomNoiseVector3 * 40.
 		scene add: ((WDPointLightSource new
-			intensity: (Vector2 x: lightIndex y: 2) randomNoiseVector3 * 30.0;
+			color: (Vector2 x: lightIndex y: 2) randomNoiseVector3;
+			intensity: 30.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				position: position;
@@ -541,7 +548,8 @@ WDSceneExamples class >> exampleManyCubesSingleMesh [
 		mesh).
 
 	scene add: (WDPointLightSource new
-		intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 300.0;
+		color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+		intensity: 300.0;
 		influenceRadius: 100.0;
 		asSceneNode).
 		
@@ -580,7 +588,8 @@ WDSceneExamples class >> exampleManyCubesSingleMeshAndLights [
 		| position |
 		position := (Vector2 x: lightIndex y: 1) signedRandomNoiseVector3 * 40.
 		scene add: ((WDPointLightSource new
-			intensity: (Vector2 x: lightIndex y: 2) randomNoiseVector3 * 30.0;
+			color: (Vector2 x: lightIndex y: 2) randomNoiseVector3;
+			intensity: 30.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				position: position;
@@ -648,7 +657,8 @@ WDSceneExamples class >> exampleOpaquePool [
 			translateToX: 0.0 y: -0.3 z: 0.0;
 			yourself);
 		add: ((WDDirectionalLightSource new
-			intensity: (Vector3 x: 1.0 y: 1.0 z: 0.8) normalized * 0.7;
+			color: (Vector3 x: 1.0 y: 1.0 z: 0.8) normalized;
+			intensity: 0.7;
 			asSceneNode)
 				rotateDegreesOnX: -35;
 				translateToX: 0.0 y: 1.5 z: 2.5;
@@ -714,7 +724,8 @@ WDSceneExamples class >> examplePool [
 			translateToX: 0.0 y: -0.3 z: 0.0;
 			yourself);
 		add: ((WDDirectionalLightSource new
-			intensity: (Vector3 x: 1.0 y: 1.0 z: 0.8) normalized * 0.7;
+			color: (Vector3 x: 1.0 y: 1.0 z: 0.8) normalized;
+			intensity: 0.7;
 			asSceneNode)
 				rotateDegreesOnX: -35;
 				translateToX: 0.0 y: 1.5 z: 2.5;
@@ -790,7 +801,7 @@ WDSceneExamples class >> exampleShadowCastingDirectionalLight [
 			mesh);
 		add: ((WDDirectionalLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7);
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.7);
 			asSceneNode)
 				rotateDegreesOnX: -45;
 				rotateDegreesOnY: -135;
@@ -912,7 +923,8 @@ WDSceneExamples class >> exampleShadowCastingPointLight [
 			mesh);
 		add: ((WDPointLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 10.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.7);
+			intensity: 10.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				position: (Vector3 x: 0.0 y: 1.5 z: 0.0);
@@ -988,7 +1000,8 @@ WDSceneExamples class >> exampleShadowCastingSpotLight [
 			mesh);
 		add: ((WDSpotLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.7) * 20.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.7);
+			intensity: 20.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				rotateDegreesOnX: -45;
@@ -1066,7 +1079,8 @@ WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 			mesh);
 		add: ((WDSpotLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.8 y: 0.6 z: 0.6) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.6 z: 0.6);
+			intensity: 5.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				rotateDegreesOnX: -45;
@@ -1075,7 +1089,8 @@ WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 				yourself);
 		add: ((WDSpotLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.6 y: 0.8 z: 0.6) * 5.0;
+			color: (Vector3 x: 0.6 y: 0.8 z: 0.6);
+			intensity: 5.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				rotateDegreesOnX: -45;
@@ -1084,7 +1099,8 @@ WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 				yourself);
 		add: ((WDSpotLightSource new
 			castShadows: true;
-			intensity: (Vector3 x: 0.6 y: 0.6 z: 0.8) * 5.0;
+			color: (Vector3 x: 0.6 y: 0.6 z: 0.8);
+			intensity: 5.0;
 			influenceRadius: 10.0;
 			asSceneNode)
 				rotateDegreesOnX: -45;
@@ -1109,7 +1125,8 @@ WDSceneExamples class >> exampleTexturedCube [
 			generateTexcoords0WithFacePlanarTransformWithScale: Vector2 ones;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1135,7 +1152,8 @@ WDSceneExamples class >> exampleTexturedCube2 [
 			generateTangentSpaceFrame;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1172,7 +1190,8 @@ WDSceneExamples class >> exampleTexturedCube4 [
 			generateTangentSpaceFrame;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1196,7 +1215,8 @@ WDSceneExamples class >> exampleTexturedCubeSphere [
 			generateTexcoords0WithSphericalProjection;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1222,7 +1242,8 @@ WDSceneExamples class >> exampleTexturedCubeSphere2 [
 			generateTangentSpaceFrame;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1244,7 +1265,8 @@ WDSceneExamples class >> exampleTexturedCubeSphere3 [
 			generateTexcoords0WithSphericalProjection;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1268,7 +1290,8 @@ WDSceneExamples class >> exampleTexturedUVSphere [
 			generateTexcoords0WithSphericalProjection;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1294,7 +1317,8 @@ WDSceneExamples class >> exampleTexturedUVSphere2 [
 			generateTangentSpaceFrame;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1316,7 +1340,8 @@ WDSceneExamples class >> exampleTexturedUVSphere3 [
 			generateTexcoords0WithSphericalProjection;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
@@ -1334,7 +1359,8 @@ WDSceneExamples class >> exampleUVSphere [
 			addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);

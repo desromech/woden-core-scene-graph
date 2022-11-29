@@ -24,7 +24,7 @@ WDPointLightSource >> asLightStateForRenderingScene: renderingScene withTransfor
 	^ WDLightState new
 		positionOrDirection: (Vector4 xyz: renderingTransform translation w: 1.0);
 		influenceRadius: influenceRadius;
-		intensity: intensity;
+		intensity: color * intensity;
 		castShadows: castShadows;
 		shadowMapDepthBiasConstant: shadowMapDepthBiasConstant;
 		shadowMapDepthBiasSlope: shadowMapDepthBiasSlope;

@@ -24,7 +24,7 @@ WDDirectionalLightSource >> asLightStateForRenderingScene: renderingScene withTr
 	direction := renderingTransform matrix thirdColumn.
 	result := WDLightState new
 		positionOrDirection: (Vector4 xyz: direction w: 0.0);
-		intensity: intensity;
+		intensity: color * intensity;
 		shadowMapDepthBiasConstant: shadowMapDepthBiasConstant;
 		shadowMapDepthBiasSlope: shadowMapDepthBiasSlope;
 		shadowMapNormalBiasFactor: shadowMapNormalBiasFactor;

@@ -9,7 +9,8 @@ Class {
 		'castShadows',
 		'shadowMapDepthBiasConstant',
 		'shadowMapDepthBiasSlope',
-		'shadowMapNormalBiasFactor'
+		'shadowMapNormalBiasFactor',
+		'color'
 	],
 	#category : #'WodenSceneGraph-Core-Lighting'
 }
@@ -58,10 +59,21 @@ WDLightSource >> castShadows: anObject [
 	castShadows := anObject
 ]
 
+{ #category : #accessing }
+WDLightSource >> color [
+	^ color
+]
+
+{ #category : #accessing }
+WDLightSource >> color: aColorOrVector3 [
+	color := aColorOrVector3 asVector3
+]
+
 { #category : #initialization }
 WDLightSource >> initialize [
 	super initialize.
-	intensity := Vector3 ones.
+	color := Vector3 ones.
+	intensity := 1.0.
 	castShadows := false.
 	shadowMapDepthBiasConstant := 2.0.
 	shadowMapDepthBiasSlope := 1.0.
@@ -75,8 +87,8 @@ WDLightSource >> intensity [
 ]
 
 { #category : #accessing }
-WDLightSource >> intensity: aVector3 [
-	intensity := aVector3 asVector3.
+WDLightSource >> intensity: aNumber [
+	intensity := aNumber
 ]
 
 { #category : #accessing }

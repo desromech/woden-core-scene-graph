@@ -19,7 +19,8 @@ WDSurfaceMaterial >> makeMaterialInteractivePreviewScene [
 			generateTangentSpaceFrame;
 			mesh);
 		add: ((WDPointLightSource new
-			intensity: (Vector3 x: 0.8 y: 0.8 z: 0.2) * 5.0;
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
 			influenceRadius: 4.0;
 			asSceneNode)
 				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
