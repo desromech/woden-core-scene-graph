@@ -18,6 +18,11 @@ WDFileAsyncContentContext class >> default [
 	^ Default ifNil: [ Default := self new ]
 ]
 
+{ #category : #accessing }
+WDFileAsyncContentContext class >> workingDirectory: aWorkingDirectory [
+	^ self new workingDirectory: aWorkingDirectory; yourself
+]
+
 { #category : #'as yet unclassified' }
 WDFileAsyncContentContext >> canonicalizeUri: uri [
 	| solvedDirectory |
