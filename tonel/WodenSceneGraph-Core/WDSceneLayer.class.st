@@ -3,7 +3,7 @@ I represent a different camera plane in a scene.
 "
 Class {
 	#name : #WDSceneLayer,
-	#superclass : #WDSceneTreeElement,
+	#superclass : #WDSceneTreeElementWithChildren,
 	#instVars : [
 		'globalLightingState'
 	],
@@ -81,6 +81,13 @@ WDSceneLayer >> asRenderingSceneWithCameraState: baseCameraState [
 		yourself.
 		
 		 
+]
+
+{ #category : #converting }
+WDSceneLayer >> asSceneNode [
+	^ WDSceneNode new
+		addAll: (children collect: [ :each | each copy ]);
+		yourself
 ]
 
 { #category : #initialization }

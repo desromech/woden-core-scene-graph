@@ -103,6 +103,12 @@ WDModelAsset >> initialize [
 	
 ]
 
+{ #category : #'lookup elements' }
+WDModelAsset >> instanceSceneNodeWithSelector: selector [
+	self scenes ifNotEmpty: [ ^ self scenes first normalLayer asSceneNode ].
+	^ nil
+]
+
 { #category : #accessing }
 WDModelAsset >> materials [
 

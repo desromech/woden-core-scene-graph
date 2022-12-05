@@ -5,7 +5,7 @@ Each one of these components is further instantiated into a flat non-hierarchica
 "
 Class {
 	#name : #WDSceneNode,
-	#superclass : #WDSceneTreeElement,
+	#superclass : #WDSceneTreeElementWithChildren,
 	#instVars : [
 		'renderables',
 		'lights',
