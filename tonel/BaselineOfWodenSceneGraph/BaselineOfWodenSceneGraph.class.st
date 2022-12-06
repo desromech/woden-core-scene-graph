@@ -48,6 +48,9 @@ BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 		package: #'WodenSceneGraph-ReadWriter' with: [
 			spec requires: #( #'WodenSceneGraph-Renderer-Core').
 		];
+		package: #'WodenSceneGraph-ZincHttpClient' with: [
+			spec requires: #( #'WodenSceneGraph-Renderer-Core').
+		];
 		package: #'WodenSceneGraph-Examples' with: [
 			spec requires: #( #'WodenSceneGraph-Spec' #FormProceduralLibrary).
 		]
