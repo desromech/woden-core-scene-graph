@@ -23,7 +23,7 @@ WDFileAsyncContentContext class >> workingDirectory: aWorkingDirectory [
 	^ self new workingDirectory: aWorkingDirectory; yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 WDFileAsyncContentContext >> canonicalizeUri: uri [
 	| solvedDirectory |
 	(uri beginsWith: 'file:') ifTrue: [ ^ uri ].
@@ -31,12 +31,12 @@ WDFileAsyncContentContext >> canonicalizeUri: uri [
 	^ 'file:' , solvedDirectory fullName
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 WDFileAsyncContentContext >> fetchUriToFileReference: canonicalUri [
 	^ (canonicalUri withoutPrefix: 'file:') asFileReference
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 WDFileAsyncContentContext >> validWorkingDirectory [
 	^ workingDirectory ifNil: [ FileSystem workingDirectory ]
 ]

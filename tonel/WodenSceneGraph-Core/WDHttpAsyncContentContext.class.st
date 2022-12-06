@@ -35,7 +35,7 @@ WDHttpAsyncContentContext >> baseUri: anObject [
 	baseUri := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 WDHttpAsyncContentContext >> canonicalizeUri: uri [
 	((uri beginsWith: 'http:') or: [uri beginsWith: 'https:']) ifTrue: [ ^ uri ].
 	^ baseUri , uri

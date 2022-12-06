@@ -22,7 +22,7 @@ WDAbstractAsyncContentContext >> asyncProcessor: anObject [
 	^ asyncProcessor := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 WDAbstractAsyncContentContext >> canonicalizeUri: uri [
 	self subclassResponsibility
 ]
@@ -44,7 +44,7 @@ WDAbstractAsyncContentContext >> enqueueLoadingModelAssetURI: modelAssetURI then
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #hooks }
 WDAbstractAsyncContentContext >> fetchUriToFileReference: canonicalUri [
 	self subclassResponsibility
 ]

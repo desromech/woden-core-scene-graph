@@ -37,7 +37,9 @@ WDAsyncProcessor >> asyncProcessorProcessIteration [
 	pendingTaskSemaphore consumeAllSignals.
 	[ nextTask := taskQueue nextOrNil ] whileNotNil: [ 
 		nextTask runSafely
-	]
+	].
+	
+	pendingTaskSemaphore wait
 ]
 
 { #category : #tasks }
