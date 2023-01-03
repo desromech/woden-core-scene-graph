@@ -1,3 +1,6 @@
+"
+I am importer for glTF 2 binary models.
+"
 Class {
 	#name : #WDSRWGLTF2BinaryImporter,
 	#superclass : #WDSRWGLTF2Importer,

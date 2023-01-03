@@ -1,3 +1,6 @@
+"
+I am a specific animation in a glTF 2 model.
+"
 Class {
 	#name : #WDSRWGLTF2Animation,
 	#superclass : #Object,

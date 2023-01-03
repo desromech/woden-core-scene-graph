@@ -1,3 +1,6 @@
+"
+I hold common constants used by a glTF 2 model.
+"
 Class {
 	#name : #WDSRWGLTF2Constants,
 	#superclass : #SharedPool,

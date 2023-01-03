@@ -1,3 +1,6 @@
+"
+I am importer for glTF 2 models.
+"
 Class {
 	#name : #WDSRWGLTF2Importer,
 	#superclass : #Object,

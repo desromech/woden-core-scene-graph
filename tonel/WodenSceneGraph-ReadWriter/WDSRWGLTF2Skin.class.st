@@ -1,3 +1,6 @@
+"
+I am a specific skin in a glTF 2 model.
+"
 Class {
 	#name : #WDSRWGLTF2Skin,
 	#superclass : #Object,

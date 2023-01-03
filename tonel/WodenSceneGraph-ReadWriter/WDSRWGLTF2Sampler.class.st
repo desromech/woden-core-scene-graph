@@ -1,3 +1,6 @@
+"
+I specify a texture sampler in a glTF 2 model.
+"
 Class {
 	#name : #WDSRWGLTF2Sampler,
 	#superclass : #Object,

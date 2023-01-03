@@ -1,3 +1,6 @@
+"
+I am a specific texture in a glTF 2 model.
+"
 Class {
 	#name : #WDSRWGLTF2Texture,
 	#superclass : #Object,

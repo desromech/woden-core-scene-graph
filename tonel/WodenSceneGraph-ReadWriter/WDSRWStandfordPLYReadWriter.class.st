@@ -1,3 +1,6 @@
+"
+I am a read-writer for the models in the standford .ply format.
+"
 Class {
 	#name : #WDSRWStandfordPLYReadWriter,
 	#superclass : #WDModelAssetReadWriter,

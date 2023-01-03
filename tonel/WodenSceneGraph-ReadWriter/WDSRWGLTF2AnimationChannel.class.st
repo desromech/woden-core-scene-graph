@@ -1,3 +1,6 @@
+"
+I am an animation channel in a glTF 2 model asset. 
+"
 Class {
 	#name : #WDSRWGLTF2AnimationChannel,
 	#superclass : #Object,

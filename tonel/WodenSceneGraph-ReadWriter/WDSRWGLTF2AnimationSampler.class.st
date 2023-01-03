@@ -1,3 +1,6 @@
+"
+I am an animation sampler in a glTF 2 model asset. 
+"
 Class {
 	#name : #WDSRWGLTF2AnimationSampler,
 	#superclass : #Object,
