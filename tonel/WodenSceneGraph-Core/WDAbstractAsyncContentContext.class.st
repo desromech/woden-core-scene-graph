@@ -11,6 +11,18 @@ Class {
 	#category : #'WodenSceneGraph-Core-Async'
 }
 
+{ #category : #'as yet unclassified' }
+WDAbstractAsyncContentContext class >> defaultForUri: uri [
+	uri ifNotNil:[
+		((uri beginsWith: 'http:') or: [uri beginsWith: 'https:'])
+			ifTrue: [ ^ WDHttpAsyncContentContext default ].
+	].
+
+	^ WDFileAsyncContentContext default
+	
+	
+]
+
 { #category : #accessing }
 WDAbstractAsyncContentContext >> asyncProcessor [
 	^ asyncProcessor
