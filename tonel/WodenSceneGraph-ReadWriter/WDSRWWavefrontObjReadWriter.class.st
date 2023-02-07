@@ -1,3 +1,6 @@
+"
+I am a read-writer for the models in the wavefront .obj format.
+"
 Class {
 	#name : #WDSRWWavefrontObjReadWriter,
 	#superclass : #WDModelAssetReadWriter,
