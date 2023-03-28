@@ -82,8 +82,19 @@ WDAbstractRenderingSceneStateOSWindow >> defaultExtent [
 
 { #category : #'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> displayExtent [
-	swapChain ifNotNil: [ ^ swapChain getWidth @ swapChain getHeight ].
-	^ extent
+	| width height |
+	
+	swapChain ifNotNil: [ 
+		width := swapChain getWidth.
+		height := swapChain getHeight.
+	].
+
+	(height isNil or:[height = 0]) ifTrue:[
+		width := extent x.
+		height := extent y. 
+	].
+
+	^ width @ height
 ]
 
 { #category : #'initialize-release' }
