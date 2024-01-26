@@ -116,6 +116,31 @@ WDMeshBuilder >> addConeWithRadius: radius halfDepth: halfDepth segments: segmen
 		self addTriangleI0: 0 i1: segment + 1 i2: (segment + 1) % segments + 1
 	].
 
+	self addConvexPolygonWithPositionsStartingFrom: 1 count: segments normal: (Vector3 z: -1) flipped: true
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addConvexPolygonTriangleIndicesStartingFrom: polygonVertexStartIndex count: polygonVertexCount [
+	2 to: polygonVertexCount - 1 do: [ :i |
+		self addTriangleI0: polygonVertexStartIndex i1: polygonVertexStartIndex + i - 1 i2: polygonVertexStartIndex + i
+	]
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addConvexPolygonWithPositionsStartingFrom: polygonVertexStartIndex count: polygonVertexCount normal: normal flipped: flippedIndices [
+	| addedVerticesIndices |
+	addedVerticesIndices := self vertexCount.
+	
+	polygonVertexStartIndex to: polygonVertexStartIndex + polygonVertexCount - 1 do: [ :i |
+		self addP: (self fetchPositionAt: i); addN: normal
+	].
+	
+	flippedIndices ifTrue:  [
+		self addFlippedConvexPolygonTriangleIndicesStartingFrom: addedVerticesIndices count: polygonVertexCount
+	] ifFalse: [ 
+		self addConvexPolygonTriangleIndicesStartingFrom: addedVerticesIndices count: polygonVertexCount
+	]
+
 ]
 
 { #category : #adding }
@@ -199,6 +224,46 @@ WDMeshBuilder >> addCubeWithWidth: width height: height depth: depth [
 	halfHeight := height / 2.
 	halfDepth := depth / 2.
 	self addCubeMinX: halfWidth negated y: halfHeight negated z: halfDepth negated maxX: halfWidth y: halfHeight z: halfDepth
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addCylinderWithRadius: radius halfHeight: halfHeight segments: segments [
+	| y segmentVerticesBlock |
+	self beginTriangles.
+	segmentVerticesBlock := [ :segment |
+		| theta x z position normal |
+		theta := (Float twoPi * segment) / (segments - 1) - Float pi.
+		z := theta cos.
+		x := theta sin.
+
+		position := Vector3 x: x * radius y: y z: z * radius.
+		normal := (Vector3 x: x y: 0 z: z) normalized.
+		self addP: position; addN: normal.		
+	].
+
+	y := halfHeight negated.
+	(0 to: segments - 1) do: segmentVerticesBlock.
+
+	y := halfHeight.
+	(0 to: segments - 1) do: segmentVerticesBlock.
+	
+	"Add the quads"
+	(0 to: segments - 1) do: [ :segment |
+		self addQuadI0: segment i1: (segment + 1) % segments
+			i2: segments + ((segment + 1) % segments) i3: segments + segment
+	].
+
+	"Add the caps"
+	self
+		addConvexPolygonWithPositionsStartingFrom: 0 count: segments normal: (Vector3 y: -1) flipped: true;
+		addConvexPolygonWithPositionsStartingFrom: segments count: segments normal: (Vector3 y: 1) flipped: false
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addFlippedConvexPolygonTriangleIndicesStartingFrom: polygonVertexStartIndex count: polygonVertexCount [
+	2 to: polygonVertexCount - 1 do: [ :i |
+		self addTriangleI0: polygonVertexStartIndex i1: polygonVertexStartIndex + i i2: polygonVertexStartIndex + i - 1
+	]
 ]
 
 { #category : #adding }
