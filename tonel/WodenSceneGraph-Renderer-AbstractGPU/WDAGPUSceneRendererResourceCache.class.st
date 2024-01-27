@@ -3165,10 +3165,8 @@ WDAGPUSceneRendererResourceCache >> volumetricDensityFragmentShader [
 WDAGPUSceneRendererResourceCache >> volumetricDensityFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self volumetricMaterialFragmentShaderInputs, (self renderFragmentShaderOutputsForOpaquePass: false), self cameraStateBlockSource , '
+' , self samplerStateSource, self volumetricMaterialFragmentShaderInputs, (self renderFragmentShaderOutputsForOpaquePass: false), self cameraStateBlockSource , self volumetricDensityMaterialStateSource , '
 #line 6
-
-layout(set=5, binding=1) uniform texture3D DensityTexture;
 
 void main()
 {
@@ -3187,14 +3185,33 @@ void main()
 		
 		vec3 densityTexcoord = rayPosition * 0.5 + 0.5;
 		float density = textureLod(sampler3D(DensityTexture, VolumetricSampler), densityTexcoord, 0.0).r;
-		totalDensity += density * StepSize * 0.2;
+		if (density >= MaterialState.minDensityThreshold && density < MaterialState.maxDensityThreshold)
+		{
+			totalDensity += (density*MaterialState.densityScale + MaterialState.densityBias) * StepSize;
+		}
 
 		rayPosition += rayStep;
 	}
 
 	DefineRenderPassDummyOutputs();
-	FragmentOutputColor = vec4(vec3(totalDensity), 1.0);
+	FragmentOutputColor = vec4(vec3(totalDensity), totalDensity > 0.0 ? 1.0 : 0.0);
 }
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> volumetricDensityMaterialStateSource [
+	^ '
+layout(set=5, binding=0, std140) uniform MaterialStateBlock	
+{
+	float minDensityThreshold;
+	float maxDensityThreshold;
+	float densityScale;
+	float densityBias;
+} MaterialState;
+
+layout(set=5, binding=1) uniform texture3D DensityTexture;
+
 '
 ]
 

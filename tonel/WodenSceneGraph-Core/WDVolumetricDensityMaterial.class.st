@@ -5,10 +5,38 @@ Class {
 	#name : #WDVolumetricDensityMaterial,
 	#superclass : #WDVolumetricMaterial,
 	#instVars : [
-		'densityTexture'
+		'densityTexture',
+		'minDensityThreshold',
+		'maxDensityThreshold',
+		'densityScale',
+		'densityBias'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> densityBias [
+
+	^ densityBias
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> densityBias: anObject [
+
+	densityBias := anObject
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> densityScale [
+
+	^ densityScale
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> densityScale: anObject [
+
+	densityScale := anObject
+]
 
 { #category : #accessing }
 WDVolumetricDensityMaterial >> densityTexture [
@@ -25,6 +53,41 @@ WDVolumetricDensityMaterial >> densityTexture: anObject [
 { #category : #'double dispatch' }
 WDVolumetricDensityMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitVolumetricDensityMaterialActivationCommands: self
+]
+
+{ #category : #initialization }
+WDVolumetricDensityMaterial >> initialize [
+	super initialize.
+	minDensityThreshold := 0.0.
+	maxDensityThreshold := 1.0.
+	densityScale := 1.0.
+	densityBias := 0.0.
+
+
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> maxDensityThreshold [
+
+	^ maxDensityThreshold
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> maxDensityThreshold: anObject [
+
+	maxDensityThreshold := anObject
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> minDensityThreshold [
+
+	^ minDensityThreshold
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> minDensityThreshold: anObject [
+
+	minDensityThreshold := anObject
 ]
 
 { #category : #rendering }
