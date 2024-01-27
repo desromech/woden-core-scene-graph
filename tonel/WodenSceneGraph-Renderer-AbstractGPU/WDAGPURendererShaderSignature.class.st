@@ -16,7 +16,8 @@ Class {
 		'bdrfSampler',
 		'shadowMapSampler',
 		'screenSampler',
-		'poseStateAllocator'
+		'poseStateAllocator',
+		'volumetricSampler'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -93,6 +94,7 @@ WDAGPURendererShaderSignature >> allocatePoseState [
 WDAGPURendererShaderSignature >> buildHandle [
 	handle := device createShaderSignatureBuilder
 		beginBindingBank: 1;
+		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLER bindingPointCount: 1;
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLER bindingPointCount: 1;
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLER bindingPointCount: 1;
 		addBindingBankElement: AGPU_SHADER_BINDING_TYPE_SAMPLER bindingPointCount: 1;
@@ -186,6 +188,16 @@ WDAGPURendererShaderSignature >> buildSamplersBinding [
 		yourself).
 		
 	samplersBinding bindSampler: 3 sampler: screenSampler.
+	
+	volumetricSampler := device createSampler: (AGPUSamplerDescription new
+		filter: AGPU_FILTER_MIN_LINEAR_MAG_LINEAR_MIPMAP_NEAREST;
+		address_u: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
+		address_v: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
+		address_w: AGPU_TEXTURE_ADDRESS_MODE_CLAMP;
+		max_lod: 0.0;
+		yourself).
+		
+	samplersBinding bindSampler: 4 sampler: volumetricSampler.
 ]
 
 { #category : #accessing }

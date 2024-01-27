@@ -78,7 +78,9 @@ Class {
 		'blurVerticalPassFragmentShader',
 		'downsampleFragmentShader',
 		'cubeMapFaceRotationMatricesShaderSource',
-		'bloomSelectionFragmentShader'
+		'bloomSelectionFragmentShader',
+		'volumetricDensityFragmentShader',
+		'volumetricVertexShader'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -115,6 +117,11 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 		WDTextureFormatB8G8R8A8UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM.
 		WDTextureFormatB8G8R8A8UNormSRGB uniqueInstance . AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB.
 		WDTextureFormatR16G16B16A16Float uniqueInstance . AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT.
+
+		WDTextureFormatR8UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_R8_UNORM.
+		WDTextureFormatR16UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_R16_UNORM.
+		WDTextureFormatR16SNorm uniqueInstance . AGPU_TEXTURE_FORMAT_R16_SNORM.
+		WDTextureFormatR32Float uniqueInstance . AGPU_TEXTURE_FORMAT_R32_FLOAT.
 	}.
 	
 	TextureTypeMap := Dictionary newFromPairs: {
@@ -1285,6 +1292,9 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 			ifFalse: [ Matrix4x4 identity ].
 	brdfLutTexture := textureUploader createAndComputeBRDFLut.
 	
+	volumetricVertexShader := self compileShader: self volumetricVertexShaderSource type: AGPU_VERTEX_SHADER.
+	volumetricDensityFragmentShader := self compileShader: self volumetricDensityFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
+
 	screenSpaceAmbientOcclusionComputationFragmentShader := self compileShader: self screenSpaceAmbientOcclusionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	staticReflectionComputationFragmentShader := self compileShader: self staticReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
 	screenSpaceReflectionComputationFragmentShader := self compileShader: self screenSpaceReflectionComputationFragmentShaderSource type: AGPU_FRAGMENT_SHADER.
@@ -2173,6 +2183,7 @@ layout(set=0, binding=0) uniform sampler TextureSampler;
 layout(set=0, binding=1) uniform sampler ShadowMapSampler;
 layout(set=0, binding=2) uniform sampler BrdfLutSampler;
 layout(set=0, binding=3) uniform sampler ScreenTextureSampler;
+layout(set=0, binding=4) uniform sampler VolumetricSampler;
 '
 ]
 
@@ -3143,6 +3154,111 @@ WDAGPUSceneRendererResourceCache >> viewportOutputRenderPass [
 		viewportOutputRenderPass := device createRenderPass: renderpassDescription.
 	] ensure: [colorAttachment free].
 
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> volumetricDensityFragmentShader [
+	^ volumetricDensityFragmentShader
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> volumetricDensityFragmentShaderSource [
+	^ '
+#version 450
+' , self samplerStateSource, self volumetricMaterialFragmentShaderInputs, (self renderFragmentShaderOutputsForOpaquePass: false), self cameraStateBlockSource , '
+#line 6
+
+layout(set=5, binding=1) uniform texture3D DensityTexture;
+
+void main()
+{
+	vec3 rayOrigin = StageInput.modelPosition;
+	vec3 rayDirection = normalize(StageInput.modelPosition - StageInput.eyeWorldPosition);
+	const int StepCount = 64;
+	const float StepSize = 2.0 / float(StepCount);
+	
+	vec3 rayPosition = rayOrigin;
+	vec3 rayStep = rayDirection * StepSize;
+	float totalDensity = 0.0;
+	for(int i = 0 ; i < StepCount; ++i)
+	{
+		if(!all(greaterThanEqual(rayPosition, vec3(-1.0))) || !all(lessThanEqual(rayPosition, vec3(1.0))))
+			continue;
+		
+		vec3 densityTexcoord = rayPosition * 0.5 + 0.5;
+		float density = textureLod(sampler3D(DensityTexture, VolumetricSampler), densityTexcoord, 0.0).r;
+		totalDensity += density * StepSize * 0.2;
+
+		rayPosition += rayStep;
+	}
+
+	DefineRenderPassDummyOutputs();
+	FragmentOutputColor = vec4(vec3(totalDensity), 1.0);
+}
+'
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> volumetricMaterialFragmentShaderInputs [
+	^ '
+layout(location=0) in StageInputBlock
+{ 
+	vec3 modelPosition;
+	vec3 worldPosition;
+	vec3 viewPosition;
+
+	vec3 eyeModelPosition;
+	vec3 eyeWorldPosition;
+} StageInput;
+
+'
+]
+
+{ #category : #'accessing shaders' }
+WDAGPUSceneRendererResourceCache >> volumetricVertexShader [
+	^ volumetricVertexShader
+]
+
+{ #category : #'private shaders' }
+WDAGPUSceneRendererResourceCache >> volumetricVertexShaderSource [
+	^ '
+#version 450
+layout(location = 0) in vec3 inPosition;
+
+' ,
+self cameraStateBlockSource ,
+self objectStateBlockSource ,'
+#line 9
+
+layout(location=0) out StageOutputBlock
+{ 
+	vec3 modelPosition;
+	vec3 worldPosition;
+	vec3 viewPosition;
+	
+	vec3 eyeModelPosition;
+	vec3 eyeWorldPosition;
+} StageOutput;
+
+void main()
+{
+	vec4 modelPosition = vec4(inPosition, 1.0);
+	vec4 worldPosition = ObjectState.transformationMatrix * modelPosition;
+	vec4 viewPosition = CameraState.inverseTransformationMatrix * worldPosition;
+
+	vec4 eyeWorldPosition = CameraState.transformationMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 eyeModelPosition = ObjectState.inverseTransformationMatrix * eyeWorldPosition;
+
+	StageOutput.modelPosition = modelPosition.xyz;
+	StageOutput.worldPosition = worldPosition.xyz;
+	StageOutput.viewPosition = viewPosition.xyz;
+
+	StageOutput.eyeModelPosition = eyeModelPosition.xyz;
+	StageOutput.eyeWorldPosition = eyeWorldPosition.xyz;
+
+	gl_Position = CameraState.projectionMatrix * viewPosition;
+}
+'
 ]
 
 { #category : #accessing }

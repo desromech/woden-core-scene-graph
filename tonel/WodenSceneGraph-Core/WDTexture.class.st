@@ -55,6 +55,11 @@ WDTexture class >> forColorForm: aForm [
 ]
 
 { #category : #construction }
+WDTexture class >> forFitsFileReference: aFileReference [
+	^ self new setupForFitsFileReference: aFileReference; yourself
+]
+
+{ #category : #construction }
 WDTexture class >> forHDRIFileReference: aFileReference [
 	^ self new setupForHDRIFileReference: aFileReference; yourself
 ]
@@ -319,6 +324,33 @@ WDTexture >> setupForColorForm: aForm [
 WDTexture >> setupForFileReferenceCommon: aFileReference [
 	self flag: 'TODO: Add support for asynchronous loading'.
 	self setupForFormCommon: (ImageReadWriter formFromFileNamed: aFileReference)
+]
+
+{ #category : #initialization }
+WDTexture >> setupForFitsFileReference: aFileReference [
+	self flag: 'TODO: Add support for asynchronous loading'.
+	
+	aFileReference binaryReadStreamDo: [ :in |
+		| fitsHeader fitsTextureData |
+		fitsHeader := WDFitsHeaderReader new
+			stream: in;
+			readHeader;
+			yourself.
+		fitsTextureData := fitsHeader readTextureData.
+
+		self
+			dataKind: WDTextureDataKindNonColor;
+			format: fitsHeader textureFormat;
+			type: fitsHeader textureType;
+			width: fitsTextureData width;
+			height: fitsTextureData height;
+			depth: fitsTextureData depth;
+			layers: 1;
+			miplevels: 1;
+			sampleCount: 1;
+			data: fitsTextureData;
+			changed
+	].
 ]
 
 { #category : #private }

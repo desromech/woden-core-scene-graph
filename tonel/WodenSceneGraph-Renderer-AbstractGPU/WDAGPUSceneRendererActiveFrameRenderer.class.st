@@ -475,6 +475,27 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 	^ true
 ]
 
+{ #category : #material }
+WDAGPUSceneRendererActiveFrameRenderer >> emitVolumetricDensityMaterialActivationCommands: material [
+	| locationMask |
+	isInDepthOnlyPass ifTrue: [^ false].
+	
+	stateTracker
+		useShaderResources: (activeResourceDictionary at: material ifAbsentPut: [ 
+			| binding |
+			binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
+			binding
+				writeState: material with: WDAGPUVolumetricDensityMaterialUniformBufferWriter;
+				bindSampledTextureView: (self validTextureViewHandleFor: material densityTexture fallbackTextureWith: [renderer resourceCache transparentTexture3D]) inSlot: 1.
+			activeSlabResource add: binding.
+			binding
+		]) bindingHandle;
+		setVertexStage: renderer resourceCache volumetricVertexShader entryPoint: 'main';
+		setFragmentStage: renderer resourceCache volumetricDensityFragmentShader entryPoint: 'main';
+		setCullMode: AGPU_CULL_MODE_BACK.
+	^ true
+]
+
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> finishExecution [
 	commandQueue finishExecution.
