@@ -13,6 +13,8 @@ WDAGPUVolumetricDensityMaterialUniformBufferWriter class >> fieldsDesc [
 
 		float densityScale
 		float densityBias
+		
+		float minTotalDensity
 	)
 ]
 
@@ -23,7 +25,7 @@ WDAGPUVolumetricDensityMaterialUniformBufferWriter >> instanceAlignment [
 
 { #category : #accessing }
 WDAGPUVolumetricDensityMaterialUniformBufferWriter >> instanceSize [
-	^ 16
+	^ 20
 ]
 
 { #category : #writing }
@@ -32,4 +34,5 @@ WDAGPUVolumetricDensityMaterialUniformBufferWriter >> write: data onto: pointer 
 	self writeFloat: data maxDensityThreshold onto: pointer at: offset + 4.
 	self writeFloat: data densityScale onto: pointer at: offset + 8.
 	self writeFloat: data densityBias onto: pointer at: offset + 12.
+	self writeFloat: data minTotalDensity onto: pointer at: offset + 16.
 ]

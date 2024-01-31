@@ -10,7 +10,8 @@ Class {
 		'minDensityThreshold',
 		'maxDensityThreshold',
 		'densityScale',
-		'densityBias'
+		'densityBias',
+		'minTotalDensity'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -75,6 +76,7 @@ WDVolumetricDensityMaterial >> initialize [
 	maxDensityThreshold := 1.0.
 	densityScale := 1.0.
 	densityBias := 0.0.
+	minTotalDensity := 0.0.
 
 
 ]
@@ -101,6 +103,18 @@ WDVolumetricDensityMaterial >> minDensityThreshold [
 WDVolumetricDensityMaterial >> minDensityThreshold: anObject [
 
 	minDensityThreshold := anObject
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> minTotalDensity [
+
+	^ minTotalDensity
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> minTotalDensity: anObject [
+
+	minTotalDensity := anObject
 ]
 
 { #category : #rendering }

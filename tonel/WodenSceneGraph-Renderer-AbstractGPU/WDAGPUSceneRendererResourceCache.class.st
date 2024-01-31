@@ -3231,7 +3231,7 @@ void main()
 	vec3 rayPosition = rayOrigin;
 	vec3 rayStep = rayDirection * StepSize;
 	float totalDensity = 0.0;
-	vec4 totalColor = vec4(0.0);
+	vec3 totalColor = vec3(0.0);
 	for(int i = 0 ; i < StepCount; ++i)
 	{
 		if(!all(greaterThanEqual(rayPosition, vec3(-1.0))) || !all(lessThanEqual(rayPosition, vec3(1.0))))
@@ -3241,8 +3241,15 @@ void main()
 		float density = textureLod(sampler3D(DensityTexture, VolumetricSampler), densityTexcoord, 0.0).r;
 		if (density >= MaterialState.minDensityThreshold && density < MaterialState.maxDensityThreshold)
 		{
-			float localDensity = density*MaterialState.densityScale + MaterialState.densityBias;
-			totalColor += textureLod(sampler1D(ColorMapTexture, VolumetricSampler), localDensity, 0.0) * StepSize;
+			float normalizedDensity = (density - MaterialState.minDensityThreshold) / (MaterialState.maxDensityThreshold - MaterialState.minDensityThreshold);
+			float localDensity = normalizedDensity*MaterialState.densityScale + MaterialState.densityBias;
+			
+			if(totalDensity >= MaterialState.minTotalDensity)
+			{
+				vec4 mappedColor = textureLod(sampler1D(ColorMapTexture, VolumetricSampler), localDensity, 0.0);
+				totalColor += max(1.0 - (totalDensity - MaterialState.minTotalDensity), 0.0) * mappedColor.rgb * mappedColor.a * StepSize * localDensity;
+			}
+
 			totalDensity += localDensity * StepSize;
 		}
 
@@ -3250,7 +3257,7 @@ void main()
 	}
 
 	DefineRenderPassDummyOutputs();
-	FragmentOutputColor = vec4(totalColor.rgb, totalDensity > 0.0 ? 1.0 : 0.0);
+	FragmentOutputColor = vec4(totalColor, max(totalDensity - MaterialState.minTotalDensity, 0.0));
 }
 '
 ]
@@ -3264,6 +3271,7 @@ layout(set=5, binding=0, std140) uniform MaterialStateBlock
 	float maxDensityThreshold;
 	float densityScale;
 	float densityBias;
+	float minTotalDensity;
 } MaterialState;
 
 layout(set=5, binding=1) uniform texture3D DensityTexture;
