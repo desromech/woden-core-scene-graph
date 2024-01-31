@@ -6,6 +6,7 @@ Class {
 	#superclass : #WDVolumetricMaterial,
 	#instVars : [
 		'densityTexture',
+		'colorMapTexture',
 		'minDensityThreshold',
 		'maxDensityThreshold',
 		'densityScale',
@@ -13,6 +14,18 @@ Class {
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> colorMapTexture [
+
+	^ colorMapTexture
+]
+
+{ #category : #accessing }
+WDVolumetricDensityMaterial >> colorMapTexture: anObject [
+
+	colorMapTexture := anObject
+]
 
 { #category : #accessing }
 WDVolumetricDensityMaterial >> densityBias [

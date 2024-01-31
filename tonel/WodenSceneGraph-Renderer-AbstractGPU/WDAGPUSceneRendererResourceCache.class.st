@@ -80,7 +80,9 @@ Class {
 		'cubeMapFaceRotationMatricesShaderSource',
 		'bloomSelectionFragmentShader',
 		'volumetricDensityFragmentShader',
-		'volumetricVertexShader'
+		'volumetricVertexShader',
+		'transparentTexture3D',
+		'grayColorMapTexture1D'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -450,10 +452,48 @@ WDAGPUSceneRendererResourceCache >> createStorageBufferWithSize: size usageModes
 ]
 
 { #category : #private }
+WDAGPUSceneRendererResourceCache >> createTexture1DWithColorData: colorData [
+	| result |
+	result := device createTexture: (AGPUTextureDescription new
+			type: AGPU_TEXTURE_1D;
+			width: colorData size // 4;
+			height: 1;
+			depth: 1;
+			layers: 1;
+			miplevels: 1;
+			format: AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM;
+			usage_modes: (AGPU_TEXTURE_USAGE_SAMPLED bitOr: AGPU_TEXTURE_USAGE_COPY_DESTINATION);
+			main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+			sample_count: 1;
+			yourself).
+	result uploadTextureData: 0 arrayIndex: 0 pitch: colorData size slicePitch: colorData size data: colorData.
+	^ result
+]
+
+{ #category : #private }
 WDAGPUSceneRendererResourceCache >> createTexture2DWithSingleColor: colorData [
 	| result |
 	result := device createTexture: (AGPUTextureDescription new
 			type: AGPU_TEXTURE_2D;
+			width: 1;
+			height: 1;
+			depth: 1;
+			layers: 1;
+			miplevels: 1;
+			format: AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM;
+			usage_modes: (AGPU_TEXTURE_USAGE_SAMPLED bitOr: AGPU_TEXTURE_USAGE_COPY_DESTINATION);
+			main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
+			sample_count: 1;
+			yourself).
+	result uploadTextureData: 0 arrayIndex: 0 pitch: 4 slicePitch: 4 data: colorData.
+	^ result
+]
+
+{ #category : #private }
+WDAGPUSceneRendererResourceCache >> createTexture3DWithSingleColor: colorData [
+	| result |
+	result := device createTexture: (AGPUTextureDescription new
+			type: AGPU_TEXTURE_3D;
 			width: 1;
 			height: 1;
 			depth: 1;
@@ -1008,6 +1048,11 @@ WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocati
 	]
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> grayColorMapTexture1D [
+	^ grayColorMapTexture1D
+]
+
 { #category : #initialization }
 WDAGPUSceneRendererResourceCache >> hdrBlurRenderPass [
 	^ self reflectionRenderPass
@@ -1245,6 +1290,9 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	transparentTexture2D := self createTexture2DWithSingleColor: #[0 0 0 0].
 	neutralNormalTexture := self createTexture2DWithSingleColor: #[128 128 255 255].
 	transparentTextureCube := self createTextureCubeWithSingleColor: #[0 0 0 0].
+	
+	grayColorMapTexture1D := self createTexture1DWithColorData: #[0 0 0 255 255 255 255 255].
+	transparentTexture3D := self createTexture3DWithSingleColor: #[0 0 0 0].
 	
 	shadowMapAtlasTexture := self createShadowMapTextureWithExtent: ShadowMapAtlasExtent clearDepth: 0.0.
 	shadowMapAtlasTextureSamplingViewDescription := AGPUTextureViewDescription new.
@@ -2782,6 +2830,11 @@ WDAGPUSceneRendererResourceCache >> transparentTexture2D [
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache >> transparentTexture3D [
+	^ transparentTexture3D
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> transparentTextureCube [
 	^ transparentTextureCube
 ]
@@ -3178,6 +3231,7 @@ void main()
 	vec3 rayPosition = rayOrigin;
 	vec3 rayStep = rayDirection * StepSize;
 	float totalDensity = 0.0;
+	vec4 totalColor = vec4(0.0);
 	for(int i = 0 ; i < StepCount; ++i)
 	{
 		if(!all(greaterThanEqual(rayPosition, vec3(-1.0))) || !all(lessThanEqual(rayPosition, vec3(1.0))))
@@ -3187,14 +3241,16 @@ void main()
 		float density = textureLod(sampler3D(DensityTexture, VolumetricSampler), densityTexcoord, 0.0).r;
 		if (density >= MaterialState.minDensityThreshold && density < MaterialState.maxDensityThreshold)
 		{
-			totalDensity += (density*MaterialState.densityScale + MaterialState.densityBias) * StepSize;
+			float localDensity = density*MaterialState.densityScale + MaterialState.densityBias;
+			totalColor += textureLod(sampler1D(ColorMapTexture, VolumetricSampler), localDensity, 0.0) * StepSize;
+			totalDensity += localDensity * StepSize;
 		}
 
 		rayPosition += rayStep;
 	}
 
 	DefineRenderPassDummyOutputs();
-	FragmentOutputColor = vec4(vec3(totalDensity), totalDensity > 0.0 ? 1.0 : 0.0);
+	FragmentOutputColor = vec4(totalColor.rgb, totalDensity > 0.0 ? 1.0 : 0.0);
 }
 '
 ]
@@ -3211,6 +3267,7 @@ layout(set=5, binding=0, std140) uniform MaterialStateBlock
 } MaterialState;
 
 layout(set=5, binding=1) uniform texture3D DensityTexture;
+layout(set=5, binding=2) uniform texture1D ColorMapTexture;
 
 '
 ]

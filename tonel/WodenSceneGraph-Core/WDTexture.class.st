@@ -55,6 +55,16 @@ WDTexture class >> forColorForm: aForm [
 ]
 
 { #category : #construction }
+WDTexture class >> forColorLutTextureData: aColorLutTextureData [
+	^ self new setupForColorLutTextureData: aColorLutTextureData; yourself
+]
+
+{ #category : #construction }
+WDTexture class >> forColorLutWith: colors [
+	^ self forColorLutTextureData: (WDColorLutTextureData with: colors)
+]
+
+{ #category : #construction }
 WDTexture class >> forFitsFileReference: aFileReference [
 	^ self new setupForFitsFileReference: aFileReference; yourself
 ]
@@ -318,6 +328,22 @@ WDTexture >> setupForColorForm: aForm [
 		dataKind: WDTextureDataKindColor;
 		format: WDTextureFormatB8G8R8A8UNormSRGB;
 		setupForFormCommon: aForm
+]
+
+{ #category : #initialization }
+WDTexture >> setupForColorLutTextureData: colorLutData [
+	self
+		dataKind: WDTextureDataKindColor;
+		format: WDTextureFormatB8G8R8A8UNormSRGB;
+		type: WDTextureType1D;
+		width: colorLutData size;
+		height: 1;
+		depth: 1;
+		layers: 1;
+		miplevels: 1;
+		sampleCount: 1;
+		data: colorLutData;
+		changed
 ]
 
 { #category : #private }

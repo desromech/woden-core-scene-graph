@@ -477,7 +477,6 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 
 { #category : #material }
 WDAGPUSceneRendererActiveFrameRenderer >> emitVolumetricDensityMaterialActivationCommands: material [
-	| locationMask |
 	isInDepthOnlyPass ifTrue: [^ false].
 	
 	stateTracker
@@ -486,7 +485,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitVolumetricDensityMaterialActivatio
 			binding := renderer resourceCache rendererShaderSignature allocateMaterialState.
 			binding
 				writeState: material with: WDAGPUVolumetricDensityMaterialUniformBufferWriter;
-				bindSampledTextureView: (self validTextureViewHandleFor: material densityTexture fallbackTextureWith: [renderer resourceCache transparentTexture3D]) inSlot: 1.
+				bindSampledTextureView: (self validTextureViewHandleFor: material densityTexture fallbackTextureWith: [renderer resourceCache transparentTexture3D]) inSlot: 1;
+				bindSampledTextureView: (self validTextureViewHandleFor: material colorMapTexture fallbackTextureWith: [renderer resourceCache grayColorMapTexture1D]) inSlot: 2.
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
