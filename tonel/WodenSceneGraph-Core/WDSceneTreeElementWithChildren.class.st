@@ -62,6 +62,12 @@ WDSceneTreeElementWithChildren >> postCopy [
 	].
 ]
 
+{ #category : #removing }
+WDSceneTreeElementWithChildren >> removeAllChildren [
+	children do: [ :each | each removedFrom: self ].
+	children removeAll
+]
+
 { #category : #adding }
 WDSceneTreeElementWithChildren >> removeSceneElement: aNode [
 	self assert: aNode isWodenSceneElement.
