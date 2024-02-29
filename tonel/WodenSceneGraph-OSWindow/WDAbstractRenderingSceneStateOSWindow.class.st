@@ -22,7 +22,8 @@ Class {
 		'leftEyeColorBuffer',
 		'rightEyeColorBuffer',
 		'stereoComposeMode',
-		'vrSystem'
+		'vrSystem',
+		'lastRenderTime'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -36,6 +37,11 @@ WDAbstractRenderingSceneStateOSWindow class >> eventHandlerClass [
 ]
 
 { #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow class >> targetFramerate [
+	^ 100
+]
+
+{ #category : #'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> attempToCreateActualVRSystem [
 	vrEnabled ifFalse: [
 		vrSystem := WDDummyVRSystem new.
@@ -46,6 +52,23 @@ WDAbstractRenderingSceneStateOSWindow >> attempToCreateActualVRSystem [
 	vrSystem ifNil: [ 
 		vrSystem := WDDummyVRSystem new.
 	].
+
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> buildFPSOverlaySceneGraphNodeWith: builder [
+	| currentRenderTime deltaTime font line |
+	currentRenderTime := Time microsecondClockValue.
+	deltaTime := (currentRenderTime - (lastRenderTime ifNil: [currentRenderTime])) * 1e-3.
+	lastRenderTime := currentRenderTime.
+	
+	font := TextStyle defaultFont.
+	line := 'Frame time {1} ms / {2} FPS' format: {
+			deltaTime printShowingDecimalPlaces: 3 .
+			1.0 / (deltaTime*1e-3 max: 0.01) printShowingDecimalPlaces: 3
+	}.
+	
+	^ builder string: line in: (10@10 extent: font height @ (font widthOfString: line)) font: font color: Color green
 
 ]
 
@@ -100,11 +123,13 @@ WDAbstractRenderingSceneStateOSWindow >> doDestroySwapChain [
 
 { #category : #'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> doRender [
-	| overlaySceneGraph |
+	| overlaySceneGraph sgBuilder |
 	self validateDevice ifFalse: [ ^ self ].
 	self validateSwapChain ifFalse: [ ^ self ].
 	
-	overlaySceneGraph := self buildWindowOverlaySceneGraphNodeWith: (self sceneRenderer formSceneGraphBuilder).
+	sgBuilder := self sceneRenderer formSceneGraphBuilder.
+	overlaySceneGraph := (self buildWindowOverlaySceneGraphNodeWith: sgBuilder) , (self buildFPSOverlaySceneGraphNodeWith: sgBuilder).
+	
 
 	self hasStereoRendering ifTrue: [
 		self validateEyeFramebuffers ifFalse: [ ^ self ].
@@ -214,8 +239,8 @@ WDAbstractRenderingSceneStateOSWindow >> renderingProcessIteration [
 
 		renderEndTime := Time monotonicMicrosecondClockValue.
 		renderDeltaTime := renderEndTime - renderStartTime.
-		timeToSleep := (16000 - renderDeltaTime) // 1000.
-		false "self isUsingRealVRSystem" ifTrue: [
+		timeToSleep := (1000000 // self class targetFramerate - renderDeltaTime) // 1000.
+		self isUsingRealVRSystem ifTrue: [
 			vrSystem endFrameCycleWaiting: timeToSleep.
 		] ifFalse: [ 
 			timeToSleep > 0 ifTrue: [

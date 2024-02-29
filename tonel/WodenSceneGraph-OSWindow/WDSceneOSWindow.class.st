@@ -16,7 +16,10 @@ Class {
 
 { #category : #'as yet unclassified' }
 WDSceneOSWindow >> buildWindowOverlaySceneGraphNodeWith: builder [
-	^ builder string: 'Hello World' in: (30@30 extent: 200@100) font: TextStyle defaultFont color: Color white
+	overlay ifNil: [ ^ builder null ].
+	^ builder withClippingBounds: (0@0 extent: self displayExtent) build: [ 
+		overlay buildFullSceneGraphWith: builder
+	]
 ]
 
 { #category : #accessing }
