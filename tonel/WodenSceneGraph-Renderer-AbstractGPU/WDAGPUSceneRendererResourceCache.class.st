@@ -3238,7 +3238,7 @@ WDAGPUSceneRendererResourceCache >> viewportOverlayRenderPass [
 		renderpassDescription
 			color_attachment_count: 1;
 			color_attachments: colorAttachment.
-		viewportOutputRenderPass := device createRenderPass: renderpassDescription.
+		viewportOverlayRenderPass := device createRenderPass: renderpassDescription.
 	] ensure: [colorAttachment free].
 
 ]
