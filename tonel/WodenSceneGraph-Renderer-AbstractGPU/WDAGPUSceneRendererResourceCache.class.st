@@ -82,7 +82,9 @@ Class {
 		'volumetricDensityFragmentShader',
 		'volumetricVertexShader',
 		'transparentTexture3D',
-		'grayColorMapTexture1D'
+		'grayColorMapTexture1D',
+		'formSceneGraphDrawCommandProcessorContext',
+		'viewportOverlayRenderPass'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -139,6 +141,7 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 		WDTextureUsageModeReadedColorAttachment uniqueInstance . AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_COPY_SOURCE.
 		WDTextureUsageModeSampledColorAttachment uniqueInstance . ((AGPU_TEXTURE_USAGE_COLOR_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_COPY_SOURCE) bitOr: AGPU_TEXTURE_USAGE_COPY_DESTINATION) bitOr: AGPU_TEXTURE_USAGE_SAMPLED.
 		WDTextureUsageModeStaticSampled uniqueInstance . (AGPU_TEXTURE_USAGE_COPY_SOURCE bitOr: AGPU_TEXTURE_USAGE_COPY_DESTINATION) bitOr: AGPU_TEXTURE_USAGE_SAMPLED.
+		WDTextureUsageModeStreamedSampled uniqueInstance . (AGPU_TEXTURE_USAGE_COPY_SOURCE bitOr: AGPU_TEXTURE_USAGE_COPY_DESTINATION) bitOr: AGPU_TEXTURE_USAGE_SAMPLED.
 	}.
 	
 	TextureMainUsageModeMap := Dictionary newFromPairs: {
@@ -887,6 +890,11 @@ void main()
 ]
 
 { #category : #accessing }
+WDAGPUSceneRendererResourceCache >> formSceneGraphDrawCommandProcessorContext [
+	^ formSceneGraphDrawCommandProcessorContext
+]
+
+{ #category : #accessing }
 WDAGPUSceneRendererResourceCache >> genericDepthOnlySurfaceFragmentShader [
 	^ genericDepthOnlySurfaceFragmentShader
 ]
@@ -1383,7 +1391,9 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 		WDRedCyanAnaglyphStereoCompositionMode asStereoComposeMode . redCyanAnaglyphStereoComposeMode.
 	}.
 	
-	emptyLightingStateBinding := rendererShaderSignature allocateLightingState
+	emptyLightingStateBinding := rendererShaderSignature allocateLightingState.
+	
+	formSceneGraphDrawCommandProcessorContext := FormSGAGPUDrawCommandProcessorContext for: device withColorCorrection: true.
 ]
 
 { #category : #'private shaders' }
@@ -3196,6 +3206,30 @@ WDAGPUSceneRendererResourceCache >> viewportOutputRenderPass [
 		colorAttachment
 			format: AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB;
 			begin_action: AGPU_ATTACHMENT_DISCARD;
+			end_action: AGPU_ATTACHMENT_KEEP;
+			clear_value: AGPUColor4f new;
+			sample_count: 1;
+			sample_quality: 0.
+		renderpassDescription := AGPURenderpassDescription new.
+		renderpassDescription
+			color_attachment_count: 1;
+			color_attachments: colorAttachment.
+		viewportOutputRenderPass := device createRenderPass: renderpassDescription.
+	] ensure: [colorAttachment free].
+
+]
+
+{ #category : #initialization }
+WDAGPUSceneRendererResourceCache >> viewportOverlayRenderPass [
+	| colorAttachment |
+	viewportOverlayRenderPass ifNotNil: [ ^ viewportOverlayRenderPass ].
+	
+	^ [
+		| renderpassDescription |
+		colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
+		colorAttachment
+			format: AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB;
+			begin_action: AGPU_ATTACHMENT_KEEP;
 			end_action: AGPU_ATTACHMENT_KEEP;
 			clear_value: AGPUColor4f new;
 			sample_count: 1;

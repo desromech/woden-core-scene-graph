@@ -36,3 +36,8 @@ WDTextureUsageMode >> isSampledColorAttachment [
 WDTextureUsageMode >> isStaticSampled [
 	^ false
 ]
+
+{ #category : #testing }
+WDTextureUsageMode >> isStreamedSampled [
+	^ false
+]

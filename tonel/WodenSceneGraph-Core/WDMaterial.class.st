@@ -6,7 +6,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'name',
-		'materialDirectory'
+		'materialDirectory',
+		'renderingStream'
 	],
 	#category : #'WodenSceneGraph-Core-Material'
 }
@@ -136,6 +137,18 @@ WDMaterial >> name: anObject [
 { #category : #rendering }
 WDMaterial >> renderPriority [
 	^ WDRenderPriority default
+]
+
+{ #category : #accessing }
+WDMaterial >> renderingStream [
+
+	^ renderingStream
+]
+
+{ #category : #accessing }
+WDMaterial >> renderingStream: anObject [
+
+	renderingStream := anObject
 ]
 
 { #category : #accessing }

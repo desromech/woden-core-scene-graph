@@ -13,6 +13,6 @@ WDNullSceneRenderer >> isNullSceneRenderer [
 ]
 
 { #category : #rendering }
-WDNullSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
+WDNullSceneRenderer >> renderSceneState: renderingSceneState overlay: overlaySceneGraph intoFramebuffer: framebuffer [
 	"Nothing is required here."
 ]

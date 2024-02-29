@@ -15,7 +15,9 @@ Class {
 		'shadowMapSets',
 		'opaqueRenderingObjects',
 		'translucentRenderingObjects',
-		'backgroundObjects'
+		'backgroundObjects',
+		'renderingStreams',
+		'renderingStreamSet'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -43,6 +45,10 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: mat
 
 { #category : #adding }
 WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState poseState: aPose [
+	(material isNotNil and: [material renderingStream isNotNil]) ifTrue: [
+		self addRenderingStream: material renderingStream
+	].
+
 	self addMeshPrimitive: meshPrimitive
 		withPriority: (material ifNil: [ WDRenderPriority default ]
 			ifNotNil: [material renderPriority])
@@ -98,6 +104,15 @@ WDRenderingSceneCameraLayer >> addRenderingSceneShadowMapSet: shadowMapSet [
 ]
 
 { #category : #adding }
+WDRenderingSceneCameraLayer >> addRenderingStream: renderingStream [
+	(renderingStreamSet includes: renderingStream) ifFalse: [ 
+		renderingStreamSet add: renderingStream.
+		renderingStreams add: renderingStream
+	].
+
+]
+
+{ #category : #adding }
 WDRenderingSceneCameraLayer >> addTranslucentRenderingSceneObject: renderingSceneObject [
 	self isDepthOnly ifFalse: [ 
 		translucentRenderingObjects add: renderingSceneObject
@@ -141,6 +156,8 @@ WDRenderingSceneCameraLayer >> initialize [
 	opaqueRenderingObjects := OrderedCollection new.
 	translucentRenderingObjects := OrderedCollection new.
 	shadowMapSets := OrderedCollection new.
+	renderingStreamSet := IdentitySet new.
+	renderingStreams := OrderedCollection new.
 	usesFrustumCulling := true.
 	isShadowMap := false.
 
@@ -172,6 +189,18 @@ WDRenderingSceneCameraLayer >> lights [
 { #category : #accessing }
 WDRenderingSceneCameraLayer >> opaqueRenderingObjects [
 	^ opaqueRenderingObjects
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> renderingStreams [
+
+	^ renderingStreams
+]
+
+{ #category : #accessing }
+WDRenderingSceneCameraLayer >> renderingStreams: anObject [
+
+	renderingStreams := anObject
 ]
 
 { #category : #accessing }

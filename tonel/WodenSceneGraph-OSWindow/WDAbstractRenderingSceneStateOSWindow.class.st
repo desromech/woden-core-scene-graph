@@ -49,6 +49,11 @@ WDAbstractRenderingSceneStateOSWindow >> attempToCreateActualVRSystem [
 
 ]
 
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> buildWindowOverlaySceneGraphNodeWith: builder [
+	^ builder null
+]
+
 { #category : #updating }
 WDAbstractRenderingSceneStateOSWindow >> changed [
 	needsToRender := true.
@@ -95,14 +100,18 @@ WDAbstractRenderingSceneStateOSWindow >> doDestroySwapChain [
 
 { #category : #'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> doRender [
+	| overlaySceneGraph |
 	self validateDevice ifFalse: [ ^ self ].
 	self validateSwapChain ifFalse: [ ^ self ].
+	
+	overlaySceneGraph := self buildWindowOverlaySceneGraphNodeWith: (self sceneRenderer formSceneGraphBuilder).
 
 	self hasStereoRendering ifTrue: [
 		self validateEyeFramebuffers ifFalse: [ ^ self ].
 		self sceneRenderer
 			renderLeftEyeSceneState: self leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer
 			renderRightEyeSceneState: self rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer
+			overlay: overlaySceneGraph
 			composeInto: swapChainFramebuffer mode: self stereoComposeMode.
 			
 		vrSystem ifNotNil: [ 
@@ -111,7 +120,7 @@ WDAbstractRenderingSceneStateOSWindow >> doRender [
 		]
 	] ifFalse: [ 
 		self sceneRenderer
-			renderSceneState: self renderingSceneState intoFramebuffer: swapChainFramebuffer.
+			renderSceneState: self renderingSceneState overlay: overlaySceneGraph intoFramebuffer: swapChainFramebuffer.
 	].
 	
 	self swapBuffers.

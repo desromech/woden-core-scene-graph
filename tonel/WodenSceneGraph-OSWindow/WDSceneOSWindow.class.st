@@ -7,11 +7,17 @@ Class {
 	#instVars : [
 		'scene',
 		'camera',
+		'overlay',
 		'hasSceneUpdateRequested',
 		'lastSceneUpdateTime'
 	],
 	#category : #'WodenSceneGraph-OSWindow'
 }
+
+{ #category : #'as yet unclassified' }
+WDSceneOSWindow >> buildWindowOverlaySceneGraphNodeWith: builder [
+	^ builder string: 'Hello World' in: (30@30 extent: 200@100) font: TextStyle defaultFont color: Color white
+]
 
 { #category : #accessing }
 WDSceneOSWindow >> camera [
@@ -58,6 +64,18 @@ WDSceneOSWindow >> leftEyeRenderingSceneState [
 { #category : #accessing }
 WDSceneOSWindow >> needsToRender [
 	^ super needsToRender or: [ hasSceneUpdateRequested ]
+]
+
+{ #category : #accessing }
+WDSceneOSWindow >> overlay [
+
+	^ overlay
+]
+
+{ #category : #accessing }
+WDSceneOSWindow >> overlay: anObject [
+
+	overlay := anObject
 ]
 
 { #category : #accessing }

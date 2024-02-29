@@ -1072,7 +1072,32 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setDepthState: false writeMask: false function: AGPU_ALWAYS;
 		setPrimitiveType: AGPU_TRIANGLES;
 		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
-		endRenderPass
+		endRenderPass.
+
+]
+
+{ #category : #rendering }
+WDAGPUSceneRendererActiveFrameRenderer >> renderOverlayFormSceneGraph: overlaySceneGraph intoFramebuffer: framebuffer [
+	| sceneGraphCommandList sceneGraphRenderTarget |
+	(overlaySceneGraph isNil or: [ overlaySceneGraph isNullNode ]) ifTrue: [ ^ self ].
+	
+	sceneGraphCommandList := FormSGAGPUCommandListBuilder new.
+	FormSGAGPUCommandListRenderer new
+		surfaceScaleFactor: framebuffer uiScaleFactor;
+		fontTextureAtlasCache: renderer drawCommandProcessor fontTextureAtlasCache;
+		hasDirectSubpixelBlending: renderer drawCommandProcessor hasDirectSubpixelBlending;
+		render: overlaySceneGraph with: sceneGraphCommandList transform: FormSGAffineTransform identity clippingBounds: (0@0 extent: framebuffer extent).
+	
+	sceneGraphRenderTarget := FormSGAGPURenderTarget new
+		device: renderer device;
+		framebuffer: (self validFramebufferFor: framebuffer);
+		renderpass: renderer resourceCache viewportOverlayRenderPass;
+		extent: framebuffer extent;
+		yourself.
+	
+	renderer drawCommandProcessor
+		commandList: stateTracker;
+		processCommandListWithDependencies: sceneGraphCommandList mainRenderTarget: sceneGraphRenderTarget
 ]
 
 { #category : #rendering }

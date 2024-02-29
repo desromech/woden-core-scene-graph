@@ -8,7 +8,8 @@ Class {
 		'extent',
 		'colorAttachments',
 		'depthStencilAttachment',
-		'swapChain'
+		'swapChain',
+		'uiScaleFactor'
 	],
 	#category : #'WodenSceneGraph-Core-Texture'
 }
@@ -76,6 +77,8 @@ WDFramebuffer >> initialize [
 	super initialize.
 	extent := 0@0.
 	colorAttachments := #().
+	uiScaleFactor := 1.0.
+	
 ]
 
 { #category : #accessing }
@@ -88,6 +91,18 @@ WDFramebuffer >> swapChain [
 WDFramebuffer >> swapChain: anObject [
 
 	swapChain := anObject
+]
+
+{ #category : #accessing }
+WDFramebuffer >> uiScaleFactor [
+
+	^ uiScaleFactor
+]
+
+{ #category : #accessing }
+WDFramebuffer >> uiScaleFactor: anObject [
+
+	uiScaleFactor := anObject
 ]
 
 { #category : #accessing }

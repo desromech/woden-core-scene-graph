@@ -54,6 +54,11 @@ WDSceneRenderer >> createVRSystem [
 	^ nil
 ]
 
+{ #category : #rendering }
+WDSceneRenderer >> formSceneGraphBuilder [
+	^ FormSGBuilder new
+]
+
 { #category : #testing }
 WDSceneRenderer >> isAGPUSceneRenderer [
 	^ false
@@ -66,5 +71,10 @@ WDSceneRenderer >> isNullSceneRenderer [
 
 { #category : #rendering }
 WDSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
+	^ self renderSceneState: renderingSceneState overlay: nil intoFramebuffer: framebuffer
+]
+
+{ #category : #rendering }
+WDSceneRenderer >> renderSceneState: renderingSceneState overlay: overlaySceneGraph intoFramebuffer: framebuffer [
 	self subclassResponsibility
 ]

@@ -9,7 +9,8 @@ Class {
 		'commandQueue',
 		'stateTrackerCache',
 		'stateTracker',
-		'resourceCache'
+		'resourceCache',
+		'drawCommandProcessor'
 	],
 	#classVars : [
 		'LightGridCellCount',
@@ -96,6 +97,19 @@ WDAGPUSceneRenderer >> device [
 	^ device
 ]
 
+{ #category : #accessing }
+WDAGPUSceneRenderer >> drawCommandProcessor [
+	^ drawCommandProcessor
+]
+
+{ #category : #rendering }
+WDAGPUSceneRenderer >> formSceneGraphBuilder [
+	^ FormSGAGPUBuilder new
+		device: device;
+		drawCommandProcessor: drawCommandProcessor;
+		yourself
+]
+
 { #category : #initialization }
 WDAGPUSceneRenderer >> initializeWithResourceCache: aResourceCache [
 	resourceCache := aResourceCache.
@@ -103,6 +117,7 @@ WDAGPUSceneRenderer >> initializeWithResourceCache: aResourceCache [
 	commandQueue := device getDefaultCommandQueue.
 	stateTrackerCache := device createStateTrackerCache: commandQueue.
 	stateTracker := stateTrackerCache createStateTracker: AGPU_COMMAND_LIST_TYPE_DIRECT command_queue: commandQueue.
+	drawCommandProcessor := FormSGExternallySynchronizedAGPUDrawCommandProcessorWithStateTracker forContext: resourceCache formSceneGraphDrawCommandProcessorContext withFrameBufferingCount: 1
 ]
 
 { #category : #testing }
@@ -141,6 +156,7 @@ WDAGPUSceneRenderer >> readbackTextureData: texture [
 { #category : #rendering }
 WDAGPUSceneRenderer >> renderLeftEyeSceneState: leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer
 renderRightEyeSceneState: rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer
+overlay: overlaySceneGraph
 composeInto: destinationFramebuffer mode: composeMode [
 	WDAGPUSceneRendererActiveFrameRenderer new
 		renderer: self;
@@ -148,18 +164,22 @@ composeInto: destinationFramebuffer mode: composeMode [
 			frame
 				recordRenderingCommandsFor: leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer;
 				recordRenderingCommandsFor: rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer;
-				composeStereoLeft: leftEyeFramebuffer right: rightEyeFramebuffer into: destinationFramebuffer mode: composeMode
+				composeStereoLeft: leftEyeFramebuffer right: rightEyeFramebuffer into: destinationFramebuffer mode: composeMode;
+				renderOverlayFormSceneGraph: overlaySceneGraph intoFramebuffer: destinationFramebuffer
 		];
 		finishExecution.
 	self readbackFramebufferAttachmentsOf: destinationFramebuffer
 ]
 
 { #category : #rendering }
-WDAGPUSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: framebuffer [
+WDAGPUSceneRenderer >> renderSceneState: renderingSceneState overlay: overlaySceneGraph intoFramebuffer: framebuffer [
 	WDAGPUSceneRendererActiveFrameRenderer new
 		renderer: self;
 		recordAndFlushCommandsOn: stateTracker queue: commandQueue with: [ :frame |
-			frame recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer.
+			frame
+				recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer;
+				renderOverlayFormSceneGraph: overlaySceneGraph intoFramebuffer: framebuffer
+
 		];
 		finishExecution.
 	self readbackFramebufferAttachmentsOf: framebuffer
