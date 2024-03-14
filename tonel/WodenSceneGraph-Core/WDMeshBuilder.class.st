@@ -213,8 +213,10 @@ WDMeshBuilder >> addCubeSphereWithRadius: radius subdivisions: subdivisions [
 
 { #category : #adding }
 WDMeshBuilder >> addCubeWithHalfExtent: halfExtent [
-	self addCubeMinX: halfExtent x negated y: halfExtent y negated z: halfExtent z negated
-		maxX: halfExtent x y: halfExtent y z: halfExtent z
+	| halfExtentVector |
+	halfExtentVector := halfExtent asVector3.
+	self addCubeMinX: halfExtentVector x negated y: halfExtentVector y negated z: halfExtentVector z negated
+		maxX: halfExtentVector x y: halfExtentVector y z: halfExtentVector z
 ]
 
 { #category : #adding }
