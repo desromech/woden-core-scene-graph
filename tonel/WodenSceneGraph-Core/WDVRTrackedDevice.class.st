@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'id',
 		'currentPose',
-		'currentRenderPose'
+		'currentRenderPose',
+		'role',
+		'eventHandler'
 	],
 	#category : #'WodenSceneGraph-Core-VR'
 }
@@ -34,6 +36,18 @@ WDVRTrackedDevice >> currentRenderPose: anObject [
 ]
 
 { #category : #accessing }
+WDVRTrackedDevice >> eventHandler [
+
+	^ eventHandler
+]
+
+{ #category : #accessing }
+WDVRTrackedDevice >> eventHandler: anObject [
+
+	eventHandler := anObject
+]
+
+{ #category : #accessing }
 WDVRTrackedDevice >> id [
 
 	^ id
@@ -51,6 +65,7 @@ WDVRTrackedDevice >> initialize [
 	
 	currentPose := WDVRTrackedDevicePose new.
 	currentRenderPose := WDVRTrackedDevicePose new.
+	self role: WDVRTrackedDeviceRoleInvalid.
 ]
 
 { #category : #testing }
@@ -81,4 +96,25 @@ WDVRTrackedDevice >> isInvalid [
 { #category : #testing }
 WDVRTrackedDevice >> isTrackingReference [
 	^ false
+]
+
+{ #category : #'as yet unclassified' }
+WDVRTrackedDevice >> processAndDispatchEvent: vrEvent [
+	eventHandler ifNotNil: [eventHandler handleVREvent: vrEvent]
+]
+
+{ #category : #initialization }
+WDVRTrackedDevice >> resetEventHandler [
+	eventHandler := nil.
+]
+
+{ #category : #accessing }
+WDVRTrackedDevice >> role [
+
+	^ role
+]
+
+{ #category : #accessing }
+WDVRTrackedDevice >> role: aRole [
+	role := aRole asVRTrackedDeviceRole
 ]

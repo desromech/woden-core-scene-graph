@@ -1,3 +1,6 @@
+"
+I represent a specific tracked device pose.
+"
 Class {
 	#name : #WDVRTrackedDevicePose,
 	#superclass : #Object,

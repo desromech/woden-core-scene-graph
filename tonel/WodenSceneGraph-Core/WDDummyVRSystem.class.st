@@ -24,6 +24,11 @@ WDDummyVRSystem >> isDummyVRSystem [
 	^ true
 ]
 
+{ #category : #testing }
+WDDummyVRSystem >> isInStandbyMode [
+	^ true
+]
+
 { #category : #'as yet unclassified' }
 WDDummyVRSystem >> leftEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRatio [
 	^ FrustumTangents leftPerspectiveFovY: cameraFovY aspect: displayAspectRatio ipd: ipd focalDistance: focalDistance

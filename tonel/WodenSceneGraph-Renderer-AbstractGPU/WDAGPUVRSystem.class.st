@@ -13,10 +13,13 @@ Class {
 		'rightEyeLocalTransform',
 		'leftEyeLocalTransform',
 		'trackedDevices',
-		'hmdTrackedDevice'
+		'hmdTrackedDevice',
+		'isInStandbyMode'
 	],
 	#classVars : [
-		'DeviceClassIDToClassMap'
+		'DeviceClassIDToClassMap',
+		'DeviceRoleMap',
+		'EventTypeMap'
 	],
 	#pools : [
 		'AGPUConstants'
@@ -33,7 +36,36 @@ WDAGPUVRSystem class >> initialize [
 		AGPU_VR_TRACKED_DEVICE_CLASS_GENERIC_TRACKER . WDVRTrackedDeviceGenericTracker .
 		AGPU_VR_TRACKED_DEVICE_CLASS_TRACKING_REFERENCE . WDVRTrackedDeviceTrackingReference .
 		AGPU_VR_TRACKED_DEVICE_CLASS_DISPLAY_REDIRECT . WDVRTrackedDeviceDisplayRedirect .
-	}
+	}.
+	
+	DeviceRoleMap := Dictionary newFromPairs: { 
+		AGPU_VR_TRACKED_DEVICE_ROLE_INVALID . WDVRTrackedDeviceRoleInvalid asVRTrackedDeviceRole.
+		AGPU_VR_TRACKED_DEVICE_ROLE_LEFT_HAND . WDVRTrackedDeviceRoleLeftHand asVRTrackedDeviceRole.
+		AGPU_VR_TRACKED_DEVICE_ROLE_RIGHT_HAND . WDVRTrackedDeviceRoleRightHand asVRTrackedDeviceRole.
+		AGPU_VR_TRACKED_DEVICE_ROLE_OPT_OUT . WDVRTrackedDeviceRoleOptOut asVRTrackedDeviceRole.
+		AGPU_VR_TRACKED_DEVICE_ROLE_THREADMILL . WDVRTrackedDeviceRoleThreadmill asVRTrackedDeviceRole.
+	}.
+	
+	EventTypeMap := Dictionary newFromPairs: {
+		AGPU_VR_EVENT_TYPE_TRACKED_DEVICE_ACTIVATED . WDVRTrackedDeviceActivatedEvent.
+		AGPU_VR_EVENT_TYPE_TRACKED_DEVICE_DEACTIVATED . WDVRTrackedDeviceDeactivatedEvent.
+		AGPU_VR_EVENT_TYPE_TRACKED_DEVICE_UPDATED . WDVRTrackedDeviceUpdatedEvent.
+		AGPU_VR_EVENT_TYPE_TRACKED_DEVICE_USER_INTERACTION_STARTED . WDVRTrackedDeviceUserInteractionStartedEvent.
+		AGPU_VR_EVENT_TYPE_TRACKED_DEVICE_USER_INTERACTION_ENDED . WDVRTrackedDeviceUserInteractionEndedEvent.
+		
+		AGPU_VR_EVENT_TYPE_BUTTON_PRESSED . WDVRTrackedDeviceButtonPressedEvent.
+		AGPU_VR_EVENT_TYPE_BUTTON_RELEASED . WDVRTrackedDeviceButtonReleasedEvent.
+		AGPU_VR_EVENT_TYPE_BUTTON_TOUCH . WDVRTrackedDeviceButtonTouchEvent.
+		AGPU_VR_EVENT_TYPE_BUTTON_UNTOUCH . WDVRTrackedDeviceButtonUntouchEvent.
+		
+		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_PRESSED . WDVRTrackedDeviceDualAnalogPressedEvent.
+		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_RELEASED . WDVRTrackedDeviceDualAnalogReleasedEvent.
+		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_TOUCH . WDVRTrackedDeviceDualAnalogTouchEvent.
+		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_UNTOUCH . WDVRTrackedDeviceDualAnalogUntouchEvent.
+		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_MOVE. WDVRTrackedDeviceDualAnalogMoveEvent.
+		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_MODE_SWITCH_1 . WDVRTrackedDeviceDualAnalogModeSwitch1Event.
+		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_MODE_SWITCH_2 . WDVRTrackedDeviceDualAnalogModeSwitch2Event.
+	}.
 ]
 
 { #category : #'as yet unclassified' }
@@ -88,6 +120,7 @@ WDAGPUVRSystem >> headTransform [
 WDAGPUVRSystem >> initialize [
 	super initialize.
 	trackedDevices := #().
+	isInStandbyMode := false.
 	
 ]
 
@@ -122,6 +155,11 @@ WDAGPUVRSystem >> initializeWithSceneRenderer: aSceneRenderer handle: aVRSystemH
 ]
 
 { #category : #testing }
+WDAGPUVRSystem >> isInStandbyMode [
+	^ isInStandbyMode
+]
+
+{ #category : #testing }
 WDAGPUVRSystem >> isRealVRSystem [
 	^ true
 ]
@@ -143,6 +181,16 @@ WDAGPUVRSystem >> newTrackedDeviceFor: trackedDevicePose [
 		yourself
 ]
 
+{ #category : #'as yet unclassified' }
+WDAGPUVRSystem >> onEnterStandbyMode [
+	isInStandbyMode := true.
+]
+
+{ #category : #'as yet unclassified' }
+WDAGPUVRSystem >> onLeaveStandbyMode [
+	isInStandbyMode := false.
+]
+
 { #category : #accessing }
 WDAGPUVRSystem >> perEyeFrameBufferExtentForDisplayWithExtent: displayExtent [
 	^ recommendedRenderTargetExtent
@@ -160,11 +208,22 @@ WDAGPUVRSystem >> pollEvents [
 
 { #category : #'vr system' }
 WDAGPUVRSystem >> processEvent: agpuVREvent [
-	| trackedDevice |
+	| eventType trackedDevice vrEventClass |
+	eventType := agpuVREvent type.
+	eventType = AGPU_VR_EVENT_TYPE_ENTER_STANDBY_MODE ifTrue: [ self onEnterStandbyMode ].
+	eventType = AGPU_VR_EVENT_TYPE_LEAVE_STANDBY_MODE ifTrue: [ self onLeaveStandbyMode ].
+	
 	trackedDevices ifNil: [ ^ self ].
 	trackedDevice := trackedDevices at: agpuVREvent tracked_device_index + 1 ifAbsent: [^ self].
 	trackedDevice ifNil: [ ^ self ].
-	trackedDevice processAndDispatchAgpuVREvent: agpuVREvent
+	
+	vrEventClass := EventTypeMap at: eventType ifAbsent: [ nil ].
+	vrEventClass ifNotNil: [ 
+		trackedDevice processAndDispatchEvent: (vrEventClass new
+			convertFromAgpuVREvent: agpuVREvent;
+			yourself)
+	].
+
 ]
 
 { #category : #eyes }
@@ -192,6 +251,11 @@ WDAGPUVRSystem >> submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeT
 	super submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeTexture rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeTexture
 ]
 
+{ #category : #accessing }
+WDAGPUVRSystem >> trackedDevicesDo: aBlock [
+	trackedDevices do: [ :each | each ifNotNil: [ aBlock value: each ] ]
+]
+
 { #category : #'vr system' }
 WDAGPUVRSystem >> waitAndFetchPoses [
 	| trackedDevicePoseCount trackedDevicePose trackedDeviceRenderPose isValidPose trackedDevice |
@@ -215,13 +279,18 @@ WDAGPUVRSystem >> waitAndFetchPoses [
 			].
 			trackedDevices at: i put: trackedDevice.
 			trackedDevice
+				role: (DeviceRoleMap at: trackedDevicePose device_role ifAbsent: [WDVRTrackedDeviceRoleInvalid asVRTrackedDeviceRole]);
 				currentPose: (self convertTrackedDevicePose: trackedDevicePose);
 				currentRenderPose: (self convertTrackedDevicePose: trackedDeviceRenderPose);
 				yourself
 		].
 	].
 
-	trackedDevices detect: [:each | each notNil and: [each isHeadMountedDisplay]] ifFound: [ :device | hmdTrackedDevice := device ].
+	trackedDevices detect: [:each |
+		each notNil and: [each isHeadMountedDisplay]
+	] ifFound: [ :device |
+		hmdTrackedDevice := device
+	].
 	
 	"Transcript show: hmdTrackedDevice currentPose deviceToAbsoluteTransform translation; cr.
 	Transcript show: hmdTrackedDevice currentPose deviceToAbsoluteTransform matrix; cr."

@@ -210,6 +210,11 @@ WDAbstractRenderingSceneStateOSWindow >> open [
 ]
 
 { #category : #rendering }
+WDAbstractRenderingSceneStateOSWindow >> pollVREventsAndUpdate [
+	vrSystem ifNotNil: [ vrSystem pollEvents ].
+]
+
+{ #category : #rendering }
 WDAbstractRenderingSceneStateOSWindow >> render [
 	osWindow ifNil: [ ^ self ].
 	renderMutex critical: [ 
@@ -231,7 +236,7 @@ WDAbstractRenderingSceneStateOSWindow >> renderingProcessIteration [
 	self needsToRender ifTrue: [ 
 		| renderStartTime renderEndTime renderDeltaTime timeToSleep |
 		renderStartTime := Time monotonicMicrosecondClockValue.
-		"self isUsingRealVRSystem" false ifTrue: [
+		self isUsingRealVRSystem ifTrue: [
 			vrSystem beginFrameRenderingCycle
 		].
 
@@ -333,15 +338,15 @@ WDAbstractRenderingSceneStateOSWindow >> update [
 
 { #category : #rendering }
 WDAbstractRenderingSceneStateOSWindow >> updateAndRender [
-	renderMutex critical: [ 
-		vrSystem ifNotNil: [ vrSystem pollEvents ].
+	renderMutex critical: [
+		self pollVREventsAndUpdate.
 		self doUpdate.
 
 		self needsToRender ifTrue: [ 
 			self doRender
 		].
 	
-		vrSystem ifNotNil: [ vrSystem waitAndFetchPoses ]
+		self waitAndFetchPosesForVR
 	].
 ]
 
@@ -421,6 +426,11 @@ WDAbstractRenderingSceneStateOSWindow >> vrEnabled: anObject [
 { #category : #accessing }
 WDAbstractRenderingSceneStateOSWindow >> vrSystem [
 	^ vrSystem
+]
+
+{ #category : #rendering }
+WDAbstractRenderingSceneStateOSWindow >> waitAndFetchPosesForVR [
+	vrSystem ifNotNil: [ vrSystem waitAndFetchPoses ]
 ]
 
 { #category : #initialization }

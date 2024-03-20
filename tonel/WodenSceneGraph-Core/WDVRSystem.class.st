@@ -19,7 +19,11 @@ WDVRSystem >> beginFrameRenderingCycle [
 
 { #category : #testing }
 WDVRSystem >> endFrameCycleWaiting: timeToSleep [
-	"hasRenderedInThisFrame ifTrue: [
+	(self isInStandbyMode and: [timeToSleep > 0]) ifTrue: [
+		^ (Delay forMilliseconds: timeToSleep) wait
+	].
+
+	hasRenderedInThisFrame ifTrue: [
 		(vrFrameCount isNil or: [ vrFrameCount = 0 ]) ifTrue: [ 
 			vrFrameCount := 5.
 			self yield
@@ -30,10 +34,7 @@ WDVRSystem >> endFrameCycleWaiting: timeToSleep [
 		timeToSleep > 0 ifTrue: [
 			(Delay forMilliseconds: timeToSleep) wait
 		]
-	]."
-	timeToSleep > 0 ifTrue: [
-		(Delay forMilliseconds: timeToSleep) wait
-	]
+	].
 ]
 
 { #category : #head }
@@ -49,6 +50,11 @@ WDVRSystem >> initialize [
 
 { #category : #testing }
 WDVRSystem >> isDummyVRSystem [
+	^ false
+]
+
+{ #category : #testing }
+WDVRSystem >> isInStandbyMode [
 	^ false
 ]
 
@@ -81,6 +87,11 @@ WDVRSystem >> perEyeFrameBufferExtentForDisplayWithExtent: displayExtent [
 WDVRSystem >> pollEvents [
 ]
 
+{ #category : #initialization }
+WDVRSystem >> resetTrackedDeviceEventHandlers [
+	self trackedDevicesDo: [ :each | each resetEventHandler ]
+]
+
 { #category : #eyes }
 WDVRSystem >> rightEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRatio [
 	^ self subclassResponsibility
@@ -99,6 +110,11 @@ WDVRSystem >> rightEyeTransform [
 { #category : #'vr system' }
 WDVRSystem >> submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeTexture rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeTexture [
 	hasRenderedInThisFrame := true.
+]
+
+{ #category : #accessing }
+WDVRSystem >> trackedDevicesDo: aBlock [
+	^ #()
 ]
 
 { #category : #'vr system' }
