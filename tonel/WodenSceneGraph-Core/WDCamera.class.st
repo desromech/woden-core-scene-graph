@@ -17,7 +17,8 @@ Class {
 		'viewMode',
 		'bloomThreshold',
 		'bloomStrength',
-		'cascadeSplitDistributionLambda'
+		'cascadeSplitDistributionLambda',
+		'headFloorTransform'
 	],
 	#category : #'WodenSceneGraph-Core-Camera'
 }
@@ -189,6 +190,18 @@ WDCamera >> hasReverseDepth: anObject [
 	hasReverseDepth := anObject
 ]
 
+{ #category : #accessing }
+WDCamera >> headFloorTransform [
+
+	^ headFloorTransform
+]
+
+{ #category : #accessing }
+WDCamera >> headFloorTransform: anObject [
+
+	headFloorTransform := anObject
+]
+
 { #category : #initialization }
 WDCamera >> initialize [
 	super initialize.
@@ -203,6 +216,7 @@ WDCamera >> initialize [
 	bloomThreshold := 1.0.
 	bloomStrength := 0.1.
 	cascadeSplitDistributionLambda := 0.99.
+	headFloorTransform := ReversibleAffineTransform3D identity.
 	self toneMappingOperator: WDLinearToneMappingOperator.
 	self viewMode: WDFullShadedViewMode.
 ]

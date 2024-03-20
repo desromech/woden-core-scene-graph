@@ -46,6 +46,20 @@ WDSceneOSWindow >> doUpdate [
 	lastSceneUpdateTime := currentTime.
 ]
 
+{ #category : #accessing }
+WDSceneOSWindow >> headFloorTransform [
+	camera cameras isNotEmpty ifTrue: [
+		^ camera cameras first headFloorTransform
+	].
+
+	^ ReversibleAffineTransform3D identity
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneOSWindow >> headTransformIsIncorporatedInCamera [
+	^ false
+]
+
 { #category : #initialization }
 WDSceneOSWindow >> initialize [
 	super initialize.
@@ -60,8 +74,15 @@ WDSceneOSWindow >> leftEyeRenderingSceneState [
 	camera ifNil: [ ^ nil ].
 	displayExtent := self displayExtent.
 	aspectRatio := displayExtent x asFloat / displayExtent y.
-	^ (camera asCameraStateWithFrustumTangents: (vrSystem leftEyeFrustumTangentsWithFovY: camera asCameraFovY aspect: aspectRatio) eyeTransform: vrSystem leftEyeTransform)
+	^ (camera asCameraStateWithFrustumTangents: (vrSystem leftEyeFrustumTangentsWithFovY: camera asCameraFovY aspect: aspectRatio) eyeTransform: self leftEyeTransform)
 		ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
+]
+
+{ #category : #accessing }
+WDSceneOSWindow >> leftEyeTransform [
+	^ self headTransformIsIncorporatedInCamera
+		ifTrue: [ vrSystem leftEyeLocalTransform ]
+		ifFalse: [ self headFloorTransform transformTransform: vrSystem leftEyeTransform ]
 ]
 
 { #category : #accessing }
@@ -98,8 +119,15 @@ WDSceneOSWindow >> rightEyeRenderingSceneState [
 	camera ifNil: [ ^ nil ].
 	displayExtent := self displayExtent.
 	aspectRatio := displayExtent x asFloat / displayExtent y.
-	^ (camera asCameraStateWithFrustumTangents: (vrSystem rightEyeFrustumTangentsWithFovY: camera asCameraFovY aspect: aspectRatio) eyeTransform: vrSystem rightEyeTransform)
+	^ (camera asCameraStateWithFrustumTangents: (vrSystem rightEyeFrustumTangentsWithFovY: camera asCameraFovY aspect: aspectRatio) eyeTransform: self rightEyeTransform)
 		ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
+]
+
+{ #category : #accessing }
+WDSceneOSWindow >> rightEyeTransform [
+	^ self headTransformIsIncorporatedInCamera
+		ifTrue: [ vrSystem rightEyeLocalTransform ]
+		ifFalse: [ self headFloorTransform transformTransform: vrSystem rightEyeTransform ]
 ]
 
 { #category : #accessing }
