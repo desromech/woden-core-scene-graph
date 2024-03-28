@@ -435,6 +435,25 @@ WDMeshBuilder >> addQuadIndices: quadIndices [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addScreenQuad: halfExtent [
+	| minX minY maxX maxY |
+	minX := halfExtent x negated.
+	minY := halfExtent y negated.
+
+	maxX := halfExtent x.
+	maxY := halfExtent y.
+	
+	self
+		beginTriangles;
+		addPx: minX y: minY z: 0; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: maxX y: minY z: 0; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: maxX y: maxY z: 0; addNx: 0.0 y: 0.0 z: -1.0;
+		addPx: minX y: maxY z: 0; addNx: 0.0 y: 0.0 z: -1.0;
+		addTriangleI0: 1 i1: 0 i2: 2;
+		addTriangleI0: 3 i1: 2 i2: 0
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addT0: tc [
 	texcoords0 add: tc x; add: tc y
 ]
@@ -799,6 +818,28 @@ WDMeshBuilder >> generateTangentSpaceFrame [
 		
 		tangents4
 			add: t x; add: t y; add: t z; add: s
+	].
+
+]
+
+{ #category : #'texture coordinate generation' }
+WDMeshBuilder >> generateTexcoords0ForScreenProjection [
+	| sourceIndex |
+	self assert: self hasValidPositions.
+	self assert: self hasValidNormals.
+	texcoords0 := OrderedCollection new: vertexCount * 2.
+	sourceIndex := 1.
+	1 to: vertexCount do: [ :i |
+		| x y |
+		"Fetch the position and normal"
+		x := positions at: sourceIndex.
+		y := positions at: sourceIndex + 1.
+		
+		texcoords0
+			add: (x < 0 ifTrue: 0 ifFalse: 1);
+			add: (y >= 0 ifTrue: 0 ifFalse: 1).
+	
+		sourceIndex := sourceIndex + 3.
 	].
 
 ]
