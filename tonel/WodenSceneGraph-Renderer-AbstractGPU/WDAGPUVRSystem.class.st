@@ -70,7 +70,7 @@ WDAGPUVRSystem class >> initialize [
 	}.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'tracked device' }
 WDAGPUVRSystem >> checkTrackedDevice: oldDevice forPose: trackedDevicePose [
 	| requiredClass |
 	requiredClass := DeviceClassIDToClassMap at: trackedDevicePose device_class ifAbsent: [ WDVRTrackedDeviceInvalid ].
@@ -97,7 +97,7 @@ WDAGPUVRSystem >> convertFrustumTangents: tangents [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'render model' }
 WDAGPUVRSystem >> convertRenderModel: agpuRenderModel [
 	| modelHandle |
 	(agpuRenderModel isNil or: [agpuRenderModel isNull]) ifTrue: [ ^ nil ].
@@ -197,7 +197,7 @@ WDAGPUVRSystem >> convertRenderModel: agpuRenderModel [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'render model' }
 WDAGPUVRSystem >> convertRenderModelMaterial: agpuRenderModelTexture [
 	^ WDMetallicRoughnessMaterial new
 		roughnessFactor: 0.7;
@@ -206,7 +206,7 @@ WDAGPUVRSystem >> convertRenderModelMaterial: agpuRenderModelTexture [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'render model' }
 WDAGPUVRSystem >> convertRenderModelTexture: agpuRenderModelTexture [
 	| textureHandle |
 	(agpuRenderModelTexture isNil or: [agpuRenderModelTexture isNull]) ifTrue: [ ^ nil ].
@@ -238,7 +238,7 @@ WDAGPUVRSystem >> convertRenderModelTexture: agpuRenderModelTexture [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'tracked device' }
 WDAGPUVRSystem >> convertTrackedDevicePose: originalPose [
 	^ WDVRTrackedDevicePose new
 		deviceToAbsoluteTransform: originalPose device_to_absolute_tracking asReversibleAffineTransform3D;
@@ -326,12 +326,12 @@ WDAGPUVRSystem >> newTrackedDeviceFor: trackedDevicePose [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #events }
 WDAGPUVRSystem >> onEnterStandbyMode [
 	isInStandbyMode := true.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #events }
 WDAGPUVRSystem >> onLeaveStandbyMode [
 	isInStandbyMode := false.
 ]

@@ -113,7 +113,7 @@ WDSceneExamplesProceduralAssets >> poolWaterMaterial [
 		form.
 
 	^ poolWaterMaterial := WDDuplicatedMetallicRoughnessLiquidMaterial new
-		alphaMode: #BLEND;
+		withAlphaBlending;
 		doubleSided: true;
 		roughnessFactor: 0.02;
 		metallicFactor: 0.0;

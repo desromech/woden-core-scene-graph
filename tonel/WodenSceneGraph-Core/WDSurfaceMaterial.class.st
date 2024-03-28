@@ -140,6 +140,16 @@ WDSurfaceMaterial >> renderPriority [
 		ifFalse: [ WDRenderPriority default ]
 ]
 
+{ #category : #'as yet unclassified' }
+WDSurfaceMaterial >> withAlphaBlending [
+	self alphaMode: #BLEND
+]
+
+{ #category : #'as yet unclassified' }
+WDSurfaceMaterial >> withAlphaMasking [
+	self alphaMode: #MASK
+]
+
 { #category : #testing }
 WDSurfaceMaterial >> writesDepth [
 	^ background not and: [alphaMode ~~ #BLEND and: [xray not]]

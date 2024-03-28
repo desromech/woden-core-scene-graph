@@ -90,7 +90,7 @@ WDSceneExamples class >> exampleAnimatedShadowCastingDirectionalLight [
 				normalTexture: self checkboardNormalTexture;
 				roughnessFactor: 0.1;
 				metallicFactor: 0.0;
-				alphaMode: #BLEND;
+				withAlphaBlending;
 				yourself);
 
 			translateToX: 2.0 y: 0.25 z: 1.0;
@@ -228,7 +228,7 @@ WDSceneExamples class >> exampleAnimatedShadowCastingPointLight [
 				normalTexture: self checkboardNormalTexture;
 				roughnessFactor: 0.1;
 				metallicFactor: 0.0;
-				alphaMode: #BLEND;
+				withAlphaBlending;
 				yourself);
 
 			translateToX: 2.0 y: 0.25 z: 1.0;
@@ -318,7 +318,7 @@ WDSceneExamples class >> exampleAnimatedShadowCastingSpotLight2 [
 				normalTexture: WDSceneExamples checkboardNormalTexture;
 				roughnessFactor: 0.1;
 				metallicFactor: 0.0;
-				alphaMode: #BLEND;
+				withAlphaBlending;
 				yourself);
 
 			translateToX: 2.0 y: 0.25 z: 1.0;
@@ -778,7 +778,7 @@ WDSceneExamples class >> exampleShadowCastingDirectionalLight [
 				normalTexture: self checkboardNormalTexture;
 				roughnessFactor: 0.1;
 				metallicFactor: 0.0;
-				alphaMode: #BLEND;
+				withAlphaBlending;
 				yourself);
 
 			translateToX: 2.0 y: 0.25 z: 1.0;
@@ -900,7 +900,7 @@ WDSceneExamples class >> exampleShadowCastingPointLight [
 				normalTexture: self checkboardNormalTexture;
 				roughnessFactor: 0.1;
 				metallicFactor: 0.0;
-				alphaMode: #BLEND;
+				withAlphaBlending;
 				yourself);
 
 			translateToX: 2.0 y: 0.25 z: 1.0;
@@ -977,7 +977,7 @@ WDSceneExamples class >> exampleShadowCastingSpotLight [
 				normalTexture: self checkboardNormalTexture;
 				roughnessFactor: 0.1;
 				metallicFactor: 0.0;
-				alphaMode: #BLEND;
+				withAlphaBlending;
 				yourself);
 
 			translateToX: 2.0 y: 0.25 z: 1.0;
@@ -1056,7 +1056,7 @@ WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 				normalTexture: self checkboardNormalTexture;
 				roughnessFactor: 0.1;
 				metallicFactor: 0.0;
-				alphaMode: #BLEND;
+				withAlphaBlending;
 				yourself);
 
 			translateToX: 2.0 y: 0.25 z: 1.0;
