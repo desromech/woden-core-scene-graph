@@ -326,7 +326,9 @@ WDTexture >> setupForColorFileReference: aFileReference [
 WDTexture >> setupForColorForm: aForm [
 	self
 		dataKind: WDTextureDataKindColor;
-		format: WDTextureFormatB8G8R8A8UNormSRGB;
+		format: (aForm depth < 0
+			ifTrue: [WDTextureFormatR8G8B8A8UNormSRGB]
+			ifFalse: [WDTextureFormatB8G8R8A8UNormSRGB]);
 		setupForFormCommon: aForm
 ]
 

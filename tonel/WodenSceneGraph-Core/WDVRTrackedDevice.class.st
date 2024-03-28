@@ -6,7 +6,8 @@ Class {
 		'currentPose',
 		'currentRenderPose',
 		'role',
-		'eventHandler'
+		'eventHandler',
+		'renderModel'
 	],
 	#category : #'WodenSceneGraph-Core-VR'
 }
@@ -101,6 +102,18 @@ WDVRTrackedDevice >> isTrackingReference [
 { #category : #'as yet unclassified' }
 WDVRTrackedDevice >> processAndDispatchEvent: vrEvent [
 	eventHandler ifNotNil: [eventHandler handleVREvent: vrEvent]
+]
+
+{ #category : #accessing }
+WDVRTrackedDevice >> renderModel [
+
+	^ renderModel
+]
+
+{ #category : #accessing }
+WDVRTrackedDevice >> renderModel: anObject [
+
+	renderModel := anObject
 ]
 
 { #category : #initialization }

@@ -118,6 +118,7 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 	TextureFormatMap := Dictionary newFromPairs: {
 		WDTextureFormatUnknown uniqueInstance . AGPU_TEXTURE_FORMAT_UNKNOWN.
 		WDTextureFormatR8G8B8A8UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM.
+		WDTextureFormatR8G8B8A8UNormSRGB uniqueInstance . AGPU_TEXTURE_FORMAT_R8G8B8A8_UNORM_SRGB.
 		WDTextureFormatB8G8R8A8UNorm uniqueInstance . AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM.
 		WDTextureFormatB8G8R8A8UNormSRGB uniqueInstance . AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB.
 		WDTextureFormatR16G16B16A16Float uniqueInstance . AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT.

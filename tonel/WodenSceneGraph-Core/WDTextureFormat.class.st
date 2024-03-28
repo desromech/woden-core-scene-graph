@@ -63,6 +63,11 @@ WDTextureFormat >> isR8G8B8A8UNorm [
 ]
 
 { #category : #testing }
+WDTextureFormat >> isR8G8B8A8UNormSRGB [
+	^ false
+]
+
+{ #category : #testing }
 WDTextureFormat >> isR8UNorm [
 	^ false
 ]

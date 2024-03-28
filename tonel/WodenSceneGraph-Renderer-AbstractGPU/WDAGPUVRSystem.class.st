@@ -14,7 +14,9 @@ Class {
 		'leftEyeLocalTransform',
 		'trackedDevices',
 		'hmdTrackedDevice',
-		'isInStandbyMode'
+		'isInStandbyMode',
+		'convertedRenderModelDictionary',
+		'convertedRenderModelTextureDictionary'
 	],
 	#classVars : [
 		'DeviceClassIDToClassMap',
@@ -96,6 +98,147 @@ WDAGPUVRSystem >> convertFrustumTangents: tangents [
 ]
 
 { #category : #'as yet unclassified' }
+WDAGPUVRSystem >> convertRenderModel: agpuRenderModel [
+	| modelHandle |
+	(agpuRenderModel isNil or: [agpuRenderModel isNull]) ifTrue: [ ^ nil ].
+	
+	modelHandle := agpuRenderModel getHandle asInteger.
+	^ convertedRenderModelDictionary at: modelHandle ifAbsentPut: [ 
+		| material vertexCount vertexBufferView vertexBufferSize vertexBufferData positionsAccessors boundingBox vertexBinding indexCount indexBufferView indexBufferSize indexBufferData |
+		material := self convertRenderModelMaterial: agpuRenderModel texture.
+		
+		vertexCount := agpuRenderModel vertex_count.
+		vertexBufferSize := AGPUVrRenderModelVertex structureSize * vertexCount.
+		vertexBufferData := ByteArray new: vertexBufferSize.
+		(AGPUMemoryCopier forExternalAddress: agpuRenderModel vertices getHandle)
+			copyBytes: vertexBufferSize at: 1 into: vertexBufferData at: 1.
+		
+		vertexBufferView := WDBinaryBufferView new
+			buffer: (WDBinaryBuffer new
+				data: vertexBufferData;
+				yourself);
+			byteLength: vertexBufferSize;
+			byteStride: AGPUVrRenderModelVertex structureSize;
+			yourself.
+			
+		positionsAccessors := WDBinaryBufferAccessor new
+			bufferView: vertexBufferView;
+			count: vertexCount;
+			componentType: WDBinaryBufferAccessorFloat32ComponentType;
+			type: WDBinaryBufferAccessorVector3Type;
+			yourself.
+		boundingBox := AABox empty.
+		positionsAccessors decodeContentAsArray do: [ :eachPosition |
+			boundingBox insertPoint: eachPosition
+		].
+		positionsAccessors min: boundingBox min; max: boundingBox max.
+		
+		vertexBinding := WDVertexBufferBinding new
+			attributes: {
+				WDVertexBufferAttribute new
+					location: WDVertexBufferAttribute positionLocation;
+					accessor: positionsAccessors;
+					yourself.
+				WDVertexBufferAttribute new
+					location: WDVertexBufferAttribute normalLocation;
+					accessor: (WDBinaryBufferAccessor new
+						bufferView: vertexBufferView;
+						byteOffset: 12;
+						count: vertexCount;
+						componentType: WDBinaryBufferAccessorFloat32ComponentType;
+						type: WDBinaryBufferAccessorVector3Type;
+						yourself);
+					yourself.
+				WDVertexBufferAttribute new
+					location: WDVertexBufferAttribute texcoord0Location;
+					accessor: (WDBinaryBufferAccessor new
+						bufferView: vertexBufferView;
+						byteOffset: 24;
+						count: vertexCount;
+						componentType: WDBinaryBufferAccessorFloat32ComponentType;
+						type: WDBinaryBufferAccessorVector2Type;
+						yourself);
+					yourself.
+			};
+			vertexCount: vertexCount;
+			yourself.
+
+		indexCount := agpuRenderModel triangle_count * 3.
+		indexBufferSize := indexCount * 2.
+		indexBufferData := ByteArray new: indexBufferSize.
+		(AGPUMemoryCopier forExternalAddress: agpuRenderModel indices getHandle)
+			copyBytes: indexBufferSize at: 1 into: indexBufferData at: 1.
+
+		indexBufferView := WDBinaryBufferView new
+			buffer: (WDBinaryBuffer new
+				data: indexBufferData;
+				yourself);
+			byteLength: indexBufferSize;
+			byteStride: 2;
+			yourself.
+			
+		WDStaticMeshRenderable new
+			boundingBox: boundingBox;
+			primitives: {
+				WDMeshPrimitive new
+					material: material;
+					boundingBox: boundingBox;
+					vertexBinding: vertexBinding;
+					indices: (WDBinaryBufferAccessor new
+						bufferView: indexBufferView;
+						count: indexCount;
+						componentType: WDBinaryBufferAccessorUInt16ComponentType;
+						type: WDBinaryBufferAccessorScalarType;
+						yourself);
+					topology: WDPrimitiveTopologyTriangles;
+					yourself
+			};
+			yourself
+	]
+]
+
+{ #category : #'as yet unclassified' }
+WDAGPUVRSystem >> convertRenderModelMaterial: agpuRenderModelTexture [
+	^ WDMetallicRoughnessMaterial new
+		roughnessFactor: 0.7;
+		metallicFactor: 0.0;
+		baseColorTexture: (self convertRenderModelTexture: agpuRenderModelTexture);
+		yourself
+]
+
+{ #category : #'as yet unclassified' }
+WDAGPUVRSystem >> convertRenderModelTexture: agpuRenderModelTexture [
+	| textureHandle |
+	(agpuRenderModelTexture isNil or: [agpuRenderModelTexture isNull]) ifTrue: [ ^ nil ].
+	
+	textureHandle := agpuRenderModelTexture getHandle asInteger.
+	^ convertedRenderModelTextureDictionary at: textureHandle ifAbsentPut: [
+		| width height sourcePitch sourceRow destRow destPitch form formBits copier rowSize |
+		width := agpuRenderModelTexture width.
+		height := agpuRenderModelTexture height.
+		sourcePitch := agpuRenderModelTexture pitch.
+		rowSize := width*4.
+		sourceRow := 1.
+
+		"destRow := 1 + ((height - 1) * rowSize).
+		destPitch := rowSize negated."
+		destRow := 1.
+		destPitch := rowSize.
+		form := Form extent: width@height depth: -32.
+		formBits := form bits.
+		copier := AGPUMemoryCopier forExternalAddress: agpuRenderModelTexture data getHandle.
+		1 to: height do: [ :y |
+			copier copyBytes: rowSize at: sourceRow into: formBits at: destRow.
+			
+			sourceRow := sourceRow + sourcePitch.
+			destRow := destRow + destPitch.
+		].
+		
+		^ WDTexture forColorForm: form
+	]
+]
+
+{ #category : #'as yet unclassified' }
 WDAGPUVRSystem >> convertTrackedDevicePose: originalPose [
 	^ WDVRTrackedDevicePose new
 		deviceToAbsoluteTransform: originalPose device_to_absolute_tracking asReversibleAffineTransform3D;
@@ -120,6 +263,8 @@ WDAGPUVRSystem >> headTransform [
 WDAGPUVRSystem >> initialize [
 	super initialize.
 	trackedDevices := #().
+	convertedRenderModelDictionary := Dictionary new.
+	convertedRenderModelTextureDictionary := Dictionary new.
 	isInStandbyMode := false.
 	
 ]
@@ -278,6 +423,9 @@ WDAGPUVRSystem >> waitAndFetchPoses [
 				self checkTrackedDevice: oldTrackedDevice forPose: trackedDevicePose
 			].
 			trackedDevices at: i put: trackedDevice.
+			trackedDevice renderModel ifNil: [ 
+				trackedDevice renderModel: (self convertRenderModel: (handle getTrackedDeviceRenderModel: i - 1))
+			].
 			trackedDevice
 				role: (DeviceRoleMap at: trackedDevicePose device_role ifAbsent: [WDVRTrackedDeviceRoleInvalid asVRTrackedDeviceRole]);
 				currentPose: (self convertTrackedDevicePose: trackedDevicePose);
