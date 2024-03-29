@@ -711,6 +711,12 @@ void main()
 	lightingParameters.worldP = StageInput.worldPosition;
 	lightingParameters.worldSurfaceN = normalize(StageInput.worldNormal);
 
+	if(!gl_FrontFacing)
+	{
+		lightingParameters.N = -lightingParameters.N;
+		lightingParameters.worldSurfaceN = -lightingParameters.worldSurfaceN;
+	}
+
 	lightingParameters.occlusionFactor = MaterialState.occlusionFactor *
 		mix(texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r,
 			texture(sampler2D(OcclusionTexture, TextureSampler), texcoord1).r,
@@ -1789,6 +1795,12 @@ void main()
 	lightingParameters.V = normalize(-StageInput.viewPosition);
 	lightingParameters.worldP = StageInput.worldPosition;
 	lightingParameters.worldSurfaceN = normalize(StageInput.worldNormal);
+
+	if(!gl_FrontFacing)
+	{
+		lightingParameters.N = -lightingParameters.N;
+		lightingParameters.worldSurfaceN = -lightingParameters.worldSurfaceN;
+	}
 
 	lightingParameters.occlusionFactor = MaterialState.occlusionFactor * texture(sampler2D(OcclusionTexture, TextureSampler), texcoord0).r;
 	vec2 roughnessMetallicFactor = vec2(MaterialState.roughnessFactor, MaterialState.metallicFactor) * texture(sampler2D(MetallicRoughnessTexture, TextureSampler), texcoord0).gb;
