@@ -2401,9 +2401,11 @@ layout(set=5, binding=3) uniform texture2D SpecularGBuffer;
 layout(set=5, binding=4) uniform texture2D GlossColorBuffer;
 layout(set=5, binding=5) uniform texture2D RoughColorBuffer;
 
-const uint SampleCount = 20u;
-const float StepDistance = 0.5;
-const float HitDepthThreshold = 0.001;
+const uint MinSampleCount = 1u;
+const uint MaxSampleCount = 128u;
+const float SampleTexelSize = 1.0;
+const float PivotDistance = 0.5;
+const float MaxDistance = 1.0;
 
 void main()
 {
@@ -2427,40 +2429,73 @@ void main()
 	
 	vec4 clipSpacePosition = CameraState.inverseProjectionMatrix*ndcPosition;
 	vec3 viewPosition = clipSpacePosition.xyz / clipSpacePosition.w;
-	vec3 V = normalize(-viewPosition);
-	vec3 R = reflect(-V, N);
+	vec3 Vi = normalize(viewPosition);
+	vec3 R = normalize(reflect(Vi, N));
 	
-	vec3 rayMarchDelta = R*StepDistance;
-	vec3 rayMarchPoint = viewPosition + rayMarchDelta;
-	vec2 reflectionScreenPoint = vec2(0.0);
+	vec3 viewRayMarchStartPoint = viewPosition + N * 0.01;
+	vec3 viewRayMarchEndPoint = viewRayMarchStartPoint + R * PivotDistance*1.2;
+
+	vec4 screenRayStartPoint = CameraState.projectionMatrix * vec4(viewRayMarchStartPoint, 1.0);
+	vec4 screenRayEndPoint = CameraState.projectionMatrix * vec4(viewRayMarchEndPoint, 1.0);
+
+	vec4 screenRayStartPointTexcoord = vec4(screenRayStartPoint.xyz, 1.0) / screenRayStartPoint.w;
+	vec4 screenRayEndPointTexcoord = vec4(screenRayEndPoint.xyz, 1.0) / screenRayEndPoint.w;
+	if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
+	{
+		screenRayStartPointTexcoord.y = -screenRayStartPointTexcoord.y;
+		screenRayEndPointTexcoord.y = -screenRayEndPointTexcoord.y;
+	}
+		
+	screenRayStartPointTexcoord.xy = screenRayStartPointTexcoord.xy * 0.5 + 0.5;
+	screenRayEndPointTexcoord.xy = screenRayEndPointTexcoord.xy * 0.5 + 0.5;
+
+	vec4 screenRayTexcoordDelta = screenRayEndPointTexcoord - screenRayStartPointTexcoord;
+
+	vec2 screenTextureSize = vec2(textureSize(sampler2D(DepthBuffer, ScreenTextureSampler), 0));
+	vec2 screenRayStartPointTexel = screenRayStartPointTexcoord.xy * screenTextureSize;
+	vec2 screenRayEndPointTexel = screenRayEndPointTexcoord.xy * screenTextureSize;
+	vec2 screenRayDeltaTexel = screenRayTexcoordDelta.xy * screenTextureSize;
+	float screenRayDeltaTexelLength = length(screenRayDeltaTexel);
+
+	float rayMarchLambdaIncrement = 1.0 / (screenRayDeltaTexelLength * SampleTexelSize);
+
+	vec3 viewRayMarchPosition = viewRayMarchStartPoint;
+	vec4 screenRayMarchTexcoord = screenRayStartPointTexcoord;
+	
 	bool hasHit = false;
 	float hitAlpha = 0.0;
+	float lambda = 0.0;
+	float maxLambda = MaxDistance / PivotDistance;
 	
-	for(uint i = 0u; i < SampleCount; ++i, rayMarchPoint += rayMarchDelta)
+	for(uint i = 0u; i < MaxSampleCount && lambda < maxLambda; ++i, lambda += rayMarchLambdaIncrement)
 	{
-		vec4 rayMarchProjectedPoint = CameraState.projectionMatrix * vec4(rayMarchPoint, 1.0);
-		if(rayMarchProjectedPoint.w == 0.0)
+		screenRayMarchTexcoord = mix(screenRayStartPointTexcoord, screenRayEndPointTexcoord, lambda);
+
+		if(screenRayMarchTexcoord.x < 0.0 || screenRayMarchTexcoord.x > 1.0 ||
+			screenRayMarchTexcoord.y < 0.0 || screenRayMarchTexcoord.y > 1.0 ||
+			screenRayMarchTexcoord.z < 0.0)
 			break;
-		
-		vec3 rayMarchNDCPoint = rayMarchProjectedPoint.xyz / rayMarchProjectedPoint.w;
+
+		float rayMarchDepth = screenRayMarchTexcoord.z;
+		float sampleDepth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), screenRayMarchTexcoord.xy, 0.0).r;
+
+		vec4 sampleDepthNDC = vec4(screenRayMarchTexcoord.xy*2.0 - 1.0, sampleDepth, 1.0);
 		if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
-			rayMarchNDCPoint.y = -rayMarchNDCPoint.y;
+			sampleDepthNDC.y = -sampleDepthNDC.y;
+		vec4 sampleDepthView = CameraState.inverseProjectionMatrix * sampleDepthNDC;
+		sampleDepthView /= sampleDepthView.w;
+
+		vec2 linearBarycentric = vec2(1.0 - lambda, lambda);
+		vec2 perspectiveBarycentric = linearBarycentric / screenRayMarchTexcoord.w;
+		perspectiveBarycentric /= perspectiveBarycentric.x + perspectiveBarycentric.y;
+
+		viewRayMarchPosition = viewRayMarchStartPoint*perspectiveBarycentric.x + perspectiveBarycentric.y*viewRayMarchEndPoint;
 		
-		reflectionScreenPoint = rayMarchNDCPoint.xy*0.5 + 0.5;
-		if(reflectionScreenPoint.x < 0.0 || reflectionScreenPoint.x > 1.0 ||
-			reflectionScreenPoint.y < 0.0 || reflectionScreenPoint.y > 1.0 ||
-			rayMarchNDCPoint.z < 0.0)
-			break;
-		
-		float rayMarchDepth = rayMarchNDCPoint.z;
-		float sampleDepth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), reflectionScreenPoint, 0.0).r;
-		
-		float depthDelta = rayMarchDepth - sampleDepth;
-		hasHit = CameraState.hasReverseDepth ? depthDelta <= HitDepthThreshold : depthDelta >= HitDepthThreshold;
-		//hasHit = CameraState.hasReverseDepth ? depthDelta >= HitDepthThreshold : depthDelta <= HitDepthThreshold;
+		float depthDelta = sampleDepthView.z - viewRayMarchPosition.z;
+		hasHit = 0 <= depthDelta && depthDelta <= PivotDistance;
 		if(hasHit)
 		{
-			hitAlpha = 1.0 - float(i)/float(SampleCount);
+			hitAlpha = 1.0 - max(lambda / maxLambda, float(i) / float(MaxSampleCount));
 			break;
 		}
 	}
@@ -2468,11 +2503,14 @@ void main()
 	if(hasHit)
 	{
 		vec3 reflectionColor = mix(
-			textureLod(sampler2D(GlossColorBuffer, ScreenTextureSampler), reflectionScreenPoint, 0.0).rgb,
-			textureLod(sampler2D(RoughColorBuffer, ScreenTextureSampler), reflectionScreenPoint, 0.0).rgb,
+			textureLod(sampler2D(GlossColorBuffer, ScreenTextureSampler), screenRayMarchTexcoord.xy, 0.0).rgb,
+			textureLod(sampler2D(RoughColorBuffer, ScreenTextureSampler), screenRayMarchTexcoord.xy, 0.0).rgb,
 			specularColor.a)*specularColor.rgb;
 
 		FragmentOutputScreenSpaceReflection = vec4(reflectionColor, hitAlpha);
+		//FragmentOutputScreenSpaceReflection = vec4(screenRayMarchTexcoord.xy, 1.0, hitAlpha);
+		//FragmentOutputScreenSpaceReflection = vec4(textureLod(sampler2D(GlossColorBuffer, ScreenTextureSampler), screenRayMarchTexcoord.xy, 0.0).rgb, 1.0);
+		//FragmentOutputScreenSpaceReflection = vec4(textureLod(sampler2D(GlossColorBuffer, ScreenTextureSampler), screenRayMarchTexcoord.xy, 0.0).rgb, hitAlpha);
 	}
 	else
 	{ 
