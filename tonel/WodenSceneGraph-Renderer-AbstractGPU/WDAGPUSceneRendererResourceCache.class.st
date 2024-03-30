@@ -2405,7 +2405,7 @@ const uint MinSampleCount = 1u;
 const uint MaxSampleCount = 128u;
 const float SampleTexelSize = 1.0;
 const float PivotDistance = 0.5;
-const float MaxDistance = 1.0;
+const float MaxDistance = 3.0;
 
 void main()
 {
