@@ -6,8 +6,8 @@ Class {
 	#superclass : #BlBackground,
 	#instVars : [
 		'renderingSceneStateModel',
-		'formFrameBuffer',
-		'formColorBuffer'
+		'frameBuffer',
+		'colorBuffer'
 	],
 	#category : #'WodenSceneGraph-Bloc'
 }
@@ -23,30 +23,24 @@ WDBlWodenColorBufferImageBackground >> = anotherObject [
 
 { #category : #rendering }
 WDBlWodenColorBufferImageBackground >> aeApplyTo: aeCanvas [
-	self ensureRenderedFormIsUpdated.
-	aeCanvas setBackgroundWithForm: (formColorBuffer ifNotNil: [formColorBuffer data]) alpha: self opacity
+	self ensureRenderedSurfaceIsUpdated.
+	colorBuffer data ifNotNil: [ 
+		aeCanvas setBackgroundWithSurface: colorBuffer data alpha: self opacity
+	]
 ]
 
 { #category : #updating }
-WDBlWodenColorBufferImageBackground >> ensureRenderedFormIsUpdated [
-	formFrameBuffer ifNil: [ ^ self ].
+WDBlWodenColorBufferImageBackground >> ensureRenderedSurfaceIsUpdated [
+	frameBuffer ifNil: [ ^ self ].
 	
-	renderingSceneStateModel renderingSceneState ifNotNil: [ :renderingSceneState |
-		WDSceneRenderer current renderSceneState: renderingSceneState intoFramebuffer: formFrameBuffer.
+	(colorBuffer data isNil or: [colorBuffer data isNull]) ifTrue: [ 
+		colorBuffer data: (AeCairoImageSurface extent: colorBuffer width @ colorBuffer height format: AeCairoSurfaceFormat argb32)
 	].
 	
-]
-
-{ #category : #rendering }
-WDBlWodenColorBufferImageBackground >> formImage [
-	self ensureRenderedFormIsUpdated.
-	^ formColorBuffer ifNotNil: [ formColorBuffer data ]
-]
-
-{ #category : #accessing }
-WDBlWodenColorBufferImageBackground >> image [
-	self ensureRenderedFormIsUpdated.
-	^ super image
+	renderingSceneStateModel renderingSceneState ifNotNil: [ :renderingSceneState |
+		WDSceneRenderer current renderSceneState: renderingSceneState intoFramebuffer: frameBuffer.
+	].
+	
 ]
 
 { #category : #testing }
@@ -58,9 +52,20 @@ WDBlWodenColorBufferImageBackground >> isTransparent [
 WDBlWodenColorBufferImageBackground >> matchExtent: anExtent [
 	| minimalExtent |
 	minimalExtent := anExtent ceiling max: 1@1.
-	(formFrameBuffer isNil or: [ formFrameBuffer extent ~= minimalExtent ]) ifTrue: [
-		formColorBuffer := WDTexture forReadedColorBufferWithExtent: minimalExtent.
-		formFrameBuffer := WDFramebuffer forColorAttachment: formColorBuffer.
+	(frameBuffer isNil or: [ frameBuffer extent ~= minimalExtent ]) ifTrue: [
+		colorBuffer := WDTexture new
+			type: WDTextureType2D;
+			dataKind: WDTextureDataKindColor;
+			format: WDTextureFormatB8G8R8A8UNormSRGB;
+			usageMode: WDTextureUsageModeReadedColorAttachment;
+			width: minimalExtent x asInteger;
+			height: minimalExtent y asInteger;
+			depth: 1;
+			layers: 1;
+			miplevels: 1;
+			sampleCount: 1;
+			yourself.
+		frameBuffer := WDFramebuffer forColorAttachment: colorBuffer.
 	].
 ]
 

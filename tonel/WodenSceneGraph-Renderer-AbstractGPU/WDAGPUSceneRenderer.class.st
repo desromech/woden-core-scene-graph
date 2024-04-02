@@ -142,15 +142,7 @@ WDAGPUSceneRenderer >> readbackFramebufferAttachmentsOf: framebuffer [
 
 { #category : #rendering }
 WDAGPUSceneRenderer >> readbackTextureData: texture [
-	| form handle pitch |
-	form := texture data.
-	form isForm ifFalse: [ ^ self ].
-	self assert: form depth = 32.
-	
-	handle := resourceCache validTextureHandleFor: texture.
-	pitch := form width * 4.
-	texture data unhibernate.
-	handle readTextureData: 0 arrayIndex: 0 pitch: pitch slicePitch: pitch * form height buffer: texture data bits.
+	texture data ifNotNil: [ :data | data readbackDataFromAgpuTexture: (resourceCache validTextureHandleFor: texture) ]
 ]
 
 { #category : #rendering }
