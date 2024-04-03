@@ -16,17 +16,17 @@ WDBlInteractiveSceneElement >> computeCameraOrientation [
 ]
 
 { #category : #'camera events' }
-WDBlInteractiveSceneElement >> dragCameraDelta: delta withEvent: dragEvent [
+WDBlInteractiveSceneElement >> dragCameraWithEvent: dragEvent [
 	camera ifNil: [ ^ self ].
 	
 	dragEvent button == BlMouseButton primary ifTrue: [
-		cameraAngles := cameraAngles + (Vector3 x: delta y negated degreesToRadians y: delta x negated degreesToRadians z: 0.0).
+		cameraAngles := cameraAngles + (Vector3 x: dragEvent delta y negated degreesToRadians y: dragEvent delta x negated degreesToRadians z: 0.0).
 		camera orientation: self computeCameraOrientation.
 		self invalidate.
 	].
 
 	dragEvent button == BlMouseButton secondary ifTrue: [
-		camera translateBy: (camera orientation transformVector3: (Vector3 x: delta x y: delta y negated z: 0.0) * 0.01).
+		camera translateBy: (camera orientation transformVector3: (Vector3 x: dragEvent delta x y: dragEvent delta y negated z: 0.0) * 0.01).
 		self invalidate.
 	].
 ]

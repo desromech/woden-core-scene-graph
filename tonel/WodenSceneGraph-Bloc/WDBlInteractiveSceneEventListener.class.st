@@ -5,25 +5,19 @@ Class {
 	#name : #WDBlInteractiveSceneEventListener,
 	#superclass : #BlEventListener,
 	#instVars : [
-		'startPosition',
-		'sceneElement',
-		'delta',
-		'currentPosition'
+		'sceneElement'
 	],
 	#category : #'WodenSceneGraph-Bloc'
 }
 
 { #category : #'dnd handlers' }
 WDBlInteractiveSceneEventListener >> dragEvent: anEvent [
-	delta := anEvent position - currentPosition.
-	currentPosition := anEvent position.
-	sceneElement dragCameraDelta: delta withEvent: anEvent
+	sceneElement dragCameraWithEvent: anEvent
 ]
 
 { #category : #'dnd handlers' }
 WDBlInteractiveSceneEventListener >> dragStartEvent: anEvent [
 	anEvent consumed: true.
-	currentPosition := anEvent position.
 ]
 
 { #category : #'mouse handlers' }
