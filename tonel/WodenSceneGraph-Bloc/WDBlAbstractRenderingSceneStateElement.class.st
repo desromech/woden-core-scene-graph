@@ -1,3 +1,6 @@
+"
+I am a Bloc element for displaying a specific Woden rendering scene state.
+"
 Class {
 	#name : #WDBlAbstractRenderingSceneStateElement,
 	#superclass : #BlElement,

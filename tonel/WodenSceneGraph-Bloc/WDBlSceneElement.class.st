@@ -1,3 +1,6 @@
+"
+I am a Bloc element that can display a Woden scene from the point of view of a specific camera.
+"
 Class {
 	#name : #WDBlSceneElement,
 	#superclass : #WDBlAbstractRenderingSceneStateElement,

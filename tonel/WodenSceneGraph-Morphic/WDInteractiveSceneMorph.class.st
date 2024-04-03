@@ -11,7 +11,7 @@ Class {
 	#category : #'WodenSceneGraph-Morphic'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 WDInteractiveSceneMorph >> computeCameraOrientation [
 	^ (Quaternion yRotation: cameraAngles y) * (Quaternion xRotation: cameraAngles x)
 ]
