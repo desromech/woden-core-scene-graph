@@ -7,7 +7,8 @@ Class {
 	#traits : 'TBlHostSpace + TBlSpaceProperties',
 	#classTraits : 'TBlHostSpace classTrait + TBlSpaceProperties classTrait',
 	#instVars : [
-		'texture'
+		'texture',
+		'eventFetcher'
 	],
 	#category : #'WodenSceneGraph-Bloc'
 }
@@ -33,6 +34,36 @@ WDBlTextureHostSpace >> densityDpi [
 	"Return the screen density expressed as dots-per-inch (a float)"
 	
 	^ 96.0
+]
+
+{ #category : #initialization }
+WDBlTextureHostSpace >> enqueueEvent: aBlEvent [
+	"I put events in a queue to be processed later"
+
+	self eventFetcher enqueueEvent: aBlEvent
+]
+
+{ #category : #initialization }
+WDBlTextureHostSpace >> eventFetcher [
+	"Return event fetcher used to enqueue events that should be
+	processed in the beginning of every frame"
+	<return: #BlHostEventFetcher>
+
+	^ eventFetcher
+]
+
+{ #category : #initialization }
+WDBlTextureHostSpace >> fetchedEventsDo: aBlock [
+	"Flush event queue and evaluate a given block with every queued event as argument"
+	
+	self eventFetcher fetchedEventsDo: aBlock
+]
+
+{ #category : #initialization }
+WDBlTextureHostSpace >> initialize [
+	super initialize.
+	
+	eventFetcher := BlHostEventFetcher hostSpace: self.
 ]
 
 { #category : #'host space - geometry' }
