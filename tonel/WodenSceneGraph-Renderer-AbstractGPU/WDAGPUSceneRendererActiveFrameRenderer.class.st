@@ -664,6 +664,10 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForCombiningOpaqueReflec
 		setCullMode: AGPU_CULL_MODE_NONE;
 		setDepthState: false writeMask: false function: AGPU_ALWAYS;
 		setPrimitiveType: AGPU_TRIANGLES;
+		setStencilState: true writeMask: 0 readMask: 1;
+		setStencilReference: 1;
+		setStencilFrontFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_KEEP stencilFunction: AGPU_EQUAL;
+		setStencilBackFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_KEEP stencilFunction: AGPU_EQUAL;
 		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0.
 ]
 
@@ -971,6 +975,10 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		beginRenderPass: (renderer resourceCache depthOnlyRenderPassWithSampleCount: sampleCount initialDepth: initialDepth) framebuffer: intermediateFramebuffers depthOnlyFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
+		setStencilState: true writeMask: 1 readMask: 1;
+		setStencilReference: 1;
+		setStencilFrontFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_REPLACE stencilFunction: AGPU_ALWAYS;
+		setStencilBackFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_REPLACE stencilFunction: AGPU_ALWAYS;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
 		setFrontFace: AGPU_COUNTER_CLOCKWISE;
@@ -1001,7 +1009,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		beginRenderPass: (renderer resourceCache hdrOpaqueRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrOpaqueFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
-		setDepthState: true writeMask: true function: depthFunction.
+		setDepthState: true writeMask: true function: depthFunction;
+		setStencilState: true writeMask: 0 readMask: 1;
+		setStencilReference: 1;
+		setStencilFrontFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_KEEP stencilFunction: AGPU_EQUAL;
+		setStencilBackFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_KEEP stencilFunction: AGPU_EQUAL.
 
 	self
 		bindLightingState: convertedLightingState;
@@ -1022,7 +1034,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		recordCommandsForStaticReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState lightingState: convertedLightingState;
 		recordCommandsForScreenSpaceReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState.
 		
-	"Translucent render pass."
+	"Combine opaque, and render translucent objects."
 	stateTracker
 		resetGraphicsPipeline;
 		beginRenderPass: (renderer resourceCache hdrTranslucentRenderPassWithSampleCount: sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0;
@@ -1037,7 +1049,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 	depthWriteMask := false.
 	depthFunction := normalDepthFunction.
 	stateTracker
-		setDepthState: true writeMask: false function: depthFunction.
+		setDepthState: true writeMask: false function: depthFunction;
+		setStencilState: false writeMask: 0 readMask: 0.
 	self
 		bindLightingState: convertedLightingState;
 		recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebuffer extent.
@@ -1098,81 +1111,6 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderOverlayFormSceneGraph: overlaySc
 	renderer drawCommandProcessor
 		commandList: stateTracker;
 		processCommandListWithDependencies: sceneGraphCommandList mainRenderTarget: sceneGraphRenderTarget
-]
-
-{ #category : #rendering }
-WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLayer [
-	| shadowCastingLightSource convertedCameraState hasReverseDepth initialDepth shaderSignature atlasElement atlasExtent viewportOffset viewportExtent viewportExtentScale |
-
-	atlasElement := renderer resourceCache shadowMapAtlasAllocator allocate.
-	shadowCastingLightSource := shadowMapCameraLayer shadowCastingLightSource.
-
-	atlasElement ifNil: [
-		shadowMapCameraLayer castShadows: false.
-		^ self
-	].
-
-	shadowCastingLightSource
-		shadowMapViewportScale: (Vector2 x: 0.5 y: 0.5);
-		shadowMapViewportOffset: (Vector2 x: 0.5 y: 0.5).
-		
-	renderer device hasTopLeftNdcOrigin = renderer device hasBottomLeftTextureCoordinates ifTrue: [ 
-		shadowCastingLightSource shadowMapViewportScale y: shadowCastingLightSource shadowMapViewportScale y negated
-	].
-
-	atlasExtent := atlasElement atlasExtent.
-	viewportOffset := atlasElement offset.
-	viewportExtent := atlasElement extent.
-	viewportExtentScale := viewportExtent / atlasExtent.
-	shadowCastingLightSource
-		shadowMapViewportScale: shadowCastingLightSource shadowMapViewportScale * viewportExtentScale;
-		shadowMapViewportOffset: shadowCastingLightSource shadowMapViewportOffset * viewportExtentScale + (viewportOffset/atlasExtent).
-		
-	hasReverseDepth := shadowMapCameraLayer hasReverseDepth.
-	initialDepth := hasReverseDepth ifTrue: [0.0] ifFalse: [1.0].
-	shaderSignature := renderer resourceCache rendererShaderSignature.
-	depthFunction := hasReverseDepth ifTrue: [ AGPU_GREATER_EQUAL ] ifFalse: [ AGPU_LESS_EQUAL ].
-
-	convertedCameraState := self convertedCameraState: shadowMapCameraLayer cameraState framebufferExtent: viewportExtent.
-
-	depthTestingEnabled := true.
-	depthWriteMask := true.
-	alphaBlendingEnabled := false.
-
-	stateTracker
-		resetGraphicsPipeline;
-		beginRenderPass: renderer resourceCache shadowMapRenderPass
-			framebuffer: renderer resourceCache shadowMapAtlasFramebuffer bundle_content: 0;
-		setViewport: viewportOffset x y: viewportOffset y w: viewportExtent x h: viewportExtent y;
-		setScissor: viewportOffset x y: viewportOffset y w: viewportExtent x h: viewportExtent y;
-		setShaderSignature: shaderSignature handle;
-		useShaderResources: shaderSignature samplersBinding;
-		useShaderResources: renderer resourceCache emptyLightingStateBinding bindingHandle;
-
-		"Clear the depth buffer"
-		setCullMode: AGPU_CULL_MODE_NONE;
-		setDepthState: true writeMask: true function: AGPU_ALWAYS;
-		setPrimitiveType: AGPU_TRIANGLES;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: renderer resourceCache clearReverseDepthFragmentShader entryPoint: 'main';
-		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
-
-		"Setup normal rendering"
-		setFrontFace: AGPU_COUNTER_CLOCKWISE;
-		setDepthState: true writeMask: true function: depthFunction.
-
-	depthTestingEnabled := true.
-	depthWriteMask := true.
-	alphaBlendingEnabled := false.
-	isInDepthOnlyPass := true.
-
-	self bindCameraState: convertedCameraState.
-		
-	shadowMapCameraLayer opaqueRenderingObjects do: [ :each |
-		self recordCommandsForRenderingObject: each
-	].
-
-	stateTracker endRenderPass.
 ]
 
 { #category : #rendering }

@@ -84,7 +84,10 @@ Class {
 		'transparentTexture3D',
 		'grayColorMapTexture1D',
 		'formSceneGraphDrawCommandProcessorContext',
-		'viewportOverlayRenderPass'
+		'viewportOverlayRenderPass',
+		'depthStencilTypelessFormat',
+		'depthStencilSampledFormat',
+		'depthStencilFormat'
 	],
 	#classVars : [
 		'AccessorTypeIntoTextureFormatMap',
@@ -576,12 +579,15 @@ WDAGPUSceneRendererResourceCache >> depthOnlyRenderPassWithSampleCount: sampleCo
 		[
 			| renderpassDescription |
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
-				format: depthFormat;
+				format: depthStencilFormat;
 				sample_count: sampleCount;
 				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
+				stencil_begin_action: AGPU_ATTACHMENT_CLEAR;
+				stencil_end_action: AGPU_ATTACHMENT_KEEP;
 				clear_value: (AGPUDepthStencilValue new
 					depth: initialDepth;
+					stencil: 0;
 					yourself);
 				yourself.
 				
@@ -606,6 +612,21 @@ WDAGPUSceneRendererResourceCache >> depthOnlyVertexAttributesForMask [
 { #category : #accessing }
 WDAGPUSceneRendererResourceCache >> depthSampledFormat [
 	^ depthSampledFormat
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> depthStencilFormat [
+	^ depthStencilFormat
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> depthStencilSampledFormat [
+	^ depthStencilSampledFormat
+]
+
+{ #category : #accessing }
+WDAGPUSceneRendererResourceCache >> depthStencilTypelessFormat [
+	^ depthStencilTypelessFormat
 ]
 
 { #category : #accessing }
@@ -1107,10 +1128,12 @@ WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCo
 			}.
 				
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
-				format: depthFormat;
+				format: depthStencilFormat;
 				sample_count: sampleCount;
 				begin_action: AGPU_ATTACHMENT_KEEP;
 				end_action: AGPU_ATTACHMENT_KEEP;
+				stencil_begin_action: AGPU_ATTACHMENT_KEEP;
+				stencil_end_action: AGPU_ATTACHMENT_KEEP;
 				yourself.
 				
 			allAttachmentsDescriptionsData := ByteArray streamContents: [ :out |
@@ -1170,7 +1193,7 @@ WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCo
 			}.
 				
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
-				format: depthFormat;
+				format: depthStencilFormat;
 				sample_count: sampleCount;
 				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
@@ -1217,7 +1240,7 @@ WDAGPUSceneRendererResourceCache >> hdrTranslucentContinueRenderPassWithSampleCo
 				clear_value: AGPUColor4f new;
 				sample_quality: 0.
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
-				format: depthFormat;
+				format: depthStencilFormat;
 				sample_count: sampleCount;
 				begin_action: AGPU_ATTACHMENT_KEEP;
 				end_action: AGPU_ATTACHMENT_KEEP;
@@ -1245,13 +1268,13 @@ WDAGPUSceneRendererResourceCache >> hdrTranslucentRenderPassWithSampleCount: sam
 			colorAttachment := AGPURenderpassColorAttachmentDescription externalNew.
 			colorAttachment
 				format: AGPU_TEXTURE_FORMAT_R16G16B16A16_FLOAT;
-				begin_action: AGPU_ATTACHMENT_DISCARD;
+				begin_action: AGPU_ATTACHMENT_CLEAR;
 				end_action: AGPU_ATTACHMENT_KEEP;
 				sample_count: sampleCount;
 				clear_value: AGPUColor4f new;
 				sample_quality: 0.
 			depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
-				format: depthFormat;
+				format: depthStencilFormat;
 				sample_count: sampleCount;
 				begin_action: AGPU_ATTACHMENT_KEEP;
 				end_action: AGPU_ATTACHMENT_KEEP;
@@ -1287,6 +1310,10 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	depthFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT.
 	depthTypelessFormat := AGPU_TEXTURE_FORMAT_R32_TYPELESS.
 	depthSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT.
+
+	depthStencilFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT_S8X24_UINT.
+	depthStencilTypelessFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT_S8X24_TYPELESS.
+	depthStencilSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT_S8X24_TYPELESS.
 	
 	"Workaround Metal renderpass backend wrong format."
 	aDevice getPreferredShaderLanguage == AGPU_SHADER_LANGUAGE_METAL_AIR ifTrue:[
@@ -1313,14 +1340,14 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	shadowMapAtlasTextureSamplingViewDescription := AGPUTextureViewDescription new.
 	shadowMapAtlasTexture getFullViewDescription: shadowMapAtlasTextureSamplingViewDescription.
 	shadowMapAtlasTextureSamplingViewDescription
-		format: AGPU_TEXTURE_FORMAT_R32_FLOAT;
+		format: depthSampledFormat;
 		usage_mode: AGPU_TEXTURE_USAGE_SAMPLED.
 	shadowMapAtlasTextureSamplingView := shadowMapAtlasTexture createView: shadowMapAtlasTextureSamplingViewDescription.
 	
 	shadowMapAtlasTextureDepthStencilViewDescription := AGPUTextureViewDescription new.
 	shadowMapAtlasTexture getFullViewDescription: shadowMapAtlasTextureDepthStencilViewDescription.
 	shadowMapAtlasTextureDepthStencilViewDescription
-		format: AGPU_TEXTURE_FORMAT_D32_FLOAT;
+		format: depthFormat;
 		usage_mode: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT.
 
 	shadowMapAtlasTextureDepthStencilView := shadowMapAtlasTexture createView: shadowMapAtlasTextureDepthStencilViewDescription.
@@ -2552,7 +2579,7 @@ WDAGPUSceneRendererResourceCache >> shadowMapRenderPass [
 	
 	^ [
 		depthStencilAttachment := AGPURenderpassDepthStencilDescription externalNew
-			format: AGPU_TEXTURE_FORMAT_D32_FLOAT;
+			format: depthFormat;
 			begin_action: AGPU_ATTACHMENT_KEEP;
 			end_action: AGPU_ATTACHMENT_KEEP;
 			stencil_begin_action: AGPU_ATTACHMENT_KEEP;

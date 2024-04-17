@@ -146,7 +146,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format atta
 		layers: 1;
 		miplevels: 1;
 		format: format;
-		usage_modes: (AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
+		usage_modes: ((AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_STENCIL_ATTACHMENT) bitOr: AGPU_TEXTURE_USAGE_SAMPLED);
 		main_usage_mode: AGPU_TEXTURE_USAGE_SAMPLED;
 		sample_count: sampleCount;
 		clear_value: (AGPUTextureClearValue new
@@ -161,13 +161,14 @@ WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format atta
 	depthStencilBufferSamplingViewDescription
 		format: samplingFormat;
 		usage_mode: AGPU_TEXTURE_USAGE_SAMPLED.
+	depthStencilBufferSamplingViewDescription subresource_range aspect: AGPU_TEXTURE_ASPECT_DEPTH.
 	depthStencilBufferSamplingView := depthStencilBuffer createView: depthStencilBufferSamplingViewDescription.
 	
 	depthStencilBufferAttachmentViewDescription := AGPUTextureViewDescription new.
 	depthStencilBuffer getFullViewDescription: depthStencilBufferAttachmentViewDescription.
 	depthStencilBufferAttachmentViewDescription
 		format: attachmentFormat;
-		usage_mode: AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT.
+		usage_mode: (AGPU_TEXTURE_USAGE_DEPTH_ATTACHMENT bitOr: AGPU_TEXTURE_USAGE_STENCIL_ATTACHMENT).
 	depthStencilBufferAttachmentView := depthStencilBuffer createView: depthStencilBufferAttachmentViewDescription
 ]
 
@@ -452,7 +453,7 @@ WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourc
 	sampleCount := aSampleCount.
 	initialDepth := anInitialDepth.
 	self
-		createDepthStencilBuffer: aResourceCache depthTypelessFormat attachmentFormat: aResourceCache depthFormat samplingFormat: aResourceCache depthSampledFormat;
+		createDepthStencilBuffer: aResourceCache depthStencilTypelessFormat attachmentFormat: aResourceCache depthStencilFormat samplingFormat: aResourceCache depthStencilSampledFormat;
 		createHdrFramebuffer;
 		createSSAOFramebuffer;
 		createStaticReflectionFramebuffer;
