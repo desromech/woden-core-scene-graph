@@ -14,6 +14,21 @@ Class {
 	#category : #'WodenSceneGraph-Core-Sound'
 }
 
+{ #category : #'digital filters' }
+WDSoundSample class >> biquadraticFilterWithCoefficient: coefficients [
+	| a0 na1 na2 nb0 nb1 nb2 |
+	a0 := coefficients first.
+	na1 := coefficients second / a0.
+	na2 := coefficients third / a0.
+	nb0 := coefficients fourth / a0.
+	nb1 := coefficients fifth / a0.
+	nb2 := coefficients sixth / a0.
+
+	^ [ :x :x1 :y1 :x2 :y2 |
+		(nb0*x) + (nb1*x1) + (nb2*x2) - (na1*y1) - (na2*y2)
+	]
+]
+
 { #category : #generation }
 WDSoundSample class >> generateNoiseSamples: sampleCount withRate: sampleRate amplitude: amplitude seed: randomSeed [
 	| random |
@@ -29,6 +44,13 @@ WDSoundSample class >> generateNoiseSamples: sampleCount withRate: sampleRate am
 ]
 
 { #category : #generation }
+WDSoundSample class >> generateNoiseSamples: sampleCount withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency q: q [
+	| random |
+	random := Random seed: randomSeed.
+	^ self generateSamples: sampleCount withRate: sampleRate with: [(random next*2.0 - 1.0) * amplitude] thenFilter2: (self lowPassFilterWithSampleRate: sampleRate frequency: cutoffFrequency q: q)
+]
+
+{ #category : #generation }
 WDSoundSample class >> generateNoiseWithDuration: duration withRate: sampleRate amplitude: amplitude seed: randomSeed [
 	^ self generateNoiseSamples: (duration * sampleRate) rounded withRate: sampleRate amplitude: amplitude seed: randomSeed
 ]
@@ -36,6 +58,11 @@ WDSoundSample class >> generateNoiseWithDuration: duration withRate: sampleRate 
 { #category : #generation }
 WDSoundSample class >> generateNoiseWithDuration: duration withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency [
 	^ self generateNoiseSamples: (duration * sampleRate) rounded withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency
+]
+
+{ #category : #generation }
+WDSoundSample class >> generateNoiseWithDuration: duration withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency q: q [
+	^ self generateNoiseSamples: (duration * sampleRate) rounded withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency q: q
 ]
 
 { #category : #generation }
@@ -76,6 +103,7 @@ WDSoundSample class >> generateSamples: sampleCount withRate: sampleRate with: a
 		t := (i - 1) * dt.
 		x := aBlock cull: t cull: dt cull: i.
 		y := aFilterBlock valueWithArguments: {x . x1 . y1 . x2 . y2}.
+
 		data signedShortAt: destIndex put: ((y min: 1.0 max: -1.0) * 32767) rounded.
 		destIndex := destIndex + 2.
 
@@ -93,16 +121,33 @@ WDSoundSample class >> generateSamples: sampleCount withRate: sampleRate with: a
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'digital filters' }
 WDSoundSample class >> lowPassFilterWithSampleRate: sampleRate frequency: cutoffFrequency [
 	"See https://en.wikipedia.org/wiki/Low-pass_filter"
-	| dt omega alpha |
-	dt := 1.0 / sampleRate.
-	omega := 2.0 * Float twoPi * cutoffFrequency.
-	alpha := omega*dt / (omega*dt + 1).
+	| omega0 alpha |
+	omega0 := 2.0 * Float twoPi * cutoffFrequency / sampleRate.
+	alpha := omega0 / (omega0 + 1).
 	^ [ :x :x1 :y1 :x2 :y2 |
-		(alpha*x) + ((1.0 - alpha)*y1)
+		y1 + (alpha * (x - y1))
 	]
+]
+
+{ #category : #'digital filters' }
+WDSoundSample class >> lowPassFilterWithSampleRate: sampleRate frequency: cutoffFrequency q: q [
+	"See https://www.w3.org/TR/audio-eq-cookbook/ and https://en.wikipedia.org/wiki/Digital_biquad_filter"
+	| omega0 co so alpha b0 b1 b2 a0 a1 a2 |
+	omega0 := 2.0 * Float twoPi * cutoffFrequency / sampleRate.
+	co := omega0 cos.
+	so := omega0 sin.
+	alpha := so / (2.0 * q).
+	
+	b0 := (1.0 - co) / 2.
+	b1 := 1.0 - co.
+	b2 := (1.0 - co) / 2.
+	a0 := 1 + alpha.
+	a1 := -2*co.
+	a2 := 1 - alpha.
+	^ self biquadraticFilterWithCoefficient: { a0 . a1 . a2 . b0 . b1 . b2 }
 ]
 
 { #category : #accessing }
