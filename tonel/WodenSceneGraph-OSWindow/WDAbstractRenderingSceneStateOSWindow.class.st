@@ -90,7 +90,8 @@ WDAbstractRenderingSceneStateOSWindow >> close [
 		osWindow destroy.
 		osWindow := nil.
 	].
-	self terminateRenderProcess
+	self terminateRenderProcess.
+	self destroyResources.
 ]
 
 { #category : #'as yet unclassified' }
@@ -106,6 +107,10 @@ WDAbstractRenderingSceneStateOSWindow >> colorBufferFormat [
 { #category : #initialization }
 WDAbstractRenderingSceneStateOSWindow >> defaultExtent [
 	^ 1024@576
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> destroyResources [
 ]
 
 { #category : #'as yet unclassified' }
