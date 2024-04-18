@@ -13,6 +13,12 @@ Class {
 	#category : #'WodenSceneGraph-Morphic'
 }
 
+{ #category : #'submorphs - add/remove' }
+WDAbstractRenderingSceneStateMorph >> announceDeleted [
+	self destroyResources.
+	super announceDeleted
+]
+
 { #category : #drawing }
 WDAbstractRenderingSceneStateMorph >> build3DSceneGraphNodeWith: builder [
 	| renderingSceneState |
@@ -60,6 +66,10 @@ WDAbstractRenderingSceneStateMorph >> buildWindowOverlaySceneGraphNodeWith: buil
 { #category : #accessing }
 WDAbstractRenderingSceneStateMorph >> defaultExtent [
 	^ 853@480
+]
+
+{ #category : #'as yet unclassified' }
+WDAbstractRenderingSceneStateMorph >> destroyResources [
 ]
 
 { #category : #drawing }
