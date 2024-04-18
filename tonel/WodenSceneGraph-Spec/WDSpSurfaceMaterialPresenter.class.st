@@ -11,10 +11,6 @@ Class {
 		'#materialSceneNode',
 		'#previewBaseMesh'
 	],
-	#classVars : [
-		'#PreviewCubeBaseMesh',
-		'#PreviewSphereBaseMesh'
-	],
 	#category : #'WodenSceneGraph-Spec'
 }
 
@@ -27,35 +23,21 @@ WDSpSurfaceMaterialPresenter class >> defaultSpec [
 		yourself
 ]
 
-{ #category : #'class initialization' }
-WDSpSurfaceMaterialPresenter class >> initialize [
-	PreviewCubeBaseMesh := WDMeshBuilder new
-		addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
-		generateTexcoords0WithFacePlanarTransformWithScale: (Vector2 withAll: 4);
-		generateTangentSpaceFrame;
-		mesh.
-	PreviewSphereBaseMesh := WDMeshBuilder new
-		addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
-		generateTexcoords0WithSphericalProjectionWithScale: (Vector2 withAll: 4);
-		generateTangentSpaceFrame;
-		mesh
-]
-
 { #category : #initialization }
 WDSpSurfaceMaterialPresenter >> initializePresenters [
-	previewBaseMesh := PreviewCubeBaseMesh.
+	previewBaseMesh := self previewCubeBaseMesh.
 	toolbar := self newToolbar
 		addItem: (SpToolbarButtonPresenter new
 			label: 'Cube';
 			action: [
-				previewBaseMesh := PreviewCubeBaseMesh.
+				previewBaseMesh := self previewCubeBaseMesh.
 				self updatePresenter
 			];
 			yourself);
 		addItem: (SpToolbarButtonPresenter new
 			label: 'Sphere';
 			action: [
-				previewBaseMesh := PreviewSphereBaseMesh.
+				previewBaseMesh := self previewSphereBaseMesh.
 				self updatePresenter
 			];
 			yourself);
@@ -87,6 +69,24 @@ WDSpSurfaceMaterialPresenter >> material [
 WDSpSurfaceMaterialPresenter >> material: anObject [
 	material := anObject.
 	self updatePresenter
+]
+
+{ #category : #initialization }
+WDSpSurfaceMaterialPresenter >> previewCubeBaseMesh [
+	^ WDMeshBuilder new
+		addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+		generateTexcoords0WithFacePlanarTransformWithScale: (Vector2 withAll: 4);
+		generateTangentSpaceFrame;
+		mesh
+]
+
+{ #category : #initialization }
+WDSpSurfaceMaterialPresenter >> previewSphereBaseMesh [
+	^ WDMeshBuilder new
+		addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
+		generateTexcoords0WithSphericalProjectionWithScale: (Vector2 withAll: 4);
+		generateTangentSpaceFrame;
+		mesh
 ]
 
 { #category : #accessing }
