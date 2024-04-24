@@ -1010,10 +1010,10 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setDepthState: true writeMask: true function: depthFunction;
-		setStencilState: true writeMask: 0 readMask: 1;
+		setStencilState: true writeMask: 1 readMask: 1;
 		setStencilReference: 1;
-		setStencilFrontFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_KEEP stencilFunction: AGPU_EQUAL;
-		setStencilBackFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_KEEP stencilFunction: AGPU_EQUAL.
+		setStencilFrontFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_REPLACE stencilFunction: AGPU_ALWAYS;
+		setStencilBackFace: AGPU_KEEP depthFailOperation: AGPU_KEEP stencilDepthPassOperation: AGPU_REPLACE stencilFunction: AGPU_ALWAYS.
 
 	self
 		bindLightingState: convertedLightingState;
