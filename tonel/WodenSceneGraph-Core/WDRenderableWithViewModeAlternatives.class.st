@@ -2,7 +2,8 @@ Class {
 	#name : #WDRenderableWithViewModeAlternatives,
 	#superclass : #WDRenderable,
 	#instVars : [
-		'alternatives'
+		'alternatives',
+		'defaultAlternativeIsEmpty'
 	],
 	#category : #'WodenSceneGraph-Core-Renderable'
 }
@@ -23,7 +24,7 @@ WDRenderableWithViewModeAlternatives >> addToRenderingScene: renderingScene with
 
 { #category : #accessing }
 WDRenderableWithViewModeAlternatives >> boundingBox [
-	^ self defaultAlternative
+	^ self defaultValidAlternative
 		ifNil: [ AABox originPoint ]
 		ifNotNil: [ :alternative | alternative boundingBox ]
 ]
@@ -40,6 +41,25 @@ WDRenderableWithViewModeAlternatives >> copyWithMaterial: aBlock [
 
 { #category : #accessing }
 WDRenderableWithViewModeAlternatives >> defaultAlternative [
+	^ defaultAlternativeIsEmpty
+		ifTrue: [nil]
+		ifFalse: [self getAlternativeFor: WDFullShadedViewMode]
+]
+
+{ #category : #accessing }
+WDRenderableWithViewModeAlternatives >> defaultAlternativeIsEmpty [
+
+	^ defaultAlternativeIsEmpty
+]
+
+{ #category : #accessing }
+WDRenderableWithViewModeAlternatives >> defaultAlternativeIsEmpty: anObject [
+
+	defaultAlternativeIsEmpty := anObject
+]
+
+{ #category : #accessing }
+WDRenderableWithViewModeAlternatives >> defaultValidAlternative [
 	^ self getAlternativeFor: WDFullShadedViewMode
 ]
 
@@ -82,6 +102,7 @@ WDRenderableWithViewModeAlternatives >> getValidAlternativeFor: viewMode [
 WDRenderableWithViewModeAlternatives >> initialize [
 	super initialize.
 	alternatives := IdentityDictionary new.
+	defaultAlternativeIsEmpty := false.
 ]
 
 { #category : #accessing }
