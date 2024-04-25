@@ -15,6 +15,11 @@ Class {
 }
 
 { #category : #accessing }
+WDRenderingSceneObject >> castShadows [
+	^ objectState castShadows
+]
+
+{ #category : #accessing }
 WDRenderingSceneObject >> objectState [
 
 	^ objectState

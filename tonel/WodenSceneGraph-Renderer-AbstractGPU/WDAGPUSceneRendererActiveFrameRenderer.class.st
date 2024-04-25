@@ -1162,7 +1162,9 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLay
 	self bindCameraState: convertedCameraState.
 		
 	shadowMapCameraLayer opaqueRenderingObjects do: [ :each |
-		self recordCommandsForRenderingObject: each
+		each castShadows ifTrue: [
+			self recordCommandsForRenderingObject: each
+		]
 	].
 
 	stateTracker endRenderPass.

@@ -11,6 +11,7 @@ Class {
 		'lights',
 		'cameras',
 		'transform',
+		'castShadows',
 		'visible',
 		'localBoundingBox',
 		'boundingBox'
@@ -31,6 +32,7 @@ WDSceneNode >> addIntoRenderingSceneCameraLayer: renderingSceneCameraLayer withT
 		| objectState |
 		objectState := WDRenderingObjectState new
 			transformation: renderingGlobalTransform;
+			castShadows: castShadows;
 			yourself.
 		renderables do: [ :eachRenderable |
 			renderingSceneCameraLayer addRenderable: eachRenderable withObjectState: objectState
@@ -115,6 +117,17 @@ WDSceneNode >> cameras: anObject [
 ]
 
 { #category : #accessing }
+WDSceneNode >> castShadows [
+
+	^ castShadows
+]
+
+{ #category : #accessing }
+WDSceneNode >> castShadows: aBoolean [
+	castShadows := aBoolean
+]
+
+{ #category : #accessing }
 WDSceneNode >> globalTransform [
 	^ parent
 		ifNil: [ transform asReversibleAffineTransform]
@@ -127,6 +140,7 @@ WDSceneNode >> initialize [
 	renderables := #().
 	lights := #().
 	cameras := #().
+	castShadows := true.
 	visible := true.
 	localBoundingBox := nil.
 	boundingBox := nil.

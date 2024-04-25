@@ -5,10 +5,23 @@ Class {
 	#name : #WDRenderingObjectState,
 	#superclass : #Object,
 	#instVars : [
-		'transformation'
+		'transformation',
+		'castShadows'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
+
+{ #category : #accessing }
+WDRenderingObjectState >> castShadows [
+
+	^ castShadows
+]
+
+{ #category : #accessing }
+WDRenderingObjectState >> castShadows: anObject [
+
+	castShadows := anObject
+]
 
 { #category : #initialization }
 WDRenderingObjectState >> initialize [
