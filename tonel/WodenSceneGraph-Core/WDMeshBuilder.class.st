@@ -212,6 +212,11 @@ WDMeshBuilder >> addCubeSphereWithRadius: radius subdivisions: subdivisions [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addCubeWithBox: box [
+	self addCubeMinX: box min x y: box min y z: box min z maxX: box max x y: box max y z: box max z
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addCubeWithHalfExtent: halfExtent [
 	| halfExtentVector |
 	halfExtentVector := halfExtent asVector3.
@@ -416,6 +421,12 @@ WDMeshBuilder >> addPlaneWithWidth: width height: height [
 ]
 
 { #category : #adding }
+WDMeshBuilder >> addPositionsData: data [
+	positions addAll: data.
+	vertexCount := vertexCount + (data size / 3).
+]
+
+{ #category : #adding }
 WDMeshBuilder >> addPx: x y: y z: z [
 	self addP: (Vector3 x: x y: y z: z)
 ]
@@ -471,6 +482,11 @@ WDMeshBuilder >> addT1: tc [
 { #category : #adding }
 WDMeshBuilder >> addT1u: u v: v [
 	texcoords1 add: u; add: v
+]
+
+{ #category : #adding }
+WDMeshBuilder >> addTexcoords0Data: data [
+	texcoords0 addAll: data.
 ]
 
 { #category : #adding }
@@ -992,6 +1008,11 @@ WDMeshBuilder >> initialize [
 	indices := OrderedCollection new.
 	primitives := OrderedCollection new.
 	self reset.
+]
+
+{ #category : #testing }
+WDMeshBuilder >> isEmpty [
+	^ positions isEmpty or: [ indices isEmpty or: primitives isEmpty ]
 ]
 
 { #category : #builder }
