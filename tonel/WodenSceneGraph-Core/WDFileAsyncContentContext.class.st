@@ -38,7 +38,7 @@ WDFileAsyncContentContext >> fetchUriToFileReference: canonicalUri [
 
 { #category : #hooks }
 WDFileAsyncContentContext >> validWorkingDirectory [
-	^ workingDirectory ifNil: [ FileSystem workingDirectory ]
+	^ workingDirectory ifNil: [ FileSystem disk workingDirectory ]
 ]
 
 { #category : #accessing }

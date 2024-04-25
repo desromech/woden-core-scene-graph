@@ -351,7 +351,7 @@ WDTexture >> setupForColorLutTextureData: colorLutData [
 { #category : #private }
 WDTexture >> setupForFileReferenceCommon: aFileReference [
 	self flag: 'TODO: Add support for asynchronous loading'.
-	self setupForFormCommon: (ImageReadWriter formFromFileNamed: aFileReference)
+	self setupForFormCommon: (ImageReadWriter formFromFileNamed: aFileReference fullName)
 ]
 
 { #category : #initialization }

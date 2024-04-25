@@ -41,7 +41,7 @@ WDMaterial class >> loadFromFileReference: aFileReference [
 
 { #category : #serialization }
 WDMaterial class >> loadFromJson: jsonData [
-	^ self loadFromJson: jsonData inDirectory: FileSystem workingDirectory
+	^ self loadFromJson: jsonData inDirectory: FileSystem disk workingDirectory
 	
 ]
 
