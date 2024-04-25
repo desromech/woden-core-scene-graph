@@ -161,7 +161,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format atta
 	depthStencilBufferSamplingViewDescription
 		format: samplingFormat;
 		usage_mode: AGPU_TEXTURE_USAGE_SAMPLED.
-	depthStencilBufferSamplingViewDescription subresource_range aspect: AGPU_TEXTURE_ASPECT_DEPTH.
+	depthStencilBufferSamplingViewDescription subresource_range: (depthStencilBufferSamplingViewDescription subresource_range aspect: AGPU_TEXTURE_ASPECT_DEPTH; yourself).
 	depthStencilBufferSamplingView := depthStencilBuffer createView: depthStencilBufferSamplingViewDescription.
 	
 	depthStencilBufferAttachmentViewDescription := AGPUTextureViewDescription new.

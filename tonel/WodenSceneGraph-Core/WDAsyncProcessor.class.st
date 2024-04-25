@@ -90,7 +90,7 @@ WDAsyncProcessor >> enqueueTask: aBlock [
 { #category : #initialization }
 WDAsyncProcessor >> initialize [
 	super initialize.
-	taskQueue := AtomicSharedQueue new.
+	taskQueue := SharedQueue new.
 	pendingTaskSemaphore := Semaphore new.
 	asyncProcessorProcess := self starkAsyncProcessorProcess.
 ]
