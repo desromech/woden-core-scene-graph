@@ -75,15 +75,15 @@ WDAsyncProcessor >> enqueueLoadingModelAssetURI: modelAssetURI context: context 
 
 { #category : #tasks }
 WDAsyncProcessor >> enqueueTask: aBlock [
-	| future task |
-	future := WDAsyncFuture new.
+	| futureResult task |
+	futureResult := WDAsyncFuture new.
 	task := WDAsyncTask new
-		future: future;
+		futureResult: futureResult;
 		action: aBlock;
 		yourself.
 	taskQueue nextPut: task.
 	pendingTaskSemaphore signal.
-	^ future
+	^ futureResult
 	
 ]
 

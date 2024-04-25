@@ -5,8 +5,8 @@ Class {
 	#name : #WDAsyncTask,
 	#superclass : #Object,
 	#instVars : [
-		'future',
-		'action'
+		'action',
+		'futureResult'
 	],
 	#category : #'WodenSceneGraph-Core-Async'
 }
@@ -24,20 +24,20 @@ WDAsyncTask >> action: anObject [
 ]
 
 { #category : #accessing }
-WDAsyncTask >> future [
+WDAsyncTask >> futureResult [
 
-	^ future
+	^ futureResult
 ]
 
 { #category : #accessing }
-WDAsyncTask >> future: anObject [
+WDAsyncTask >> futureResult: anObject [
 
-	future := anObject
+	futureResult := anObject
 ]
 
 { #category : #running }
 WDAsyncTask >> run [
-	future value: action value
+	futureResult value: action value
 ]
 
 { #category : #running }
