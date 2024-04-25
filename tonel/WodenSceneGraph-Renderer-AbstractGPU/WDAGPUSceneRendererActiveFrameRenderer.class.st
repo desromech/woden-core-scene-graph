@@ -679,7 +679,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderable: renderabl
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingBackgroundObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
 	renderingSceneState cameraLayers do: [ :eachCameraLayer |
-		eachCameraLayer backgroundObjects isNotEmpty ifTrue: [
+		eachCameraLayer backgroundObjects isEmpty ifFalse: [
 			self bindCameraState: (self convertedCameraState: eachCameraLayer cameraState framebufferExtent: framebufferExtent).
 			eachCameraLayer backgroundObjects do: [ :each |
 				self recordCommandsForRenderingObject: each
@@ -699,7 +699,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: rend
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingOpaqueObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
 	renderingSceneState cameraLayers reverseDo: [ :eachCameraLayer |
-		eachCameraLayer opaqueRenderingObjects isNotEmpty ifTrue: [ 
+		eachCameraLayer opaqueRenderingObjects isEmpty ifFalse: [ 
 			self bindCameraState: (self convertedCameraState: eachCameraLayer cameraState framebufferExtent: framebufferExtent).
 			eachCameraLayer opaqueRenderingObjects do: [ :each |
 				self recordCommandsForRenderingObject: each
@@ -711,7 +711,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingOpaqueObject
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
 	renderingSceneState cameraLayers do: [ :eachCameraLayer |
-		eachCameraLayer translucentRenderingObjects isNotEmpty ifTrue: [ 
+		eachCameraLayer translucentRenderingObjects isEmpty ifFalse: [ 
 			self bindCameraState: (self convertedCameraState: eachCameraLayer cameraState framebufferExtent: framebufferExtent).
 			eachCameraLayer translucentRenderingObjects do: [ :each |
 				self recordCommandsForRenderingObject: each

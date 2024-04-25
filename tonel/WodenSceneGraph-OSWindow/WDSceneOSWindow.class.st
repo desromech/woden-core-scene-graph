@@ -48,7 +48,7 @@ WDSceneOSWindow >> doUpdate [
 
 { #category : #accessing }
 WDSceneOSWindow >> headFloorTransform [
-	camera cameras isNotEmpty ifTrue: [
+	camera cameras isEmpty ifFalse: [
 		^ camera cameras first headFloorTransform
 	].
 

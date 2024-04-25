@@ -26,7 +26,7 @@ WDSkeletalMeshRenderable >> addIntoModelAssetWithDependencies: modelAsset [
 { #category : #adding }
 WDSkeletalMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
 	referenceMesh ifNotNil: [
-		(skeleton isNotNil and: [ currentPose isNotNil ]) ifTrue: [ 
+		(skeleton notNil and: [ currentPose notNil ]) ifTrue: [ 
 			referenceMesh addToRenderingScene: renderingScene withObjectState: anObjectState poseState: currentPose asPoseState
 		] ifFalse: [ 
 			referenceMesh addToRenderingScene: renderingScene withObjectState: anObjectState

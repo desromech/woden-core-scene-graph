@@ -45,7 +45,7 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: mat
 
 { #category : #adding }
 WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState poseState: aPose [
-	(material isNotNil and: [material renderingStream isNotNil]) ifTrue: [
+	(material notNil and: [material renderingStream notNil]) ifTrue: [
 		self addRenderingStream: material renderingStream
 	].
 
