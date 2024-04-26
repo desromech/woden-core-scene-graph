@@ -7,6 +7,10 @@ Class {
 	#category : #'WodenSceneGraph-MorphicSqueak'
 }
 
+{ #category : #'accessing' }
+KeyboardKey class >> space [
+	^ Character space
+]
 
 { #category : #'accessing' }
 KeyboardKey class >> A [
