@@ -106,19 +106,24 @@ WDModelAsset >> initialize [
 { #category : #'as yet unclassified' }
 WDModelAsset >> instanceDefaultSceneNode [
 	scenes isEmpty ifFalse: [
-		^ scenes first normalLayer copyAsSceneNode
+		^ scenes first instanceAsSceneNode
 	].
 
 	meshes isEmpty ifFalse: [
-		^ meshes first asSceneNode
+		^ meshes first instanceAsSceneNode
 	].
 
 	^ nil
 ]
 
-{ #category : #'lookup elements' }
-WDModelAsset >> instanceSceneNodeWithSelector: selector [
-	self scenes ifNotEmpty: [ ^ self scenes first normalLayer asSceneNode ].
+{ #category : #'as yet unclassified' }
+WDModelAsset >> instanceSceneNodeForElementNamed: elementName [
+	| element |
+	(elementName isNil or: [elementName isEmpty]) ifTrue: [ ^ self instanceDefaultSceneNode ].
+	
+	element := nameDictionary at: elementName ifAbsent: [ nil ].
+	element isWodenSceneElement ifTrue: [ ^ element instanceAsSceneNode ].
+	element isWodenRenderable ifFalse: [ ^ element asSceneNode ].
 	^ nil
 ]
 

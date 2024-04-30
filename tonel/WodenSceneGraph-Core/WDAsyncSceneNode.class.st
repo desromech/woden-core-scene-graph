@@ -223,7 +223,7 @@ WDAsyncSceneNode >> validSceneNodeFuture [
 	sceneNodeFuture ifNil: [ 
 		asyncContext ifNotNil: [
 			sceneNodeFuture := asyncContext enqueueLoadingModelAssetURI: uri thenDo: [ :loadedModelAsset |
-				loadedModelAsset ifNotNil: [loadedModelAsset instanceSceneNodeWithSelector: elementSelector ]
+				loadedModelAsset ifNotNil: [loadedModelAsset instanceSceneNodeForElementNamed: elementSelector ]
 			]
 		]
 	].

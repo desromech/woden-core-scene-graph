@@ -98,6 +98,11 @@ WDScene >> initialize [
 	updateBlock := [ :delta | false ].
 ]
 
+{ #category : #copying }
+WDScene >> instanceAsSceneNode [
+	^ self normalLayer instanceAsSceneNode
+]
+
 { #category : #testing }
 WDScene >> isScene [
 	^ true

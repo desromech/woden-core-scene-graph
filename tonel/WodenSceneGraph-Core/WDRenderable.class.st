@@ -66,6 +66,11 @@ WDRenderable >> initialize [
 	name := ''.
 ]
 
+{ #category : #testing }
+WDRenderable >> isWodenRenderable [
+	^ true
+]
+
 { #category : #accessing }
 WDRenderable >> name [
 

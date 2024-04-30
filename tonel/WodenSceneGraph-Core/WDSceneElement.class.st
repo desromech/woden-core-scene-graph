@@ -39,6 +39,11 @@ WDSceneElement >> globalTransform [
 	^ ReversibleAffineTransform3D identity
 ]
 
+{ #category : #copying }
+WDSceneElement >> instanceAsSceneNode [
+	^ self subclassResponsibility
+]
+
 { #category : #hook }
 WDSceneElement >> invalidateChildBoundingBox [
 	

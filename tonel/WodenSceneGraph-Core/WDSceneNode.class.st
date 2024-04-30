@@ -153,6 +153,11 @@ WDSceneNode >> initialize [
 	transform := TRSTransform3D new.
 ]
 
+{ #category : #copying }
+WDSceneNode >> instanceAsSceneNode [
+	^ self copy
+]
+
 { #category : #'bounding volume' }
 WDSceneNode >> invalidateBoundingBox [
 	boundingBox := nil.
