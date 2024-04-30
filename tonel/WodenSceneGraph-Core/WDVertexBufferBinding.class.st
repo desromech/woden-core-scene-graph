@@ -36,6 +36,16 @@ WDVertexBufferBinding >> locationMask [
 ]
 
 { #category : #accessing }
+WDVertexBufferBinding >> positionAccessor [
+	attributes do: [ :eachAttribute |
+		eachAttribute isPosition ifTrue: [ 
+			^ eachAttribute accessor
+		]
+	].
+	^ nil
+]
+
+{ #category : #accessing }
 WDVertexBufferBinding >> validVertexCount [
 	^ vertexCount ifNil: [ vertexCount := attributes
 			ifEmpty: [ 0 ]

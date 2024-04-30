@@ -33,6 +33,11 @@ WDSceneTreeElementWithChildren >> addSceneElement: aNode [
 	aNode addedTo: self.
 ]
 
+{ #category : #'as yet unclassified' }
+WDSceneTreeElementWithChildren >> childChanged: aChild [
+	parent ifNotNil: [ parent childChanged: self ]
+]
+
 { #category : #accessing }
 WDSceneTreeElementWithChildren >> children [
 

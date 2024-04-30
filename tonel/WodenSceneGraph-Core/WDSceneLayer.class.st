@@ -95,6 +95,16 @@ WDSceneLayer >> copiedIntoScene: aScene [
 	parent := aScene.
 ]
 
+{ #category : #copying }
+WDSceneLayer >> copyAsSceneNode [
+	| sceneNode |
+	sceneNode := WDSceneNode new.
+	self childrenDo: [ :child |
+		sceneNode add: child copy
+	].
+	^ sceneNode
+]
+
 { #category : #initialization }
 WDSceneLayer >> initializeWithScene: aScene [
 	parent := aScene.

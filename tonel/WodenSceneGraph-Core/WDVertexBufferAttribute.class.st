@@ -86,6 +86,11 @@ WDVertexBufferAttribute >> accessor: anObject [
 	accessor := anObject
 ]
 
+{ #category : #testing }
+WDVertexBufferAttribute >> isPosition [
+	^ location == PositionLocation
+]
+
 { #category : #accessing }
 WDVertexBufferAttribute >> location [
 

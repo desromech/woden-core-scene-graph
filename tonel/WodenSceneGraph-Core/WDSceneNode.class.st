@@ -127,6 +127,12 @@ WDSceneNode >> castShadows: aBoolean [
 	castShadows := aBoolean
 ]
 
+{ #category : #'as yet unclassified' }
+WDSceneNode >> childChanged: aChild [
+	self invalidateLocalBoundingBox.
+	super childChanged: aChild.
+]
+
 { #category : #accessing }
 WDSceneNode >> globalTransform [
 	^ parent
@@ -226,6 +232,14 @@ WDSceneNode >> position: aPosition [
 WDSceneNode >> postCopy [
 	super postCopy.
 	transform := transform copy.
+]
+
+{ #category : #removing }
+WDSceneNode >> removeAllChildren [
+	children isEmpty ifTrue: [ ^ self ].
+	super removeAllChildren.
+	self invalidateLocalBoundingBox.
+	parent ifNotNil: [ parent childChanged: self ]
 ]
 
 { #category : #removing }

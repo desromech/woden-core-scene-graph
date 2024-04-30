@@ -25,6 +25,10 @@ WDSceneElement >> asSceneElement [
 	^ self
 ]
 
+{ #category : #'as yet unclassified' }
+WDSceneElement >> childChanged: aChild [
+]
+
 { #category : #accessing }
 WDSceneElement >> children [
 	self subclassResponsibility

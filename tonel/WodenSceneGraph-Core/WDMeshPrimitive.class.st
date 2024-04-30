@@ -49,6 +49,16 @@ WDMeshPrimitive >> boundingBox: anObject [
 	boundingBox := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+WDMeshPrimitive >> computeBoundingBoxFromVertexBindingData [
+	| positionAccessor |
+	vertexBinding ifNil: [ ^ self ].
+	positionAccessor := vertexBinding positionAccessor.
+	(positionAccessor min isNotNil and: [ positionAccessor max isNotNil ]) ifTrue: [ 
+		self boundingBox: (AABox min: positionAccessor min max: positionAccessor max)
+	].
+]
+
 { #category : #copying }
 WDMeshPrimitive >> copyTransformingMaterialsWith: aBlock [
 	^ self copy
@@ -84,6 +94,7 @@ WDMeshPrimitive >> indices: anObject [
 WDMeshPrimitive >> initialize [
 	super initialize.
 	self topology: WDPrimitiveTopologyPoints.
+	boundingBox := AABox originPoint.
 ]
 
 { #category : #accessing }

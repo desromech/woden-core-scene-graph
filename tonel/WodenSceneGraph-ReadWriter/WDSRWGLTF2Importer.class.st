@@ -406,7 +406,6 @@ WDSRWGLTF2Importer >> loadMeshFrom: meshDescription [
 WDSRWGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
 	| primitive attributes vertexAttributes |
 	primitive := WDMeshPrimitive new
-		boundingBox: AABox empty;
 		topology: WDPrimitiveTopologyTriangles;
 		yourself.
 	
@@ -420,7 +419,6 @@ WDSRWGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
 	primitiveDescription at: 'mode' ifPresent: [ :mode |
 		primitive topology: (PrimitiveModeMap at: mode)
 	].
-	
 
 	vertexAttributes := OrderedCollection new.
 	attributes keysAndValuesDo: [ :attributeName :attributeBinding |
@@ -445,6 +443,7 @@ WDSRWGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
 			yourself
 	]).
 
+	primitive computeBoundingBoxFromVertexBindingData.
 	^ primitive
 
 ]
