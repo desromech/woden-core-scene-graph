@@ -5,7 +5,8 @@ Class {
 	#name : #WDSceneLayer,
 	#superclass : #WDSceneTreeElementWithChildren,
 	#instVars : [
-		'globalLightingState'
+		'globalLightingState',
+		'boundingBox'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
@@ -90,6 +91,24 @@ WDSceneLayer >> asSceneNode [
 		yourself
 ]
 
+{ #category : #accessing }
+WDSceneLayer >> boundingBox [
+	boundingBox ifNil: [ 
+		boundingBox := AABox empty.
+		self childrenDo: [ :eachChild |
+			boundingBox insertBox: eachChild boundingBox
+		]
+	].
+
+	^ boundingBox
+]
+
+{ #category : #hook }
+WDSceneLayer >> childChanged: aChild [
+	super childChanged: aChild.
+	self invalidateBoundingBox
+]
+
 { #category : #initialization }
 WDSceneLayer >> copiedIntoScene: aScene [
 	parent := aScene.
@@ -109,6 +128,16 @@ WDSceneLayer >> instanceAsSceneNode [
 		sceneNode add: child copy
 	].
 	^ sceneNode
+]
+
+{ #category : #hook }
+WDSceneLayer >> invalidateBoundingBox [
+	boundingBox := nil.
+]
+
+{ #category : #hook }
+WDSceneLayer >> invalidateChildBoundingBox [
+	self invalidateBoundingBox
 ]
 
 { #category : #testing }

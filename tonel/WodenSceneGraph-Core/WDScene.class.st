@@ -68,6 +68,11 @@ WDScene >> backgroundLayer [
 ]
 
 { #category : #accessing }
+WDScene >> boundingBox [
+	^ self normalLayer boundingBox
+]
+
+{ #category : #accessing }
 WDScene >> children [
 	^ { backgroundLayer . normalLayer . foregroundLayer }
 ]

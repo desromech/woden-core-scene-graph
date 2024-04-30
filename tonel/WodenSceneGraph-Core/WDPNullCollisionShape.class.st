@@ -49,3 +49,8 @@ WDPNullCollisionShape >> localSupportInDirection: aDirection [
 WDPNullCollisionShape >> rayCast: ray [
 	^ nil
 ]
+
+{ #category : #transforming }
+WDPNullCollisionShape >> transformedWith: aTransform [
+	^ self
+]

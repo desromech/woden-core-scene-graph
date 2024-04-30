@@ -134,3 +134,14 @@ WDCompoundCollisionShape >> rayCast: ray [
 
 	^ nil
 ]
+
+{ #category : #transforming }
+WDCompoundCollisionShape >> transformedWith: aTransform [
+	| reversibleAffineTransform result |
+	reversibleAffineTransform := aTransform asReversibleAffineTransform3D.
+	result := self class new.
+	components do: [ :eachComponent |
+		result addShape: eachComponent shape withTransform: (reversibleAffineTransform transformTransform: eachComponent transform)
+	].
+	^ result
+]

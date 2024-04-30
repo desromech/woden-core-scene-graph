@@ -94,6 +94,15 @@ WDCollisionShape >> rayCast: ray [
 	self subclassResponsibility
 ]
 
+{ #category : #transforming }
+WDCollisionShape >> transformedWith: aTransform [
+	aTransform isIdentity ifTrue: [ ^ self ].
+
+	^ WDCompoundCollisionShape new
+		addShape: self withTransform: aTransform;
+		yourself
+]
+
 { #category : #testing }
 WDCollisionShape >> withTransform: shapeTransform intersectsBox: box withTransform: boxTransform [
 	^ false

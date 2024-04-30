@@ -88,6 +88,18 @@ WDModelAsset >> elementNamed: aName [
 	^ nameDictionary at: aName
 ]
 
+{ #category : #'as yet unclassified' }
+WDModelAsset >> getCollisionShapeNamed: collisionElementName [
+	| collisionElement boundingBox |
+	collisionElement := self renderableOrSceneElementNamed: collisionElementName.
+	collisionElement ifNil: [ ^ nil ].
+	
+	(collisionElement isWodenRenderable or: [ collisionElement isWodenSceneElement ]) ifFalse: [ ^ nil ].
+	boundingBox := collisionElement boundingBox.
+	
+	^ WDConvexHullCollisionShape withPoints: boundingBox corners.
+]
+
 { #category : #initialization }
 WDModelAsset >> initialize [
 	super initialize.
@@ -119,9 +131,7 @@ WDModelAsset >> instanceDefaultSceneNode [
 { #category : #'as yet unclassified' }
 WDModelAsset >> instanceSceneNodeForElementNamed: elementName [
 	| element |
-	(elementName isNil or: [elementName isEmpty]) ifTrue: [ ^ self instanceDefaultSceneNode ].
-	
-	element := nameDictionary at: elementName ifAbsent: [ nil ].
+	element := self renderableOrSceneElementNamed: elementName.
 	element isWodenSceneElement ifTrue: [ ^ element instanceAsSceneNode ].
 	element isWodenRenderable ifFalse: [ ^ element asSceneNode ].
 	^ nil
@@ -145,6 +155,21 @@ WDModelAsset >> privateAddElement: anElement [
 	(anElement name notNil and: [anElement name isEmpty not]) ifTrue: [ 
 		nameDictionary at: anElement name put: anElement
 	]
+]
+
+{ #category : #'as yet unclassified' }
+WDModelAsset >> renderableOrSceneElementNamed: name [
+	(name isNil or: [name isEmpty]) ifTrue: [ 
+		scenes isEmpty ifFalse: [
+			^ scenes first
+		].
+
+		meshes isEmpty ifFalse: [
+			^ meshes first
+		].
+	].
+
+	^ nameDictionary at: name ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }

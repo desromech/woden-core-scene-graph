@@ -47,3 +47,12 @@ WDConvexHullCollisionShape >> points: aListOfPoints [
 	points := aListOfPoints.
 	self localBoundingBox: (AABox encompassing: points).
 ]
+
+{ #category : #transforming }
+WDConvexHullCollisionShape >> transformedWith: aTransform [
+	aTransform isIdentity ifTrue: [ ^ self ].
+	
+	^ self class withPoints: (points collect: [:eachPoint |
+		aTransform transformPosition: eachPoint
+	])
+]
