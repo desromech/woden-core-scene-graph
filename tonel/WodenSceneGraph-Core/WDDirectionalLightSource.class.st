@@ -73,6 +73,7 @@ WDDirectionalLightSource >> setupShadowMapCameraStateForRenderingScene: renderin
 	^ WDCameraState new
 		nearDistance: localShadowCastingVolume min z;
 		farDistance: localShadowCastingVolume max z;
+		isPerspective: false;
 		projectionMatrix: (Matrix4x4 reverseDepthOrthoLeft: localShadowCastingVolume min x right: localShadowCastingVolume max x
 			bottom: localShadowCastingVolume min y top: localShadowCastingVolume max y
 			near: localShadowCastingVolume max z negated far: localShadowCastingVolume min z negated);
@@ -94,13 +95,20 @@ WDDirectionalLightSource >> setupShadowMapCascadeFor: lightState renderingScene:
 	farDistance := cameraState farDistance.
 	cascadeSplitDistributionLambda := cameraState cascadeSplitDistributionLambda.
 
-	"Cascade shadow map split distribution scheme from GPU Gems 3, Chapter 10: Parallel-Split Shadow Maps on Programmable GPUs [https://developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-10-parallel-split-shadow-maps-programmable-gpus]"
 	numSlices := 4. 
-	splitDistributionDistances := (0 to: 4) collect: [ :i | 
-		| uniformSlice exponentialSlice |
-		uniformSlice := (farDistance - nearDistance) / numSlices * i + nearDistance.
-		exponentialSlice := nearDistance * (farDistance / nearDistance raisedTo: i / numSlices).
-		uniformSlice interpolateTo: exponentialSlice at: cascadeSplitDistributionLambda
+	cameraState isPerspective ifTrue: [ 
+		"Cascade shadow map split distribution scheme from GPU Gems 3, Chapter 10: Parallel-Split Shadow Maps on Programmable GPUs [https://developer.nvidia.com/gpugems/gpugems3/part-ii-light-and-shadows/chapter-10-parallel-split-shadow-maps-programmable-gpus]"
+		splitDistributionDistances := (0 to: 4) collect: [ :i | 
+			| uniformSlice exponentialSlice |
+			uniformSlice := (farDistance - nearDistance) / numSlices * i + nearDistance.
+			exponentialSlice := nearDistance * (farDistance / nearDistance raisedTo: i / numSlices).
+			uniformSlice interpolateTo: exponentialSlice at: cascadeSplitDistributionLambda
+		]
+	] ifFalse: [
+		"Use the uniform scheme on non-perspective cameras."
+		splitDistributionDistances := (0 to: 4) collect: [ :i | 
+			(farDistance - nearDistance) / numSlices * i + nearDistance
+		].
 	].
 
 	splitDistributionLambdas := splitDistributionDistances collect: [ :distance |

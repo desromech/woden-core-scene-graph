@@ -25,7 +25,8 @@ Class {
 		'worldFrustum',
 		'bloomThreshold',
 		'bloomStrength',
-		'cascadeSplitDistributionLambda'
+		'cascadeSplitDistributionLambda',
+		'isPerspective'
 	],
 	#category : #'WodenSceneGraph-Core-RenderingState'
 }
@@ -217,6 +218,7 @@ WDCameraState >> initialize [
 	super initialize.
 	projectionMatrix := Matrix4x4 identity.
 	frustum := Frustum new.
+	isPerspective := false.
 	currentTime := 0.0.
 	exposure := 1.0.
 	bloomThreshold := 1.0.
@@ -235,6 +237,18 @@ WDCameraState >> initialize [
 { #category : #accessing }
 WDCameraState >> inverseProjectionMatrix [
 	^ inverseProjectionMatrix ifNil: [inverseProjectionMatrix := projectionMatrix inverse]
+]
+
+{ #category : #accessing }
+WDCameraState >> isPerspective [
+
+	^ isPerspective
+]
+
+{ #category : #accessing }
+WDCameraState >> isPerspective: anObject [
+
+	isPerspective := anObject
 ]
 
 { #category : #accessing }

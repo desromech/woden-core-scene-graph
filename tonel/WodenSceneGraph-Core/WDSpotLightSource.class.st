@@ -70,6 +70,7 @@ WDSpotLightSource >> shadowMapCameraStatesWithTransform: worldRenderingTransform
 	^ {WDCameraState new
 		nearDistance: nearDistance;
 		farDistance: influenceRadius;
+		isPerspective: true;
 		projectionMatrix: (Matrix4x4 reverseDepthPerspectiveFovY: fovy aspect: aspect near: nearDistance far: farDistance);
 		frustum: (Frustum new makePerspectiveFovY: fovy aspect: aspect near: nearDistance far: farDistance);
 		hasReverseDepth: true;

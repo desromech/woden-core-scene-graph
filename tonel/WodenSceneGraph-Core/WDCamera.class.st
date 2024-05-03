@@ -33,6 +33,7 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 	^ WDCameraState new
 		nearDistance: nearDistance;
 		farDistance: farDistance;
+		isPerspective: isPerspective;
 		projectionMatrix: (self projectionMatrixWithAspect: aspectRatio);
 		frustum: (self frustumWithAspect: aspectRatio);
 		currentTime: currentTime;
@@ -51,6 +52,7 @@ WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeT
 	^ WDCameraState new
 		nearDistance: nearDistance;
 		farDistance: farDistance;
+		isPerspective: isPerspective;
 		projectionMatrix: (self projectionMatrixWithFrustumTangents: frustumTangents);
 		frustum: (self frustumWithTangents: frustumTangents);
 		currentTime: currentTime;
