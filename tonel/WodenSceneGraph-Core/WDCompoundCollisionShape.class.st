@@ -124,12 +124,13 @@ WDCompoundCollisionShape >> rayCast: ray [
 	| result |
 	result := nil.
 	self componentsIntersectingRay: ray do: [:eachComponent |
-		| shapeRay shapeRayResult |
+		| shapeRay |
 		shapeRay := ray inverseTransformedWith: eachComponent transform.
-		shapeRayResult := eachComponent shape rayCast: shapeRay.
-		(result isNil or: [shapeRayResult distance < result distance]) ifTrue: [
-			result := shapeRayResult
-		].
+		(eachComponent shape rayCast: shapeRay) ifNotNil: [ :shapeRayResult |
+			(result isNil or: [shapeRayResult distance < result distance]) ifTrue: [
+				result := shapeRayResult
+			].
+		]
 	].
 
 	^ nil
