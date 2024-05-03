@@ -96,7 +96,11 @@ WDSceneLayer >> boundingBox [
 	boundingBox ifNil: [ 
 		boundingBox := AABox empty.
 		self childrenDo: [ :eachChild |
-			boundingBox insertBox: eachChild boundingBox
+			| childBox |
+			childBox := eachChild boundingBox.
+			childBox isInfinite ifFalse: [ 
+				boundingBox insertBox: childBox
+			].
 		]
 	].
 

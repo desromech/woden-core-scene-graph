@@ -188,8 +188,8 @@ WDSceneNode >> lights [
 
 { #category : #accessing }
 WDSceneNode >> lights: anObject [
-
-	lights := anObject
+	lights := anObject.
+	self invalidateLocalBoundingBox
 ]
 
 { #category : #accessing }
@@ -260,8 +260,8 @@ WDSceneNode >> renderables [
 
 { #category : #accessing }
 WDSceneNode >> renderables: anObject [
-
-	renderables := anObject
+	renderables := anObject.
+	self invalidateLocalBoundingBox.
 ]
 
 { #category : #transforming }
