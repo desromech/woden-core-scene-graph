@@ -14,7 +14,8 @@ Class {
 		'castShadows',
 		'visible',
 		'localBoundingBox',
-		'boundingBox'
+		'boundingBox',
+		'boundingVolumeTreeNode'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
@@ -96,6 +97,18 @@ WDSceneNode >> boundingBox [
 	^ boundingBox ifNil: [ boundingBox := self localBoundingBox transformedWith: self transform ]
 ]
 
+{ #category : #accessing }
+WDSceneNode >> boundingVolumeTreeNode [
+
+	^ boundingVolumeTreeNode
+]
+
+{ #category : #accessing }
+WDSceneNode >> boundingVolumeTreeNode: anObject [
+
+	boundingVolumeTreeNode := anObject
+]
+
 { #category : #'animation subtree map' }
 WDSceneNode >> buildAnimationSubtreeMap [
 	| result |
@@ -127,10 +140,9 @@ WDSceneNode >> castShadows: aBoolean [
 	castShadows := aBoolean
 ]
 
-{ #category : #'as yet unclassified' }
-WDSceneNode >> childChanged: aChild [
-	self invalidateLocalBoundingBox.
-	super childChanged: aChild.
+{ #category : #'bounding volume' }
+WDSceneNode >> childBoundingBoxChanged: aChild [
+	self invalidateLocalBoundingBox
 ]
 
 { #category : #accessing }
@@ -161,12 +173,7 @@ WDSceneNode >> instanceAsSceneNode [
 { #category : #'bounding volume' }
 WDSceneNode >> invalidateBoundingBox [
 	boundingBox := nil.
-	parent ifNotNil: [ parent invalidateChildBoundingBox ]
-]
-
-{ #category : #'bounding volume' }
-WDSceneNode >> invalidateChildBoundingBox [
-	self invalidateLocalBoundingBox
+	parent ifNotNil: [ parent childBoundingBoxChanged: self ]
 ]
 
 { #category : #'bounding volume' }
@@ -237,6 +244,7 @@ WDSceneNode >> position: aPosition [
 WDSceneNode >> postCopy [
 	super postCopy.
 	transform := transform copy.
+	boundingVolumeTreeNode := nil.
 ]
 
 { #category : #removing }
@@ -244,7 +252,6 @@ WDSceneNode >> removeAllChildren [
 	children isEmpty ifTrue: [ ^ self ].
 	super removeAllChildren.
 	self invalidateLocalBoundingBox.
-	parent ifNotNil: [ parent childChanged: self ]
 ]
 
 { #category : #removing }

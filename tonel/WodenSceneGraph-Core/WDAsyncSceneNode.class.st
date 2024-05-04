@@ -82,7 +82,7 @@ WDAsyncSceneNode >> initialize [
 { #category : #accessing }
 WDAsyncSceneNode >> invalidateBoundingBox [
 	boundingBox := nil.
-	parent ifNotNil: [ parent invalidateChildBoundingBox ]
+	parent ifNotNil: [ parent childBoundingBoxChanged: self ]
 ]
 
 { #category : #accessing }

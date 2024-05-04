@@ -19,7 +19,6 @@ WDSceneTreeElement >> addRecursivelyIntoRenderingSceneCameraLayer: renderingScen
 WDSceneTreeElement >> addedTo: newParent [
 	self assert: parent isNil.
 	parent := newParent.
-	parent childChanged: self
 ]
 
 { #category : #converting }

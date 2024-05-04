@@ -236,13 +236,6 @@ WDRenderingSceneCameraLayer >> shouldRenderBoundingBox: boundingBoxToTest withOb
 ]
 
 { #category : #testing }
-WDRenderingSceneCameraLayer >> shouldRenderWorldBoundingBox: boundingBoxToText [
-	^ usesFrustumCulling
-		ifTrue: [ self cameraState worldFrustum intersectsOrContainsBox: boundingBoxToText ]
-		ifFalse: [ true ]
-]
-
-{ #category : #testing }
 WDRenderingSceneCameraLayer >> shouldRenderWorldSphereWithCenter: sphereCenter radius: sphereRadius [
 	^ usesFrustumCulling
 		ifTrue: [ self cameraState worldFrustum intersectsOrContainsSphereWithCenter: sphereCenter radius: sphereRadius ]

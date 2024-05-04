@@ -6,7 +6,8 @@ Class {
 	#superclass : #WDSceneTreeElementWithChildren,
 	#instVars : [
 		'globalLightingState',
-		'boundingBox'
+		'boundingBox',
+		'boundingVolumeTree'
 	],
 	#category : #'WodenSceneGraph-Core-Scene'
 }
@@ -23,13 +24,19 @@ WDSceneLayer class >> isAbstract [
 
 { #category : #converting }
 WDSceneLayer >> addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: renderingSceneCameraLayer [
-	| parentGlobalTransform |
+	| parentGlobalTransform frustum |
 	parentGlobalTransform := ReversibleAffineTransform3D identity.
-	children do: [ :each |
-		(renderingSceneCameraLayer shouldRenderWorldBoundingBox: each boundingBox) ifTrue: [ 
+	renderingSceneCameraLayer usesFrustumCulling ifFalse: [ 
+		children do: [ :each |
 			each addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform
 		].
-	]
+		^ self
+	].
+
+	frustum := renderingSceneCameraLayer cameraState worldFrustum.
+	boundingVolumeTree leavesIntersectingFrustum: frustum do: [ :treeNode |
+		treeNode value addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform
+	].
 ]
 
 { #category : #adding }
@@ -108,14 +115,24 @@ WDSceneLayer >> boundingBox [
 ]
 
 { #category : #hook }
-WDSceneLayer >> childChanged: aChild [
-	super childChanged: aChild.
-	self invalidateBoundingBox
+WDSceneLayer >> childBoundingBoxChanged: aChild [
+	| childBoundingBox |
+	super childBoundingBoxChanged: aChild.
+	childBoundingBox := aChild boundingBox.
+	boundingVolumeTree updateLeafNode: aChild boundingVolumeTreeNode boundingBox: childBoundingBox.
+	
+	self invalidateBoundingBox.
 ]
 
 { #category : #initialization }
 WDSceneLayer >> copiedIntoScene: aScene [
 	parent := aScene.
+]
+
+{ #category : #initialization }
+WDSceneLayer >> initialize [
+	super initialize.
+	boundingVolumeTree := WMDbvt new.
 ]
 
 { #category : #initialization }
@@ -139,14 +156,32 @@ WDSceneLayer >> invalidateBoundingBox [
 	boundingBox := nil.
 ]
 
-{ #category : #hook }
-WDSceneLayer >> invalidateChildBoundingBox [
-	self invalidateBoundingBox
-]
-
 { #category : #testing }
 WDSceneLayer >> isSceneLayer [
 	^ true
+]
+
+{ #category : #copying }
+WDSceneLayer >> postCopy [
+	boundingVolumeTree := WMDbvt new.
+	super postCopy.
+	
+]
+
+{ #category : #adding }
+WDSceneLayer >> privateAddChild: aNode [
+	self assert: aNode boundingVolumeTreeNode isNil.
+	super privateAddChild: aNode.
+	
+	aNode boundingVolumeTreeNode: (boundingVolumeTree insertValue: aNode withBoundingBox: aNode boundingBox)
+]
+
+{ #category : #adding }
+WDSceneLayer >> privateRemoveChild: aNode [
+	self assert: aNode boundingVolumeTreeNode notNil.
+	super privateRemoveChild: aNode.
+	boundingVolumeTree removeNode: aNode boundingVolumeTreeNode.
+	
 ]
 
 { #category : #accessing }

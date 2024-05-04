@@ -25,8 +25,9 @@ WDSceneElement >> asSceneElement [
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
-WDSceneElement >> childChanged: aChild [
+{ #category : #hook }
+WDSceneElement >> childBoundingBoxChanged: aChild [
+	
 ]
 
 { #category : #accessing }
@@ -42,11 +43,6 @@ WDSceneElement >> globalTransform [
 { #category : #copying }
 WDSceneElement >> instanceAsSceneNode [
 	^ self subclassResponsibility
-]
-
-{ #category : #hook }
-WDSceneElement >> invalidateChildBoundingBox [
-	
 ]
 
 { #category : #testing }

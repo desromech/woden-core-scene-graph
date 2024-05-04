@@ -29,13 +29,8 @@ WDSceneTreeElementWithChildren >> addSceneElement: aNode [
 	self assert: aNode isWodenSceneElement.
 	self assert: aNode parent isNil.
 	
-	children add: aNode.
+	self privateAddChild: aNode.
 	aNode addedTo: self.
-]
-
-{ #category : #'as yet unclassified' }
-WDSceneTreeElementWithChildren >> childChanged: aChild [
-	parent ifNotNil: [ parent childChanged: self ]
 ]
 
 { #category : #accessing }
@@ -67,6 +62,16 @@ WDSceneTreeElementWithChildren >> postCopy [
 	].
 ]
 
+{ #category : #adding }
+WDSceneTreeElementWithChildren >> privateAddChild: aNode [
+	children add: aNode.
+]
+
+{ #category : #adding }
+WDSceneTreeElementWithChildren >> privateRemoveChild: aNode [
+	children remove: aNode.
+]
+
 { #category : #removing }
 WDSceneTreeElementWithChildren >> removeAllChildren [
 	children do: [ :each | each removedFrom: self ].
@@ -78,6 +83,6 @@ WDSceneTreeElementWithChildren >> removeSceneElement: aNode [
 	self assert: aNode isWodenSceneElement.
 	self assert: aNode parent == self.
 	
-	children remove: aNode.
+	self privateRemoveChild: aNode.
 	aNode removedFrom: self.
 ]
