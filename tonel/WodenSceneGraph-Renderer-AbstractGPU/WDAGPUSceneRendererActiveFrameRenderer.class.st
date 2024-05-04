@@ -285,8 +285,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer 
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: (renderer resourceCache stereoComposeShaderFor: composeMode) entryPoint: 'main'.		
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: (renderer resourceCache stereoComposeShaderFor: composeMode).
 
 	leftEyeTexture := leftEyeFramebuffer colorAttachments first.
 	rightEyeTexture := rightEyeFramebuffer colorAttachments first.
@@ -321,8 +321,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDepthOnlyOpaqueSurfaceMaterialActi
 	locationMask := currentObjectVertexBinding locationMask bitAnd: renderer resourceCache depthOnlyVertexAttributesForMask.
 	
 	stateTracker
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
-		setFragmentStage: renderer resourceCache genericDepthOnlySurfaceFragmentShader entryPoint: 'main';
+		setVertexStageWithMain: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState);
+		setFragmentStageWithMain: renderer resourceCache genericDepthOnlySurfaceFragmentShader;
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -350,12 +350,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidM
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
-		setFragmentStage: (isInDepthOnlyPass
+		setVertexStageWithMain: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask hasSkinning: hasSkinningState);
+		setFragmentStageWithMain: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader ]
 			ifFalse: [ material hasAlphaBlending
 				ifTrue: [ renderer resourceCache duplicatedMetallicRoughnessLiquidTranslucentFragmentShader ]
-				ifFalse: [renderer resourceCache duplicatedMetallicRoughnessLiquidOpaqueFragmentShader]]) entryPoint: 'main';
+				ifFalse: [renderer resourceCache duplicatedMetallicRoughnessLiquidOpaqueFragmentShader]]);
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -380,12 +380,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
-		setFragmentStage: (isInDepthOnlyPass
+		setVertexStageWithMain: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState);
+		setFragmentStageWithMain: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache environmentMapDepthOnlyFragmentShaderSource ]
 			ifFalse: [ material hasAlphaBlending
 				ifTrue: [ renderer resourceCache environmentMapTranslucentFragmentShader ]
-				ifFalse: [ renderer resourceCache environmentMapOpaqueFragmentShader ]]) entryPoint: 'main';
+				ifFalse: [ renderer resourceCache environmentMapOpaqueFragmentShader ]]);
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -413,12 +413,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivatio
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
-		setFragmentStage: (isInDepthOnlyPass
+		setVertexStageWithMain: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: currentObjectVertexBinding locationMask hasSkinning: hasSkinningState);
+		setFragmentStageWithMain: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache metallicRoughnessDepthOnlyFragmentShader ]
 			ifFalse: [material hasAlphaBlending
 				ifTrue: [ renderer resourceCache metallicRoughnessTranslucentFragmentShader ]
-				ifFalse: [renderer resourceCache metallicRoughnessOpaqueFragmentShader]]) entryPoint: 'main';
+				ifFalse: [renderer resourceCache metallicRoughnessOpaqueFragmentShader]]);
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -463,12 +463,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState) entryPoint: 'main';
-		setFragmentStage: (isInDepthOnlyPass
+		setVertexStageWithMain: (renderer resourceCache genericSurfaceMaterialVertexShaderWithLocationMask: locationMask hasSkinning: hasSkinningState);
+		setFragmentStageWithMain: (isInDepthOnlyPass
 			ifTrue: [ renderer resourceCache unlitDepthOnlyFragmentShaderSource ]
 			ifFalse: [ material hasAlphaBlending
 				ifTrue: [ renderer resourceCache unlitTranslucentFragmentShader ]
-				ifFalse: [ renderer resourceCache unlitOpaqueFragmentShader ]]) entryPoint: 'main';
+				ifFalse: [ renderer resourceCache unlitOpaqueFragmentShader ]]);
 		setCullMode: (material doubleSided
 			ifTrue: [ AGPU_CULL_MODE_NONE ]
 			ifFalse: [ AGPU_CULL_MODE_BACK ]).
@@ -490,8 +490,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitVolumetricDensityMaterialActivatio
 			activeSlabResource add: binding.
 			binding
 		]) bindingHandle;
-		setVertexStage: renderer resourceCache volumetricVertexShader entryPoint: 'main';
-		setFragmentStage: renderer resourceCache volumetricDensityFragmentShader entryPoint: 'main';
+		setVertexStageWithMain: renderer resourceCache volumetricVertexShader;
+		setFragmentStageWithMain: renderer resourceCache volumetricDensityFragmentShader;
 		setCullMode: AGPU_CULL_MODE_BACK.
 	^ true
 ]
@@ -586,8 +586,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderi
 		setScissor: 0 y: 0 w: bloomExtent x h: bloomExtent y;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: renderer resourceCache bloomSelectionFragmentShader entryPoint: 'main'.
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: renderer resourceCache bloomSelectionFragmentShader.
 
 	self
 		bindCameraState: mainCameraState;
@@ -632,7 +632,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderi
 		beginRenderPass: (renderer resourceCache hdrTranslucentContinueRenderPassWithSampleCount: renderingSceneState sampleCount) framebuffer: intermediateFramebuffers hdrTranslucentFramebuffer bundle_content: 0;
 		setViewport: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
 		setFragmentStage: renderer resourceCache downsampleFragmentShader entryPoint: 'main';
 		setBlendState: 1 enabled: 1;
 		setBlendFunction: 1
@@ -653,8 +653,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForCombiningOpaqueReflec
 
 	extent := intermediateFramebuffers extent.
 	stateTracker
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: renderer resourceCache opaqueReflectionCombinationFragmentShader entryPoint: 'main'.
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: renderer resourceCache opaqueReflectionCombinationFragmentShader.
 
 	self
 		bindCameraState: mainCameraState;
@@ -744,8 +744,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenRoughComputatio
 			setScissor: 0 y: 0 w: extent x h: extent y;
 			setShaderSignature: shaderSignature handle;
 			useShaderResources: shaderSignature samplersBinding;
-			setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-			setFragmentStage: renderer resourceCache downsampleFragmentShader entryPoint: 'main'.
+			setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+			setFragmentStageWithMain: renderer resourceCache downsampleFragmentShader.
 
 		self bindBlurTextureSource: previousTexture.
 
@@ -808,8 +808,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcc
 		setScissor: 0 y: 0 w: ssaoExtent x h: ssaoExtent y;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: renderer resourceCache screenSpaceAmbientOcclusionComputationFragmentShader entryPoint: 'main'.
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: renderer resourceCache screenSpaceAmbientOcclusionComputationFragmentShader.
 
 	self
 		bindCameraState: mainCameraState;
@@ -869,8 +869,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflection
 		setScissor: 0 y: 0 w: extent x h: extent y;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: (renderer resourceCache screenSpaceReflectionComputationFragmentShader) entryPoint: 'main'.
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: (renderer resourceCache screenSpaceReflectionComputationFragmentShader).
 
 	self
 		bindCameraState: mainCameraState;
@@ -897,8 +897,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForStaticReflectionCompu
 		setScissor: 0 y: 0 w: extent x h: extent y;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: (renderer resourceCache staticReflectionComputationFragmentShader) entryPoint: 'main'.
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: renderer resourceCache staticReflectionComputationFragmentShader.
 
 	self
 		bindCameraState: mainCameraState;
@@ -924,15 +924,15 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
 
 	"Compute the per-cluster bounding boxes."
 	stateTracker
-		setComputeStage: renderer resourceCache lightGridComputationShader entryPoint: 'main';
+		setComputeStageWithMain: renderer resourceCache lightGridComputationShader;
 		dispatchCompute: workgroupCountX group_count_y: workgroupCountY group_count_z: workgroupCountZ;
 		memoryBarrier: AGPU_PIPELINE_STAGE_COMPUTE_SHADER dest_stage: AGPU_PIPELINE_STAGE_COMPUTE_SHADER source_accesses: AGPU_ACCESS_SHADER_WRITE dest_accesses: AGPU_ACCESS_SHADER_READ;
 
-		setComputeStage: renderer resourceCache lightClusterListBeginComputationShader entryPoint: 'main';
+		setComputeStageWithMain: renderer resourceCache lightClusterListBeginComputationShader;
 		dispatchCompute: 1 group_count_y: 1 group_count_z: 1;
 		memoryBarrier: AGPU_PIPELINE_STAGE_COMPUTE_SHADER dest_stage: AGPU_PIPELINE_STAGE_COMPUTE_SHADER source_accesses: AGPU_ACCESS_SHADER_WRITE dest_accesses: AGPU_ACCESS_SHADER_READ;
 
-		setComputeStage: renderer resourceCache lightClusterListComputationShader entryPoint: 'main';
+		setComputeStageWithMain: renderer resourceCache lightClusterListComputationShader;
 		dispatchCompute: workgroupCount group_count_y: 1 group_count_z: 1;
 		memoryBarrier: AGPU_PIPELINE_STAGE_COMPUTE_SHADER dest_stage: AGPU_PIPELINE_STAGE_FRAGMENT_SHADER source_accesses: AGPU_ACCESS_SHADER_WRITE dest_accesses: AGPU_ACCESS_SHADER_READ.
 ]
@@ -1073,8 +1073,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		setScissor: 0 y: 0 w: framebuffer width h: framebuffer height;
 		setShaderSignature: shaderSignature handle;
 		useShaderResources: shaderSignature samplersBinding;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: (renderer resourceCache toneMappingOperatorShaderFor: mainCameraState toneMappingOperator) entryPoint: 'main'.
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: (renderer resourceCache toneMappingOperatorShaderFor: mainCameraState toneMappingOperator).
 
 	self
 		bindCameraState: mainCameraState;
@@ -1146,8 +1146,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLay
 		setDepthState: true writeMask: true function: AGPU_ALWAYS;
 		setDepthBias: lightSource shadowMapDepthBiasConstant asFloat negated clamp: 0.0 slope_factor: lightSource shadowMapDepthBiasSlope asFloat negated;
 		setPrimitiveType: AGPU_TRIANGLES;
-		setVertexStage: renderer resourceCache screenQuadVertexShader entryPoint: 'main';
-		setFragmentStage: renderer resourceCache clearReverseDepthFragmentShader entryPoint: 'main';
+		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
+		setFragmentStageWithMain: renderer resourceCache clearReverseDepthFragmentShader;
 		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0;
 
 		"Setup normal rendering"
