@@ -19,6 +19,7 @@ Class {
 		'convertedRenderModelTextureDictionary'
 	],
 	#classVars : [
+		'AxisStateClassMap',
 		'DeviceClassIDToClassMap',
 		'DeviceRoleMap',
 		'EventTypeMap'
@@ -68,6 +69,12 @@ WDAGPUVRSystem class >> initialize [
 		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_MODE_SWITCH_1 . WDVRTrackedDeviceDualAnalogModeSwitch1Event.
 		AGPU_VR_EVENT_TYPE_DUAL_ANALOG_MODE_SWITCH_2 . WDVRTrackedDeviceDualAnalogModeSwitch2Event.
 	}.
+	
+	AxisStateClassMap := Dictionary newFromPairs: { 
+		AGPU_VR_CONTROLLER_AXIS_JOYSTICK . WDVRControllerJoystickAxisState.
+		AGPU_VR_CONTROLLER_AXIS_TRACK_PAD . WDVRControllerTrackPadAxisState.
+		AGPU_VR_CONTROLLER_AXIS_TRIGGER . WDVRControllerTriggerAxisState.
+	}.
 ]
 
 { #category : #'tracked device' }
@@ -77,6 +84,31 @@ WDAGPUVRSystem >> checkTrackedDevice: oldDevice forPose: trackedDevicePose [
 	^ oldDevice class == requiredClass
 		ifTrue: [ oldDevice ]
 		ifFalse: [ self newTrackedDeviceFor: trackedDevicePose ]
+]
+
+{ #category : #'as yet unclassified' }
+WDAGPUVRSystem >> controllerAxisState: axisState [
+	^ (AxisStateClassMap at: axisState type ifAbsent: [nil]) ifNotNil: [ :cls |
+		cls new
+			x: axisState x;
+			y: axisState y;
+			yourself
+	]
+]
+
+{ #category : #'tracked device' }
+WDAGPUVRSystem >> convertControllerState: state [
+	^ WDVRControllerState new
+		touchedButtons: state buttons_touched;
+		pressedButtons: state buttons_pressed;
+		axes: ({
+			self controllerAxisState: state axis0 .
+			self controllerAxisState: state axis1 .
+			self controllerAxisState: state axis2 .
+			self controllerAxisState: state axis3 .
+			self controllerAxisState: state axis4 .
+		} select: [ :each | each notNil ])
+		yourself 
 ]
 
 { #category : #private }
@@ -403,7 +435,7 @@ WDAGPUVRSystem >> trackedDevicesDo: aBlock [
 
 { #category : #'vr system' }
 WDAGPUVRSystem >> waitAndFetchPoses [
-	| trackedDevicePoseCount trackedDevicePose trackedDeviceRenderPose isValidPose trackedDevice |
+	| trackedDevicePoseCount trackedDevicePose trackedDeviceRenderPose isValidPose trackedDevice controllerState controllerStateFetched |
 	handle waitAndFetchPoses.
 	
 	trackedDevices ifEmpty: [ trackedDevices := Array new: handle getMaxTrackedDevicePoseCount ].
@@ -411,6 +443,8 @@ WDAGPUVRSystem >> waitAndFetchPoses [
 	trackedDevicePoseCount := handle getCurrentTrackedDevicePoseCount.
 	trackedDevicePose := AGPUVrTrackedDevicePose new.
 	trackedDeviceRenderPose := AGPUVrTrackedDevicePose new.
+	controllerState := AGPUVrControllerState new.
+	
 	1 to: trackedDevicePoseCount do: [ :i |
 		handle getCurrentTrackedDevicePoseInto: i - 1 dest: trackedDevicePose.
 		handle getCurrentRenderTrackedDevicePoseInto: i - 1 dest: trackedDeviceRenderPose.
@@ -426,10 +460,15 @@ WDAGPUVRSystem >> waitAndFetchPoses [
 			trackedDevice renderModel ifNil: [ 
 				trackedDevice renderModel: (self convertRenderModel: (handle getTrackedDeviceRenderModel: i - 1))
 			].
+		
+			controllerStateFetched := (handle getControllerState: i - 1 dest: controllerState) ~= 0.
 			trackedDevice
 				role: (DeviceRoleMap at: trackedDevicePose device_role ifAbsent: [WDVRTrackedDeviceRoleInvalid asVRTrackedDeviceRole]);
 				currentPose: (self convertTrackedDevicePose: trackedDevicePose);
 				currentRenderPose: (self convertTrackedDevicePose: trackedDeviceRenderPose);
+				controllerState: (controllerStateFetched
+					ifTrue: [self convertControllerState: controllerState]
+					ifFalse: [nil]);
 				yourself
 		].
 	].

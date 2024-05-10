@@ -133,7 +133,7 @@ WDCompoundCollisionShape >> rayCast: ray [
 		]
 	].
 
-	^ nil
+	^ result
 ]
 
 { #category : #transforming }

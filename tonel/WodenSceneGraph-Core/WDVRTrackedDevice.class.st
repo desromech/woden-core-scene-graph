@@ -7,10 +7,23 @@ Class {
 		'currentRenderPose',
 		'role',
 		'eventHandler',
-		'renderModel'
+		'renderModel',
+		'controllerState'
 	],
 	#category : #'WodenSceneGraph-Core-VR'
 }
+
+{ #category : #accessing }
+WDVRTrackedDevice >> controllerState [
+
+	^ controllerState
+]
+
+{ #category : #accessing }
+WDVRTrackedDevice >> controllerState: anObject [
+
+	controllerState := anObject
+]
 
 { #category : #accessing }
 WDVRTrackedDevice >> currentPose [
