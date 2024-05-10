@@ -5,11 +5,25 @@ Class {
 	#name : #WDSceneRenderer,
 	#superclass : #Object,
 	#classVars : [
+		'BloomEnabled',
 		'Current',
-		'CurrentSession'
+		'CurrentSession',
+		'ScreenSpaceAmbientOcclusionEnabled',
+		'ScreenSpaceReflectionEnabled',
+		'ShadowMappingEnabled'
 	],
 	#category : #'WodenSceneGraph-Renderer-Core'
 }
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> bloomEnabled [
+	^ BloomEnabled ifNil: [ BloomEnabled := true ]
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> bloomEnabled: aBoolean [
+	^ BloomEnabled := aBoolean
+]
 
 { #category : #accessing }
 WDSceneRenderer class >> current [
@@ -49,6 +63,63 @@ WDSceneRenderer class >> reset [
 	Current := nil
 ]
 
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> screenSpaceAmbientOcclusionEnabled [
+	^ ScreenSpaceAmbientOcclusionEnabled ifNil: [ ScreenSpaceAmbientOcclusionEnabled := true ]
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> screenSpaceAmbientOcclusionEnabled: aBoolean [
+	^ ScreenSpaceAmbientOcclusionEnabled := aBoolean
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> screenSpaceReflectionEnabled [
+	^ ScreenSpaceReflectionEnabled ifNil: [ ScreenSpaceReflectionEnabled := true ]
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> screenSpaceReflectionEnabled: aBoolean [
+	^ ScreenSpaceReflectionEnabled := aBoolean
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> shadowMappingEnabled [
+	^ ShadowMappingEnabled ifNil: [ ShadowMappingEnabled := true ]
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer class >> shadowMappingEnabled: aBoolean [
+	^ ShadowMappingEnabled := aBoolean
+]
+
+{ #category : #preferences }
+WDSceneRenderer class >> wodenSettingsOn: aBuilder [
+	<systemsettings>
+	(aBuilder group: #woden)
+		label: 'Woden';
+		description: 'Woden Settings';
+		with: [
+			(aBuilder setting: #shadowMappingEnabled)
+				label: 'Shadow Mapping Enabled';
+				description: 'This enables the support for shadow mapping.'.
+			(aBuilder setting: #screenSpaceAmbientOcclusionEnabled)
+				label: 'SSAO Enabled';
+				description: 'This enables the support for screen space ambient occlusion.'.
+			(aBuilder setting: #screenSpaceReflectionEnabled)
+				label: 'SSR Enabled';
+				description: 'This enables the support for screen space reflection.'.
+			(aBuilder setting: #bloomEnabled)
+				label: 'Bloom Enabled';
+				description: 'This enables the support for bloom.'.
+		]
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer >> bloomEnabled [
+	^ self class bloomEnabled
+]
+
 { #category : #vr }
 WDSceneRenderer >> createVRSystem [
 	^ nil
@@ -77,4 +148,19 @@ WDSceneRenderer >> renderSceneState: renderingSceneState intoFramebuffer: frameb
 { #category : #rendering }
 WDSceneRenderer >> renderSceneState: renderingSceneState overlay: overlaySceneGraph intoFramebuffer: framebuffer [
 	self subclassResponsibility
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer >> screenSpaceAmbientOcclusionEnabled [
+	^ self class screenSpaceAmbientOcclusionEnabled
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer >> screenSpaceReflectionEnabled [
+	^ self class screenSpaceReflectionEnabled
+]
+
+{ #category : #'as yet unclassified' }
+WDSceneRenderer >> shadowMappingEnabled [
+	^ self class shadowMappingEnabled
 ]

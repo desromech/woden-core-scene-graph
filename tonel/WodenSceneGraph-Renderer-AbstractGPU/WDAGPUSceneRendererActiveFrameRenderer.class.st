@@ -576,6 +576,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderi
 	| shaderSignature bloomExtent |
 	
 	mainCameraState bloomStrength <= 0.0 ifTrue: [ ^ self ].
+	renderer bloomEnabled ifFalse: [ ^ self ].
 
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	bloomExtent := intermediateFramebuffers bloomExtent.
@@ -649,16 +650,23 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderi
 
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForCombiningOpaqueReflections: intermediateFramebuffers cameraState: mainCameraState [
-	| extent |
+	| extent ssaoTexture ssrTexture |
 
 	extent := intermediateFramebuffers extent.
 	stateTracker
 		setVertexStageWithMain: renderer resourceCache screenQuadVertexShader;
 		setFragmentStageWithMain: renderer resourceCache opaqueReflectionCombinationFragmentShader.
 
+	ssaoTexture := renderer screenSpaceAmbientOcclusionEnabled
+		ifTrue: [ intermediateFramebuffers ssaoPingTexture ]
+		ifFalse: [ renderer resourceCache whiteTexture2D ].
+	ssrTexture := renderer screenSpaceReflectionEnabled
+		ifTrue: [ intermediateFramebuffers screenSpaceReflectionTexture ]
+		ifFalse: [ renderer resourceCache transparentTexture2D ].
+		
 	self
 		bindCameraState: mainCameraState;
-		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView  opaqueColorBuffer: intermediateFramebuffers hdrOpaqueColorBuffer ssaoTexture: intermediateFramebuffers ssaoPingTexture staticReflectionTexture: intermediateFramebuffers staticReflectionTexture screenSpaceReflectionTexture: intermediateFramebuffers screenSpaceReflectionTexture.
+		bindOpaqueDepthBuffer: intermediateFramebuffers depthStencilBufferSamplingView  opaqueColorBuffer: intermediateFramebuffers hdrOpaqueColorBuffer ssaoTexture: ssaoTexture staticReflectionTexture: intermediateFramebuffers staticReflectionTexture screenSpaceReflectionTexture: ssrTexture.
 
 	stateTracker
 		setCullMode: AGPU_CULL_MODE_NONE;
@@ -798,6 +806,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenRoughComputatio
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcclusionComputationFor: intermediateFramebuffers cameraState: mainCameraState [
 	| shaderSignature ssaoExtent |
+	renderer screenSpaceAmbientOcclusionEnabled ifFalse: [ ^ self ].
 
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	ssaoExtent := intermediateFramebuffers ssaoExtent.
@@ -854,6 +863,8 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcc
 { #category : #rendering }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState [
 	| shaderSignature extent screenRoughTextures screenRoughTexture |
+	
+	renderer screenSpaceReflectionEnabled ifFalse: [ ^ self ].
 	
 	self recordCommandsForScreenRoughComputationFor: intermediateFramebuffers.
 	
@@ -951,11 +962,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 		initialDepth: initialDepth.
 	shaderSignature := renderer resourceCache rendererShaderSignature.
 	
-	renderer resourceCache shadowMapAtlasAllocator reset.	
-	renderingSceneState cameraLayers do: [ :cameraLayer |
-		cameraLayer shadowMapSets do: [ :shadowMapSet |
-			self allocateAndRenderShadowMapFor: shadowMapSet
-		]
+	renderer shadowMappingEnabled ifTrue: [
+		renderer resourceCache shadowMapAtlasAllocator reset.	
+		renderingSceneState cameraLayers do: [ :cameraLayer |
+			cameraLayer shadowMapSets do: [ :shadowMapSet |
+				self allocateAndRenderShadowMapFor: shadowMapSet
+			]
+		].
 	].
 
 	mainCameraState := self convertedCameraState: (renderingSceneState mainCameraState ifNil: [WDCameraState new]) framebufferExtent: framebuffer extent.
@@ -1219,17 +1232,23 @@ WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled writeMa
 
 { #category : #private }
 WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
-	| lightStateSize lightStateAlignment uploadAllocation destOffset |
+	| lightStateSize lightStateAlignment uploadAllocation destOffset shadowMappingEnabled |
 	lightStateSize := WDAGPULightStateUniformBufferWriter uniqueInstance instanceSize.
 	lightStateAlignment := WDAGPULightStateUniformBufferWriter uniqueInstance instanceAlignment.
 	uploadAllocation := renderer resourceCache uploadBuffer allocate: (lights size + 1) * lightStateSize alignment: lightStateAlignment.
+	
+	shadowMappingEnabled := renderer shadowMappingEnabled.
 	
 	destOffset := 0.
 	lights doWithIndex: [ :light :index |
 		| adjustedLight |
 		adjustedLight := light copy.
-		adjustedLight castShadows ifTrue: [ 
-			adjustedLight shadowMapProjectionMatrices: (adjustedLight shadowMapProjectionMatrices collect: [:each | renderer resourceCache projectionNDCAdjustMatrix * each])
+		shadowMappingEnabled ifTrue: [
+			adjustedLight castShadows ifTrue: [ 
+				adjustedLight shadowMapProjectionMatrices: (adjustedLight shadowMapProjectionMatrices collect: [:each | renderer resourceCache projectionNDCAdjustMatrix * each])
+			].
+		] ifFalse: [
+			adjustedLight castShadows: false
 		].
 	
 		uploadAllocation writeValue: adjustedLight with: WDAGPULightStateUniformBufferWriter at: destOffset.
