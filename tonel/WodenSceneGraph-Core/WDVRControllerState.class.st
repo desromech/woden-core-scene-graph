@@ -35,6 +35,12 @@ WDVRControllerState >> initialize [
 ]
 
 { #category : #accessing }
+WDVRControllerState >> joysticks [
+
+	^ joysticks
+]
+
+{ #category : #accessing }
 WDVRControllerState >> pressedButtons [
 
 	^ pressedButtons
@@ -56,4 +62,16 @@ WDVRControllerState >> touchedButtons [
 WDVRControllerState >> touchedButtons: anObject [
 
 	touchedButtons := anObject
+]
+
+{ #category : #accessing }
+WDVRControllerState >> trackpads [
+
+	^ trackpads
+]
+
+{ #category : #accessing }
+WDVRControllerState >> triggers [
+
+	^ triggers
 ]

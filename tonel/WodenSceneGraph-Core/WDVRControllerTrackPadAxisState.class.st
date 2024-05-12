@@ -6,5 +6,5 @@ Class {
 
 { #category : #testing }
 WDVRControllerTrackPadAxisState >> isTrackPad [
-	^ false
+	^ true
 ]
