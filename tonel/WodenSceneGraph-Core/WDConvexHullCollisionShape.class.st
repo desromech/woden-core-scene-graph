@@ -2,7 +2,8 @@ Class {
 	#name : #WDConvexHullCollisionShape,
 	#superclass : #WDConvexCollisionShape,
 	#instVars : [
-		'points'
+		'points',
+		'baseInertiaTensor'
 	],
 	#category : #'WodenSceneGraph-Core-Collision'
 }
@@ -10,6 +11,21 @@ Class {
 { #category : #construction }
 WDConvexHullCollisionShape class >> withPoints: aListOfPoints [
 	^ self new points: aListOfPoints; yourself
+]
+
+{ #category : #'mass distribution' }
+WDConvexHullCollisionShape >> baseInertiaTensor [
+	baseInertiaTensor ifNotNil: [ ^ baseInertiaTensor ].
+	
+	"Approximate the convex hull inertia by using the bounding box."
+	^ baseInertiaTensor :=
+		(Matrix3x3 inertiaTensorForBoxWithHalfExtent: self localBoundingBox halfExtent)
+		+ (Matrix3x3 inertiaTensorTransport: self localBoundingBox center).
+]
+
+{ #category : #'mass distribution' }
+WDConvexHullCollisionShape >> computeInertiaTensorWithMass: mass [
+	^ self baseInertiaTensor * mass
 ]
 
 { #category : #adding }
@@ -46,6 +62,7 @@ WDConvexHullCollisionShape >> points [
 WDConvexHullCollisionShape >> points: aListOfPoints [
 	points := aListOfPoints.
 	self localBoundingBox: (AABox encompassing: points).
+	baseInertiaTensor := nil.
 ]
 
 { #category : #transforming }

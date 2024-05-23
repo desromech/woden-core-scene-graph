@@ -17,10 +17,7 @@ WDSphereCollisionShape class >> radius: radius [
 
 { #category : #'mass distribution' }
 WDSphereCollisionShape >> computeInertiaTensorWithMass: mass [
-	| i |
-	i := mass * radius * radius * 2 * 5. 
-	
-	^ Matrix3x3 scale: i
+	^ (Matrix3x3 inertiaTensorForSphereWithRadius: radius) * mass
 ]
 
 { #category : #adding }

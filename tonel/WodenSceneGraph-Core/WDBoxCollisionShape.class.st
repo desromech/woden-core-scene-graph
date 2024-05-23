@@ -17,16 +17,7 @@ WDBoxCollisionShape class >> halfExtent: halfExtent [
 
 { #category : #'mass distribution' }
 WDBoxCollisionShape >> computeInertiaTensorWithMass: mass [
-	| extent extentSquared mo12 |
-	extent := halfExtent * 2.
-	extentSquared := extent * extent.
-	mo12 := mass / 12.
-	
-	^ Matrix3x3 new
-		m11: mo12 * (extentSquared y + extentSquared z);
-		m22: mo12 * (extentSquared x + extentSquared z);
-		m33: mo12 * (extentSquared x + extentSquared y);
-		yourself
+	^ (Matrix3x3 inertiaTensorForBoxWithHalfExtent: halfExtent) * mass
 ]
 
 { #category : #adding }
