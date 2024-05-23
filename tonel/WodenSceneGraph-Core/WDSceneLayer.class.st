@@ -119,7 +119,9 @@ WDSceneLayer >> childBoundingBoxChanged: aChild [
 	| childBoundingBox |
 	super childBoundingBoxChanged: aChild.
 	childBoundingBox := aChild boundingBox.
-	boundingVolumeTree updateLeafNode: aChild boundingVolumeTreeNode boundingBox: childBoundingBox.
+	aChild boundingVolumeTreeNode ifNotNil: [ 
+		boundingVolumeTree updateLeafNode: aChild boundingVolumeTreeNode boundingBox: childBoundingBox.
+	].
 	
 	self invalidateBoundingBox.
 ]

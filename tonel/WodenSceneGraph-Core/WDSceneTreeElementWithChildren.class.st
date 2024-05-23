@@ -65,6 +65,7 @@ WDSceneTreeElementWithChildren >> postCopy [
 { #category : #adding }
 WDSceneTreeElementWithChildren >> privateAddChild: aNode [
 	children add: aNode.
+	self childBoundingBoxChanged: aNode.
 ]
 
 { #category : #adding }
