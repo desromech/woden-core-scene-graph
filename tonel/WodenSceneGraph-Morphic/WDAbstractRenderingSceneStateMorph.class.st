@@ -134,6 +134,9 @@ WDAbstractRenderingSceneStateMorph >> uiScaleFactor [
 
 { #category : #'scale factor' }
 WDAbstractRenderingSceneStateMorph >> worldRendererScaleFactor [
+	(Smalltalk at: #FormSGAbstractWorldRenderer ifAbsent: [ ^ 1 ])
+		isEnabled ifFalse: [ ^ 1 ].
+
 	^ self world ifNil: [ 1 ]
 		ifNotNil: [ :world |
 			(world respondsTo: #worldState) ifTrue: [ 
