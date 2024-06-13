@@ -2,33 +2,34 @@
 I am a Bloc element that can display a Woden scene from the point of view of a specific camera.
 "
 Class {
-	#name : #WDBlSceneElement,
-	#superclass : #WDBlAbstractRenderingSceneStateElement,
+	#name : 'WDBlSceneElement',
+	#superclass : 'WDBlAbstractRenderingSceneStateElement',
 	#instVars : [
 		'scene',
 		'camera'
 	],
-	#category : #'WodenSceneGraph-Bloc'
+	#category : 'WodenSceneGraph-Bloc',
+	#package : 'WodenSceneGraph-Bloc'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlSceneElement >> camera [
 
 	^ camera
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlSceneElement >> camera: aCameraNode [
 	camera := aCameraNode ifNotNil: [aCameraNode asSceneNode]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBlSceneElement >> initialize [
 	super initialize.
 	self camera: WDCamera new.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlSceneElement >> renderingSceneState [
 	| extent aspectRatio |
 	scene ifNil: [ ^ nil ].
@@ -38,13 +39,13 @@ WDBlSceneElement >> renderingSceneState [
 	^ (camera asCameraStateWithAspectRatio: aspectRatio) ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlSceneElement >> scene [
 
 	^ scene
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlSceneElement >> scene: aNewScene [
 	scene := aNewScene.
 	self invalidate.

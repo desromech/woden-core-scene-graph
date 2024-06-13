@@ -1,6 +1,6 @@
-Extension { #name : #WDSceneElement }
+Extension { #name : 'WDSceneElement' }
 
-{ #category : #'*WodenSceneGraph-Bloc' }
+{ #category : '*WodenSceneGraph-Bloc' }
 WDSceneElement >> openInBlocSpace [
 	^ WDBlInteractiveSceneElement new
 		scene: self;

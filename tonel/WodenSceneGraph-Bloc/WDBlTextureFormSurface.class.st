@@ -5,49 +5,50 @@ When used, rendering happens in an internal Form and than can be used by a Woden
 
 "
 Class {
-	#name : #WDBlTextureFormSurface,
-	#superclass : #BlHostRendererSurface,
+	#name : 'WDBlTextureFormSurface',
+	#superclass : 'BlHostRendererSurface',
 	#instVars : [
 		'form'
 	],
-	#category : #'WodenSceneGraph-Bloc'
+	#category : 'WodenSceneGraph-Bloc',
+	#package : 'WodenSceneGraph-Bloc'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBlTextureFormSurface >> createSpaceRendererOn: anObject [
 
 	^ anObject createFormSpaceRenderer
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBlTextureFormSurface >> createSurfaceRendererOn: anObject [
 	
 	^ anObject createFormSurfaceRenderer
 ]
 
-{ #category : #geometry }
+{ #category : 'geometry' }
 WDBlTextureFormSurface >> extent [
 	^ form extent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureFormSurface >> form [
 	^ form
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureFormSurface >> form: aForm [
 	self assert: aForm depth = 32.
 	form := aForm
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureFormSurface >> pointer [
 	form unhibernate.
 	^ form bits tfPointerAddress
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureFormSurface >> stride [
 	^ form width * 4
 ]

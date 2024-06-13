@@ -1,6 +1,6 @@
-Extension { #name : #AeCairoImageSurface }
+Extension { #name : 'AeCairoImageSurface' }
 
-{ #category : #'*WodenSceneGraph-Bloc' }
+{ #category : '*WodenSceneGraph-Bloc' }
 AeCairoImageSurface >> readbackDataFromAgpuTexture: agpuTexture [
 	self flush.
 	agpuTexture readTextureData: 0 arrayIndex: 0 pitch: self stride slicePitch: self stride * self height buffer: self data.

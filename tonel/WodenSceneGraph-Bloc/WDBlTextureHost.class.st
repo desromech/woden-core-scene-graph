@@ -2,66 +2,67 @@
 I am Bloc host whose render space is a Woden texture.
 "
 Class {
-	#name : #WDBlTextureHost,
-	#superclass : #BlHost,
+	#name : 'WDBlTextureHost',
+	#superclass : 'BlHost',
 	#instVars : [
 		'texture'
 	],
 	#classVars : [
 		'PulseLoop'
 	],
-	#category : #'WodenSceneGraph-Bloc'
+	#category : 'WodenSceneGraph-Bloc',
+	#package : 'WodenSceneGraph-Bloc'
 }
 
-{ #category : #geometry }
+{ #category : 'geometry' }
 WDBlTextureHost class >> extent: anExtent [
 	^ self new initializeWithExtent: anExtent; yourself
 ]
 
-{ #category : #'api - lifecycle' }
+{ #category : 'api - lifecycle' }
 WDBlTextureHost class >> initialize [
 	PulseLoop := BlHostPulseLoop forHost: self
 ]
 
-{ #category : #'api - lifecycle' }
+{ #category : 'api - lifecycle' }
 WDBlTextureHost class >> isRunning [
 	^ PulseLoop isRunning
 ]
 
-{ #category : #'driver selection' }
+{ #category : 'driver selection' }
 WDBlTextureHost class >> label [
 	^ 'Woden Texture Host'
 ]
 
-{ #category : #'api - lifecycle' }
+{ #category : 'api - lifecycle' }
 WDBlTextureHost class >> pulsePeriod: aDuration [
 
 	PulseLoop pulsePeriod: aDuration
 ]
 
-{ #category : #'api - lifecycle' }
+{ #category : 'api - lifecycle' }
 WDBlTextureHost class >> start [
 	PulseLoop start
 ]
 
-{ #category : #'api - lifecycle' }
+{ #category : 'api - lifecycle' }
 WDBlTextureHost class >> stop [
 	PulseLoop stop
 ]
 
-{ #category : #'api - ui process' }
+{ #category : 'api - ui process' }
 WDBlTextureHost class >> uiProcessDo: aBlock [
 	"Evaluate aBlock with the running UI Process of this host if any"
 	
 	PulseLoop loopProcess ifNotNil: aBlock
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDBlTextureHost >> createHostSpace [
 	^ WDBlTextureHostSpace new
 ]
 
-{ #category : #'host - api' }
+{ #category : 'host - api' }
 WDBlTextureHost >> createHostSpaceFor: aSpace [
 	"Create and assign a new host space for given bloc space"
 
@@ -72,7 +73,7 @@ WDBlTextureHost >> createHostSpaceFor: aSpace [
 	aSpace hostSpace: aHostSpace
 ]
 
-{ #category : #'host - api' }
+{ #category : 'host - api' }
 WDBlTextureHost >> createTextureSpaceFor: aSpace [
 	| aHostSpace |
 	aHostSpace := self createHostSpace.
@@ -85,7 +86,7 @@ WDBlTextureHost >> createTextureSpaceFor: aSpace [
 	^ aHostSpace
 ]
 
-{ #category : #'host - api' }
+{ #category : 'host - api' }
 WDBlTextureHost >> destroyHostSpaceFor: aSpace [
 	"Closes OSWindow window and unrefer it from bloc space"
 	
@@ -98,17 +99,17 @@ WDBlTextureHost >> destroyHostSpaceFor: aSpace [
 	aSpace detachHostSpace
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBlTextureHost >> initializeWithExtent: anExtent [
 	texture := WDTexture forColorForm: (Form extent: anExtent depth: 32).
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureHost >> texture [
 	^ texture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureHost >> texture: anObject [
 
 	texture := anObject

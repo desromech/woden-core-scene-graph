@@ -1,29 +1,30 @@
 Class {
-	#name : #WDBlTextureFormSurfaceRenderer,
-	#superclass : #BlHostSurfaceRenderer,
+	#name : 'WDBlTextureFormSurfaceRenderer',
+	#superclass : 'BlHostSurfaceRenderer',
 	#instVars : [
 		'texture'
 	],
-	#category : #'WodenSceneGraph-Bloc'
+	#category : 'WodenSceneGraph-Bloc',
+	#package : 'WodenSceneGraph-Bloc'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBlTextureFormSurfaceRenderer >> initializeForSurface: aSurface [
 	aSurface form: texture data
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDBlTextureFormSurfaceRenderer >> renderSurface: aSurface damaged: aCollectionOfRectangles [
 	texture changed
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureFormSurfaceRenderer >> texture [
 
 	^ texture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlTextureFormSurfaceRenderer >> texture: anObject [
 
 	texture := anObject

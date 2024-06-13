@@ -2,20 +2,21 @@
 I am bloc element that can be used for displaying a Woden scene with some basic movement interactions.
 "
 Class {
-	#name : #WDBlInteractiveSceneElement,
-	#superclass : #WDBlSceneElement,
+	#name : 'WDBlInteractiveSceneElement',
+	#superclass : 'WDBlSceneElement',
 	#instVars : [
 		'cameraAngles'
 	],
-	#category : #'WodenSceneGraph-Bloc'
+	#category : 'WodenSceneGraph-Bloc',
+	#package : 'WodenSceneGraph-Bloc'
 }
 
-{ #category : #'camera events' }
+{ #category : 'camera events' }
 WDBlInteractiveSceneElement >> computeCameraOrientation [
 	^ (Quaternion yRotation: cameraAngles y) * (Quaternion xRotation: cameraAngles x)
 ]
 
-{ #category : #'camera events' }
+{ #category : 'camera events' }
 WDBlInteractiveSceneElement >> dragCameraWithEvent: dragEvent [
 	camera ifNil: [ ^ self ].
 	
@@ -31,7 +32,7 @@ WDBlInteractiveSceneElement >> dragCameraWithEvent: dragEvent [
 	].
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBlInteractiveSceneElement >> initialize [
 	super initialize.
 	cameraAngles := Vector3 zeros.
@@ -39,7 +40,7 @@ WDBlInteractiveSceneElement >> initialize [
 	
 ]
 
-{ #category : #'camera events' }
+{ #category : 'camera events' }
 WDBlInteractiveSceneElement >> scrollCamera: scrollVector [
 	| delta |
 	camera ifNil: [ ^ self ].

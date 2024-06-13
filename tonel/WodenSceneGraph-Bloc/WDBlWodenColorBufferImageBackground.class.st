@@ -2,17 +2,18 @@
 I am a bloc background which uses a Woden Color buffer form for its image backing store.
 "
 Class {
-	#name : #WDBlWodenColorBufferImageBackground,
-	#superclass : #BlBackground,
+	#name : 'WDBlWodenColorBufferImageBackground',
+	#superclass : 'BlBackground',
 	#instVars : [
 		'renderingSceneStateModel',
 		'frameBuffer',
 		'colorBuffer'
 	],
-	#category : #'WodenSceneGraph-Bloc'
+	#category : 'WodenSceneGraph-Bloc',
+	#package : 'WodenSceneGraph-Bloc'
 }
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 WDBlWodenColorBufferImageBackground >> = anotherObject [
 
 	self == anotherObject ifTrue: [ ^ true ].
@@ -21,7 +22,7 @@ WDBlWodenColorBufferImageBackground >> = anotherObject [
 	^ anotherObject renderingSceneStateModel == self renderingSceneStateModel
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDBlWodenColorBufferImageBackground >> aeApplyTo: aeCanvas [
 	self ensureRenderedSurfaceIsUpdated.
 	colorBuffer data ifNotNil: [ 
@@ -29,7 +30,7 @@ WDBlWodenColorBufferImageBackground >> aeApplyTo: aeCanvas [
 	]
 ]
 
-{ #category : #updating }
+{ #category : 'updating' }
 WDBlWodenColorBufferImageBackground >> ensureRenderedSurfaceIsUpdated [
 	frameBuffer ifNil: [ ^ self ].
 	
@@ -43,12 +44,12 @@ WDBlWodenColorBufferImageBackground >> ensureRenderedSurfaceIsUpdated [
 	
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDBlWodenColorBufferImageBackground >> isTransparent [
 	^ (self opacity closeTo: 0)
 ]
 
-{ #category : #geometry }
+{ #category : 'geometry' }
 WDBlWodenColorBufferImageBackground >> matchExtent: anExtent [
 	| minimalExtent |
 	minimalExtent := anExtent ceiling max: 1@1.
@@ -69,13 +70,13 @@ WDBlWodenColorBufferImageBackground >> matchExtent: anExtent [
 	].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlWodenColorBufferImageBackground >> renderingSceneStateModel [
 
 	^ renderingSceneStateModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBlWodenColorBufferImageBackground >> renderingSceneStateModel: anObject [
 
 	renderingSceneStateModel := anObject

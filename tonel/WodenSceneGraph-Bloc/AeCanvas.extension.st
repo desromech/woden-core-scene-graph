@@ -1,6 +1,6 @@
-Extension { #name : #AeCanvas }
+Extension { #name : 'AeCanvas' }
 
-{ #category : #'*WodenSceneGraph-Bloc' }
+{ #category : '*WodenSceneGraph-Bloc' }
 AeCanvas >> setBackgroundWithSurface: aCairoSurface alpha: aDouble [
 
 	self
