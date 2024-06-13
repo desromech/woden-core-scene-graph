@@ -1,6 +1,6 @@
 Class {
-	#name : #WDAGPUShadowMapTextureAtlasAllocator,
-	#superclass : #Object,
+	#name : 'WDAGPUShadowMapTextureAtlasAllocator',
+	#superclass : 'Object',
 	#instVars : [
 		'atlasExtent',
 		'columns',
@@ -9,15 +9,17 @@ Class {
 		'capacity',
 		'size'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Allocator'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Allocator',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Allocator'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUShadowMapTextureAtlasAllocator class >> forAtlasWithExtent: atlasExtent [
 	^ self new initializeWithAtlasExtent: atlasExtent; yourself
 ]
 
-{ #category : #allocation }
+{ #category : 'allocation' }
 WDAGPUShadowMapTextureAtlasAllocator >> allocate [
 	| column row offset element |
 	size >= capacity ifTrue: [ ^ nil ].
@@ -34,7 +36,7 @@ WDAGPUShadowMapTextureAtlasAllocator >> allocate [
 	^ element
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUShadowMapTextureAtlasAllocator >> initializeWithAtlasExtent: initialAtlasExtent [
 	atlasExtent := initialAtlasExtent.
 	columns := rows := 4.
@@ -45,7 +47,7 @@ WDAGPUShadowMapTextureAtlasAllocator >> initializeWithAtlasExtent: initialAtlasE
 	
 ]
 
-{ #category : #allocation }
+{ #category : 'allocation' }
 WDAGPUShadowMapTextureAtlasAllocator >> reset [
 	size := 0.
 ]

@@ -2,8 +2,8 @@
 I provide connections with the AGPU VR system.
 "
 Class {
-	#name : #WDAGPUVRSystem,
-	#superclass : #WDVRSystem,
+	#name : 'WDAGPUVRSystem',
+	#superclass : 'WDVRSystem',
 	#instVars : [
 		'sceneRenderer',
 		'handle',
@@ -27,10 +27,12 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-VR'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-VR',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'VR'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUVRSystem class >> initialize [
 
 	DeviceClassIDToClassMap := Dictionary newFromPairs: { 
@@ -77,7 +79,7 @@ WDAGPUVRSystem class >> initialize [
 	}.
 ]
 
-{ #category : #'tracked device' }
+{ #category : 'tracked device' }
 WDAGPUVRSystem >> checkTrackedDevice: oldDevice forPose: trackedDevicePose [
 	| requiredClass |
 	requiredClass := DeviceClassIDToClassMap at: trackedDevicePose device_class ifAbsent: [ WDVRTrackedDeviceInvalid ].
@@ -86,7 +88,7 @@ WDAGPUVRSystem >> checkTrackedDevice: oldDevice forPose: trackedDevicePose [
 		ifFalse: [ self newTrackedDeviceFor: trackedDevicePose ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUVRSystem >> controllerAxisState: axisState [
 	^ (AxisStateClassMap at: axisState type ifAbsent: [nil]) ifNotNil: [ :cls |
 		cls new
@@ -96,7 +98,7 @@ WDAGPUVRSystem >> controllerAxisState: axisState [
 	]
 ]
 
-{ #category : #'tracked device' }
+{ #category : 'tracked device' }
 WDAGPUVRSystem >> convertControllerState: state [
 	^ WDVRControllerState new
 		touchedButtons: state buttons_touched;
@@ -111,7 +113,7 @@ WDAGPUVRSystem >> convertControllerState: state [
 		yourself 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUVRSystem >> convertEyeToHeadTransform: rawEyeMatrix [
 	| t |
 	t := rawEyeMatrix c4.
@@ -119,7 +121,7 @@ WDAGPUVRSystem >> convertEyeToHeadTransform: rawEyeMatrix [
 	^ ReversibleAffineTransform3D translation: (Vector3 x: t x y: t y z: t z)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUVRSystem >> convertFrustumTangents: tangents [
 	^ FrustumTangents new
 		left: tangents left;
@@ -129,7 +131,7 @@ WDAGPUVRSystem >> convertFrustumTangents: tangents [
 		yourself
 ]
 
-{ #category : #'render model' }
+{ #category : 'render model' }
 WDAGPUVRSystem >> convertRenderModel: agpuRenderModel [
 	| modelHandle |
 	(agpuRenderModel isNil or: [agpuRenderModel isNull]) ifTrue: [ ^ nil ].
@@ -229,7 +231,7 @@ WDAGPUVRSystem >> convertRenderModel: agpuRenderModel [
 	]
 ]
 
-{ #category : #'render model' }
+{ #category : 'render model' }
 WDAGPUVRSystem >> convertRenderModelMaterial: agpuRenderModelTexture [
 	^ WDMetallicRoughnessMaterial new
 		roughnessFactor: 0.7;
@@ -238,7 +240,7 @@ WDAGPUVRSystem >> convertRenderModelMaterial: agpuRenderModelTexture [
 		yourself
 ]
 
-{ #category : #'render model' }
+{ #category : 'render model' }
 WDAGPUVRSystem >> convertRenderModelTexture: agpuRenderModelTexture [
 	| textureHandle |
 	(agpuRenderModelTexture isNil or: [agpuRenderModelTexture isNull]) ifTrue: [ ^ nil ].
@@ -270,7 +272,7 @@ WDAGPUVRSystem >> convertRenderModelTexture: agpuRenderModelTexture [
 	]
 ]
 
-{ #category : #'tracked device' }
+{ #category : 'tracked device' }
 WDAGPUVRSystem >> convertTrackedDevicePose: originalPose [
 	^ WDVRTrackedDevicePose new
 		deviceToAbsoluteTransform: originalPose device_to_absolute_tracking asReversibleAffineTransform3D;
@@ -279,19 +281,19 @@ WDAGPUVRSystem >> convertTrackedDevicePose: originalPose [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVRSystem >> handle [
 
 	^ handle
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVRSystem >> headTransform [
 	hmdTrackedDevice ifNil: [ ^ super headTransform ].
 	^ hmdTrackedDevice currentPose deviceToAbsoluteTransform
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUVRSystem >> initialize [
 	super initialize.
 	trackedDevices := #().
@@ -301,7 +303,7 @@ WDAGPUVRSystem >> initialize [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUVRSystem >> initializeWithSceneRenderer: aSceneRenderer handle: aVRSystemHandle [
 	"Fetch the recommended render target extent."
 	| size agpuFrustumTangents rawEyeMatrix |
@@ -331,49 +333,49 @@ WDAGPUVRSystem >> initializeWithSceneRenderer: aSceneRenderer handle: aVRSystemH
 
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUVRSystem >> isInStandbyMode [
 	^ isInStandbyMode
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUVRSystem >> isRealVRSystem [
 	^ true
 ]
 
-{ #category : #eyes }
+{ #category : 'eyes' }
 WDAGPUVRSystem >> leftEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRatio [
 	^ leftEyeFrustumTangents
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVRSystem >> leftEyeLocalTransform [
 	^ leftEyeLocalTransform
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPUVRSystem >> newTrackedDeviceFor: trackedDevicePose [
 	^ (DeviceClassIDToClassMap at: trackedDevicePose device_class ifAbsent: [ WDVRTrackedDeviceInvalid ]) new
 		id: trackedDevicePose device_id;
 		yourself
 ]
 
-{ #category : #events }
+{ #category : 'events' }
 WDAGPUVRSystem >> onEnterStandbyMode [
 	isInStandbyMode := true.
 ]
 
-{ #category : #events }
+{ #category : 'events' }
 WDAGPUVRSystem >> onLeaveStandbyMode [
 	isInStandbyMode := false.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVRSystem >> perEyeFrameBufferExtentForDisplayWithExtent: displayExtent [
 	^ recommendedRenderTargetExtent
 ]
 
-{ #category : #'vr system' }
+{ #category : 'vr system' }
 WDAGPUVRSystem >> pollEvents [
 	| rawEvent |
 	rawEvent := AGPUVrEvent new.
@@ -383,7 +385,7 @@ WDAGPUVRSystem >> pollEvents [
 	]
 ]
 
-{ #category : #'vr system' }
+{ #category : 'vr system' }
 WDAGPUVRSystem >> processEvent: agpuVREvent [
 	| eventType trackedDevice vrEventClass |
 	eventType := agpuVREvent type.
@@ -403,23 +405,23 @@ WDAGPUVRSystem >> processEvent: agpuVREvent [
 
 ]
 
-{ #category : #eyes }
+{ #category : 'eyes' }
 WDAGPUVRSystem >> rightEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRatio [
 	^ rightEyeFrustumTangents
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVRSystem >> rightEyeLocalTransform [
 	^ rightEyeLocalTransform
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVRSystem >> sceneRenderer [
 
 	^ sceneRenderer
 ]
 
-{ #category : #'vr system' }
+{ #category : 'vr system' }
 WDAGPUVRSystem >> submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeTexture rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeTexture [
 	| leftEyeTextureHandle rightEyeTextureHandle |
 	leftEyeTextureHandle := sceneRenderer resourceCache validTextureHandleFor: leftEyeTexture.
@@ -428,12 +430,12 @@ WDAGPUVRSystem >> submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeT
 	super submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeTexture rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVRSystem >> trackedDevicesDo: aBlock [
 	trackedDevices do: [ :each | each ifNotNil: [ aBlock value: each ] ]
 ]
 
-{ #category : #'vr system' }
+{ #category : 'vr system' }
 WDAGPUVRSystem >> waitAndFetchPoses [
 	| trackedDevicePoseCount trackedDevicePose trackedDeviceRenderPose isValidPose trackedDevice controllerState controllerStateFetched |
 	handle waitAndFetchPoses.

@@ -2,8 +2,8 @@
 I am a Woden scene renderer that uses the agpu library.
 "
 Class {
-	#name : #WDAGPUSceneRenderer,
-	#superclass : #WDSceneRenderer,
+	#name : 'WDAGPUSceneRenderer',
+	#superclass : 'WDSceneRenderer',
 	#instVars : [
 		'device',
 		'commandQueue',
@@ -23,10 +23,12 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Renderer',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Renderer'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer class >> initialize [
 	MaxLightCapacity := 1024.
 	MaxClusterLightCapacity := 1000.
@@ -36,52 +38,52 @@ WDAGPUSceneRenderer class >> initialize [
 	LightGridCellCount := LightGridRows*LightGridColumns*LightGridSlices
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUSceneRenderer class >> isAvailable [
 	^ true
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer class >> lightGridCellCount [
 	^ LightGridCellCount
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer class >> lightGridColumns [
 	^ LightGridColumns
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer class >> lightGridRows [
 	^ LightGridRows
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer class >> lightGridSlices [
 	^ LightGridSlices
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer class >> maxClusterLightCapacity [
 	^ MaxClusterLightCapacity
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer class >> maxLightCapacity [
 	^ MaxLightCapacity
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPUSceneRenderer class >> new [
 	^ self withResourceCache: (WDAGPUSceneRendererResourceCache for: AGPU mainDevice)
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPUSceneRenderer class >> withResourceCache: aResourceCache [
 	^ self basicNew initializeWithResourceCache: aResourceCache; yourself
 ]
 
-{ #category : #vr }
+{ #category : 'vr' }
 WDAGPUSceneRenderer >> createVRSystem [
 	| vrSystemHandle |
 	vrSystemHandle := device getVRSystem.
@@ -91,26 +93,27 @@ WDAGPUSceneRenderer >> createVRSystem [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRenderer >> device [
 
 	^ device
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRenderer >> drawCommandProcessor [
 	^ drawCommandProcessor
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRenderer >> formSceneGraphBuilder [
-	^ FormSGAGPUBuilder new
+	^ WDFormSGAGPUBuilder new
 		device: device;
 		drawCommandProcessor: drawCommandProcessor;
+		resourceCache: resourceCache;
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRenderer >> initializeWithResourceCache: aResourceCache [
 	resourceCache := aResourceCache.
 	device := resourceCache device.
@@ -120,12 +123,12 @@ WDAGPUSceneRenderer >> initializeWithResourceCache: aResourceCache [
 	drawCommandProcessor := FormSGExternallySynchronizedAGPUDrawCommandProcessorWithStateTracker forContext: resourceCache formSceneGraphDrawCommandProcessorContext withFrameBufferingCount: 1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUSceneRenderer >> isAGPUSceneRenderer [
 	^ true
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRenderer >> readbackFramebufferAttachmentsOf: framebuffer [
 	framebuffer colorAttachments do: [ :each |
 		each usageMode isReadedColorAttachment ifTrue: [ 
@@ -140,12 +143,12 @@ WDAGPUSceneRenderer >> readbackFramebufferAttachmentsOf: framebuffer [
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRenderer >> readbackTextureData: texture [
 	texture data ifNotNil: [ :data | data readbackDataFromAgpuTexture: (resourceCache validTextureHandleFor: texture) ]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRenderer >> renderLeftEyeSceneState: leftEyeRenderingSceneState intoFramebuffer: leftEyeFramebuffer
 renderRightEyeSceneState: rightEyeRenderingSceneState intoFramebuffer: rightEyeFramebuffer
 overlay: overlaySceneGraph
@@ -163,7 +166,7 @@ composeInto: destinationFramebuffer mode: composeMode [
 	self readbackFramebufferAttachmentsOf: destinationFramebuffer
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRenderer >> renderSceneState: renderingSceneState overlay: overlaySceneGraph intoFramebuffer: framebuffer [
 	WDAGPUSceneRendererActiveFrameRenderer new
 		renderer: self;
@@ -177,7 +180,7 @@ WDAGPUSceneRenderer >> renderSceneState: renderingSceneState overlay: overlaySce
 	self readbackFramebufferAttachmentsOf: framebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRenderer >> resourceCache [
 
 	^ resourceCache

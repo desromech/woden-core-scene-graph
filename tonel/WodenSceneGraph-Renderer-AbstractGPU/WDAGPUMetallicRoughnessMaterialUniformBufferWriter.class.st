@@ -1,10 +1,12 @@
 Class {
-	#name : #WDAGPUMetallicRoughnessMaterialUniformBufferWriter,
-	#superclass : #WDAGPUSurfaceMaterialUniformBufferWriter,
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#name : 'WDAGPUMetallicRoughnessMaterialUniformBufferWriter',
+	#superclass : 'WDAGPUSurfaceMaterialUniformBufferWriter',
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUMetallicRoughnessMaterialUniformBufferWriter class >> fieldsDesc [
 	<script: 'self generateWriter'>
 	^ super fieldsDesc , #(
@@ -21,17 +23,17 @@ WDAGPUMetallicRoughnessMaterialUniformBufferWriter class >> fieldsDesc [
 	)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUMetallicRoughnessMaterialUniformBufferWriter >> instanceAlignment [
 	^ 16
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUMetallicRoughnessMaterialUniformBufferWriter >> instanceSize [
 	^ 80
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUMetallicRoughnessMaterialUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeBool: data doubleSided onto: pointer at: offset.
 	self writeFloat: data effectiveAlphaCutoff onto: pointer at: offset + 4.

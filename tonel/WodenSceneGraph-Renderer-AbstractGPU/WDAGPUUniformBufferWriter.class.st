@@ -2,28 +2,30 @@
 I am an utility for writing uniform buffer data. My instances are completely stateless, so they are a singleton.
 "
 Class {
-	#name : #WDAGPUUniformBufferWriter,
-	#superclass : #Object,
+	#name : 'WDAGPUUniformBufferWriter',
+	#superclass : 'Object',
 	#classVars : [
 		'TypeNameMap'
 	],
 	#classInstVars : [
 		'uniqueInstance'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDAGPUUniformBufferWriter class >> asWDAGPUUniformBufferWriter [
 	^ self uniqueInstance
 ]
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUUniformBufferWriter class >> fieldsDesc [
 	self subclassResponsibility
 ]
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUUniformBufferWriter class >> generateWriter [
 	| writerSourceCode instanceSize instanceAlignment |
 	instanceSize := 0.
@@ -85,7 +87,7 @@ WDAGPUUniformBufferWriter class >> generateWriter [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUUniformBufferWriter class >> initialize [
 	TypeNameMap := Dictionary newFromPairs: #(
 		"Type name (size alignment)"
@@ -112,47 +114,47 @@ WDAGPUUniformBufferWriter class >> initialize [
 	)
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUUniformBufferWriter class >> isAbstract [
 	^ self == WDAGPUUniformBufferWriter
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPUUniformBufferWriter class >> new [
 	self error: 'New cannot be used here.'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUUniformBufferWriter class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self basicNew ]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDAGPUUniformBufferWriter >> asWDAGPUUniformBufferWriter [
 	^ self
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> write: data onto: pointer at: offset [
 	self subclassResponsibility
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeBool: data onto: pointer at: offset [
 	pointer unsignedLongAt: offset + 1 put: data asBit
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeFloat: data onto: pointer at: offset [
 	pointer floatAt: offset + 1 put: data asFloat
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeMat3: data onto: pointer at: offset [
 	self halt
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeMat4: matrix onto: pointer at: offset [
 	pointer
 		floatAt: offset + 1 put: matrix m11 asFloat;
@@ -177,7 +179,7 @@ WDAGPUUniformBufferWriter >> writeMat4: matrix onto: pointer at: offset [
 
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeMat4: matrixArray onto: pointer at: offset count: count [
 	| writeCount destOffset |
 	writeCount := matrixArray size min: count.
@@ -188,7 +190,7 @@ WDAGPUUniformBufferWriter >> writeMat4: matrixArray onto: pointer at: offset cou
 	]
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeStruct: data writer: structWriter onto: pointer at: offset count: count [
 	| currentOffset elementSize writeCount |
 	currentOffset := offset.
@@ -200,19 +202,19 @@ WDAGPUUniformBufferWriter >> writeStruct: data writer: structWriter onto: pointe
 	]
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeUint: data onto: pointer at: offset [
 	pointer unsignedLongAt: offset + 1 put: data asInteger
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeUvec2: data onto: pointer at: offset [
 	pointer
 		unsignedLongAt: offset + 1 put: data x asInteger;
 		unsignedLongAt: offset + 5 put: data y asInteger
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeUvec3: data onto: pointer at: offset [
 	pointer
 		unsignedLongAt: offset + 1 put: data x asInteger;
@@ -220,14 +222,14 @@ WDAGPUUniformBufferWriter >> writeUvec3: data onto: pointer at: offset [
 		unsignedLongAt: offset + 9 put: data z asInteger
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeVec2: data onto: pointer at: offset [
 	pointer
 		floatAt: offset + 1 put: data x asFloat;
 		floatAt: offset + 5 put: data y asFloat
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeVec2: vectorArray onto: pointer at: offset count: count [
 	| writeCount destOffset |
 	writeCount := vectorArray size min: count.
@@ -238,7 +240,7 @@ WDAGPUUniformBufferWriter >> writeVec2: vectorArray onto: pointer at: offset cou
 	]
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeVec3: data onto: pointer at: offset [
 	pointer
 		floatAt: offset + 1 put: data x asFloat;
@@ -246,7 +248,7 @@ WDAGPUUniformBufferWriter >> writeVec3: data onto: pointer at: offset [
 		floatAt: offset + 9 put: data z asFloat
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUUniformBufferWriter >> writeVec4: data onto: pointer at: offset [
 	pointer
 		floatAt: offset + 1 put: data x asFloat;

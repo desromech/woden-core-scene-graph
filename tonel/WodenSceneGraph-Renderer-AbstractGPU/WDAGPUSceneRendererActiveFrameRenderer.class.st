@@ -3,8 +3,8 @@ I am renderer for a specific frame.
 I hold references to resources that are still in flight on the GPU that cannot be garbage collected until my job is finished.
 "
 Class {
-	#name : #WDAGPUSceneRendererActiveFrameRenderer,
-	#superclass : #WDFrameRenderer,
+	#name : 'WDAGPUSceneRendererActiveFrameRenderer',
+	#superclass : 'WDFrameRenderer',
 	#instVars : [
 		'renderer',
 		'stateTracker',
@@ -30,10 +30,12 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Renderer',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Renderer'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererActiveFrameRenderer class >> initialize [
 	SSAOBlurPasses := 2.
 	ScreenRoughnessBlurPasses := 2.
@@ -48,13 +50,13 @@ WDAGPUSceneRendererActiveFrameRenderer class >> initialize [
 	}.
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> abortRecording [
 	self freeActiveResources.
 	stateTracker := nil.
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexBinding: vertexBinding primitiveTopology: primitiveTopology [
 	| validMaterial vertexBindingHandle |
 	vertexBinding ifNil: [ ^ false ].
@@ -76,7 +78,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> activateMaterial: material withVertexB
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowMapSet [
 	| atlasAllocator atlasElements lightSource atlasExtent viewportOffset viewportExtent  viewportScale viewportExtentScale |
 	atlasAllocator := renderer resourceCache shadowMapAtlasAllocator.
@@ -110,7 +112,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> allocateAndRenderShadowMapFor: shadowM
 		])
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> beginRecordingCommandsOn: aStateTracker queue: aCommandQueue [
 	stateTracker := aStateTracker.
 	commandQueue := aCommandQueue.
@@ -121,7 +123,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> beginRecordingCommandsOn: aStateTracke
 	self resetCurrentActiveState.
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindBlurTextureSource: sourceTexture [
 	stateTracker useShaderResources: (activeResourceDictionary at: {sourceTexture} ifAbsentPut: [ 
 		| binding |
@@ -133,25 +135,25 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindBlurTextureSource: sourceTexture [
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindCameraState: cameraState [
 	stateTracker useShaderResources: (self getOrCreateCameraStateBinding: cameraState) bindingHandle.
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindComputeCameraState: cameraState [
 	stateTracker useComputeShaderResources: (self getOrCreateCameraStateBinding: cameraState) bindingHandle.
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindComputeLightingState: lightingState [
 	stateTracker useComputeShaderResources: (self getOrCreateLightingStateBinding: lightingState) bindingHandle.
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindHDRColorBuffer: hdrColorBuffer [
 	stateTracker useShaderResources: (activeResourceDictionary at: hdrColorBuffer ifAbsentPut: [ 
 		| binding |
@@ -163,7 +165,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindHDRColorBuffer: hdrColorBuffer [
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindLeftEye: leftEyeTexture rightEye: rightEyeTexture [
 	stateTracker useShaderResources: (activeResourceDictionary at: {leftEyeTexture . rightEyeTexture} ifAbsentPut: [ 
 		| binding |
@@ -177,13 +179,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindLeftEye: leftEyeTexture rightEye: 
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindLightingState: lightingState [
 	stateTracker useShaderResources: (self getOrCreateLightingStateBinding: lightingState) bindingHandle.
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindObjectState: objectState [
 	stateTracker useShaderResources: (activeResourceDictionary at: objectState ifAbsentPut: [ 
 		| binding |
@@ -195,7 +197,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindObjectState: objectState [
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBufferView normalGBuffer: normalGBuffer [
 	stateTracker useShaderResources: (activeResourceDictionary at: {opaqueDepthBufferView . normalGBuffer} ifAbsentPut: [ 
 		| binding |
@@ -209,7 +211,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBuff
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBufferView normalGBuffer: normalGBuffer specularGBuffer: specularGBuffer [
 	stateTracker useShaderResources: (activeResourceDictionary at: {opaqueDepthBufferView . normalGBuffer . specularGBuffer} ifAbsentPut: [ 
 		| binding |
@@ -224,7 +226,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBuff
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBufferView normalGBuffer: normalGBuffer specularGBuffer: specularGBuffer glossColorBuffer: glossColorBuffer roughColorBuffer: roughColorBuffer [
 	stateTracker useShaderResources: (activeResourceDictionary at: {opaqueDepthBufferView . normalGBuffer . specularGBuffer . glossColorBuffer . roughColorBuffer} ifAbsentPut: [ 
 		| binding |
@@ -241,7 +243,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBuff
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBufferView opaqueColorBuffer: opaqueColorBuffer ssaoTexture: ssaoTexture staticReflectionTexture: staticReflectionTexture screenSpaceReflectionTexture: screenSpaceReflectionTexture [
 	stateTracker useShaderResources: (activeResourceDictionary at: {opaqueDepthBufferView . opaqueColorBuffer . ssaoTexture . staticReflectionTexture . screenSpaceReflectionTexture} ifAbsentPut: [ 
 		| binding |
@@ -258,7 +260,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindOpaqueDepthBuffer: opaqueDepthBuff
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> bindPoseState: poseState [
 	hasSkinningState := poseState notNil.
 	poseState ifNil: [ ^ self ].
@@ -272,7 +274,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> bindPoseState: poseState [
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer right: rightEyeFramebuffer into: framebuffer mode: composeMode [
 
 	| outputFramebufferHandle shaderSignature leftEyeTexture rightEyeTexture |
@@ -300,7 +302,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> composeStereoLeft: leftEyeFramebuffer 
 		endRenderPass
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState framebufferExtent: framebufferExtent [
 	^ aCameraState shallowCopy
 		projectionMatrix: renderer resourceCache projectionNDCAdjustMatrix * aCameraState projectionMatrix;
@@ -314,7 +316,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> convertedCameraState: aCameraState fra
 		yourself
 ]
 
-{ #category : #material }
+{ #category : 'material' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material [
 	| locationMask |
 	material hasOpaqueRendering ifFalse: [ ^ false ].
@@ -329,7 +331,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDepthOnlyOpaqueSurfaceMaterialActi
 	^ true
 ]
 
-{ #category : #material }
+{ #category : 'material' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidMaterialActivationCommands: material [
 	| locationMask |
 	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
@@ -362,7 +364,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitDuplicatedMetallicRoughnessLiquidM
 	^ true
 ]
 
-{ #category : #material }
+{ #category : 'material' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCommands: material [
 	| locationMask |
 	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
@@ -392,7 +394,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 	^ true
 ]
 
-{ #category : #material }
+{ #category : 'material' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivationCommands: material [
 	| locationMask |
 	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
@@ -425,7 +427,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivatio
 	^ true
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive: meshPrimitive [
 	(self activateMaterial: meshPrimitive material withVertexBinding: meshPrimitive vertexBinding primitiveTopology: meshPrimitive topology) ifFalse: [ ^ self ].
 		
@@ -445,7 +447,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitRenderingCommandsForMeshPrimitive:
 
 ]
 
-{ #category : #material }
+{ #category : 'material' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: material [
 	| locationMask |
 	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
@@ -475,7 +477,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitUnlitMaterialActivationCommands: m
 	^ true
 ]
 
-{ #category : #material }
+{ #category : 'material' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitVolumetricDensityMaterialActivationCommands: material [
 	isInDepthOnlyPass ifTrue: [^ false].
 	
@@ -496,13 +498,13 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitVolumetricDensityMaterialActivatio
 	^ true
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> finishExecution [
 	commandQueue finishExecution.
 	self freeActiveResources.
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererActiveFrameRenderer >> freeActiveResources [
 	activeSlabResource ifNotNil: [ 
 		activeSlabResource do: [ :each | each free ].
@@ -514,7 +516,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> freeActiveResources [
 	self resetCurrentActiveState
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateCameraStateBinding: cameraState [
 	^ activeResourceDictionary at: cameraState ifAbsentPut: [ 
 		| binding |
@@ -527,7 +529,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateCameraStateBinding: cameraS
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateLightingStateBinding: lightingState [
 	^ activeResourceDictionary at: lightingState ifAbsentPut: [ 
 		| binding |
@@ -549,17 +551,17 @@ WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateLightingStateBinding: light
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererActiveFrameRenderer >> isInDepthOnlyPass [
 	^ isInDepthOnlyPass
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> makeLightingStateForRenderingSceneState: renderingSceneState [
 	^ renderingSceneState lightingStateInViewSpaceWithMaxNumberOfLights: WDAGPUSceneRenderer maxLightCapacity
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordAndFlushCommandsOn: aStateTracker queue: aCommandQueue with: aBlock [
 	self beginRecordingCommandsOn: aStateTracker queue: aCommandQueue.
 	[
@@ -571,7 +573,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordAndFlushCommandsOn: aStateTracke
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderingScene: renderingSceneState framebuffer: framebuffer intermediateFramebuffers: intermediateFramebuffers cameraState: mainCameraState [
 	| shaderSignature bloomExtent |
 	
@@ -648,7 +650,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForBloomEffectForRenderi
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForCombiningOpaqueReflections: intermediateFramebuffers cameraState: mainCameraState [
 	| extent ssaoTexture ssrTexture |
 
@@ -679,12 +681,12 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForCombiningOpaqueReflec
 		drawArrays: 3 instance_count: 1 first_vertex: 0 base_instance: 0.
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderable: renderable [
 	renderable emitRenderingCommandsWithRenderer: self
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingBackgroundObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
 	renderingSceneState cameraLayers do: [ :eachCameraLayer |
 		eachCameraLayer backgroundObjects isEmpty ifFalse: [
@@ -696,7 +698,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingBackgroundOb
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: renderingObject [
 	self
 		bindObjectState: renderingObject objectState;
@@ -704,7 +706,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingObject: rend
 	self recordCommandsForRenderable: renderingObject renderable
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingOpaqueObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
 	renderingSceneState cameraLayers reverseDo: [ :eachCameraLayer |
 		eachCameraLayer opaqueRenderingObjects isEmpty ifFalse: [ 
@@ -716,7 +718,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingOpaqueObject
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingTranslucentObjectsInScene: renderingSceneState framebufferExtent: framebufferExtent [
 	renderingSceneState cameraLayers do: [ :eachCameraLayer |
 		eachCameraLayer translucentRenderingObjects isEmpty ifFalse: [ 
@@ -728,7 +730,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForRenderingTranslucentO
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenRoughComputationFor: intermediateFramebuffers [
 	| shaderSignature screenRoughExtents screenRoughTextures screenRoughFramebuffers previousTexture pingTextureIndex blurExtent pingTexture pingFramebuffer pongTexture pongFramebuffer |
 
@@ -803,7 +805,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenRoughComputatio
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcclusionComputationFor: intermediateFramebuffers cameraState: mainCameraState [
 	| shaderSignature ssaoExtent |
 	renderer screenSpaceAmbientOcclusionEnabled ifFalse: [ ^ self ].
@@ -860,7 +862,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceAmbientOcc
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState [
 	| shaderSignature extent screenRoughTextures screenRoughTexture |
 	
@@ -895,7 +897,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForScreenSpaceReflection
 		endRenderPass
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForStaticReflectionComputationFor: intermediateFramebuffers cameraState: mainCameraState lightingState: lightingState [
 	| shaderSignature extent |
 
@@ -924,7 +926,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordCommandsForStaticReflectionCompu
 		endRenderPass
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
 	| workgroupCountX workgroupCountY workgroupCountZ workgroupCount |
 	workgroupCountX := (WDAGPUSceneRenderer lightGridColumns + 3) // 4.
@@ -948,7 +950,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordLightGridComputationCommands [
 		memoryBarrier: AGPU_PIPELINE_STAGE_COMPUTE_SHADER dest_stage: AGPU_PIPELINE_STAGE_FRAGMENT_SHADER source_accesses: AGPU_ACCESS_SHADER_WRITE dest_accesses: AGPU_ACCESS_SHADER_READ.
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingSceneState intoFramebuffer: framebuffer [
 	| intermediateFramebuffers outputFramebufferHandle shaderSignature sampleCount hasReverseDepth initialDepth mainCameraState convertedLightingState normalDepthFunction |
 	sampleCount := renderingSceneState sampleCount.
@@ -1102,7 +1104,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> recordRenderingCommandsFor: renderingS
 
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> renderOverlayFormSceneGraph: overlaySceneGraph intoFramebuffer: framebuffer [
 	| sceneGraphCommandList sceneGraphRenderTarget |
 	(overlaySceneGraph isNil or: [ overlaySceneGraph isNullNode ]) ifTrue: [ ^ self ].
@@ -1126,7 +1128,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderOverlayFormSceneGraph: overlaySc
 		processCommandListWithDependencies: sceneGraphCommandList mainRenderTarget: sceneGraphRenderTarget
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLayer atlasElement: atlasElement lightSource: lightSource [
 	| convertedCameraState hasReverseDepth initialDepth shaderSignature viewportOffset viewportExtent |
 
@@ -1183,25 +1185,25 @@ WDAGPUSceneRendererActiveFrameRenderer >> renderShadowMapFor: shadowMapCameraLay
 	stateTracker endRenderPass.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererActiveFrameRenderer >> renderer [
 
 	^ renderer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererActiveFrameRenderer >> renderer: anObject [
 
 	renderer := anObject
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererActiveFrameRenderer >> resetCurrentActiveState [
 	currentObjectVertexBinding := nil.
 	currentObjectPrimitiveTopology := nil.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererActiveFrameRenderer >> setAlphaBlendingEnabled: enabled [
 	alphaBlendingEnabled == enabled  ifTrue: [ ^ self ].
 	enabled ifTrue: [
@@ -1220,7 +1222,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> setAlphaBlendingEnabled: enabled [
 	alphaBlendingEnabled := enabled
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled writeMask: writeMask [
 	(depthTestingEnabled == enabled and: [ depthWriteMask == writeMask ])ifTrue: [ ^ self ].
 	stateTracker setDepthState: (enabled or: [writeMask])
@@ -1230,7 +1232,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> setDepthTestingEnable: enabled writeMa
 	depthWriteMask := writeMask
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
 	| lightStateSize lightStateAlignment uploadAllocation destOffset shadowMappingEnabled |
 	lightStateSize := WDAGPULightStateUniformBufferWriter uniqueInstance instanceSize.
@@ -1265,7 +1267,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> uploadLightStates: lights [
 
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererActiveFrameRenderer >> validBufferHandleForAccessor: aWDBinaryBufferAccessor [
 	^ activeResourceDictionary at: aWDBinaryBufferAccessor ifAbsentPut: [
 		| handle |
@@ -1275,7 +1277,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> validBufferHandleForAccessor: aWDBinar
 	]
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererActiveFrameRenderer >> validFramebufferFor: aWDFramebuffer [
 	^ activeResourceDictionary at: aWDFramebuffer ifAbsentPut: [
 		| handle |
@@ -1285,7 +1287,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> validFramebufferFor: aWDFramebuffer [
 	]
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererActiveFrameRenderer >> validIntermediateFramebuffersFor: aWDFramebuffer sampleCount: sampleCount initialDepth: initialDepth [
 	^ activeResourceDictionary at: {#intermediateFramebuffer . aWDFramebuffer} ifAbsentPut: [
 		| handle |
@@ -1295,7 +1297,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> validIntermediateFramebuffersFor: aWDF
 	]
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererActiveFrameRenderer >> validTextureViewHandleFor: aWDTexture fallbackTextureWith: aBlock [
 	aWDTexture ifNil: [ 
 		^ aBlock value getOrCreateFullView
@@ -1309,7 +1311,7 @@ WDAGPUSceneRendererActiveFrameRenderer >> validTextureViewHandleFor: aWDTexture 
 		]) first
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererActiveFrameRenderer >> validVertexBindingFor: aWDVertexBufferBinding [
 	aWDVertexBufferBinding ifNil: [ ^ nil ].
 	^ activeResourceDictionary at: aWDVertexBufferBinding ifAbsentPut: [

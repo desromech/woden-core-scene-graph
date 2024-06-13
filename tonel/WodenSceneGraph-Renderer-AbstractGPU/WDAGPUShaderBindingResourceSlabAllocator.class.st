@@ -2,8 +2,8 @@
 I am a slab based allocator for shader resource uniform buffer binding.
 "
 Class {
-	#name : #WDAGPUShaderBindingResourceSlabAllocator,
-	#superclass : #Object,
+	#name : 'WDAGPUShaderBindingResourceSlabAllocator',
+	#superclass : 'Object',
 	#instVars : [
 		'device',
 		'elementSize',
@@ -15,15 +15,17 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Allocator'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Allocator',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Allocator'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUShaderBindingResourceSlabAllocator class >> for: device writers: writers [
 	^ self basicNew initializeWithDevice: device writers: writers
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUShaderBindingResourceSlabAllocator >> allocate [
 	| result |
 	freeList ifNotNil: [ 
@@ -39,37 +41,37 @@ WDAGPUShaderBindingResourceSlabAllocator >> allocate [
 	^ currentBlock allocate
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocator >> device [
 
 	^ device
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocator >> elementAlignment [
 
 	^ elementAlignment
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocator >> elementSize [
 
 	^ elementSize
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUShaderBindingResourceSlabAllocator >> freeAllocation: allocation [
 	self assert: allocation nextFree isNil.
 	allocation nextFree: freeList.
 	freeList := allocation
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocator >> hasPersistentMapping [
 	^ hasPersistentMapping
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUShaderBindingResourceSlabAllocator >> initializeWithDevice: aDevice writers: aListOfWriters [
 	device := aDevice.
 	elementSize := 0.

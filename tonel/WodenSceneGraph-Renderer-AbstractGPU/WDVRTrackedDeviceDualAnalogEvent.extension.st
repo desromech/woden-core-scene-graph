@@ -1,6 +1,6 @@
-Extension { #name : #WDVRTrackedDeviceDualAnalogEvent }
+Extension { #name : 'WDVRTrackedDeviceDualAnalogEvent' }
 
-{ #category : #'*WodenSceneGraph-Renderer-AbstractGPU' }
+{ #category : '*WodenSceneGraph-Renderer-AbstractGPU' }
 WDVRTrackedDeviceDualAnalogEvent >> convertFromAgpuVREvent: vrEvent [
 	| agpuDualAnalog |
 	agpuDualAnalog := vrEvent data dual_analog.

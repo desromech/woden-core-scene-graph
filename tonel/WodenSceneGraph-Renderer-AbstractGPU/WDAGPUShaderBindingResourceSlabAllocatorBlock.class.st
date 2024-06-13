@@ -2,8 +2,8 @@
 I hold a uniform buffer block which is suballocated.
 "
 Class {
-	#name : #WDAGPUShaderBindingResourceSlabAllocatorBlock,
-	#superclass : #Object,
+	#name : 'WDAGPUShaderBindingResourceSlabAllocatorBlock',
+	#superclass : 'Object',
 	#instVars : [
 		'allocator',
 		'buffer',
@@ -15,15 +15,17 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Allocator'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Allocator',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Allocator'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock class >> for: anAllocator [
 	^ self basicNew initializeWithAllocator: anAllocator
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> allocate [
 	| result |
 	self assert: self isFull not.
@@ -35,30 +37,30 @@ WDAGPUShaderBindingResourceSlabAllocatorBlock >> allocate [
 	^ result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> allocator [
 
 	^ allocator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> buffer [
 
 	^ buffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> capacity [
 
 	^ capacity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> elementSize [
 	^ elementSize
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> initializeWithAllocator: anAllocator [
 	| mappingFlags |
 	allocator := anAllocator.
@@ -82,23 +84,23 @@ WDAGPUShaderBindingResourceSlabAllocatorBlock >> initializeWithAllocator: anAllo
 		) initial_data: nil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> isFull [
 	^ size + elementSize >= capacity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> size [
 	^ size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> size: anObject [
 
 	size := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUShaderBindingResourceSlabAllocatorBlock >> validBufferPointer [
 	bufferPointer ifNotNil: [ ^ bufferPointer ].
 	

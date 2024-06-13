@@ -2,8 +2,8 @@
 I am a descriptor for a vertex attribute in a layout.
 "
 Class {
-	#name : #WDAGPUVertexAttributeDescriptor,
-	#superclass : #Object,
+	#name : 'WDAGPUVertexAttributeDescriptor',
+	#superclass : 'Object',
 	#instVars : [
 		'format',
 		'binding',
@@ -11,10 +11,12 @@ Class {
 		'stride',
 		'divisor'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Renderer',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Renderer'
 }
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 WDAGPUVertexAttributeDescriptor >> = other [
 	^ self class == other class and: [
 	format = other format and: [
@@ -24,7 +26,7 @@ WDAGPUVertexAttributeDescriptor >> = other [
 	divisor = other divisor ]]]]]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDAGPUVertexAttributeDescriptor >> asAGPUVertexAttribDescriptionData [
 	^ AGPUVertexAttribDescription new
 		binding: binding;
@@ -35,55 +37,55 @@ WDAGPUVertexAttributeDescriptor >> asAGPUVertexAttribDescriptionData [
 		getHandle
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> binding [
 
 	^ binding
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> binding: anObject [
 
 	binding := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> buffer [
 
 	^ buffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> buffer: anObject [
 
 	buffer := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> divisor [
 
 	^ divisor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> divisor: anObject [
 
 	divisor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> format [
 
 	^ format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> format: anObject [
 
 	format := anObject
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 WDAGPUVertexAttributeDescriptor >> hash [
 	^ (((format hash hashMultiply +
 	buffer hash) hashMultiply +
@@ -92,13 +94,13 @@ WDAGPUVertexAttributeDescriptor >> hash [
 	divisor hash
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> stride [
 
 	^ stride
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVertexAttributeDescriptor >> stride: anObject [
 
 	stride := anObject

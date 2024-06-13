@@ -1,6 +1,6 @@
-Extension { #name : #Form }
+Extension { #name : 'Form' }
 
-{ #category : #'*WodenSceneGraph-Renderer-AbstractGPU' }
+{ #category : '*WodenSceneGraph-Renderer-AbstractGPU' }
 Form >> readbackDataFromAgpuTexture: agpuTexture [
 	| pitch |
 	self assert: depth = 32.
@@ -9,7 +9,7 @@ Form >> readbackDataFromAgpuTexture: agpuTexture [
 	agpuTexture readTextureData: 0 arrayIndex: 0 pitch: pitch slicePitch: pitch * self height buffer: self bits.
 ]
 
-{ #category : #'*WodenSceneGraph-Renderer-AbstractGPU' }
+{ #category : '*WodenSceneGraph-Renderer-AbstractGPU' }
 Form >> uploadIntoWodenTexture: aWDTexture agpuHandle: agpuTexture withWodenSceneRendererResourceCache: resourceCache [
 	| repeated mipmapQuality |
 	repeated := true.

@@ -11,14 +11,21 @@ Class {
 	#package : 'WodenSceneGraph-Bloc'
 }
 
+{ #category : 'as yet unclassified' }
+WDBlOverlay class >> withExtent: anExtent [
+	^ self new makeSpaceWithExtent: anExtent; yourself
+]
+
 { #category : 'drawing' }
 WDBlOverlay >> buildSceneGraphWith: builder [
-	| texture |
+	| texture extent origin |
 	texture := self space host texture.
 	texture ifNil: [ ^ builder null ].
 	
-	Transcript show: texture extent; cr.
-	^ builder null
+	extent := texture width @ texture height.
+	origin := (builder clippingBounds extent / 2) - (extent / 2).
+	
+	^ builder texturedRectangle: (origin extent: extent) wodenTexture: texture
 ]
 
 { #category : 'as yet unclassified' }

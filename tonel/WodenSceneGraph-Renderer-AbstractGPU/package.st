@@ -1,1 +1,1 @@
-Package { #name : #'WodenSceneGraph-Renderer-AbstractGPU' }
+Package { #name : 'WodenSceneGraph-Renderer-AbstractGPU' }

@@ -1,6 +1,6 @@
-Extension { #name : #WDVRTrackedDeviceButtonEvent }
+Extension { #name : 'WDVRTrackedDeviceButtonEvent' }
 
-{ #category : #'*WodenSceneGraph-Renderer-AbstractGPU' }
+{ #category : '*WodenSceneGraph-Renderer-AbstractGPU' }
 WDVRTrackedDeviceButtonEvent >> convertFromAgpuVREvent: vrEvent [
 	button := vrEvent data controller button
 ]

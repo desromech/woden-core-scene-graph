@@ -1,10 +1,12 @@
 Class {
-	#name : #WDAGPUCameraStateUniformBufferWriter,
-	#superclass : #WDAGPUObjectStateUniformBufferWriter,
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#name : 'WDAGPUCameraStateUniformBufferWriter',
+	#superclass : 'WDAGPUObjectStateUniformBufferWriter',
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUCameraStateUniformBufferWriter class >> fieldsDesc [
 	<script: 'self generateWriter'>
 	^ super fieldsDesc , #(
@@ -31,17 +33,17 @@ WDAGPUCameraStateUniformBufferWriter class >> fieldsDesc [
 	)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUCameraStateUniformBufferWriter >> instanceAlignment [
 	^ 16
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUCameraStateUniformBufferWriter >> instanceSize [
 	^ 336
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUCameraStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeMat4: data transformationMatrix onto: pointer at: offset.
 	self writeMat4: data inverseTransformationMatrix onto: pointer at: offset + 64.

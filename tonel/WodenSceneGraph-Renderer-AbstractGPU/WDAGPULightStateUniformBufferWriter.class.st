@@ -1,10 +1,12 @@
 Class {
-	#name : #WDAGPULightStateUniformBufferWriter,
-	#superclass : #WDAGPUUniformBufferWriter,
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#name : 'WDAGPULightStateUniformBufferWriter',
+	#superclass : 'WDAGPUUniformBufferWriter',
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPULightStateUniformBufferWriter class >> fieldsDesc [
 	<script: 'self generateWriter'>
 	^ #(
@@ -33,17 +35,17 @@ WDAGPULightStateUniformBufferWriter class >> fieldsDesc [
 	)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPULightStateUniformBufferWriter >> instanceAlignment [
 	^ 16
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPULightStateUniformBufferWriter >> instanceSize [
 	^ 928
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPULightStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeVec4: data positionOrDirection onto: pointer at: offset.
 	self writeVec3: data intensity onto: pointer at: offset + 16.

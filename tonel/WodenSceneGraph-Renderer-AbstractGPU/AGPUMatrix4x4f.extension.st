@@ -1,6 +1,6 @@
-Extension { #name : #AGPUMatrix4x4f }
+Extension { #name : 'AGPUMatrix4x4f' }
 
-{ #category : #'*WodenSceneGraph-Renderer-AbstractGPU' }
+{ #category : '*WodenSceneGraph-Renderer-AbstractGPU' }
 AGPUMatrix4x4f >> asReversibleAffineTransform3D [
 	| matrix translation |
 	matrix := Matrix3x3 columns: {

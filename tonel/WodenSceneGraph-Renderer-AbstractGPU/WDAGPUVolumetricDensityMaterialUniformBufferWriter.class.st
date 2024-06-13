@@ -1,10 +1,12 @@
 Class {
-	#name : #WDAGPUVolumetricDensityMaterialUniformBufferWriter,
-	#superclass : #WDAGPUVolumetricMaterialUniformBufferWriter,
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#name : 'WDAGPUVolumetricDensityMaterialUniformBufferWriter',
+	#superclass : 'WDAGPUVolumetricMaterialUniformBufferWriter',
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUVolumetricDensityMaterialUniformBufferWriter class >> fieldsDesc [
 	<script: 'self generateWriter'>
 	^ super fieldsDesc , #(
@@ -18,17 +20,17 @@ WDAGPUVolumetricDensityMaterialUniformBufferWriter class >> fieldsDesc [
 	)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVolumetricDensityMaterialUniformBufferWriter >> instanceAlignment [
 	^ 4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUVolumetricDensityMaterialUniformBufferWriter >> instanceSize [
 	^ 20
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUVolumetricDensityMaterialUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeFloat: data minDensityThreshold onto: pointer at: offset.
 	self writeFloat: data maxDensityThreshold onto: pointer at: offset + 4.

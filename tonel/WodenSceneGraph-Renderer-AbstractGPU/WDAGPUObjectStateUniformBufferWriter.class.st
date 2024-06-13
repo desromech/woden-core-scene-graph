@@ -1,10 +1,12 @@
 Class {
-	#name : #WDAGPUObjectStateUniformBufferWriter,
-	#superclass : #WDAGPUUniformBufferWriter,
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#name : 'WDAGPUObjectStateUniformBufferWriter',
+	#superclass : 'WDAGPUUniformBufferWriter',
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUObjectStateUniformBufferWriter class >> fieldsDesc [
 	<script: 'self generateWriter'>
 	^ #(
@@ -13,17 +15,17 @@ WDAGPUObjectStateUniformBufferWriter class >> fieldsDesc [
 	)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUObjectStateUniformBufferWriter >> instanceAlignment [
 	^ 16
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUObjectStateUniformBufferWriter >> instanceSize [
 	^ 128
 ]
 
-{ #category : #writing }
+{ #category : 'writing' }
 WDAGPUObjectStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeMat4: data transformationMatrix onto: pointer at: offset.
 	self writeMat4: data inverseTransformationMatrix onto: pointer at: offset + 64.

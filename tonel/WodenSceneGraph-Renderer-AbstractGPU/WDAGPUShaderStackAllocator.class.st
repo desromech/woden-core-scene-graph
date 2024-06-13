@@ -1,6 +1,6 @@
 Class {
-	#name : #WDAGPUShaderStackAllocator,
-	#superclass : #Object,
+	#name : 'WDAGPUShaderStackAllocator',
+	#superclass : 'Object',
 	#instVars : [
 		'buffer',
 		'capacity',
@@ -10,15 +10,17 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Allocator'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Allocator',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Allocator'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUShaderStackAllocator class >> for: device capacity: capacity [
 	^ self new initializeWithDevice: device capacity: capacity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> allocate: allocationSize alignment: allocationAlignment [
 	| offset newSize |
 	offset := size alignedTo: allocationAlignment.
@@ -33,36 +35,36 @@ WDAGPUShaderStackAllocator >> allocate: allocationSize alignment: allocationAlig
 		yourself.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> buffer [
 
 	^ buffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> buffer: anObject [
 
 	buffer := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> capacity [
 
 	^ capacity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> capacity: anObject [
 
 	capacity := anObject
 ]
 
-{ #category : #'initialize-release' }
+{ #category : 'initialize-release' }
 WDAGPUShaderStackAllocator >> free [
 	size := 0.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUShaderStackAllocator >> initializeWithDevice: aDevice capacity: initialCapacity [
 	buffer := aDevice createBuffer: (AGPUBufferDescription new
 		size: initialCapacity;
@@ -76,18 +78,18 @@ WDAGPUShaderStackAllocator >> initializeWithDevice: aDevice capacity: initialCap
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> size [
 	^ size
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> size: anObject [
 
 	size := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShaderStackAllocator >> validBufferPointer [
 	bufferPointer ifNotNil: [ ^ bufferPointer ].
 	

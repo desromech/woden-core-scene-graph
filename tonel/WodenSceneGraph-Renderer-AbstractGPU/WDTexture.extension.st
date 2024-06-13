@@ -1,6 +1,6 @@
-Extension { #name : #WDTexture }
+Extension { #name : 'WDTexture' }
 
-{ #category : #'*WodenSceneGraph-Renderer-AbstractGPU' }
+{ #category : '*WodenSceneGraph-Renderer-AbstractGPU' }
 WDTexture >> uploadIntoWodenTexture: aWDTexture agpuHandle: agpuTexture withWodenSceneRendererResourceCache: resourceCache [
 	| dataKind selfHandle |
 	dataKind := aWDTexture dataKind.

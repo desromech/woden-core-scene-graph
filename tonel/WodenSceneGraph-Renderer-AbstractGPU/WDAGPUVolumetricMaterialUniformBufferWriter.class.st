@@ -1,15 +1,17 @@
 Class {
-	#name : #WDAGPUVolumetricMaterialUniformBufferWriter,
-	#superclass : #WDAGPUMaterialUniformBufferWriter,
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#name : 'WDAGPUVolumetricMaterialUniformBufferWriter',
+	#superclass : 'WDAGPUMaterialUniformBufferWriter',
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUVolumetricMaterialUniformBufferWriter class >> fieldsDesc [
 	^ #()
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUVolumetricMaterialUniformBufferWriter class >> isAbstract [
 	^ self == WDAGPUVolumetricMaterialUniformBufferWriter
 ]

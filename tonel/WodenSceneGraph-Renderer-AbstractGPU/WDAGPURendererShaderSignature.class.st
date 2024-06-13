@@ -2,8 +2,8 @@
 I encapsulate the 3D renderer shader signature, and allocators for its different states.
 "
 Class {
-	#name : #WDAGPURendererShaderSignature,
-	#superclass : #Object,
+	#name : 'WDAGPURendererShaderSignature',
+	#superclass : 'Object',
 	#instVars : [
 		'device',
 		'handle',
@@ -22,15 +22,17 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Resources'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Resources',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Resources'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPURendererShaderSignature class >> for: device [
 	^ self basicNew initializeWithDevice: device
 ]
 
-{ #category : #utility }
+{ #category : 'utility' }
 WDAGPURendererShaderSignature >> allocateCameraState [
 	| result |
 	result := cameraStateAllocator allocate.
@@ -42,7 +44,7 @@ WDAGPURendererShaderSignature >> allocateCameraState [
 	^ result
 ]
 
-{ #category : #utility }
+{ #category : 'utility' }
 WDAGPURendererShaderSignature >> allocateLightingState [
 	| result |
 	result := lightingStateAllocator allocate.
@@ -54,7 +56,7 @@ WDAGPURendererShaderSignature >> allocateLightingState [
 	^ result
 ]
 
-{ #category : #utility }
+{ #category : 'utility' }
 WDAGPURendererShaderSignature >> allocateMaterialState [
 	| result |
 	result := materialStateAllocator allocate.
@@ -66,7 +68,7 @@ WDAGPURendererShaderSignature >> allocateMaterialState [
 	^ result
 ]
 
-{ #category : #utility }
+{ #category : 'utility' }
 WDAGPURendererShaderSignature >> allocateObjectState [
 	| result |
 	result := objectStateAllocator allocate.
@@ -78,7 +80,7 @@ WDAGPURendererShaderSignature >> allocateObjectState [
 	^ result
 ]
 
-{ #category : #utility }
+{ #category : 'utility' }
 WDAGPURendererShaderSignature >> allocatePoseState [
 	| result |
 	result := poseStateAllocator allocate.
@@ -90,7 +92,7 @@ WDAGPURendererShaderSignature >> allocatePoseState [
 	^ result
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPURendererShaderSignature >> buildHandle [
 	handle := device createShaderSignatureBuilder
 		beginBindingBank: 1;
@@ -146,7 +148,7 @@ WDAGPURendererShaderSignature >> buildHandle [
 		build
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPURendererShaderSignature >> buildSamplersBinding [
 	sampler := device createSampler: (AGPUSamplerDescription new
 		filter: AGPU_FILTER_MIN_LINEAR_MAG_LINEAR_MIPMAP_LINEAR;
@@ -200,12 +202,12 @@ WDAGPURendererShaderSignature >> buildSamplersBinding [
 	samplersBinding bindSampler: 4 sampler: volumetricSampler.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPURendererShaderSignature >> handle [
 	^ handle
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPURendererShaderSignature >> initializeWithDevice: aDevice [
 	device := aDevice.
 	self
@@ -223,7 +225,7 @@ WDAGPURendererShaderSignature >> initializeWithDevice: aDevice [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPURendererShaderSignature >> samplersBinding [
 	^ samplersBinding
 ]

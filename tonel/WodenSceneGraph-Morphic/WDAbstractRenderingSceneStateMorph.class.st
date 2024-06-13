@@ -97,7 +97,7 @@ WDAbstractRenderingSceneStateMorph >> initialize [
 WDAbstractRenderingSceneStateMorph >> renderRenderingSceneStateIntoFormFramebuffer: renderingSceneState [
 	| drawingExtent overlaySceneGraph |
 	drawingExtent := self drawingSurfaceExtent.
-	overlaySceneGraph := self buildWindowOverlaySceneGraphNodeWith: (FormSGBuilder extent: drawingExtent).
+	overlaySceneGraph := self buildWindowOverlaySceneGraphNodeWith: (WDSceneRenderer current formSceneGraphBuilder extent: drawingExtent; yourself).
 	
 	(formFrameBuffer isNil or: [ formFrameBuffer extent ~= drawingExtent ]) ifTrue: [
 		formColorBuffer := WDTexture forReadedColorBufferWithExtent: drawingExtent.

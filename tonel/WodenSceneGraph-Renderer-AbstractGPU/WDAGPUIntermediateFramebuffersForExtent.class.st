@@ -1,6 +1,6 @@
 Class {
-	#name : #WDAGPUIntermediateFramebuffersForExtent,
-	#superclass : #Object,
+	#name : 'WDAGPUIntermediateFramebuffersForExtent',
+	#superclass : 'Object',
 	#instVars : [
 		'device',
 		'extent',
@@ -41,50 +41,52 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Renderer'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Renderer',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Renderer'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAGPUIntermediateFramebuffersForExtent class >> for: device resourceCache: resourceCache withExtent: anExtent sampleCount: aSampleCount initialDepth: anInitialDepth [
 	^ self basicNew initializeWithDevice: device resourceCache: resourceCache extent: anExtent sampleCount: aSampleCount initialDepth: anInitialDepth; yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> bloomExtent [
 
 	^ bloomExtent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> bloomPingFramebuffer [
 
 	^ bloomPingFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> bloomPingTexture [
 
 	^ bloomPingTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> bloomPongFramebuffer [
 
 	^ bloomPongFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> bloomPongTexture [
 
 	^ bloomPongTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> colorBufferTexture [
 	^ colorBufferTexture
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> createBloomFramebuffer [
 	| bloomWidth bloomHeight viewDesc |
 	bloomWidth := (extent x / 4) floor max: 1.
@@ -135,7 +137,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createBloomFramebuffer [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format attachmentFormat: attachmentFormat samplingFormat: samplingFormat [
 	| depthStencilBufferSamplingViewDescription depthStencilBufferAttachmentViewDescription |
 	depthStencilBuffer := device createTexture: (AGPUTextureDescription new
@@ -172,7 +174,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createDepthStencilBuffer: format atta
 	depthStencilBufferAttachmentView := depthStencilBuffer createView: depthStencilBufferAttachmentViewDescription
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 	| viewDesc opaqueColorBufferAttachmentView colorBufferAttachmentView normalGBufferAttachmentView specularGBufferAttachmentView |
 	opaqueColorBufferTexture := device createTexture: (AGPUTextureDescription new
@@ -258,7 +260,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createHdrFramebuffer [
 		depthStencilView: depthStencilBufferAttachmentView
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> createSSAOFramebuffer [
 	| ssaoWidth ssaoHeight viewDesc |
 	ssaoWidth := (extent x / 2) floor max: 1.
@@ -309,7 +311,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createSSAOFramebuffer [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> createScreenRoughFramebuffer [
 	screenRoughExtents := {256@256 . 128@128 . 64@64 . 64@64}.
 	screenRoughTextures := Array new: screenRoughExtents size.
@@ -345,7 +347,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createScreenRoughFramebuffer [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> createScreenSpaceReflectionFramebuffer [
 	| viewDesc screenSpaceReflectionTextureAttachmentView |
 	screenSpaceReflectionTexture := device createTexture: (AGPUTextureDescription new
@@ -372,7 +374,7 @@ WDAGPUIntermediateFramebuffersForExtent >> createScreenSpaceReflectionFramebuffe
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> createStaticReflectionFramebuffer [
 	| viewDesc staticReflectionTextureAttachmentView |
 	staticReflectionTexture := device createTexture: (AGPUTextureDescription new
@@ -399,54 +401,54 @@ WDAGPUIntermediateFramebuffersForExtent >> createStaticReflectionFramebuffer [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> depthOnlyFramebuffer [
 	^ depthOnlyFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> depthStencilBufferSamplingView [
 	^ depthStencilBufferSamplingView
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> device [
 
 	^ device
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> extent [
 
 	^ extent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> hdrColorBufferTexture [
 	^ colorBufferTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> hdrOpaqueColorBuffer [
 	^ opaqueColorBufferTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> hdrOpaqueFramebuffer [
 	^ hdrOpaqueFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> hdrTranslucentFramebuffer [
 	^ hdrTranslucentFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> initialDepth [
 	^ initialDepth
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourceCache: aResourceCache extent: anExtent sampleCount: aSampleCount initialDepth: anInitialDepth [
 	device := aDevice.
 	extent := anExtent.
@@ -462,82 +464,82 @@ WDAGPUIntermediateFramebuffersForExtent >> initializeWithDevice: aDevice resourc
 		createBloomFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> normalGBufferTexture [
 	^ normalGBufferTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> opaqueColorBufferTexture [
 	^ opaqueColorBufferTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> sampleCount [
 	^ sampleCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> screenRoughExtents [
 	^ screenRoughExtents
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> screenRoughFramebuffers [
 	^ screenRoughFramebuffers
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> screenRoughTextures [
 	^ screenRoughTextures
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> screenSpaceReflectionFramebuffer [
 	^ screenSpaceReflectionFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> screenSpaceReflectionTexture [
 	^ screenSpaceReflectionTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> specularGBufferTexture [
 	^ specularGBufferTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> ssaoExtent [
 	^ ssaoExtent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> ssaoPingFramebuffer [
 	^ ssaoPingFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> ssaoPingTexture [
 	^ ssaoPingTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> ssaoPongFramebuffer [
 	^ ssaoPongFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> ssaoPongTexture [
 	^ ssaoPongTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> staticReflectionFramebuffer [
 	^ staticReflectionFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUIntermediateFramebuffersForExtent >> staticReflectionTexture [
 	^ staticReflectionTexture
 ]

@@ -2,8 +2,8 @@
 I am a cache for connecting session independent woden resources with device and session specific resources.
 "
 Class {
-	#name : #WDAGPUSceneRendererResourceCache,
-	#superclass : #Object,
+	#name : 'WDAGPUSceneRendererResourceCache',
+	#superclass : 'Object',
 	#instVars : [
 		'device',
 		'textureUploader',
@@ -101,20 +101,22 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Resources'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Resources',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Resources'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPUSceneRendererResourceCache class >> for: aDevice [
 	^ self for: aDevice withTextureUploader: (AGPUTextureUploader for: aDevice)
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAGPUSceneRendererResourceCache class >> for: device withTextureUploader: textureUploader [
 	^ self basicNew initializeWithDevice: device withTextureUploader: textureUploader
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache class >> initialize [
 	ShadowMapAtlasExtent := 4192@4192.
 	
@@ -196,22 +198,22 @@ WDAGPUSceneRendererResourceCache class >> initialize [
 	UploadBufferCapacity := 2*1024*1024.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache class >> shadowMapAtlasExtent [
 	^ ShadowMapAtlasExtent
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> bloomRenderPass [
 	^ self reflectionRenderPass
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> bloomSelectionFragmentShader [
 	^ bloomSelectionFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> bloomSelectionFragmentShaderSource [
 	^ '
 #version 450
@@ -236,12 +238,12 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> blurHorizontalPassFragmentShader [
 	^ blurHorizontalPassFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> blurHorizontalPassFragmentShaderSource [
 	^ '
 #version 450
@@ -268,12 +270,12 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> blurVerticalPassFragmentShader [
 	^ blurVerticalPassFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> blurVerticalPassFragmentShaderSource [
 	^ '
 #version 450
@@ -300,12 +302,12 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> brdfLutTexture [
 	^ brdfLutTexture
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> buildRendererComputePipelineWithShaderSource: shaderSource [
 	| shader |
 	shader := self compileShader: shaderSource type: AGPU_COMPUTE_SHADER.
@@ -315,7 +317,7 @@ WDAGPUSceneRendererResourceCache >> buildRendererComputePipelineWithShaderSource
 		build
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> cameraStateBlockSource [
 	^ '
 layout(set=1, binding=0, std140) uniform CameraStateBlock	
@@ -348,12 +350,12 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> clearReverseDepthFragmentShader [
 	^ clearReverseDepthFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> clearReverseDepthFragmentShaderSource [
 	^ '
 #version 450
@@ -366,7 +368,7 @@ void main()
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> compileShader: sourceText type: shaderType [
 	| shaderCompiler convertedSourceText |
 	shaderCompiler := device createOfflineShaderCompiler.
@@ -393,12 +395,12 @@ WDAGPUSceneRendererResourceCache >> compileShader: sourceText type: shaderType [
 		]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> computeScratchStorageBuffer [
 	^ computeScratchStorageBuffer
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> convertTextureDescription: description [
 	^ AGPUTextureDescription new
 		type: (TextureTypeMap at: description type);
@@ -415,7 +417,7 @@ WDAGPUSceneRendererResourceCache >> convertTextureDescription: description [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createShadowMapTextureWithExtent: extent clearDepth: clearDepth [
 	| result |
 	result := device createTexture: (AGPUTextureDescription new
@@ -438,17 +440,17 @@ WDAGPUSceneRendererResourceCache >> createShadowMapTextureWithExtent: extent cle
 	^ result
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createStorageBufferFor: elementWriter capacity: capacity usageModes: usageModes [
 	^ self createStorageBufferForElementSize: elementWriter uniqueInstance instanceSize capacity: capacity usageModes: usageModes
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createStorageBufferForElementSize: elementSize capacity: capacity usageModes: usageModes [
 	^ self createStorageBufferWithSize: elementSize*capacity usageModes: usageModes
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createStorageBufferWithSize: size usageModes: usageModes [
 	^ device createBuffer: (AGPUBufferDescription new
 		heap_type: AGPU_MEMORY_HEAP_TYPE_DEVICE_LOCAL;
@@ -458,7 +460,7 @@ WDAGPUSceneRendererResourceCache >> createStorageBufferWithSize: size usageModes
 		yourself) initial_data: nil
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createTexture1DWithColorData: colorData [
 	| result |
 	result := device createTexture: (AGPUTextureDescription new
@@ -477,7 +479,7 @@ WDAGPUSceneRendererResourceCache >> createTexture1DWithColorData: colorData [
 	^ result
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createTexture2DWithSingleColor: colorData [
 	| result |
 	result := device createTexture: (AGPUTextureDescription new
@@ -496,7 +498,7 @@ WDAGPUSceneRendererResourceCache >> createTexture2DWithSingleColor: colorData [
 	^ result
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createTexture3DWithSingleColor: colorData [
 	| result |
 	result := device createTexture: (AGPUTextureDescription new
@@ -515,7 +517,7 @@ WDAGPUSceneRendererResourceCache >> createTexture3DWithSingleColor: colorData [
 	^ result
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> createTextureCubeWithSingleColor: colorData [
 	| result |
 	result := device createTexture: (AGPUTextureDescription new
@@ -536,7 +538,7 @@ WDAGPUSceneRendererResourceCache >> createTextureCubeWithSingleColor: colorData 
 	^ result
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> cubeMapFaceRotationMatricesShaderSource [
 	^ cubeMapFaceRotationMatricesShaderSource ifNil: [cubeMapFaceRotationMatricesShaderSource := 		ByteString streamContents: [ :out |
 			out nextPutAll: 'const mat3[6] CubeMapFaceRotations = mat3[6]('; cr.
@@ -562,17 +564,17 @@ WDAGPUSceneRendererResourceCache >> cubeMapFaceRotationMatricesShaderSource [
 ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> defaultMaterial [
 	^ defaultMaterial
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> depthFormat [
 	^ depthFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> depthOnlyRenderPassWithSampleCount: sampleCount initialDepth: initialDepth [
 	^ renderPasses at: {#depthOnlyRenderPassWithSampleCount . sampleCount . initialDepth} ifAbsentPut: [
 		| depthStencilAttachment |
@@ -602,49 +604,49 @@ WDAGPUSceneRendererResourceCache >> depthOnlyRenderPassWithSampleCount: sampleCo
 
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> depthOnlyVertexAttributesForMask [
 	^ ((1 bitShift: 0)
 		bitOr: (1 bitShift: 5))
 		bitOr: (1 bitShift: 6)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> depthSampledFormat [
 	^ depthSampledFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> depthStencilFormat [
 	^ depthStencilFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> depthStencilSampledFormat [
 	^ depthStencilSampledFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> depthStencilTypelessFormat [
 	^ depthStencilTypelessFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> depthTypelessFormat [
 	^ depthTypelessFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> device [
 	^ device
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> downsampleFragmentShader [
 	^ downsampleFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> downsampleFragmentShaderSource [
 	^ '
 #version 450
@@ -662,12 +664,12 @@ void main()
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader [
 	^ duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidDepthOnlyFragmentShaderSource [
 	^ '
 #version 450
@@ -692,7 +694,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
@@ -756,7 +758,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidMaterialStateSource [
 	^ '
 layout(set=5, binding=0, std140) uniform MaterialStateBlock	
@@ -790,27 +792,27 @@ layout(set=5, binding=5) uniform texture2D MetallicRoughnessTexture;
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidOpaqueFragmentShader [
 	^ duplicatedMetallicRoughnessLiquidOpaqueFragmentShader
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> duplicatedMetallicRoughnessLiquidTranslucentFragmentShader [
 	^ duplicatedMetallicRoughnessLiquidTranslucentFragmentShader
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> emptyLightingStateBinding [
 	^ emptyLightingStateBinding
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapDepthOnlyFragmentShader [
 	^ environmentMapDepthOnlyFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapDepthOnlyFragmentShaderSource [
 	^ '
 #version 450
@@ -826,7 +828,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
@@ -847,7 +849,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapMaterialStateSource [
 	^ '
 layout(set=5, binding=0, std140) uniform MaterialStateBlock
@@ -861,17 +863,17 @@ layout(set=5, binding=1) uniform textureCube ColorTexture;
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapOpaqueFragmentShader [
 	^ environmentMapOpaqueFragmentShader
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> environmentMapTranslucentFragmentShader [
 	^ environmentMapTranslucentFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> exponentialToneMappingOperatorShaderSource [
 	^ '
 #version 450
@@ -889,7 +891,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> filmicToneMappingOperatorShaderSource [
 	^ '
 #version 450
@@ -917,17 +919,17 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> formSceneGraphDrawCommandProcessorContext [
 	^ formSceneGraphDrawCommandProcessorContext
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> genericDepthOnlySurfaceFragmentShader [
 	^ genericDepthOnlySurfaceFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> genericDepthOnlySurfaceFragmentShaderSource [
 	^ '
 #version 450
@@ -939,7 +941,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialFragmentShaderInputs [
 	^ '
 layout(location=0) in StageInputBlock
@@ -957,7 +959,7 @@ layout(location=0) in StageInputBlock
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderSourceWithMask: mask hasSkinning: hasSkinning [
 	^ '
 #version 450
@@ -1077,24 +1079,24 @@ void main()
 '
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> genericSurfaceMaterialVertexShaderWithLocationMask: mask hasSkinning: hasSkinning [
 	^ genericSurfaceMaterialVertexShaders at: {mask . hasSkinning} ifAbsentPut: [
 		self compileShader: (self genericSurfaceMaterialVertexShaderSourceWithMask: mask hasSkinning: hasSkinning) type: AGPU_VERTEX_SHADER
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> grayColorMapTexture1D [
 	^ grayColorMapTexture1D
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> hdrBlurRenderPass [
 	^ self reflectionRenderPass
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCount [
 	^ renderPasses at: {#hdrOpaqueRenderPass . sampleCount} ifAbsentPut: [
 		| depthStencilAttachment colorAttachmentDescriptionsPointer |
@@ -1160,7 +1162,7 @@ WDAGPUSceneRendererResourceCache >> hdrOpaqueRenderPassWithSampleCount: sampleCo
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> hdrTranslucentContinueRenderPassWithSampleCount: sampleCount [
 	^ renderPasses at: {#hdrTranslucentContinueRenderPass . sampleCount} ifAbsentPut: [
 		| colorAttachment depthStencilAttachment |
@@ -1194,7 +1196,7 @@ WDAGPUSceneRendererResourceCache >> hdrTranslucentContinueRenderPassWithSampleCo
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> hdrTranslucentRenderPassWithSampleCount: sampleCount [
 	^ renderPasses at: {#hdrTranslucentRenderPass . sampleCount} ifAbsentPut: [
 		| colorAttachment depthStencilAttachment |
@@ -1228,7 +1230,7 @@ WDAGPUSceneRendererResourceCache >> hdrTranslucentRenderPassWithSampleCount: sam
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUploader: aTextureUploader [
 	| shadowMapAtlasTextureDepthStencilViewDescription shadowMapAtlasTextureSamplingViewDescription |
 	device := aDevice.
@@ -1365,7 +1367,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	formSceneGraphDrawCommandProcessorContext := FormSGAGPUDrawCommandProcessorContext for: device withColorCorrection: true.
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> leftEyeStereoComposeShaderSource [
 	^ '
 #version 450
@@ -1379,17 +1381,17 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> lightClusterBuffer [
 	^ lightClusterBuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> lightClusterListBeginComputationShader [
 	^ lightClusterListBeginComputationShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> lightClusterListBeginComputationShaderSource [
 	^ '
 #version 450
@@ -1408,12 +1410,12 @@ void main()
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> lightClusterListComputationShader [
 	^ lightClusterListComputationShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> lightClusterListComputationShaderSource [
 	"Clustered forward rendering list shader is heavily based in the one from http://www.aortiz.me/2018/12/21/CG.html by Ángel Ortiz"
 	^ '
@@ -1510,17 +1512,17 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> lightGridBuffer [
 	^ lightGridBuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> lightGridComputationShader [
 	^ lightGridComputationShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> lightGridComputationShaderSource [
 	^ '
 #version 450
@@ -1607,12 +1609,12 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> lightStateBuffer [
 	^ lightStateBuffer
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> lightingStateBlockSource [
 	^ '
 #line 4
@@ -1682,12 +1684,12 @@ layout(set=2, binding=8) uniform textureCube AmbientSpecularLightProbeTexture;
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> linearToneMappingOperator [
 	^ linearToneMappingOperator
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> linearToneMappingOperatorShaderSource [
 	^ '
 #version 450
@@ -1703,12 +1705,12 @@ void main()
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessDepthOnlyFragmentShader [
 	^ metallicRoughnessDepthOnlyFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessDepthOnlyFragmentShaderSource [
 	^ '
 #version 450
@@ -1727,7 +1729,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
@@ -1775,7 +1777,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessLightingModel [
 ^ self lightingStateBlockSource , self shadowMappingSamplingSource , '
 #line 4
@@ -2000,7 +2002,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessMaterialStateSource [
 	^ '
 layout(set=5, binding=0, std140) uniform MaterialStateBlock	
@@ -2028,22 +2030,22 @@ layout(set=5, binding=5) uniform texture2D MetallicRoughnessTexture;
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessOpaqueFragmentShader [
 	^ metallicRoughnessOpaqueFragmentShader
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessTranslucentFragmentShader [
 	^ metallicRoughnessTranslucentFragmentShader
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> neutralNormalTexture [
 	^ neutralNormalTexture
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> objectStateBlockSource [
 	^ '
 layout(set=3, binding=0, std140) uniform ObjectStateBlock
@@ -2055,12 +2057,12 @@ layout(set=3, binding=0, std140) uniform ObjectStateBlock
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> opaqueReflectionCombinationFragmentShader [
 	^ opaqueReflectionCombinationFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> opaqueReflectionCombinationFragmentShaderSource [
 	^ '
 #version 450
@@ -2096,7 +2098,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> poseStateBlockSource [
 	^ '
 #define HAS_SKINNING
@@ -2110,12 +2112,12 @@ layout(set=4, binding=0, std140) uniform PoseStateBlock
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> projectionNDCAdjustMatrix [
 	^ projectionNDCAdjustMatrix
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> redCyanAnaglyphComposeShaderSource [
 	^ '
 #version 450
@@ -2131,7 +2133,7 @@ void main()
 '
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> reflectionRenderPass [
 	| colorAttachment |
 	reflectionRenderPass ifNotNil: [ ^ reflectionRenderPass ].
@@ -2155,7 +2157,7 @@ WDAGPUSceneRendererResourceCache >> reflectionRenderPass [
 
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> reinhardToneMappingOperatorShaderSource [
 	^ '
 #version 450
@@ -2173,7 +2175,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> renderFragmentShaderOutputs [
 	^ '
 layout(location=0) out vec4 FragmentOutputColor;
@@ -2182,7 +2184,7 @@ layout(location=2) out vec4 FragmentOutputSpecularity;
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> renderFragmentShaderOutputsForOpaquePass: isOpaquePass [
 	^ isOpaquePass ifTrue: [
 '
@@ -2204,12 +2206,12 @@ vec4 FragmentOutputSpecularity;
 ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> rendererShaderSignature [
 	^ rendererShaderSignature
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> samplerStateSource [
 	^ '
 layout(set=0, binding=0) uniform sampler TextureSampler;
@@ -2220,17 +2222,17 @@ layout(set=0, binding=4) uniform sampler VolumetricSampler;
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> screenQuadVertexShader [
 	^ screenQuadVertexShader
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionComputationFragmentShader [
 	^ screenSpaceAmbientOcclusionComputationFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionComputationFragmentShaderSource [
 	^ '
 #version 450
@@ -2317,7 +2319,7 @@ void main()
 '
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionRenderPass [
 	| colorAttachment |
 	screenSpaceAmbientOcclusionRenderPass ifNotNil: [ ^ screenSpaceAmbientOcclusionRenderPass ].
@@ -2341,12 +2343,12 @@ WDAGPUSceneRendererResourceCache >> screenSpaceAmbientOcclusionRenderPass [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> screenSpaceReflectionComputationFragmentShader [
 	^ screenSpaceReflectionComputationFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> screenSpaceReflectionComputationFragmentShaderSource [
 	^ '
 #version 450
@@ -2482,32 +2484,32 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> shadowMapAtlasAllocator [
 	^ shadowMapAtlasAllocator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> shadowMapAtlasExtent [
 	^ ShadowMapAtlasExtent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> shadowMapAtlasFramebuffer [
 	^ shadowMapAtlasFramebuffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> shadowMapAtlasTexture [
 	^ shadowMapAtlasTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> shadowMapAtlasTextureSamplingView [
 	^ shadowMapAtlasTextureSamplingView
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> shadowMapRenderPass [
 	| renderpassDescription depthStencilAttachment |
 	shadowMapRenderPass ifNotNil: [ ^ shadowMapRenderPass ].
@@ -2528,7 +2530,7 @@ WDAGPUSceneRendererResourceCache >> shadowMapRenderPass [
 
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> shadowMappingSamplingSource [
 	^ self cubeMapFaceRotationMatricesShaderSource , '
 #line 4
@@ -2699,7 +2701,7 @@ float sampleShadowMapForLightWithIndex(in ShadowMappingSamplingData samplingData
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> sideBySideStereoComposeShaderSource [
 	^ '
 #version 450
@@ -2716,12 +2718,12 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> staticReflectionComputationFragmentShader [
 	^ staticReflectionComputationFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> staticReflectionComputationFragmentShaderSource [
 	^ '
 #version 450
@@ -2787,12 +2789,12 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> stereoComposeShaderFor: composeMode [
 	^ stereoComposeModeShaderDictionary at: composeMode
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> stereoComposeShaderIOSource [
 	^ '
 layout(location=0) in vec2 inTexcoord;
@@ -2804,17 +2806,17 @@ layout(set=5, binding=2) uniform texture2D RightEyeBuffer;
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> textureUploader [
 	^ textureUploader
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> tileLightIndexListBuffer [
 	^ tileLightIndexListBuffer
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> toneMappingOperatorIOSource [
 	^ '
 layout(location=0) in vec2 inTexcoord;
@@ -2825,12 +2827,12 @@ layout(set=5, binding=1) uniform texture2D HDRColorBuffer;
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> toneMappingOperatorShaderFor: aToneMapOperator [
 	^ toneMapOperatorShaderDictionary at: aToneMapOperator ifAbsent:[ linearToneMappingOperator ]
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> topBottomStereoComposeShaderSource [
 	^ '
 #version 450
@@ -2847,22 +2849,22 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> transparentTexture2D [
 	^ transparentTexture2D
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> transparentTexture3D [
 	^ transparentTexture3D
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> transparentTextureCube [
 	^ transparentTextureCube
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> triangleVertexShaderSource [
 	^ '
 #version 450
@@ -2897,12 +2899,12 @@ void main()
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> unlitDepthOnlyFragmentShader [
 	^ unlitDepthOnlyFragmentShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> unlitDepthOnlyFragmentShaderSource [
 	^ '
 #version 450
@@ -2921,7 +2923,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> unlitFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
@@ -2945,7 +2947,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> unlitMaterialStateSource [
 	^ '
 layout(set=5, binding=0, std140) uniform MaterialStateBlock
@@ -2963,22 +2965,22 @@ layout(set=5, binding=1) uniform texture2D ColorTexture;
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> unlitOpaqueFragmentShader [
 	^ unlitOpaqueFragmentShader
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> unlitTranslucentFragmentShader [
 	^ unlitTranslucentFragmentShader
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> uploadBuffer [
 	^ uploadBuffer
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validBufferHandleFor: aWDBinaryBuffer [
 	| cachedBuffer requiredCapacity |
 	cachedBuffer := textures at: aWDBinaryBuffer ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
@@ -3004,13 +3006,13 @@ WDAGPUSceneRendererResourceCache >> validBufferHandleFor: aWDBinaryBuffer [
 	^ cachedBuffer handle
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validBufferHandleForAccessor: aWDBinaryBufferAccessor [
 	aWDBinaryBufferAccessor bufferView ifNil: [ ^ nil ].
 	^ self validBufferHandleFor: aWDBinaryBufferAccessor bufferView buffer
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validColorAttachmentTextureViewFor: aWDTexture [
 	| textureHandle viewDescription range |
 	textureHandle := self validTextureHandleFor: aWDTexture.
@@ -3027,7 +3029,7 @@ WDAGPUSceneRendererResourceCache >> validColorAttachmentTextureViewFor: aWDTextu
 	^ textureHandle createView: viewDescription
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validDepthStencilAttachmentTextureViewFor: aWDTexture [
 	| textureHandle viewDescription range usageMode |
 	textureHandle := self validTextureHandleFor: aWDTexture.
@@ -3054,7 +3056,7 @@ WDAGPUSceneRendererResourceCache >> validDepthStencilAttachmentTextureViewFor: a
 	^ textureHandle createView: viewDescription
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validFramebufferFor: aWDFramebuffer [
 	| cachedFramebuffer colorBufferViews depthStencilView |
 	aWDFramebuffer swapChain ifNotNil: [ :swapChain | ^ swapChain getCurrentBackBuffer ].
@@ -3074,7 +3076,7 @@ WDAGPUSceneRendererResourceCache >> validFramebufferFor: aWDFramebuffer [
 	^ cachedFramebuffer handle
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validIntermediateFramebuffersFor: aWDFramebuffer sampleCount: sampleCount initialDepth: initialDepth [
 	| result |
 	result := intermediateFramebuffers at: aWDFramebuffer ifAbsent: [ nil ].
@@ -3088,7 +3090,7 @@ WDAGPUSceneRendererResourceCache >> validIntermediateFramebuffersFor: aWDFramebu
 	^ result
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validTextureHandleFor: aWDTexture [
 	| cachedTexture |
 	cachedTexture := textures at: aWDTexture ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
@@ -3111,14 +3113,14 @@ WDAGPUSceneRendererResourceCache >> validTextureHandleFor: aWDTexture [
 	^ cachedTexture handle
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validTextureViewHandleFor: aWDTexture [
 	| textureHandle |
 	textureHandle := self validTextureHandleFor: aWDTexture.
 	^ { textureHandle getOrCreateFullView . textureHandle }
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validVertexBindingFor: aWDVertexBufferBinding [
 	| cachedVertexBinding attributeBuffers offsets |
 	aWDVertexBufferBinding ifNil: [ ^ nil ].
@@ -3146,7 +3148,7 @@ WDAGPUSceneRendererResourceCache >> validVertexBindingFor: aWDVertexBufferBindin
 	^ cachedVertexBinding handle
 ]
 
-{ #category : #handles }
+{ #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validVertexLayoutForVertexBinding: vertexBinding [
 	| layoutDescriptors |
 	layoutDescriptors := vertexBinding attributes collectWithIndex: [ :each :index | self vertexLayoutDescriptorFor: each bufferIndex: index - 1].
@@ -3167,7 +3169,7 @@ WDAGPUSceneRendererResourceCache >> validVertexLayoutForVertexBinding: vertexBin
 
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> vertexAttributesForMask: locationMask [
 	^ ByteString streamContents: [:out |
 		#(
@@ -3188,7 +3190,7 @@ WDAGPUSceneRendererResourceCache >> vertexAttributesForMask: locationMask [
 	]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAGPUSceneRendererResourceCache >> vertexLayoutDescriptorFor: vertexBindingAttribute bufferIndex: bufferIndex [
 	| accessor format stride |
 	accessor := vertexBindingAttribute accessor.
@@ -3208,7 +3210,7 @@ WDAGPUSceneRendererResourceCache >> vertexLayoutDescriptorFor: vertexBindingAttr
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> viewportOutputRenderPass [
 	| colorAttachment |
 	viewportOutputRenderPass ifNotNil: [ ^ viewportOutputRenderPass ].
@@ -3232,7 +3234,7 @@ WDAGPUSceneRendererResourceCache >> viewportOutputRenderPass [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAGPUSceneRendererResourceCache >> viewportOverlayRenderPass [
 	| colorAttachment |
 	viewportOverlayRenderPass ifNotNil: [ ^ viewportOverlayRenderPass ].
@@ -3256,12 +3258,12 @@ WDAGPUSceneRendererResourceCache >> viewportOverlayRenderPass [
 
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> volumetricDensityFragmentShader [
 	^ volumetricDensityFragmentShader
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> volumetricDensityFragmentShaderSource [
 	^ '
 #version 450
@@ -3309,7 +3311,7 @@ void main()
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> volumetricDensityMaterialStateSource [
 	^ '
 layout(set=5, binding=0, std140) uniform MaterialStateBlock	
@@ -3327,7 +3329,7 @@ layout(set=5, binding=2) uniform texture1D ColorMapTexture;
 '
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> volumetricMaterialFragmentShaderInputs [
 	^ '
 layout(location=0) in StageInputBlock
@@ -3343,12 +3345,12 @@ layout(location=0) in StageInputBlock
 '
 ]
 
-{ #category : #'accessing shaders' }
+{ #category : 'accessing shaders' }
 WDAGPUSceneRendererResourceCache >> volumetricVertexShader [
 	^ volumetricVertexShader
 ]
 
-{ #category : #'private shaders' }
+{ #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> volumetricVertexShaderSource [
 	^ '
 #version 450
@@ -3390,7 +3392,7 @@ void main()
 '
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUSceneRendererResourceCache >> whiteTexture2D [
 	^ whiteTexture2D
 ]

@@ -1,10 +1,12 @@
 Class {
-	#name : #WDAGPUSurfaceMaterialUniformBufferWriter,
-	#superclass : #WDAGPUMaterialUniformBufferWriter,
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Uniform'
+	#name : 'WDAGPUSurfaceMaterialUniformBufferWriter',
+	#superclass : 'WDAGPUMaterialUniformBufferWriter',
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Uniform',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Uniform'
 }
 
-{ #category : #'field definition' }
+{ #category : 'field definition' }
 WDAGPUSurfaceMaterialUniformBufferWriter class >> fieldsDesc [
 	^ #(
 		bool doubleSided
@@ -12,7 +14,7 @@ WDAGPUSurfaceMaterialUniformBufferWriter class >> fieldsDesc [
 	)
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAGPUSurfaceMaterialUniformBufferWriter class >> isAbstract [
 	^ self == WDAGPUSurfaceMaterialUniformBufferWriter
 ]

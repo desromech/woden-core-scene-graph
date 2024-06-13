@@ -1,45 +1,47 @@
 Class {
-	#name : #WDAGPUShadowMapTextureAtlasElement,
-	#superclass : #Object,
+	#name : 'WDAGPUShadowMapTextureAtlasElement',
+	#superclass : 'Object',
 	#instVars : [
 		'offset',
 		'extent',
 		'atlasExtent'
 	],
-	#category : #'WodenSceneGraph-Renderer-AbstractGPU-Allocator'
+	#category : 'WodenSceneGraph-Renderer-AbstractGPU-Allocator',
+	#package : 'WodenSceneGraph-Renderer-AbstractGPU',
+	#tag : 'Allocator'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShadowMapTextureAtlasElement >> atlasExtent [
 
 	^ atlasExtent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShadowMapTextureAtlasElement >> atlasExtent: anObject [
 
 	atlasExtent := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShadowMapTextureAtlasElement >> extent [
 
 	^ extent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShadowMapTextureAtlasElement >> extent: anObject [
 
 	extent := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShadowMapTextureAtlasElement >> offset [
 
 	^ offset
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAGPUShadowMapTextureAtlasElement >> offset: anObject [
 
 	offset := anObject
