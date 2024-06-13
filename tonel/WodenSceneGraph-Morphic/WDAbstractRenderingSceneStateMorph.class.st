@@ -2,24 +2,25 @@
 I am an abstract morph that connect a Woden RenderingSceneState with the Pharo UI by using the current per-session renderer.
 "
 Class {
-	#name : #WDAbstractRenderingSceneStateMorph,
-	#superclass : #Morph,
+	#name : 'WDAbstractRenderingSceneStateMorph',
+	#superclass : 'Morph',
 	#instVars : [
 		'formFrameBuffer',
 		'formColorBuffer',
 		'sampledFrameBuffer',
 		'sampledColorBuffer'
 	],
-	#category : #'WodenSceneGraph-Morphic'
+	#category : 'WodenSceneGraph-Morphic',
+	#package : 'WodenSceneGraph-Morphic'
 }
 
-{ #category : #'submorphs - add/remove' }
+{ #category : 'submorphs - add/remove' }
 WDAbstractRenderingSceneStateMorph >> announceDeleted [
 	self destroyResources.
 	super announceDeleted
 ]
 
-{ #category : #drawing }
+{ #category : 'drawing' }
 WDAbstractRenderingSceneStateMorph >> build3DSceneGraphNodeWith: builder [
 	| renderingSceneState |
 	renderingSceneState := self renderingSceneState.
@@ -32,7 +33,7 @@ WDAbstractRenderingSceneStateMorph >> build3DSceneGraphNodeWith: builder [
 
 ]
 
-{ #category : #drawing }
+{ #category : 'drawing' }
 WDAbstractRenderingSceneStateMorph >> buildAGPUBasedSceneGraphNodeWith: builder renderingSceneState: renderingSceneState [
 	| textureHandle |
 	self renderRenderingSceneStateIntoSampledFramebuffer: renderingSceneState.
@@ -46,71 +47,67 @@ WDAbstractRenderingSceneStateMorph >> buildAGPUBasedSceneGraphNodeWith: builder 
 		rectangle: self innerBounds
 ]
 
-{ #category : #drawing }
+{ #category : 'drawing' }
 WDAbstractRenderingSceneStateMorph >> buildReadbackBasedSceneGraphNodeWith: builder renderingSceneState: renderingSceneState [
 	self renderRenderingSceneStateIntoFormFramebuffer: renderingSceneState.
 	^ builder null
 ]
 
-{ #category : #drawing }
+{ #category : 'drawing' }
 WDAbstractRenderingSceneStateMorph >> buildSceneGraphNodeWith: builder [
 	^ (super buildSceneGraphNodeWith: builder) , (self build3DSceneGraphNodeWith: builder) , (self buildWindowOverlaySceneGraphNodeWith: builder)
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateMorph >> buildWindowOverlaySceneGraphNodeWith: builder [
 	^ builder null
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateMorph >> defaultExtent [
 	^ 853@480
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateMorph >> destroyResources [
 ]
 
-{ #category : #drawing }
+{ #category : 'drawing' }
 WDAbstractRenderingSceneStateMorph >> drawOn: aCanvas [
 	| renderingSceneState |
 	renderingSceneState := self renderingSceneState.
 	renderingSceneState ifNil: [ ^ super drawOn: aCanvas ].
 	self renderRenderingSceneStateIntoFormFramebuffer: renderingSceneState.
 	aCanvas drawImage: formColorBuffer data at: self bounds origin.
-	self drawWindowOverlayOn: aCanvas
-	
 ]
 
-{ #category : #'as yet unclassified' }
-WDAbstractRenderingSceneStateMorph >> drawWindowOverlayOn: aCanvas [
-]
-
-{ #category : #'scale factor' }
+{ #category : 'scale factor' }
 WDAbstractRenderingSceneStateMorph >> drawingSurfaceExtent [
 	^ (self innerBounds extent * self uiScaleFactor) ceiling
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAbstractRenderingSceneStateMorph >> initialize [
 	super initialize.
 	self extent: self defaultExtent
 ]
 
-{ #category : #drawing }
+{ #category : 'drawing' }
 WDAbstractRenderingSceneStateMorph >> renderRenderingSceneStateIntoFormFramebuffer: renderingSceneState [
-	| drawingExtent |
+	| drawingExtent overlaySceneGraph |
 	drawingExtent := self drawingSurfaceExtent.
+	overlaySceneGraph := self buildWindowOverlaySceneGraphNodeWith: (FormSGBuilder extent: drawingExtent).
+	
 	(formFrameBuffer isNil or: [ formFrameBuffer extent ~= drawingExtent ]) ifTrue: [
 		formColorBuffer := WDTexture forReadedColorBufferWithExtent: drawingExtent.
 		formFrameBuffer := WDFramebuffer forColorAttachment: formColorBuffer.
 	].
-	WDSceneRenderer current renderSceneState: renderingSceneState intoFramebuffer: formFrameBuffer.
+	WDSceneRenderer current renderSceneState: renderingSceneState overlay: overlaySceneGraph intoFramebuffer: formFrameBuffer.
 	
 ]
 
-{ #category : #drawing }
+{ #category : 'drawing' }
 WDAbstractRenderingSceneStateMorph >> renderRenderingSceneStateIntoSampledFramebuffer: renderingSceneState [
 	| drawingExtent |
 	drawingExtent := self drawingSurfaceExtent.
@@ -122,17 +119,17 @@ WDAbstractRenderingSceneStateMorph >> renderRenderingSceneStateIntoSampledFrameb
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateMorph >> renderingSceneState [
 	^ nil
 ]
 
-{ #category : #'scale factor' }
+{ #category : 'scale factor' }
 WDAbstractRenderingSceneStateMorph >> uiScaleFactor [
 	^ self worldRendererScaleFactor
 ]
 
-{ #category : #'scale factor' }
+{ #category : 'scale factor' }
 WDAbstractRenderingSceneStateMorph >> worldRendererScaleFactor [
 	(Smalltalk at: #FormSGAbstractWorldRenderer ifAbsent: [ ^ 1 ])
 		isEnabled ifFalse: [ ^ 1 ].

@@ -2,31 +2,32 @@
 I am a Woden OSWindow with support for basic interactions.
 "
 Class {
-	#name : #WDInteractiveSceneOSWindow,
-	#superclass : #WDSceneOSWindow,
+	#name : 'WDInteractiveSceneOSWindow',
+	#superclass : 'WDSceneOSWindow',
 	#instVars : [
 		'cameraAngles'
 	],
-	#category : #'WodenSceneGraph-OSWindow'
+	#category : 'WodenSceneGraph-OSWindow',
+	#package : 'WodenSceneGraph-OSWindow'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDInteractiveSceneOSWindow class >> eventHandlerClass [
 	^ WDInteractiveSceneOSWindowEventHandler
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDInteractiveSceneOSWindow >> computeCameraOrientation [
 	^ (Quaternion yRotation: cameraAngles y) * (Quaternion xRotation: cameraAngles x)
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDInteractiveSceneOSWindow >> initialize [
 	super initialize.
 	cameraAngles := Vector3 zeros.
 ]
 
-{ #category : #events }
+{ #category : 'events' }
 WDInteractiveSceneOSWindow >> onMouseMove: event [
 	| delta |
 	delta := event delta.
@@ -45,11 +46,11 @@ WDInteractiveSceneOSWindow >> onMouseMove: event [
 
 ]
 
-{ #category : #events }
+{ #category : 'events' }
 WDInteractiveSceneOSWindow >> onMouseMoveEvent: event [
 ]
 
-{ #category : #events }
+{ #category : 'events' }
 WDInteractiveSceneOSWindow >> onMouseWheel: event [
 	renderMutex critical: [
 		camera translateBy: (camera orientation transformVector3: (Vector3 z: event scrollVertical) * -0.2).

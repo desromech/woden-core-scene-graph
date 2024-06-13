@@ -2,8 +2,8 @@
 I am generic OS Window wrapper for displaying an arbitrary woden rendering scene state.
 "
 Class {
-	#name : #WDAbstractRenderingSceneStateOSWindow,
-	#superclass : #Object,
+	#name : 'WDAbstractRenderingSceneStateOSWindow',
+	#superclass : 'Object',
 	#instVars : [
 		'renderMutex',
 		'sceneRenderer',
@@ -28,20 +28,21 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-OSWindow'
+	#category : 'WodenSceneGraph-OSWindow',
+	#package : 'WodenSceneGraph-OSWindow'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow class >> eventHandlerClass [
 	^ WDAbstractRenderingSceneStateOSWindowEventHandler
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow class >> targetFramerate [
 	^ 100
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> attempToCreateActualVRSystem [
 	vrEnabled ifFalse: [
 		vrSystem := WDDummyVRSystem new.
@@ -55,7 +56,7 @@ WDAbstractRenderingSceneStateOSWindow >> attempToCreateActualVRSystem [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> buildFPSOverlaySceneGraphNodeWith: builder [
 	| currentRenderTime deltaTime font line |
 	currentRenderTime := Time microsecondClockValue.
@@ -72,17 +73,17 @@ WDAbstractRenderingSceneStateOSWindow >> buildFPSOverlaySceneGraphNodeWith: buil
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> buildWindowOverlaySceneGraphNodeWith: builder [
 	^ builder null
 ]
 
-{ #category : #updating }
+{ #category : 'updating' }
 WDAbstractRenderingSceneStateOSWindow >> changed [
 	needsToRender := true.
 ]
 
-{ #category : #'initialize-release' }
+{ #category : 'initialize-release' }
 WDAbstractRenderingSceneStateOSWindow >> close [
 	renderMutex critical: [ 
 		self doDestroySwapChain.
@@ -94,39 +95,39 @@ WDAbstractRenderingSceneStateOSWindow >> close [
 	self destroyResources.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> closeRequest [
 	self close
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAbstractRenderingSceneStateOSWindow >> colorBufferFormat [
 	^ AGPU_TEXTURE_FORMAT_B8G8R8A8_UNORM_SRGB
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAbstractRenderingSceneStateOSWindow >> defaultExtent [
 	^ 1024@576
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> destroyResources [
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> displayExtent [
 	swapChain ifNotNil: [ ^ swapChain getWidth @ swapChain getHeight ].
 	^ extent
 ]
 
-{ #category : #'initialize-release' }
+{ #category : 'initialize-release' }
 WDAbstractRenderingSceneStateOSWindow >> doDestroySwapChain [
 	device ifNotNil: [ device finishExecution ].
 	swapChain ifNotNil: [ swapChain release. ].
 	swapChain := nil.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> doRender [
 	| overlaySceneGraph sgBuilder |
 	self validateDevice ifFalse: [ ^ self ].
@@ -157,21 +158,21 @@ WDAbstractRenderingSceneStateOSWindow >> doRender [
 	needsToRender := false.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> doUpdate [
 ]
 
-{ #category : #'updating screen' }
+{ #category : 'updating screen' }
 WDAbstractRenderingSceneStateOSWindow >> exposed [
 	self render
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAbstractRenderingSceneStateOSWindow >> hasStereoRendering [
 	^ vrEnabled
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAbstractRenderingSceneStateOSWindow >> initialize [
 	super initialize.
 	extent := self defaultExtent.
@@ -181,22 +182,22 @@ WDAbstractRenderingSceneStateOSWindow >> initialize [
 	self stereoComposeMode: WDSideBySideStereoCompositionMode.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> isUsingRealVRSystem [
 	^ vrSystem notNil and: [ vrSystem isRealVRSystem ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> leftEyeRenderingSceneState [
 	^ self renderingSceneState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> needsToRender [
 	^ needsToRender or: [ self isUsingRealVRSystem ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDAbstractRenderingSceneStateOSWindow >> open [
 	| eventHandler attributes |
 	osWindow ifNotNil: [ ^ self ].
@@ -214,12 +215,12 @@ WDAbstractRenderingSceneStateOSWindow >> open [
 	self startRenderingProcess
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAbstractRenderingSceneStateOSWindow >> pollVREventsAndUpdate [
 	vrSystem ifNotNil: [ vrSystem pollEvents ].
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAbstractRenderingSceneStateOSWindow >> render [
 	osWindow ifNil: [ ^ self ].
 	renderMutex critical: [ 
@@ -227,7 +228,7 @@ WDAbstractRenderingSceneStateOSWindow >> render [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> renderingProcessEntry [
 	| session |
 	session := Smalltalk session.
@@ -236,7 +237,7 @@ WDAbstractRenderingSceneStateOSWindow >> renderingProcessEntry [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> renderingProcessIteration [
 	self needsToRender ifTrue: [ 
 		| renderStartTime renderEndTime renderDeltaTime timeToSleep |
@@ -262,56 +263,56 @@ WDAbstractRenderingSceneStateOSWindow >> renderingProcessIteration [
 	].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> renderingProcessPriority [
 	^ vrEnabled
 		ifTrue: [ Processor userInterruptPriority ]
 		ifFalse: [ Processor userSchedulingPriority ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> renderingSceneState [
 	^ nil
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> requiredPerEyeExtent [
 	^ vrSystem perEyeFrameBufferExtentForDisplayWithExtent: self displayExtent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> rightEyeRenderingSceneState [
 	^ self renderingSceneState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> sceneRenderer [
 	^ sceneRenderer ifNil: [ sceneRenderer := WDSceneRenderer newStandalone ]
 ]
 
-{ #category : #asserting }
+{ #category : 'asserting' }
 WDAbstractRenderingSceneStateOSWindow >> shouldUseVSync [
 	^ AGPU shouldUseVSync
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> startRenderingProcess [
 	self terminateRenderProcess.
 	renderingProcess := [ self renderingProcessEntry ] forkAt: self renderingProcessPriority
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> stereoComposeMode [
 	^ stereoComposeMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> stereoComposeMode: aStereoComposeMode [
 	stereoComposeMode := aStereoComposeMode asStereoComposeMode.
 	self changed
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> swapBuffers [
 	[ 
 		swapChain swapBuffers
@@ -326,7 +327,7 @@ WDAbstractRenderingSceneStateOSWindow >> swapBuffers [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> terminateRenderProcess [
 	renderingProcess ifNotNil: [
 		renderingProcess terminate.
@@ -334,14 +335,14 @@ WDAbstractRenderingSceneStateOSWindow >> terminateRenderProcess [
 	].
 ]
 
-{ #category : #updating }
+{ #category : 'updating' }
 WDAbstractRenderingSceneStateOSWindow >> update [
 	renderMutex critical: [ 
 		self doUpdate
 	]
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAbstractRenderingSceneStateOSWindow >> updateAndRender [
 	renderMutex critical: [
 		self pollVREventsAndUpdate.
@@ -355,14 +356,14 @@ WDAbstractRenderingSceneStateOSWindow >> updateAndRender [
 	].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> validateDevice [
 	self sceneRenderer isAGPUSceneRenderer ifFalse: [ ^ false ].
 	device := self sceneRenderer device.
 	^ device notNil and: [ device isNull not ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractRenderingSceneStateOSWindow >> validateEyeFramebuffers [
 	| requiredExtent |
 	requiredExtent := self requiredPerEyeExtent.
@@ -377,7 +378,7 @@ WDAbstractRenderingSceneStateOSWindow >> validateEyeFramebuffers [
 	^ true
 ]
 
-{ #category : #'scale factor' }
+{ #category : 'scale factor' }
 WDAbstractRenderingSceneStateOSWindow >> validateSwapChain [
 	| oldSwapChain requiredExtent swapChainInfo platformSpecificHandle |
 	requiredExtent := self windowExtent.
@@ -417,28 +418,28 @@ WDAbstractRenderingSceneStateOSWindow >> validateSwapChain [
 	^ swapChain notNil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> vrEnabled [
 
 	^ vrEnabled
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> vrEnabled: anObject [
 	vrEnabled := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindow >> vrSystem [
 	^ vrSystem
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDAbstractRenderingSceneStateOSWindow >> waitAndFetchPosesForVR [
 	vrSystem ifNotNil: [ vrSystem waitAndFetchPoses ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAbstractRenderingSceneStateOSWindow >> windowExtent [
 
 	^ osWindow ifNil: [ 240@120 ] ifNotNil: [ osWindow extent ]

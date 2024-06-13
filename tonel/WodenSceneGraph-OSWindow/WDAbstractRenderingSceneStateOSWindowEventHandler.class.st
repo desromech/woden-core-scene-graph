@@ -2,33 +2,34 @@
 I am a generic event handler that is used for displaying a woden rendering scene state in an oswindow.
 "
 Class {
-	#name : #WDAbstractRenderingSceneStateOSWindowEventHandler,
-	#superclass : #OSWindowEventVisitor,
+	#name : 'WDAbstractRenderingSceneStateOSWindowEventHandler',
+	#superclass : 'OSWindowEventVisitor',
 	#instVars : [
 		'window'
 	],
-	#category : #'WodenSceneGraph-OSWindow'
+	#category : 'WodenSceneGraph-OSWindow',
+	#package : 'WodenSceneGraph-OSWindow'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 WDAbstractRenderingSceneStateOSWindowEventHandler >> visitWindowCloseEvent: anEvent [
 	window ifNotNil: [ window closeRequest ].
 	anEvent suppressDefaultAction
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 WDAbstractRenderingSceneStateOSWindowEventHandler >> visitWindowExposeEvent: anEvent [
 	window ifNotNil: [ window exposed ].
 	anEvent suppressDefaultAction
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindowEventHandler >> window [
 
 	^ window
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractRenderingSceneStateOSWindowEventHandler >> window: anObject [
 
 	window := anObject

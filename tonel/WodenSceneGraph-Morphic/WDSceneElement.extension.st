@@ -1,6 +1,6 @@
-Extension { #name : #WDSceneElement }
+Extension { #name : 'WDSceneElement' }
 
-{ #category : #'*WodenSceneGraph-Morphic' }
+{ #category : '*WodenSceneGraph-Morphic' }
 WDSceneElement >> openInMorphicWindow [
 	^ WDInteractiveSceneMorph new
 		scene: self;
@@ -8,7 +8,7 @@ WDSceneElement >> openInMorphicWindow [
 		openInWindow
 ]
 
-{ #category : #'*WodenSceneGraph-Morphic' }
+{ #category : '*WodenSceneGraph-Morphic' }
 WDSceneElement >> openInWindow [
 	(self respondsTo: #inspectionSceneView) ifTrue: [ ^ self inspect ].
 	^ self openInMorphicWindow

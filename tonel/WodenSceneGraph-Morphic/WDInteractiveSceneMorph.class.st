@@ -2,42 +2,43 @@
 I am a morph that displays a single woden scene with basic interactions.
 "
 Class {
-	#name : #WDInteractiveSceneMorph,
-	#superclass : #WDSceneMorph,
+	#name : 'WDInteractiveSceneMorph',
+	#superclass : 'WDSceneMorph',
 	#instVars : [
 		'dragStartPosition',
 		'cameraAngles'
 	],
-	#category : #'WodenSceneGraph-Morphic'
+	#category : 'WodenSceneGraph-Morphic',
+	#package : 'WodenSceneGraph-Morphic'
 }
 
-{ #category : #private }
+{ #category : 'private' }
 WDInteractiveSceneMorph >> computeCameraOrientation [
 	^ (Quaternion yRotation: cameraAngles y) * (Quaternion xRotation: cameraAngles x)
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 WDInteractiveSceneMorph >> handlesMouseDown: anEvent [
 	^ anEvent wasHandled not
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 WDInteractiveSceneMorph >> handlesMouseMove: anEvent [
 	^ anEvent wasHandled not 
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 WDInteractiveSceneMorph >> handlesMouseWheel: anEvent [
 	^ anEvent wasHandled not 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDInteractiveSceneMorph >> initialize [
 	super initialize.
 	cameraAngles := Vector3 zeros.
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 WDInteractiveSceneMorph >> mouseDown: evt [
 	camera ifNil: [ ^ self ].
 	
@@ -48,7 +49,7 @@ WDInteractiveSceneMorph >> mouseDown: evt [
 	evt wasHandled: true.
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 WDInteractiveSceneMorph >> mouseMove: evt [
 	camera ifNil: [ ^ self ].
 	
@@ -76,7 +77,7 @@ WDInteractiveSceneMorph >> mouseMove: evt [
 	evt wasHandled: true.
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 WDInteractiveSceneMorph >> mouseUp: evt [
 	camera ifNil: [ ^ self ].
 
@@ -84,7 +85,7 @@ WDInteractiveSceneMorph >> mouseUp: evt [
 
 ]
 
-{ #category : #'event handling' }
+{ #category : 'event handling' }
 WDInteractiveSceneMorph >> mouseWheel: evt [
 	| delta |
 	camera ifNil: [ ^ self ].

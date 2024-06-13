@@ -8,6 +8,11 @@ Class {
 	#package : 'WodenSceneGraph-Bloc'
 }
 
+{ #category : 'as yet unclassified' }
+WDBlAbstractRenderingSceneStateElement >> buildWindowOverlaySceneGraphNodeWith: builder [
+	^ builder null
+]
+
 { #category : 'initialization' }
 WDBlAbstractRenderingSceneStateElement >> defaultSize [
 	^ 853@480

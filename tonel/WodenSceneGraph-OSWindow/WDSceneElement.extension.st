@@ -1,6 +1,6 @@
-Extension { #name : #WDSceneElement }
+Extension { #name : 'WDSceneElement' }
 
-{ #category : #'*WodenSceneGraph-OSWindow' }
+{ #category : '*WodenSceneGraph-OSWindow' }
 WDSceneElement >> openInOSWindow [
 	^ WDInteractiveSceneOSWindow new
 		scene: self;
@@ -8,7 +8,7 @@ WDSceneElement >> openInOSWindow [
 		open
 ]
 
-{ #category : #'*WodenSceneGraph-OSWindow' }
+{ #category : '*WodenSceneGraph-OSWindow' }
 WDSceneElement >> openInVR [
 	^ WDInteractiveSceneOSWindow new
 		vrEnabled: true;

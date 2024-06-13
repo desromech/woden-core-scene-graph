@@ -1,15 +1,16 @@
 Class {
-	#name : #WDInteractiveSceneOSWindowEventHandler,
-	#superclass : #WDAbstractRenderingSceneStateOSWindowEventHandler,
-	#category : #'WodenSceneGraph-OSWindow'
+	#name : 'WDInteractiveSceneOSWindowEventHandler',
+	#superclass : 'WDAbstractRenderingSceneStateOSWindowEventHandler',
+	#category : 'WodenSceneGraph-OSWindow',
+	#package : 'WodenSceneGraph-OSWindow'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 WDInteractiveSceneOSWindowEventHandler >> visitMouseMoveEvent: anEvent [
 	window ifNotNil: [ window onMouseMove: anEvent ]
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 WDInteractiveSceneOSWindowEventHandler >> visitMouseWheelEvent: anEvent [
 	window ifNotNil: [ window onMouseWheel: anEvent ]
 ]

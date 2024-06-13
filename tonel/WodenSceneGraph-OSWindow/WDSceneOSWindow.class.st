@@ -2,39 +2,40 @@
 I am an OSWindow that is used for displaying a woden scene.
 "
 Class {
-	#name : #WDSceneOSWindow,
-	#superclass : #WDAbstractRenderingSceneStateOSWindow,
+	#name : 'WDSceneOSWindow',
+	#superclass : 'WDAbstractRenderingSceneStateOSWindow',
 	#instVars : [
 		'scene',
 		'camera',
-		'overlay',
+		'overlays',
 		'hasSceneUpdateRequested',
 		'lastSceneUpdateTime'
 	],
-	#category : #'WodenSceneGraph-OSWindow'
+	#category : 'WodenSceneGraph-OSWindow',
+	#package : 'WodenSceneGraph-OSWindow'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSceneOSWindow >> buildWindowOverlaySceneGraphNodeWith: builder [
-	overlay ifNil: [ ^ builder null ].
+	overlays isEmpty ifTrue: [ ^ builder null ].
 	^ builder withClippingBounds: (0@0 extent: self displayExtent) build: [ 
-		overlay buildFullSceneGraphWith: builder
+		builder containerWith: (overlays collect: [:each | each buildFullSceneGraphWith: builder])
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> camera [
 
 	^ camera
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> camera: anObject [
 
 	camera := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSceneOSWindow >> doUpdate [
 	| currentTime deltaTime |
 	currentTime := Time monotonicMicrosecondClockValue.
@@ -46,7 +47,7 @@ WDSceneOSWindow >> doUpdate [
 	lastSceneUpdateTime := currentTime.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> headFloorTransform [
 	camera cameras isEmpty ifFalse: [
 		^ camera cameras first headFloorTransform
@@ -55,19 +56,20 @@ WDSceneOSWindow >> headFloorTransform [
 	^ ReversibleAffineTransform3D identity
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSceneOSWindow >> headTransformIsIncorporatedInCamera [
 	^ false
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSceneOSWindow >> initialize [
 	super initialize.
 	self camera: WDCamera new.
+	overlays := #().
 	hasSceneUpdateRequested := false.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> leftEyeRenderingSceneState [
 	| displayExtent aspectRatio |
 	scene ifNil: [ ^ nil ].
@@ -78,31 +80,40 @@ WDSceneOSWindow >> leftEyeRenderingSceneState [
 		ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> leftEyeTransform [
 	^ self headTransformIsIncorporatedInCamera
 		ifTrue: [ vrSystem leftEyeLocalTransform ]
 		ifFalse: [ self headFloorTransform transformTransform: vrSystem leftEyeTransform ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> needsToRender [
 	^ super needsToRender or: [ hasSceneUpdateRequested ]
 ]
 
-{ #category : #accessing }
-WDSceneOSWindow >> overlay [
+{ #category : 'accessing' }
+WDSceneOSWindow >> overlay: aWDWindowOverlay [
+	aWDWindowOverlay ifNil: [ 
+		self overlays: #()
+	] ifNotNil: [ 
+		self overlays: { aWDWindowOverlay }
+	].
 
-	^ overlay
 ]
 
-{ #category : #accessing }
-WDSceneOSWindow >> overlay: anObject [
-
-	overlay := anObject
+{ #category : 'accessing' }
+WDSceneOSWindow >> overlays [
+	^ overlays
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
+WDSceneOSWindow >> overlays: anArrayOfWDOverlay [
+	overlays := anArrayOfWDOverlay.
+	self changed
+]
+
+{ #category : 'accessing' }
 WDSceneOSWindow >> renderingSceneState [
 	| displayExtent aspectRatio |
 	scene ifNil: [ ^ nil ].
@@ -112,7 +123,7 @@ WDSceneOSWindow >> renderingSceneState [
 	^ (camera asCameraStateWithAspectRatio: aspectRatio) ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> rightEyeRenderingSceneState [
 	| displayExtent aspectRatio |
 	scene ifNil: [ ^ nil ].
@@ -123,20 +134,20 @@ WDSceneOSWindow >> rightEyeRenderingSceneState [
 		ifNotNil: [ :cameraState | scene asRenderingSceneWithCameraState: cameraState ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> rightEyeTransform [
 	^ self headTransformIsIncorporatedInCamera
 		ifTrue: [ vrSystem rightEyeLocalTransform ]
 		ifFalse: [ self headFloorTransform transformTransform: vrSystem rightEyeTransform ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> scene [
 
 	^ scene
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneOSWindow >> scene: anObject [
 
 	scene := anObject.

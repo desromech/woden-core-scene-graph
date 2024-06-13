@@ -1,1 +1,1 @@
-Package { #name : #'WodenSceneGraph-OSWindow' }
+Package { #name : 'WodenSceneGraph-OSWindow' }
