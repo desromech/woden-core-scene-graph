@@ -44,6 +44,11 @@ WDCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withConv
 	self subclassResponsibility
 ]
 
+{ #category : 'collision detection' }
+WDCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withHeightfieldShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
+	self subclassResponsibility
+]
+
 { #category : 'initialization' }
 WDCollisionShape >> initialize [
 	super initialize.
@@ -60,6 +65,11 @@ WDCollisionShape >> isCompoundCollisionShape [
 { #category : 'testing' }
 WDCollisionShape >> isEmptyShape [
 	^ false
+]
+
+{ #category : 'as yet unclassified' }
+WDCollisionShape >> localBoundaryCorners [
+	^ #()
 ]
 
 { #category : 'accessing' }

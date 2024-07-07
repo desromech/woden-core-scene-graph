@@ -37,6 +37,11 @@ WDConvexHullCollisionShape >> constructVisualizationSceneNode [
 			mesh) asSceneNode
 ]
 
+{ #category : 'as yet unclassified' }
+WDConvexHullCollisionShape >> localBoundaryCorners [
+	^ points
+]
+
 { #category : 'intersection testing' }
 WDConvexHullCollisionShape >> localSupportInDirection: aDirection [
 	| bestDistance bestFound |

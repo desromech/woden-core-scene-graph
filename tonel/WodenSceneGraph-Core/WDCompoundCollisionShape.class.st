@@ -2,7 +2,8 @@ Class {
 	#name : 'WDCompoundCollisionShape',
 	#superclass : 'WDCollisionShape',
 	#instVars : [
-		'components'
+		'components',
+		'localBoundaryCorners'
 	],
 	#category : 'WodenSceneGraph-Core-Collision',
 	#package : 'WodenSceneGraph-Core',
@@ -17,7 +18,7 @@ WDCompoundCollisionShape >> addComponent: aShapeComponent [
 	] ifFalse: [ 
 		self localBoundingBox: (self localBoundingBox insertBox: aShapeComponent boundingBox )
 	].
-
+	localBoundaryCorners := nil.
 ]
 
 { #category : 'adding' }
@@ -119,6 +120,21 @@ WDCompoundCollisionShape >> initialize [
 WDCompoundCollisionShape >> isCompoundCollisionShape [
 	^ true
 
+]
+
+{ #category : 'as yet unclassified' }
+WDCompoundCollisionShape >> localBoundaryCorners [
+	^ localBoundaryCorners ifNil: [
+		| corners |
+		corners := OrderedCollection new.
+		self components do: [ :eachComponent |
+			eachComponent shape localBoundaryCorners do: [ :eachComponentCorner |
+				corners add: (eachComponent shape transform transformPosition: eachComponentCorner)
+			]
+		].
+	
+		localBoundaryCorners := corners asArray
+	]
 ]
 
 { #category : 'collision detection' }

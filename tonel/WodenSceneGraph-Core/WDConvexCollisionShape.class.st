@@ -47,7 +47,7 @@ WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform wi
 	shapeDistance > totalMargin ifTrue: [ ^ #() ].	
 
 	shapeDistance >= ShallowPenetrationThreshold ifTrue: [
-		^ {WDPContactPoint new
+		^ {WDContactPoint new
 				normal: closestPointToOrigin normalized;
 				requiredSeparation: totalMargin;
 				firstPoint: gjkSimplex closestPointToOriginInFirst;
@@ -61,7 +61,7 @@ WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform wi
 		distanceAndNormal := GeometricFunctions samplePenetrationContactForSupport: firstSupportFunction with: secondSupportFunction margin: totalMargin separatingAxisHint: separatingAxisHint.
 		distanceAndNormal ifNil: [ ^ #() ].
 		
-		^ {WDPContactPoint new
+		^ {WDContactPoint new
 				normal: distanceAndNormal second;
 				requiredSeparation: totalMargin;
 				firstPoint: distanceAndNormal third;
@@ -71,6 +71,16 @@ WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform wi
 				yourself
 		}
 	]
+]
+
+{ #category : 'accessing' }
+WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withHeightfieldShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
+	^ otherShape detectAndComputeCollisionContactPointsAt: otherTransform withConvexShape: self at: transform separatingAxisHint: separatingAxisHint
+]
+
+{ #category : 'as yet unclassified' }
+WDConvexCollisionShape >> localBoundaryCorners [
+	^ localBoundingBox corners
 ]
 
 { #category : 'intersection testing' }
