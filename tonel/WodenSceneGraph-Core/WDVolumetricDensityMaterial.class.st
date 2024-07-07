@@ -19,6 +19,11 @@ Class {
 }
 
 { #category : 'accessing' }
+WDVolumetricDensityMaterial class >> typeName [
+	^ #VolumetricDensity
+]
+
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> colorMapTexture [
 
 	^ colorMapTexture

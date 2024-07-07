@@ -56,6 +56,11 @@ WDModelAsset >> addMesh: aMesh [
 WDModelAsset >> addScene: aScene [
 	(elementSet includes: aScene) ifTrue: [ ^ self ].
 	self privateAddElement: aScene.
+	aScene withChildrenDo: [ :eachNode |
+		(eachNode name isNotNil and: [eachNode name isNotEmpty and: [(nameDictionary includesKey: eachNode name) not]]) ifTrue: [
+			nameDictionary at: eachNode name put: eachNode
+		]
+	].
 	scenes add: aScene
 ]
 

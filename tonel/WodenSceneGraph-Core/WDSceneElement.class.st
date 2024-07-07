@@ -113,3 +113,11 @@ WDSceneElement >> sceneLayer [
 WDSceneElement >> updateWithDeltaTime: deltaTime [
 	^ false
 ]
+
+{ #category : 'enumerating' }
+WDSceneElement >> withChildrenDo: aBlock [
+	aBlock value: self.
+	self children do: [ :each |
+		each withChildrenDo: aBlock
+	]
+]
