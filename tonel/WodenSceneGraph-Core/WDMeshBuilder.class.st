@@ -2,8 +2,8 @@
 I am an utilty for building renderable meshes.
 "
 Class {
-	#name : #WDMeshBuilder,
-	#superclass : #Object,
+	#name : 'WDMeshBuilder',
+	#superclass : 'Object',
 	#instVars : [
 		'positions',
 		'colors',
@@ -28,10 +28,12 @@ Class {
 		'CubeSphereBaseLevelQuads',
 		'NormalAxis'
 	],
-	#category : #'WodenSceneGraph-Core-RenderableBuilder'
+	#category : 'WodenSceneGraph-Core-RenderableBuilder',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderableBuilder'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDMeshBuilder class >> initialize [
 	NormalAxis := { 
 		Vector3 x: 1 y: 0 z: 0.
@@ -87,14 +89,14 @@ WDMeshBuilder class >> initialize [
 	}.
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addColor: color [
 	| v4 |
 	v4 := color asVector4.
 	self addCr: v4 x g: v4 y b: v4 z a: v4 w
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addConeWithRadius: radius halfDepth: halfDepth segments: segments [
 	self beginTriangles.
 	self addP: Vector3 zeros; addN: (Vector3 z: 1).
@@ -119,14 +121,14 @@ WDMeshBuilder >> addConeWithRadius: radius halfDepth: halfDepth segments: segmen
 	self addConvexPolygonWithPositionsStartingFrom: 1 count: segments normal: (Vector3 z: -1) flipped: true
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addConvexPolygonTriangleIndicesStartingFrom: polygonVertexStartIndex count: polygonVertexCount [
 	2 to: polygonVertexCount - 1 do: [ :i |
 		self addTriangleI0: polygonVertexStartIndex i1: polygonVertexStartIndex + i - 1 i2: polygonVertexStartIndex + i
 	]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addConvexPolygonWithPositionsStartingFrom: polygonVertexStartIndex count: polygonVertexCount normal: normal flipped: flippedIndices [
 	| addedVerticesIndices |
 	addedVerticesIndices := self vertexCount.
@@ -143,12 +145,12 @@ WDMeshBuilder >> addConvexPolygonWithPositionsStartingFrom: polygonVertexStartIn
 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addCr: r g: g b: b a: a [
 	colors add: r; add: g; add: b; add: a.
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z: maxZ [
 	self
 		"Left"
@@ -206,17 +208,17 @@ WDMeshBuilder >> addCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z: maxZ [
 		addTriangleI0: 2 i1: 3 i2: 0
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addCubeSphereWithRadius: radius subdivisions: subdivisions [
 	self privateAddCubeSphereWithRadius: radius subdivisions: subdivisions quads: CubeSphereBaseLevelQuads
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addCubeWithBox: box [
 	self addCubeMinX: box min x y: box min y z: box min z maxX: box max x y: box max y z: box max z
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addCubeWithHalfExtent: halfExtent [
 	| halfExtentVector |
 	halfExtentVector := halfExtent asVector3.
@@ -224,7 +226,7 @@ WDMeshBuilder >> addCubeWithHalfExtent: halfExtent [
 		maxX: halfExtentVector x y: halfExtentVector y z: halfExtentVector z
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addCubeWithWidth: width height: height depth: depth [
 	| halfWidth halfHeight halfDepth |
 	halfWidth := width / 2.
@@ -233,7 +235,7 @@ WDMeshBuilder >> addCubeWithWidth: width height: height depth: depth [
 	self addCubeMinX: halfWidth negated y: halfHeight negated z: halfDepth negated maxX: halfWidth y: halfHeight z: halfDepth
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addCylinderWithRadius: radius halfHeight: halfHeight segments: segments [
 	| y segmentVerticesBlock |
 	self beginTriangles.
@@ -266,14 +268,14 @@ WDMeshBuilder >> addCylinderWithRadius: radius halfHeight: halfHeight segments: 
 		addConvexPolygonWithPositionsStartingFrom: segments count: segments normal: (Vector3 y: 1) flipped: false
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addFlippedConvexPolygonTriangleIndicesStartingFrom: polygonVertexStartIndex count: polygonVertexCount [
 	2 to: polygonVertexCount - 1 do: [ :i |
 		self addTriangleI0: polygonVertexStartIndex i1: polygonVertexStartIndex + i i2: polygonVertexStartIndex + i - 1
 	]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addInteriorCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z: maxZ [
 	self
 		"Left"
@@ -331,7 +333,7 @@ WDMeshBuilder >> addInteriorCubeMinX: minX y: minY z: minZ maxX: maxX y: maxY z:
 		addTriangleI0: 3 i1: 2 i2: 0
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addInteriorCubeWithWidth: width height: height depth: depth [
 	| halfWidth halfHeight halfDepth |
 	halfWidth := width / 2.
@@ -340,7 +342,7 @@ WDMeshBuilder >> addInteriorCubeWithWidth: width height: height depth: depth [
 	self addInteriorCubeMinX: halfWidth negated y: halfHeight negated z: halfDepth negated maxX: halfWidth y: halfHeight z: halfDepth
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addLineGridWithWidth: width height: height subdivisions: subdivisions [
 	| dx dy x y px py nx ny tc  |
 	
@@ -374,24 +376,24 @@ WDMeshBuilder >> addLineGridWithWidth: width height: height subdivisions: subdiv
 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addLineI0: i0 i1: i1 [
 	indices add: i0 + baseVertex ; add: i1 + baseVertex
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addN: normal [
 	| transformedNormal |
 	transformedNormal := (currentTransform transformNormalVector: normal) normalized.
 	normals add: transformedNormal x; add: transformedNormal y; add: transformedNormal z.
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addNx: x y: y z: z [
 	self addN: (Vector3 x: x y: y z: z)
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addP: position [
 	| transformedPosition |
 	transformedPosition := currentTransform transformPosition: position. 
@@ -399,7 +401,7 @@ WDMeshBuilder >> addP: position [
 	vertexCount := vertexCount + 1.
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addPlaneMinX: minX z: minZ maxX: maxX z: maxZ [
 	self
 		"Top"
@@ -412,7 +414,7 @@ WDMeshBuilder >> addPlaneMinX: minX z: minZ maxX: maxX z: maxZ [
 		addTriangleI0: 3 i1: 2 i2: 0
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addPlaneWithWidth: width height: height [
 	| halfWidth halfHeight |
 	halfWidth := width / 2.
@@ -420,32 +422,32 @@ WDMeshBuilder >> addPlaneWithWidth: width height: height [
 	self addPlaneMinX: halfWidth negated z: halfHeight negated maxX: halfWidth z: halfHeight
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addPositionsData: data [
 	positions addAll: data.
 	vertexCount := vertexCount + (data size / 3).
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addPx: x y: y z: z [
 	self addP: (Vector3 x: x y: y z: z)
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addQuadI0: i0 i1: i1 i2: i2 i3: i3 [ 
 	indices
 		add: i0 + baseVertex ; add: i1 + baseVertex; add: i2 + baseVertex;
 		add: i2 + baseVertex ; add: i3 + baseVertex; add: i0 + baseVertex
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addQuadIndices: quadIndices [
 	indices
 		add: quadIndices first + baseVertex ; add: quadIndices second + baseVertex; add: quadIndices third + baseVertex;
 		add: quadIndices third + baseVertex ; add: quadIndices fourth + baseVertex; add: quadIndices first + baseVertex
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addScreenQuad: halfExtent [
 	| minX minY maxX maxY |
 	minX := halfExtent x negated.
@@ -464,42 +466,86 @@ WDMeshBuilder >> addScreenQuad: halfExtent [
 		addTriangleI0: 3 i1: 2 i2: 0
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addT0: tc [
 	texcoords0 add: tc x; add: tc y
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addT0u: u v: v [
 	texcoords0 add: u; add: v
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addT1: tc [
 	texcoords1 add: tc x; add: tc y
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addT1u: u v: v [
 	texcoords1 add: u; add: v
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addTexcoords0Data: data [
 	texcoords0 addAll: data.
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
+WDMeshBuilder >> addTexturedTerrainPatchWithSize: patchSize scale: terrainScale heights: heights textureMatrix: textureMatrix [
+	| sourceIndex |
+	sourceIndex := 1.
+	self beginTriangles.
+	0 to: patchSize - 1 do: [ :y |
+		| vz |
+		vz := (y / (patchSize - 1)).
+		0 to: patchSize - 1 do: [ :x |
+			| vx t b l r c tc |
+			vx := (x / (patchSize - 1)).
+			t := b := l := r := c := heights at: sourceIndex.
+			y > 0 ifTrue: [ b := heights at: sourceIndex - patchSize ].
+			y + 1 < patchSize ifTrue: [ t := heights at: sourceIndex + patchSize ].
+			x > 0 ifTrue: [ l := heights at: sourceIndex - 1 ].
+			x + 1 < patchSize ifTrue: [ r := heights at: sourceIndex + 1 ].
+			tc := textureMatrix transformVector2: (Vector2 x: vx * terrainScale x y: vz * terrainScale z).
+			
+			self
+				addPx: vx y: c z: vz;
+				addT0: tc;
+				addN: (self computeNormalWithDx: r - l dz: t - b).
+			sourceIndex := sourceIndex + 1.
+		]
+	].
+
+	0 to: patchSize - 2 do: [ :y |
+		| rowStart |
+		rowStart := patchSize * y.
+		0 to: patchSize - 2 do: [ :x |
+			self
+				addTriangleI0: rowStart + x + patchSize + 1 i1: rowStart + x + 1 i2: rowStart + x;
+				addTriangleI0: rowStart + x i1: rowStart + x + patchSize i2: rowStart + x + patchSize + 1.
+			sourceIndex := sourceIndex + 1.
+		].
+	].
+
+]
+
+{ #category : 'adding' }
+WDMeshBuilder >> addTexturedTerrainPatchWithSize: patchSize scale: terrainScale heights: heights textureScale: textureScale offset: textureOffset rotation: textureRotation [
+	self addTexturedTerrainPatchWithSize: patchSize scale: terrainScale heights: heights textureMatrix: (Matrix3x3 texScale: textureScale rotation: textureRotation offset: textureOffset)
+]
+
+{ #category : 'adding' }
 WDMeshBuilder >> addTriangleI0: i0 i1: i1 i2: i2 [
 	indices add: i0 + baseVertex ; add: i1 + baseVertex; add: i2 + baseVertex
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addUVEllipsoidWithDiameters: diameters segments: segments slices: slices [
 	self addUVEllipsoidWithRadiuses: diameters / 2 segments: segments slices: slices
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addUVEllipsoidWithRadiuses: radiuses segments: segments slices: slices [
 	self beginTriangles.
 
@@ -535,27 +581,27 @@ WDMeshBuilder >> addUVEllipsoidWithRadiuses: radiuses segments: segments slices:
 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addUVSphereWithDiameter: diameter segments: segments slices: slices [
 	self addUVEllipsoidWithRadiuses: (diameter / 2) asVector3 segments: segments slices: slices
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> addUVSphereWithRadius: radius segments: segments slices: slices [
 	self addUVEllipsoidWithRadiuses: radius asVector3 segments: segments slices: slices
 ]
 
-{ #category : #builder }
+{ #category : 'builder' }
 WDMeshBuilder >> beginLines [
 	^ self beginPrimitiveWithTopology: WDPrimitiveTopologyLines
 ]
 
-{ #category : #builder }
+{ #category : 'builder' }
 WDMeshBuilder >> beginPrimitiveWithTopology: topology [
 	^ self beginPrimitiveWithTopology: topology material: self currentMaterial
 ]
 
-{ #category : #builder }
+{ #category : 'builder' }
 WDMeshBuilder >> beginPrimitiveWithTopology: topology material: material [
 	primitives isEmpty ifFalse: [ 
 		| lastPrimitive |
@@ -575,23 +621,23 @@ WDMeshBuilder >> beginPrimitiveWithTopology: topology material: material [
 		yourself)
 ]
 
-{ #category : #builder }
+{ #category : 'builder' }
 WDMeshBuilder >> beginTriangles [
 	^ self beginPrimitiveWithTopology: WDPrimitiveTopologyTriangles
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> bitangentForAxis: normalAxis [
 	^ NormalAxis at: ((normalAxis + 3) rem: NormalAxis size) + 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> colors [
 
 	^ colors
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> computeBoundingBoxForPrimitive: builderPrimitive [
 	| box |
 	box := AABox empty.
@@ -602,7 +648,7 @@ WDMeshBuilder >> computeBoundingBoxForPrimitive: builderPrimitive [
 	^ box
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> computeNormalAxis: normal [
 	| amount bestAmount best |
 	bestAmount := Float negativeInfinity.
@@ -620,17 +666,25 @@ WDMeshBuilder >> computeNormalAxis: normal [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'adding' }
+WDMeshBuilder >> computeNormalWithDx: dx dz: dz [
+	| tangent bitangent |
+	tangent := Vector3 x: 1 y: dx z: 0.
+	bitangent := Vector3 x: 0 y: dz z: -1.
+	^ (tangent cross: bitangent) normalized
+]
+
+{ #category : 'accessing' }
 WDMeshBuilder >> currentMaterial [
 	^ currentMaterial
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> currentMaterial: aMaterial [
 	currentMaterial := aMaterial
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> decodeNormals [
 	| sourceIndex |
 	sourceIndex := -2.
@@ -640,7 +694,7 @@ WDMeshBuilder >> decodeNormals [
 	]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> decodePositions [
 	| sourceIndex |
 	sourceIndex := -2.
@@ -650,7 +704,7 @@ WDMeshBuilder >> decodePositions [
 	]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> decodeTexcoords0 [
 	| sourceIndex |
 	sourceIndex := -1.
@@ -660,7 +714,7 @@ WDMeshBuilder >> decodeTexcoords0 [
 	]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> encodeBufferData [
 	| encoder encodedAttributes |
 	self assert: vertexCount > 0.
@@ -703,7 +757,7 @@ WDMeshBuilder >> encodeBufferData [
 		yourself
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> encodeWith: encoder float32Array: array type: type location: location into: encodedAttributes [
 	| accessor |
 	array isEmpty ifTrue: [ ^ self ].
@@ -720,7 +774,7 @@ WDMeshBuilder >> encodeWith: encoder float32Array: array type: type location: lo
 		yourself)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> encodeWith: encoder uint16Array: array type: type location: location into: encodedAttributes [
 	| accessor |
 	array isEmpty ifTrue: [ ^ self ].
@@ -736,7 +790,7 @@ WDMeshBuilder >> encodeWith: encoder uint16Array: array type: type location: loc
 		yourself)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> encodedPrimitives [
 	^ (primitives collect: [ :each | WDMeshPrimitive new
 		topology: each topology;
@@ -747,14 +801,14 @@ WDMeshBuilder >> encodedPrimitives [
 		yourself ]) asArray
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> fetchPositionAt: index [
 	| baseIndex |
 	baseIndex := index * 3.
 	^ Vector3 x: (positions at: baseIndex + 1) y: (positions at: baseIndex + 2) z: (positions at: baseIndex + 3)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> finishLastPrimitive [
 	| primitive |
 	primitives isEmpty ifTrue: [ ^ self ].
@@ -763,7 +817,7 @@ WDMeshBuilder >> finishLastPrimitive [
 	primitive indexCount: indices size - primitive firstIndex.
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTangentSpaceFrame [
 	| tangents bitangents decodedPositions decodedNormals decodedTexcoords0 |
 	self assert: self hasValidPositions.
@@ -838,7 +892,7 @@ WDMeshBuilder >> generateTangentSpaceFrame [
 
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0ForScreenProjection [
 	| sourceIndex |
 	self assert: self hasValidPositions.
@@ -860,7 +914,7 @@ WDMeshBuilder >> generateTexcoords0ForScreenProjection [
 
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithFacePlanarTransform: transformMatrix [
 	| sourceIndex |
 	self assert: self hasValidPositions.
@@ -890,32 +944,32 @@ WDMeshBuilder >> generateTexcoords0WithFacePlanarTransform: transformMatrix [
 
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithFacePlanarTransformWithScale: scale [
 	^ self generateTexcoords0WithFacePlanarTransform: (Matrix3x3 texScale: scale offset: 0)
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithFacePlanarTransformWithScale: scale offset: offset [
 	^ self generateTexcoords0WithFacePlanarTransform: (Matrix3x3 texScale: scale offset: offset)
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithSphericalProjection [
 	^ self generateTexcoords0WithSphericalProjectionWithCenter: Vector3 zeros
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center [
 	self generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: Vector3 ones
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: radiuses [
 	self generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: radiuses scale: Vector2 ones
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: radiuses scale: scale [
 	| sourceIndex |
 	self assert: self hasValidPositions.
@@ -945,37 +999,37 @@ WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center rad
 
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithCenter: center scale: scale [
 	self generateTexcoords0WithSphericalProjectionWithCenter: center radiuses: Vector3 ones scale: scale
 ]
 
-{ #category : #'texture coordinate generation' }
+{ #category : 'texture coordinate generation' }
 WDMeshBuilder >> generateTexcoords0WithSphericalProjectionWithScale: scale [
 	^ self generateTexcoords0WithSphericalProjectionWithCenter: Vector3 zeros scale: scale
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMeshBuilder >> hasValidNormals [
 	^ normals size = (vertexCount * 3)
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMeshBuilder >> hasValidPositions [
 	^ positions size = (vertexCount * 3)
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMeshBuilder >> hasValidTexcoords0 [
 	^ texcoords0 size = (vertexCount * 2)
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMeshBuilder >> hasValidTexcoords1 [
 	^ texcoords1 size = (vertexCount * 1)
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> indexAccessorForPrimitive: builderPrimitive [
 	^ WDBinaryBufferAccessor new
 		bufferView: indexBufferView;
@@ -988,13 +1042,13 @@ WDMeshBuilder >> indexAccessorForPrimitive: builderPrimitive [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> indices [
 
 	^ indices
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDMeshBuilder >> initialize [
 	super initialize.
 	positions := OrderedCollection new.
@@ -1010,12 +1064,12 @@ WDMeshBuilder >> initialize [
 	self reset.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMeshBuilder >> isEmpty [
 	^ positions isEmpty or: [ indices isEmpty or: primitives isEmpty ]
 ]
 
-{ #category : #builder }
+{ #category : 'builder' }
 WDMeshBuilder >> mesh [
 	(vertexCount <= 0 or: [ indices isEmpty ]) ifTrue: [ ^ WDStaticMeshRenderable new ].
 	self finishLastPrimitive.
@@ -1026,25 +1080,25 @@ WDMeshBuilder >> mesh [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> normals [
 
 	^ normals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> positions [
 
 	^ positions
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> primitives [
 
 	^ primitives
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMeshBuilder >> privateAddCubeSphereWithRadius: radius subdivisions: subdivisions quads: quads [
 	| subdividedQuads |
 	subdivisions <= 0 ifTrue: [
@@ -1105,7 +1159,7 @@ WDMeshBuilder >> privateAddCubeSphereWithRadius: radius subdivisions: subdivisio
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDMeshBuilder >> reset [
 	currentTransform := TRSTransform3D identity.
 	positions removeAll.
@@ -1123,44 +1177,44 @@ WDMeshBuilder >> reset [
 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> tangentForAxis: normalAxis [
 	^ NormalAxis at: ((normalAxis + 1) rem: NormalAxis size) + 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> tangents4 [
 	^ tangents4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> texcoords0 [
 
 	^ texcoords0
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> texcoords1 [
 	^ texcoords1
 ]
 
-{ #category : #transform }
+{ #category : 'transform' }
 WDMeshBuilder >> transform: aTransform [
 	currentTransform := aTransform asTRSTransform3D copy
 ]
 
-{ #category : #transform }
+{ #category : 'transform' }
 WDMeshBuilder >> translateToX: x y: y z: z [
 	currentTransform translateToX: x y: y z: z
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDMeshBuilder >> vertexBinding [
 	vertexBinding ifNil: [ self encodeBufferData ].
 	^ vertexBinding
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilder >> vertexCount [
 	^ vertexCount
 ]

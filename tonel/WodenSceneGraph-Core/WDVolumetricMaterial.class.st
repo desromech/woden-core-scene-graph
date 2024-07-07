@@ -2,22 +2,24 @@
 I am volumetric material.
 "
 Class {
-	#name : #WDVolumetricMaterial,
-	#superclass : #WDMaterial,
-	#category : #'WodenSceneGraph-Core-Material'
+	#name : 'WDVolumetricMaterial',
+	#superclass : 'WDMaterial',
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVolumetricMaterial class >> isAbstract [
 	^ self == WDVolumetricMaterial
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVolumetricMaterial >> hasAlphaBlending [
 	^ true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVolumetricMaterial >> hasOpaqueRendering [
 	^ false
 ]

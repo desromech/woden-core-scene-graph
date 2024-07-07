@@ -1,38 +1,40 @@
 Class {
-	#name : #WDCompoundCollisionShapeComponent,
-	#superclass : #Object,
+	#name : 'WDCompoundCollisionShapeComponent',
+	#superclass : 'Object',
 	#instVars : [
 		'shape',
 		'transform',
 		'boundingBox'
 	],
-	#category : #'WodenSceneGraph-Core-Collision'
+	#category : 'WodenSceneGraph-Core-Collision',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Collision'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCompoundCollisionShapeComponent >> boundingBox [
 	^ boundingBox ifNil: [boundingBox := shape localBoundingBoxWithMargin transformedWith: transform]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCompoundCollisionShapeComponent >> shape [
 
 	^ shape
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCompoundCollisionShapeComponent >> shape: anObject [
 
 	shape := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCompoundCollisionShapeComponent >> transform [
 
 	^ transform
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCompoundCollisionShapeComponent >> transform: anObject [
 
 	transform := anObject

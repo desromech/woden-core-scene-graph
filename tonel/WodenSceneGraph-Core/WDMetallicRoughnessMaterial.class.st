@@ -4,8 +4,8 @@ I am a material that uses the metallic-roughness PBR lighting model.
 My parameters are taken from the gltf 2.0 spec for model formats.
 "
 Class {
-	#name : #WDMetallicRoughnessMaterial,
-	#superclass : #WDSurfaceMaterial,
+	#name : 'WDMetallicRoughnessMaterial',
+	#superclass : 'WDSurfaceMaterial',
 	#instVars : [
 		'baseColorFactor',
 		'baseColorTexture',
@@ -21,10 +21,12 @@ Class {
 		'texcoordOffset',
 		'texcoordOffsetVelocity'
 	],
-	#category : #'WodenSceneGraph-Core-Material'
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial class >> default [
 	^ self new
 		roughnessFactor: 0.4;
@@ -32,12 +34,12 @@ WDMetallicRoughnessMaterial class >> default [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial class >> typeName [
 	^ #MetallicRoughness
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMetallicRoughnessMaterial >> addIntoModelAssetWithDependencies: modelAsset [
 	super addIntoModelAssetWithDependencies: modelAsset.
 	baseColorTexture ifNotNil: [ modelAsset addTexture: baseColorTexture ].
@@ -47,7 +49,7 @@ WDMetallicRoughnessMaterial >> addIntoModelAssetWithDependencies: modelAsset [
 	occlusionTexture ifNotNil: [ modelAsset addTexture: occlusionTexture ].
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDMetallicRoughnessMaterial >> asUnlitMaterial [
 	^ WDUnlitMaterial new
 		alphaMode: alphaMode;
@@ -60,59 +62,59 @@ WDMetallicRoughnessMaterial >> asUnlitMaterial [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> baseColorFactor [
 
 	^ baseColorFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> baseColorFactor: aColor [
 
 	baseColorFactor := aColor asVector4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> baseColorTexture [
 
 	^ baseColorTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> baseColorTexture: anObject [
 
 	baseColorTexture := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> emissiveFactor [
 
 	^ emissiveFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> emissiveFactor: aFactor [
 	emissiveFactor := aFactor asVector3
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> emissiveTexture [
 
 	^ emissiveTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> emissiveTexture: anObject [
 
 	emissiveTexture := anObject
 ]
 
-{ #category : #'double dispatch' }
+{ #category : 'double dispatch' }
 WDMetallicRoughnessMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitMetallicRoughnessMaterialActivationCommands: self
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMetallicRoughnessMaterial >> encodeJsonKeyValues [
 	^ super encodeJsonKeyValues , {
 		#baseColorFactor . baseColorFactor encodeForJSON.
@@ -132,7 +134,7 @@ WDMetallicRoughnessMaterial >> encodeJsonKeyValues [
 	}
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDMetallicRoughnessMaterial >> initialize [
 	super initialize.
 	
@@ -147,7 +149,7 @@ WDMetallicRoughnessMaterial >> initialize [
 	texcoordOffsetVelocity := Vector2 zeros.
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMetallicRoughnessMaterial >> loadFromJson: jsonData [
 	super loadFromJson: jsonData.
 	jsonData at: #baseColorFactor ifPresent: [ :found | baseColorFactor := Vector4 loadFromJson: found ].
@@ -166,7 +168,7 @@ WDMetallicRoughnessMaterial >> loadFromJson: jsonData [
 	jsonData at: #texcoordOffsetVelocity ifPresent: [ :found | texcoordOffsetVelocity := Vector2 loadFromJson: found ].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDMetallicRoughnessMaterial >> makeThumbnail [
 	baseColorTexture ifNotNil: [ baseColorTexture makeThumbnail ifNotNil: [ :thumb | ^ thumb ] ].
 	^ (Form extent: 16@16 depth: 32)
@@ -174,109 +176,109 @@ WDMetallicRoughnessMaterial >> makeThumbnail [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> metallicFactor [
 
 	^ metallicFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> metallicFactor: anObject [
 
 	metallicFactor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> metallicRoughnessTexture [
 
 	^ metallicRoughnessTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> metallicRoughnessTexture: anObject [
 
 	metallicRoughnessTexture := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> normalTexture [
 
 	^ normalTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> normalTexture: anObject [
 
 	normalTexture := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> occlusionFactor [
 
 	^ occlusionFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> occlusionFactor: anObject [
 
 	occlusionFactor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> occlusionTexture [
 
 	^ occlusionTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> occlusionTexture: anObject [
 
 	occlusionTexture := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> roughnessFactor [
 
 	^ roughnessFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> roughnessFactor: anObject [
 
 	roughnessFactor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> texcoordOffset [
 
 	^ texcoordOffset
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> texcoordOffset: anObject [
 
 	texcoordOffset := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> texcoordOffsetVelocity [
 
 	^ texcoordOffsetVelocity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> texcoordOffsetVelocity: anObject [
 
 	texcoordOffsetVelocity := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> texcoordScale [
 
 	^ texcoordScale
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMetallicRoughnessMaterial >> texcoordScale: anObject [
 
 	texcoordScale := anObject

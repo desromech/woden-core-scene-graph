@@ -2,17 +2,19 @@
 I am an utility for reading or writing a model asset.
 "
 Class {
-	#name : #WDModelAssetReadWriter,
-	#superclass : #Object,
-	#category : #'WodenSceneGraph-Core-Asset'
+	#name : 'WDModelAssetReadWriter',
+	#superclass : 'Object',
+	#category : 'WodenSceneGraph-Core-Asset',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Asset'
 }
 
-{ #category : #factory }
+{ #category : 'factory' }
 WDModelAssetReadWriter class >> extensions [
 	^ #()
 ]
 
-{ #category : #factory }
+{ #category : 'factory' }
 WDModelAssetReadWriter class >> forExtension: anExtension [
 	self withAllSubclassesDo: [ :sc |
 		(sc supportsExtension: anExtension) ifTrue: [
@@ -22,7 +24,7 @@ WDModelAssetReadWriter class >> forExtension: anExtension [
 	^ nil
 ]
 
-{ #category : #'read/write usage' }
+{ #category : 'read/write usage' }
 WDModelAssetReadWriter class >> readFileNamed: aFileName [
 	| fileReference extension readWriter |
 	fileReference := aFileName asFileReference.
@@ -34,12 +36,12 @@ WDModelAssetReadWriter class >> readFileNamed: aFileName [
 	^ readWriter readFromFileReference: fileReference
 ]
 
-{ #category : #'read/write usage' }
+{ #category : 'read/write usage' }
 WDModelAssetReadWriter class >> readFromFileReference: aFileReference [
 	self subclassResponsibility
 ]
 
-{ #category : #factory }
+{ #category : 'factory' }
 WDModelAssetReadWriter class >> supportsExtension: anExtension [
 	^ self extensions includes: anExtension
 ]

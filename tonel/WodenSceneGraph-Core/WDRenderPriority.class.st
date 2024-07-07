@@ -2,8 +2,8 @@
 I encapsulate a list of valid render priorities.
 "
 Class {
-	#name : #WDRenderPriority,
-	#superclass : #Object,
+	#name : 'WDRenderPriority',
+	#superclass : 'Object',
 	#classVars : [
 		'RenderPriorityBackgroundNoDepth',
 		'RenderPriorityCount',
@@ -11,25 +11,27 @@ Class {
 		'RenderPriorityOpaque',
 		'RenderPriorityTranslucent'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderPriority class >> backgroundNoDepth [
 	^ RenderPriorityBackgroundNoDepth
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderPriority class >> count [
 	^ RenderPriorityCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderPriority class >> default [
 	^ RenderPriorityDefault
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDRenderPriority class >> initialize [
 	RenderPriorityBackgroundNoDepth := 1.
 	RenderPriorityOpaque := 2.
@@ -39,12 +41,12 @@ WDRenderPriority class >> initialize [
 	RenderPriorityDefault := RenderPriorityOpaque.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderPriority class >> opaque [
 	^ RenderPriorityOpaque
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderPriority class >> translucent [
 	^ RenderPriorityTranslucent
 ]

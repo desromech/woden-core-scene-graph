@@ -2,8 +2,8 @@
 I represent a specific light source.
 "
 Class {
-	#name : #WDLightSource,
-	#superclass : #Object,
+	#name : 'WDLightSource',
+	#superclass : 'Object',
 	#instVars : [
 		'intensity',
 		'castShadows',
@@ -12,64 +12,66 @@ Class {
 		'shadowMapNormalBiasFactor',
 		'color'
 	],
-	#category : #'WodenSceneGraph-Core-Lighting'
+	#category : 'WodenSceneGraph-Core-Lighting',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Lighting'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDLightSource class >> isAbstract [
 	^ self == WDLightSource
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDLightSource >> addToRenderingScene: renderingScene withGlobalTransform: globalTransform [
 	self subclassResponsibility
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDLightSource >> asLightStateForRenderingScene: renderingScene withTransform: renderingTransform [
 	self subclassResponsibility
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDLightSource >> asSceneElement [
 	^ self asSceneNode
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDLightSource >> asSceneNode [
 	^ WDSceneNode new
 		lights: { self };
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> boundingBox [
 	^ AABox fullSpace
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> castShadows [
 
 	^ castShadows
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> castShadows: anObject [
 
 	castShadows := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> color [
 	^ color
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> color: aColorOrVector3 [
 	color := aColorOrVector3 asVector3
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDLightSource >> initialize [
 	super initialize.
 	color := Vector3 ones.
@@ -80,48 +82,48 @@ WDLightSource >> initialize [
 	shadowMapNormalBiasFactor := 0.005.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> intensity [
 
 	^ intensity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> intensity: aNumber [
 	intensity := aNumber
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> shadowMapDepthBiasConstant [
 
 	^ shadowMapDepthBiasConstant
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> shadowMapDepthBiasConstant: anObject [
 
 	shadowMapDepthBiasConstant := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> shadowMapDepthBiasSlope [
 
 	^ shadowMapDepthBiasSlope
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> shadowMapDepthBiasSlope: anObject [
 
 	shadowMapDepthBiasSlope := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> shadowMapNormalBiasFactor [
 
 	^ shadowMapNormalBiasFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightSource >> shadowMapNormalBiasFactor: anObject [
 
 	shadowMapNormalBiasFactor := anObject

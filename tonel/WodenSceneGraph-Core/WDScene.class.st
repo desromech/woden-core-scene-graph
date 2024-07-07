@@ -4,8 +4,8 @@ I am Woden 3D graphics scene.
 I provide a logical description of elements in a 3D graphical scene, along with facilities for fast traversal of elements distributed in a bounding volume such as a frustum to facilitate actual rendering.
 "
 Class {
-	#name : #WDScene,
-	#superclass : #WDSceneElement,
+	#name : 'WDScene',
+	#superclass : 'WDSceneElement',
 	#instVars : [
 		'backgroundLayer',
 		'normalLayer',
@@ -13,40 +13,42 @@ Class {
 		'updateBlock',
 		'globalLightingState'
 	],
-	#category : #'WodenSceneGraph-Core-Scene'
+	#category : 'WodenSceneGraph-Core-Scene',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Scene'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDScene >> add: aNode [
 	normalLayer add: aNode
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDScene >> addBackground: aNode [
 	backgroundLayer add: aNode
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDScene >> addForeground: aNode [
 	foregroundLayer add: aNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> ambientLightProbe: aWDLightProbe [
 	globalLightingState ambientLightProbe: aWDLightProbe
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> ambientLighting [
 	^ globalLightingState ambientLighting
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> ambientLighting: aLightingColor [
 	globalLightingState ambientLighting: aLightingColor
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDScene >> asRenderingSceneWithCameraState: baseCameraState [
 	^ WDRenderingScene new
 		mainCameraState: baseCameraState;
@@ -61,39 +63,39 @@ WDScene >> asRenderingSceneWithCameraState: baseCameraState [
 		 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> backgroundLayer [
 
 	^ backgroundLayer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> boundingBox [
 	^ self normalLayer boundingBox
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> children [
 	^ { backgroundLayer . normalLayer . foregroundLayer }
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> foregroundLayer [
 
 	^ foregroundLayer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> globalLightingState [
 	^ globalLightingState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> globalLightingState: aGlobalLightingState [
 	globalLightingState := aGlobalLightingState
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDScene >> initialize [
 	super initialize.
 	globalLightingState := WDGlobalLightingState default.
@@ -103,28 +105,28 @@ WDScene >> initialize [
 	updateBlock := [ :delta | false ].
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDScene >> instanceAsSceneNode [
 	^ self normalLayer instanceAsSceneNode
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDScene >> isScene [
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> normalLayer [
 
 	^ normalLayer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> parent [
 	^ nil
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDScene >> postCopy [
 	super postCopy.
 	updateBlock := [ :delta | false ].
@@ -134,29 +136,29 @@ WDScene >> postCopy [
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDScene >> remove: aNode [
 	normalLayer remove: aNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> scene [
 	^ self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> updateBlock [
 
 	^ updateBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDScene >> updateBlock: anObject [
 
 	updateBlock := anObject
 ]
 
-{ #category : #update }
+{ #category : 'update' }
 WDScene >> updateWithDeltaTime: deltaTime [
 	^ (updateBlock cull: deltaTime) ~~ false
 ]

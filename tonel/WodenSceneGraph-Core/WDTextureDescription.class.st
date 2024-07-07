@@ -2,8 +2,8 @@
 I hold a description for creating a texture handle.
 "
 Class {
-	#name : #WDTextureDescription,
-	#superclass : #Object,
+	#name : 'WDTextureDescription',
+	#superclass : 'Object',
 	#instVars : [
 		'dataKind',
 		'type',
@@ -17,10 +17,12 @@ Class {
 		'sampleCount',
 		'sampleQuality'
 	],
-	#category : #'WodenSceneGraph-Core-Texture'
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 WDTextureDescription >> = other [
 	^ self class == other class and: [
 	dataKind = other dataKind and: [
@@ -36,41 +38,41 @@ WDTextureDescription >> = other [
 	sampleQuality = other sampleQuality ]]]]]]]]]]]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> dataKind [
 
 	^ dataKind
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> dataKind: aDataKind [
 	dataKind := aDataKind asTextureDataKind
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> depth [
 
 	^ depth
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> depth: anObject [
 
 	depth := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> format [
 
 	^ format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> format: aTextureFormat [
 	format := aTextureFormat asTextureFormat
 ]
 
-{ #category : #comparing }
+{ #category : 'comparing' }
 WDTextureDescription >> hash [
 	^ self class identityHash bitXor: (
 	dataKind hash bitXor: (
@@ -86,19 +88,19 @@ WDTextureDescription >> hash [
 	sampleQuality hash)))))))))))
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> height [
 
 	^ height
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> height: anObject [
 
 	height := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTextureDescription >> initialize [
 	self
 		dataKind: WDTextureDataKindColor;
@@ -114,83 +116,83 @@ WDTextureDescription >> initialize [
 	sampleQuality := 0.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> layers [
 
 	^ layers
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> layers: anObject [
 
 	layers := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> miplevels [
 
 	^ miplevels
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> miplevels: anObject [
 
 	miplevels := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> sampleCount [
 
 	^ sampleCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> sampleCount: anObject [
 
 	sampleCount := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> sampleQuality [
 
 	^ sampleQuality
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> sampleQuality: anObject [
 
 	sampleQuality := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> type [
 
 	^ type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> type: aTextureType [
 	type := aTextureType asTextureType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> usageMode [
 
 	^ usageMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> usageMode: aTextureUsageMode [
 	usageMode := aTextureUsageMode asTextureUsageMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> width [
 
 	^ width
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTextureDescription >> width: anObject [
 
 	width := anObject

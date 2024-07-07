@@ -4,22 +4,24 @@ I am a punctual light source.
 I have a specific influence radius that constraints the locations that are affected by me.
 "
 Class {
-	#name : #WDPointLightSource,
-	#superclass : #WDLightSource,
+	#name : 'WDPointLightSource',
+	#superclass : 'WDLightSource',
 	#instVars : [
 		'influenceRadius'
 	],
-	#category : #'WodenSceneGraph-Core-Lighting'
+	#category : 'WodenSceneGraph-Core-Lighting',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Lighting'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDPointLightSource >> addToRenderingScene: renderingScene withGlobalTransform: globalTransform [
 	(renderingScene shouldRenderWorldSphereWithCenter: globalTransform translation radius: influenceRadius) ifTrue: [
 		renderingScene addLight: (self asLightStateForRenderingScene: renderingScene withTransform: globalTransform)
 	].
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDPointLightSource >> asLightStateForRenderingScene: renderingScene withTransform: renderingTransform [
 	^ WDLightState new
 		positionOrDirection: (Vector4 xyz: renderingTransform translation w: 1.0);
@@ -33,30 +35,30 @@ WDPointLightSource >> asLightStateForRenderingScene: renderingScene withTransfor
 		yourself.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDPointLightSource >> boundingBox [
 	^ AABox halfExtent: influenceRadius asVector3
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDPointLightSource >> influenceRadius [
 
 	^ influenceRadius
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDPointLightSource >> influenceRadius: anObject [
 
 	influenceRadius := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDPointLightSource >> initialize [
 	super initialize.
 	influenceRadius := 1.0.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDPointLightSource >> shadowMapCameraStatesWithTransform: worldRenderingTransform [
 	| nearDistance farDistance aspect fovy baseState |
 	castShadows ifFalse: [ ^ #() ].

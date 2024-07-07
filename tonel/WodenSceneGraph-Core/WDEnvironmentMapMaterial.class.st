@@ -2,50 +2,52 @@
 I am an unlit material that uses an environment map for its texture. I am typically used for implementing sky boxes.
 "
 Class {
-	#name : #WDEnvironmentMapMaterial,
-	#superclass : #WDSurfaceMaterial,
+	#name : 'WDEnvironmentMapMaterial',
+	#superclass : 'WDSurfaceMaterial',
 	#instVars : [
 		'colorFactor',
 		'colorTexture'
 	],
-	#category : #'WodenSceneGraph-Core-Material'
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDEnvironmentMapMaterial class >> typeName [
 	^ #EnvironmentMap
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDEnvironmentMapMaterial >> colorFactor [
 
 	^ colorFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDEnvironmentMapMaterial >> colorFactor: aColor [
 
 	colorFactor := aColor asVector4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDEnvironmentMapMaterial >> colorTexture [
 
 	^ colorTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDEnvironmentMapMaterial >> colorTexture: anObject [
 
 	colorTexture := anObject
 ]
 
-{ #category : #'double dispatch' }
+{ #category : 'double dispatch' }
 WDEnvironmentMapMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitEnvironmentMapMaterialActivationCommands: self
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDEnvironmentMapMaterial >> encodeJsonKeyValues [
 	^ super encodeJsonKeyValues , {
 		#colorFactor . colorFactor encodeForJSON.
@@ -53,14 +55,14 @@ WDEnvironmentMapMaterial >> encodeJsonKeyValues [
 	}
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDEnvironmentMapMaterial >> initialize [
 	super initialize.
 	
 	colorFactor := Vector4 ones.
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDEnvironmentMapMaterial >> loadFromJson: jsonData [
 	super loadFromJson: jsonData.
 	jsonData at: #colorFactor ifPresent: [ :found | colorFactor := Vector4 loadFromJson: found ].

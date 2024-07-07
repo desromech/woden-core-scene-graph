@@ -5,17 +5,19 @@ My camera is simply the active rendering camera.
 
 "
 Class {
-	#name : #WDNormalSceneLayer,
-	#superclass : #WDSceneLayer,
-	#category : #'WodenSceneGraph-Core-Scene'
+	#name : 'WDNormalSceneLayer',
+	#superclass : 'WDSceneLayer',
+	#category : 'WodenSceneGraph-Core-Scene',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Scene'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDNormalSceneLayer >> adjustBaseCameraState: aBaseCameraState [
 	^ aBaseCameraState
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDNormalSceneLayer >> isNormalSceneLayer [
 	^ true
 ]

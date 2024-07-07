@@ -1,61 +1,63 @@
 Class {
-	#name : #WDAbstractCapsuleCollisionShape,
-	#superclass : #WDConvexCollisionShape,
+	#name : 'WDAbstractCapsuleCollisionShape',
+	#superclass : 'WDConvexCollisionShape',
 	#instVars : [
 		'height',
 		'radius',
 		'halfHeight'
 	],
-	#category : #'WodenSceneGraph-Core-Collision'
+	#category : 'WodenSceneGraph-Core-Collision',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Collision'
 }
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDAbstractCapsuleCollisionShape class >> height: height radius: radius [
 	^ self new height: height; radius: radius; yourself
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDAbstractCapsuleCollisionShape class >> isAbstract [
 	^ self == WDAbstractCapsuleCollisionShape
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractCapsuleCollisionShape >> computeLocalBoundingBox [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractCapsuleCollisionShape >> halfHeight [
 	^ halfHeight
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractCapsuleCollisionShape >> height [
 
 	^ height
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractCapsuleCollisionShape >> height: aNumber [
 	height := aNumber.
 	halfHeight := aNumber / 2.
 	self computeLocalBoundingBox.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAbstractCapsuleCollisionShape >> initialize [
 	super initialize.
 	radius := 1.0.
 	self height: 1.0.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractCapsuleCollisionShape >> radius [
 
 	^ radius
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractCapsuleCollisionShape >> radius: anObject [
 	radius := anObject.
 	self computeLocalBoundingBox.

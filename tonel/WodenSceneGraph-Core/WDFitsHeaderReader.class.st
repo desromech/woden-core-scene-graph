@@ -2,8 +2,8 @@
 I am an utility used for reading textures in fits format, an image file format typically used in astronomy.
 "
 Class {
-	#name : #WDFitsHeaderReader,
-	#superclass : #Object,
+	#name : 'WDFitsHeaderReader',
+	#superclass : 'Object',
 	#instVars : [
 		'stream',
 		'properties'
@@ -12,10 +12,12 @@ Class {
 		'TextureFormatMap',
 		'TextureTypeMap'
 	],
-	#category : #'WodenSceneGraph-Core-Texture'
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 WDFitsHeaderReader class >> initialize [
 	TextureFormatMap := Dictionary newFromPairs: { 
 		8 . WDTextureFormatR8UNorm.
@@ -31,43 +33,43 @@ WDFitsHeaderReader class >> initialize [
 	}.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> bitpix [
 	^ (properties at: 'BITPIX') asInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDFitsHeaderReader >> initialize [
 	properties := Dictionary new.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> naxis [
 	^ (properties at: 'NAXIS') asInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> naxis1 [
 	^ (properties at: 'NAXIS1' ifAbsent: ['1']) asInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> naxis2 [
 	^ (properties at: 'NAXIS2' ifAbsent: ['1']) asInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> naxis3 [
 	^ (properties at: 'NAXIS3' ifAbsent: ['1']) asInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> properties [
 
 	^ properties
 ]
 
-{ #category : #'private - decoding' }
+{ #category : 'private - decoding' }
 WDFitsHeaderReader >> readHeader [
 	| startPosition nextProperty headerSize remainingHeader |
 	startPosition := stream position.
@@ -91,7 +93,7 @@ WDFitsHeaderReader >> readHeader [
 	
 ]
 
-{ #category : #'private - decoding' }
+{ #category : 'private - decoding' }
 WDFitsHeaderReader >> readHeaderLine [
 	| headerLine key value valueString commentIndex |
 	headerLine := (stream next: 80) asString.
@@ -109,7 +111,7 @@ WDFitsHeaderReader >> readHeaderLine [
 	^ key -> value
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDFitsHeaderReader >> readTextureData [
 	| width height depth bitsPerPixel bytesPerPixel dataSize data pitch slicePitch |
 	width := self naxis1.
@@ -132,24 +134,24 @@ WDFitsHeaderReader >> readTextureData [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> stream [
 
 	^ stream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsHeaderReader >> stream: anObject [
 
 	stream := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDFitsHeaderReader >> textureFormat [
 	^ TextureFormatMap at: self bitpix
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDFitsHeaderReader >> textureType [
 	^ TextureTypeMap at: self naxis
 ]

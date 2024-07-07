@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRTrackedDeviceInvalid,
-	#superclass : #WDVRTrackedDevice,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceInvalid',
+	#superclass : 'WDVRTrackedDevice',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceInvalid >> isInvalid [
 	^ true
 ]

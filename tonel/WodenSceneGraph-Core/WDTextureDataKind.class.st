@@ -2,52 +2,54 @@
 I specify the data kind of a texture. I am typically used for automatically selecting the correct algorithm for automatic mipmap generation.
 "
 Class {
-	#name : #WDTextureDataKind,
-	#superclass : #WDAbstractEnumClass,
-	#category : #'WodenSceneGraph-Core-Texture'
+	#name : 'WDTextureDataKind',
+	#superclass : 'WDAbstractEnumClass',
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDTextureDataKind class >> asTextureDataKind [
 	^ self uniqueInstance
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDTextureDataKind >> asTextureDataKind [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureDataKind >> isColorData [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureDataKind >> isCubeEnvironmentMapData [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureDataKind >> isDiffuseLightProbe [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureDataKind >> isHDRIData [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureDataKind >> isNonColorData [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureDataKind >> isNormalMapData [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureDataKind >> isSpecularLightProbe [
 	^ false
 ]

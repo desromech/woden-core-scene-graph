@@ -2,29 +2,31 @@
 I hold the data that is required for actually binding a set of vertex buffers for rendering.
 "
 Class {
-	#name : #WDVertexBufferBinding,
-	#superclass : #WDRendererCacheableResource,
+	#name : 'WDVertexBufferBinding',
+	#superclass : 'WDRendererCacheableResource',
 	#instVars : [
 		'attributes',
 		'vertexCount',
 		'locationMask'
 	],
-	#category : #'WodenSceneGraph-Core-Resources'
+	#category : 'WodenSceneGraph-Core-Resources',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Resources'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVertexBufferBinding >> attributes [
 
 	^ attributes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVertexBufferBinding >> attributes: anObject [
 
 	attributes := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVertexBufferBinding >> locationMask [
 	locationMask ifNil: [ 
 		locationMask := 0.
@@ -35,7 +37,7 @@ WDVertexBufferBinding >> locationMask [
 	^ locationMask
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVertexBufferBinding >> positionAccessor [
 	attributes do: [ :eachAttribute |
 		eachAttribute isPosition ifTrue: [ 
@@ -45,20 +47,20 @@ WDVertexBufferBinding >> positionAccessor [
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVertexBufferBinding >> validVertexCount [
 	^ vertexCount ifNil: [ vertexCount := attributes
 			ifEmpty: [ 0 ]
 			ifNotEmpty: [ attributes first accessor count ]  ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVertexBufferBinding >> vertexCount [
 
 	^ vertexCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVertexBufferBinding >> vertexCount: anObject [
 
 	vertexCount := anObject

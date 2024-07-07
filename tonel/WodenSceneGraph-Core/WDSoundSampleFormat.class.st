@@ -2,22 +2,24 @@
 I represent a specific sound sample format.
 "
 Class {
-	#name : #WDSoundSampleFormat,
-	#superclass : #WDAbstractEnumClass,
-	#category : #'WodenSceneGraph-Core-Sound'
+	#name : 'WDSoundSampleFormat',
+	#superclass : 'WDAbstractEnumClass',
+	#category : 'WodenSceneGraph-Core-Sound',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Sound'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSoundSampleFormat class >> asSoundSampleFormat [
 	^ self uniqueInstance
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSoundSampleFormat >> asSoundSampleFormat [
 	^ self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSampleFormat >> sampleSize [
 	^ self subclassResponsibility
 ]

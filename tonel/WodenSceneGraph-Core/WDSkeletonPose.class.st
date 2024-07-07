@@ -2,8 +2,8 @@
 I encapsulate the pose for a specific skeleton.
 "
 Class {
-	#name : #WDSkeletonPose,
-	#superclass : #Object,
+	#name : 'WDSkeletonPose',
+	#superclass : 'Object',
 	#instVars : [
 		'skeleton',
 		'bonePoses',
@@ -12,10 +12,12 @@ Class {
 		'forwardMatrices',
 		'poseMatrices'
 	],
-	#category : #'WodenSceneGraph-Core-Renderable'
+	#category : 'WodenSceneGraph-Core-Renderable',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Renderable'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSkeletonPose >> asPoseState [
 	^ renderingPoseState ifNil: [ renderingPoseState := WDRenderingPoseState new
 		skinningMatrices: self skinningMatrices;
@@ -23,30 +25,30 @@ WDSkeletonPose >> asPoseState [
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeletonPose >> bonePoses [
 
 	^ bonePoses
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeletonPose >> bonePoses: anObject [
 
 	bonePoses := anObject
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSkeletonPose >> forwardMatrices [
 	^ forwardMatrices ifNil: [ forwardMatrices := skeleton computeForwardMatricesWithPoseMatrices: self poseMatrices ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSkeletonPose >> initialize [
 	super initialize.
 	bonePoses := #()
 ]
 
-{ #category : #scrolling }
+{ #category : 'scrolling' }
 WDSkeletonPose >> invalidate [
 	poseMatrices := nil.
 	forwardMatrices := nil.
@@ -55,30 +57,30 @@ WDSkeletonPose >> invalidate [
 
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSkeletonPose >> poseMatrices [
 	^ poseMatrices ifNil: [ poseMatrices := bonePoses collect: [ :each | each matrix4 ] ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSkeletonPose >> setForRestPose [
 	bonePoses := skeleton bones collect: [ :each | each transform copy ].
 	self invalidate
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeletonPose >> skeleton [
 
 	^ skeleton
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeletonPose >> skeleton: anObject [
 
 	skeleton := anObject
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSkeletonPose >> skinningMatrices [
 	^ skinningMatrices ifNil: [ skinningMatrices := skeleton computeSkinningMatricesWithForwardMatrices: self forwardMatrices ]
 ]

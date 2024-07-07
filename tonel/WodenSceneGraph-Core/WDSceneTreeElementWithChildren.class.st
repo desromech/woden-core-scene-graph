@@ -1,30 +1,32 @@
 Class {
-	#name : #WDSceneTreeElementWithChildren,
-	#superclass : #WDSceneTreeElement,
+	#name : 'WDSceneTreeElementWithChildren',
+	#superclass : 'WDSceneTreeElement',
 	#instVars : [
 		'children'
 	],
-	#category : #'WodenSceneGraph-Core-Scene'
+	#category : 'WodenSceneGraph-Core-Scene',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Scene'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElementWithChildren >> add: anObject [
 	self addSceneElement: anObject asSceneElement
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElementWithChildren >> addAll: aCollectionOfObjects [
 	aCollectionOfObjects do: [ :each | self add: each ]
 ]
 
-{ #category : #'rendering scene generation' }
+{ #category : 'rendering scene generation' }
 WDSceneTreeElementWithChildren >> addChildrenRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
 	children do: [ :each |
 		each addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform
 	]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElementWithChildren >> addSceneElement: aNode [
 	self assert: aNode isWodenSceneElement.
 	self assert: aNode parent isNil.
@@ -33,24 +35,24 @@ WDSceneTreeElementWithChildren >> addSceneElement: aNode [
 	aNode addedTo: self.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneTreeElementWithChildren >> children [
 
 	^ children
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 WDSceneTreeElementWithChildren >> childrenDo: aBlock [
 	children do: aBlock
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSceneTreeElementWithChildren >> initialize [
 	super initialize.
 	children := OrderedCollection new.
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDSceneTreeElementWithChildren >> postCopy [
 	| oldChildren |
 	super postCopy.
@@ -62,24 +64,24 @@ WDSceneTreeElementWithChildren >> postCopy [
 	].
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElementWithChildren >> privateAddChild: aNode [
 	children add: aNode.
 	self childBoundingBoxChanged: aNode.
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElementWithChildren >> privateRemoveChild: aNode [
 	children remove: aNode.
 ]
 
-{ #category : #removing }
+{ #category : 'removing' }
 WDSceneTreeElementWithChildren >> removeAllChildren [
 	children do: [ :each | each removedFrom: self ].
 	children removeAll
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElementWithChildren >> removeSceneElement: aNode [
 	self assert: aNode isWodenSceneElement.
 	self assert: aNode parent == self.

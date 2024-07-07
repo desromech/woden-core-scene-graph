@@ -2,8 +2,8 @@
 I am a scene node which is asynchronously loaded. I might be loaded from either disk or even network.
 "
 Class {
-	#name : #WDAsyncSceneNode,
-	#superclass : #WDSceneTreeElement,
+	#name : 'WDAsyncSceneNode',
+	#superclass : 'WDSceneTreeElement',
 	#instVars : [
 		'visible',
 		'transform',
@@ -15,10 +15,12 @@ Class {
 		'boundingBox',
 		'hasSolvedSceneNode'
 	],
-	#category : #'WodenSceneGraph-Core-Scene'
+	#category : 'WodenSceneGraph-Core-Scene',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Scene'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDAsyncSceneNode >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
 	visible ifFalse: [ ^ self ].
 	
@@ -29,48 +31,48 @@ WDAsyncSceneNode >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneC
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> asyncContext [
 
 	^ asyncContext
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> asyncContext: anObject [
 
 	asyncContext := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> boundingBox [
 	^ boundingBox ifNil: [ boundingBox := self localBoundingBox transformedWith: self transform ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> children [
 	self solvedSceneNode ifNotNil: [ :solvedNode | ^ { solvedNode } ].
 	fallbackNode ifNotNil: [ ^ { fallbackNode } ].
 	^ #()
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> currentRenderingSceneNode [
 	^ self solvedSceneNode ifNil: [ fallbackNode ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> elementSelector [
 
 	^ elementSelector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> elementSelector: anObject [
 
 	elementSelector := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAsyncSceneNode >> initialize [
 	super initialize.
 	visible := true.
@@ -79,73 +81,73 @@ WDAsyncSceneNode >> initialize [
 	hasSolvedSceneNode := false.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> invalidateBoundingBox [
 	boundingBox := nil.
 	parent ifNotNil: [ parent childBoundingBoxChanged: self ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> localBoundingBox [
 	^ self currentRenderingSceneNode
 		ifNil: [ AABox empty ]
 		ifNotNil: [ :renderingNode | renderingNode boundingBox ].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> postCopy [
 	super postCopy.
 	transform := transform copy.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> rotateDegreesOnX: rotation [
 	transform rotateDegreesOnX: rotation.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> rotateDegreesOnY: rotation [
 	transform rotateDegreesOnY: rotation.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> rotateDegreesOnZ: rotation [
 	transform rotateDegreesOnZ: rotation.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> rotateRadiansOnX: rotation [
 	transform rotateRadiansOnX: rotation.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> rotateRadiansOnY: rotation [
 	transform rotateRadiansOnY: rotation.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> rotateRadiansOnZ: rotation [
 	transform rotateRadiansOnZ: rotation.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> scale [
 	^ transform scale
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> scale: aScale [
 	transform scale: aScale.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> solvedSceneNode [
 	^ self validSceneNodeFuture ifNotNil: [
 		sceneNodeFuture valueOrNil ifNotNil: [ :result |
@@ -159,66 +161,66 @@ WDAsyncSceneNode >> solvedSceneNode [
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> transform [
 
 	^ transform copy
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> transform: aTransform [
 	transform := aTransform asTRSTransform3D.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> transformChanged [
 	self invalidateBoundingBox
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> translateBy: aVector [
 	transform translateBy: aVector.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> translateByX: amount [
 	transform translateByX: amount.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> translateByY: amount [
 	transform translateByY: amount.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> translateByZ: amount [
 	transform translateByZ: amount.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> translateToX: x y: y z: z [
 	transform translateToX: x y: y z: z.
 	self transformChanged
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> uri [
 
 	^ uri
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> uri: anObject [
 
 	uri := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> validSceneNodeFuture [
 	sceneNodeFuture ifNil: [ 
 		asyncContext ifNotNil: [
@@ -231,13 +233,13 @@ WDAsyncSceneNode >> validSceneNodeFuture [
 	^ sceneNodeFuture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> visible [
 
 	^ visible
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncSceneNode >> visible: anObject [
 
 	visible := anObject

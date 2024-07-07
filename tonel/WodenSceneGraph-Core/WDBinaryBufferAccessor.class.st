@@ -4,8 +4,8 @@ I am an accessor for structured data in a binary buffer.
 I have a direct correspondence to a gltf 2 model binary buffer accessor.
 "
 Class {
-	#name : #WDBinaryBufferAccessor,
-	#superclass : #Object,
+	#name : 'WDBinaryBufferAccessor',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'bufferView',
@@ -18,57 +18,59 @@ Class {
 		'max',
 		'decodedContentAsArray'
 	],
-	#category : #'WodenSceneGraph-Core-Resources'
+	#category : 'WodenSceneGraph-Core-Resources',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Resources'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> bufferView [
 
 	^ bufferView
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> bufferView: anObject [
 
 	bufferView := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> byteOffset [
 
 	^ byteOffset
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> byteOffset: anObject [
 
 	byteOffset := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> componentType [
 
 	^ componentType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> componentType: aWDBinaryAccessorComponentType [
 	componentType := aWDBinaryAccessorComponentType asBinaryBufferAccessorComponentType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> count [
 
 	^ count
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> count: anObject [
 
 	count := anObject
 ]
 
-{ #category : #'content accessing' }
+{ #category : 'content accessing' }
 WDBinaryBufferAccessor >> decodeContentAsArray [
 	| result destIndex sourceIndex sourceBuffer componentSize componentCount stride |
 	decodedContentAsArray ifNotNil: [ ^ decodedContentAsArray ].
@@ -108,7 +110,7 @@ WDBinaryBufferAccessor >> decodeContentAsArray [
 	^ result
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBinaryBufferAccessor >> initialize [
 	super initialize.
 	name := ''.
@@ -120,61 +122,61 @@ WDBinaryBufferAccessor >> initialize [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> max [
 
 	^ max
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> max: anObject [
 
 	max := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> min [
 
 	^ min
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> min: anObject [
 
 	min := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> normalized [
 
 	^ normalized
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> normalized: anObject [
 
 	normalized := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> type [
 
 	^ type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessor >> type: aWDBinaryBufferAccessorType [
 	type := aWDBinaryBufferAccessorType asBinaryBufferAccessorType
 ]

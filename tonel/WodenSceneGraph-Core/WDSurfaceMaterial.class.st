@@ -2,8 +2,8 @@
 I am a material that can be applied to polygonal surfaces.
 "
 Class {
-	#name : #WDSurfaceMaterial,
-	#superclass : #WDMaterial,
+	#name : 'WDSurfaceMaterial',
+	#superclass : 'WDMaterial',
 	#instVars : [
 		'alphaMode',
 		'doubleSided',
@@ -11,67 +11,69 @@ Class {
 		'background',
 		'xray'
 	],
-	#category : #'WodenSceneGraph-Core-Material'
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial class >> isAbstract [
 	^ self == WDSurfaceMaterial
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> alphaCutoff [
 
 	^ alphaCutoff
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> alphaCutoff: anObject [
 
 	alphaCutoff := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> alphaMode [
 
 	^ alphaMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> alphaMode: aModeName [
 	alphaMode := aModeName asSymbol
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> background [
 
 	^ background
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> background: anObject [
 
 	background := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> doubleSided [
 
 	^ doubleSided
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> doubleSided: anObject [
 
 	doubleSided := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> effectiveAlphaCutoff [
 	^ alphaMode == #MASK ifTrue: [ alphaCutoff ] ifFalse: [ 0.0 ]
 ]
 
-{ #category : #serializationm }
+{ #category : 'serializationm' }
 WDSurfaceMaterial >> encodeJsonKeyValues [
 	^ super encodeJsonKeyValues , {
 		#alphaMode . alphaMode.
@@ -82,32 +84,32 @@ WDSurfaceMaterial >> encodeJsonKeyValues [
 	}
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial >> hasAlphaBlending [
 	^ alphaMode == #BLEND
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial >> hasAlphaMasking [
 	^ alphaMode == #MASK
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial >> hasBackgroundRendering [
 	^ background
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial >> hasDepthTesting [
 	^ xray not
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial >> hasOpaqueRendering [
 	^ self hasAlphaBlending not
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSurfaceMaterial >> initialize [
 	super initialize.
 	xray := false.
@@ -117,12 +119,12 @@ WDSurfaceMaterial >> initialize [
 	background := false.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial >> isOpaque [
 	^ alphaMode == #OPAQUE
 ]
 
-{ #category : #serializationm }
+{ #category : 'serializationm' }
 WDSurfaceMaterial >> loadFromJson: jsonData [
 	super loadFromJson: jsonData.
 	self alphaMode: (jsonData at: #alphaMode ifAbsent: [ alphaMode ]).
@@ -132,7 +134,7 @@ WDSurfaceMaterial >> loadFromJson: jsonData [
 	xray := jsonData at: #xray ifAbsent: [ xray ].
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDSurfaceMaterial >> renderPriority [
 	self hasAlphaBlending ifTrue: [ ^ WDRenderPriority translucent ].
 	^ background
@@ -140,28 +142,28 @@ WDSurfaceMaterial >> renderPriority [
 		ifFalse: [ WDRenderPriority default ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSurfaceMaterial >> withAlphaBlending [
 	self alphaMode: #BLEND
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSurfaceMaterial >> withAlphaMasking [
 	self alphaMode: #MASK
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSurfaceMaterial >> writesDepth [
 	^ background not and: [alphaMode ~~ #BLEND and: [xray not]]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> xray [
 
 	^ xray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSurfaceMaterial >> xray: aBoolean [
 	xray := aBoolean
 ]

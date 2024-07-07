@@ -2,8 +2,8 @@
 I am an object in a rendering scene.
 "
 Class {
-	#name : #WDRenderingSceneObject,
-	#superclass : #Object,
+	#name : 'WDRenderingSceneObject',
+	#superclass : 'Object',
 	#instVars : [
 		'sortKey',
 		'priority',
@@ -11,69 +11,71 @@ Class {
 		'poseState',
 		'renderable'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> castShadows [
 	^ objectState castShadows
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> objectState [
 
 	^ objectState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> objectState: anObject [
 
 	objectState := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> poseState [
 
 	^ poseState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> poseState: anObject [
 
 	poseState := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> priority [
 
 	^ priority
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> priority: anObject [
 
 	priority := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> renderable [
 
 	^ renderable
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> renderable: anObject [
 
 	renderable := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> sortKey [
 
 	^ sortKey
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneObject >> sortKey: anObject [
 
 	sortKey := anObject

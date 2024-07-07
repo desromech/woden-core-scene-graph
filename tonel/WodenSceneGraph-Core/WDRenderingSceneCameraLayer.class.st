@@ -5,8 +5,8 @@ I encapsulate a specific state for rendering a scene camera layer. I hold the fo
 - The camera state for the viewport.
 "
 Class {
-	#name : #WDRenderingSceneCameraLayer,
-	#superclass : #Object,
+	#name : 'WDRenderingSceneCameraLayer',
+	#superclass : 'Object',
 	#instVars : [
 		'cameraState',
 		'lights',
@@ -19,31 +19,33 @@ Class {
 		'renderingStreams',
 		'renderingStreamSet'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addBackgroundRenderingSceneObject: renderingSceneObject [
 	backgroundObjects add: renderingSceneObject
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addLight: aLightState [
 	lights add: aLightState
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addLight: light withGlobalTransform: globalTransform [
 	light addToRenderingScene: self withGlobalTransform: globalTransform
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState [
 	self addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState poseState: nil
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: material objectState: anObjectState poseState: aPose [
 	(material notNil and: [material renderingStream notNil]) ifTrue: [
 		self addRenderingStream: material renderingStream
@@ -58,7 +60,7 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withMaterial: mat
 		poseState: aPose
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: renderPriority opaque: isOpaque background: isBackground objectState: anObjectState poseState: aPoseState [
 	isOpaque ifTrue: [ 
 		isBackground ifTrue: [ 
@@ -87,23 +89,23 @@ WDRenderingSceneCameraLayer >> addMeshPrimitive: meshPrimitive withPriority: ren
 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addOpaqueRenderingSceneObject: renderingSceneObject [
 	opaqueRenderingObjects add: renderingSceneObject
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addRenderable: renderable withObjectState: anObjectState [
 	renderable addToRenderingScene: self withObjectState: anObjectState
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addRenderingSceneShadowMapSet: shadowMapSet [
 	shadowMapSets add: shadowMapSet
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addRenderingStream: renderingStream [
 	(renderingStreamSet includes: renderingStream) ifFalse: [ 
 		renderingStreamSet add: renderingStream.
@@ -112,7 +114,7 @@ WDRenderingSceneCameraLayer >> addRenderingStream: renderingStream [
 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDRenderingSceneCameraLayer >> addTranslucentRenderingSceneObject: renderingSceneObject [
 	self isDepthOnly ifFalse: [ 
 		translucentRenderingObjects add: renderingSceneObject
@@ -120,34 +122,34 @@ WDRenderingSceneCameraLayer >> addTranslucentRenderingSceneObject: renderingScen
 	
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDRenderingSceneCameraLayer >> asRenderingScene [
 	^ WDRenderingScene new cameraLayers: { self }; yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> backgroundObjects [
 	^ backgroundObjects
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> cameraState [
 
 	^ cameraState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> cameraState: anObject [
 
 	cameraState := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> hasReverseDepth [
 	^ cameraState hasReverseDepth
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDRenderingSceneCameraLayer >> initialize [
 	super initialize.
 	cameraState := WDCameraState new.
@@ -163,52 +165,52 @@ WDRenderingSceneCameraLayer >> initialize [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> isDepthOnly [
 	^ isShadowMap
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> isShadowMap [
 
 	^ isShadowMap
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> isShadowMap: anObject [
 
 	isShadowMap := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> lights [
 
 	^ lights
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> opaqueRenderingObjects [
 	^ opaqueRenderingObjects
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> renderingStreams [
 
 	^ renderingStreams
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> renderingStreams: anObject [
 
 	renderingStreams := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> sampleCount [
 	^ 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> shadowCastingLightsDo: aBlock [
 	lights do: [ :each |
 		each castShadows ifTrue: [
@@ -217,49 +219,49 @@ WDRenderingSceneCameraLayer >> shadowCastingLightsDo: aBlock [
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> shadowMapSets [
 	^ shadowMapSets
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDRenderingSceneCameraLayer >> shouldRenderBoundingBox: boundingBoxToTest withObjectState: objectState [
 	^ usesFrustumCulling
 		ifTrue: [ self cameraState worldFrustum intersectsOrContainsBox: (boundingBoxToTest transformedWith: objectState transformation) ]
 		ifFalse: [ true ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDRenderingSceneCameraLayer >> shouldRenderBoundingBox: boundingBoxToTest withObjectState: objectState poseState: aPoseState [
 	self flag: 'Expand the bounding box to account for deformation size increase.'.
 	^ self shouldRenderBoundingBox: boundingBoxToTest withObjectState: objectState
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDRenderingSceneCameraLayer >> shouldRenderWorldSphereWithCenter: sphereCenter radius: sphereRadius [
 	^ usesFrustumCulling
 		ifTrue: [ self cameraState worldFrustum intersectsOrContainsSphereWithCenter: sphereCenter radius: sphereRadius ]
 		ifFalse: [ true ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> translucentRenderingObjects [
 	^ translucentRenderingObjects
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> usesFrustumCulling [
 
 	^ usesFrustumCulling
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> usesFrustumCulling: anObject [
 
 	usesFrustumCulling := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingSceneCameraLayer >> viewMode [
 	^ cameraState viewMode
 ]

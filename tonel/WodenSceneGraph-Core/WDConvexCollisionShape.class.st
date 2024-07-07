@@ -2,35 +2,37 @@
 I represent a convex collision shape.
 "
 Class {
-	#name : #WDConvexCollisionShape,
-	#superclass : #WDCollisionShape,
+	#name : 'WDConvexCollisionShape',
+	#superclass : 'WDCollisionShape',
 	#classVars : [
 		'ShallowPenetrationThreshold'
 	],
-	#category : #'WodenSceneGraph-Core-Collision'
+	#category : 'WodenSceneGraph-Core-Collision',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Collision'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDConvexCollisionShape class >> initialize [
 	ShallowPenetrationThreshold := 1e-5.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDConvexCollisionShape class >> isAbstract [
 	^ self == WDConvexCollisionShape
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform with: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	^ (otherShape detectAndComputeCollisionContactPointsAt: otherTransform withConvexShape: self at: transform separatingAxisHint: (separatingAxisHint ifNotNil: [separatingAxisHint negated])) collect: [ :each | each flipped ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withCompoundShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	^ otherShape detectAndComputeCollisionContactPointsAt: otherTransform withConvexShape: self at: transform separatingAxisHint: separatingAxisHint
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withConvexShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	| firstSupportFunction secondSupportFunction
 		gjkSimplex closestPointToOrigin totalMargin shapeDistance |
@@ -71,22 +73,22 @@ WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform wi
 	]
 ]
 
-{ #category : #'intersection testing' }
+{ #category : 'intersection testing' }
 WDConvexCollisionShape >> localSupportFunction [
 	^ [ :d | self localSupportInDirection: d ]
 ]
 
-{ #category : #'intersection testing' }
+{ #category : 'intersection testing' }
 WDConvexCollisionShape >> localSupportInDirection: aDirection [
 	self subclassResponsibility
 ]
 
-{ #category : #'intersection testing' }
+{ #category : 'intersection testing' }
 WDConvexCollisionShape >> localSupportInDirectionWithMargin: aDirection [
 	^ (self localSupportInDirection: aDirection) + margin
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexCollisionShape >> rayCast: ray [
 	| gjkResult |
 	gjkResult := GeometricFunctions gjkRayCast: ray support: [:d | self localSupportInDirectionWithMargin: d].
@@ -101,7 +103,7 @@ WDConvexCollisionShape >> rayCast: ray [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexCollisionShape >> withTransform: shapeTransform intersectsBox: box withTransform: boxTransform [
 	| mySupportFunction otherSupportFunction |
 	mySupportFunction := GeometricFunctions transformSupportFunction: self localSupportFunction with: shapeTransform.
@@ -109,7 +111,7 @@ WDConvexCollisionShape >> withTransform: shapeTransform intersectsBox: box withT
 	^ (GeometricFunctions gjkDistanceFrom: mySupportFunction to: otherSupportFunction) <= margin
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexCollisionShape >> withTransform: shapeTransform intersectsSphere: sphere withTransform: sphereTransform [
 	| mySupportFunction otherSupportFunction |
 	mySupportFunction := GeometricFunctions transformSupportFunction: self localSupportFunction with: shapeTransform.

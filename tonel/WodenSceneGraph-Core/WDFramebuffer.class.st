@@ -2,8 +2,8 @@
 I represent a framebuffer.
 "
 Class {
-	#name : #WDFramebuffer,
-	#superclass : #WDRendererCacheableResource,
+	#name : 'WDFramebuffer',
+	#superclass : 'WDRendererCacheableResource',
 	#instVars : [
 		'extent',
 		'colorAttachments',
@@ -11,10 +11,12 @@ Class {
 		'swapChain',
 		'uiScaleFactor'
 	],
-	#category : #'WodenSceneGraph-Core-Texture'
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDFramebuffer class >> forColorAttachment: aColorAttachment [
 	self assert: aColorAttachment type is2DTextureType.
 	^ self new
@@ -23,7 +25,7 @@ WDFramebuffer class >> forColorAttachment: aColorAttachment [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDFramebuffer class >> forSwapChain: swapChain extent: extent [
 	^ self new
 		extent: extent;
@@ -31,48 +33,48 @@ WDFramebuffer class >> forSwapChain: swapChain extent: extent [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> colorAttachments [
 
 	^ colorAttachments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> colorAttachments: anObject [
 
 	colorAttachments := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> depthStencilAttachment [
 
 	^ depthStencilAttachment
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> depthStencilAttachment: anObject [
 
 	depthStencilAttachment := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> extent [
 
 	^ extent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> extent: anObject [
 
 	extent := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> height [
 	^ extent y
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDFramebuffer >> initialize [
 	super initialize.
 	extent := 0@0.
@@ -81,31 +83,31 @@ WDFramebuffer >> initialize [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> swapChain [
 
 	^ swapChain
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> swapChain: anObject [
 
 	swapChain := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> uiScaleFactor [
 
 	^ uiScaleFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> uiScaleFactor: anObject [
 
 	uiScaleFactor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFramebuffer >> width [
 	^ extent x
 ]

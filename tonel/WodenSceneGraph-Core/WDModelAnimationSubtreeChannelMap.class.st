@@ -1,32 +1,34 @@
 Class {
-	#name : #WDModelAnimationSubtreeChannelMap,
-	#superclass : #Object,
+	#name : 'WDModelAnimationSubtreeChannelMap',
+	#superclass : 'Object',
 	#instVars : [
 		'subtreeMap',
 		'targets'
 	],
-	#category : #'WodenSceneGraph-Core-Animation'
+	#category : 'WodenSceneGraph-Core-Animation',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Animation'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationSubtreeChannelMap >> subtreeMap [
 
 	^ subtreeMap
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationSubtreeChannelMap >> subtreeMap: anObject [
 
 	subtreeMap := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationSubtreeChannelMap >> targets [
 
 	^ targets
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationSubtreeChannelMap >> targets: anObject [
 
 	targets := anObject

@@ -1,19 +1,21 @@
 Class {
-	#name : #WDSceneAnimationSubtreeNameMap,
-	#superclass : #Object,
+	#name : 'WDSceneAnimationSubtreeNameMap',
+	#superclass : 'Object',
 	#instVars : [
 		'nodes',
 		'bonePoses'
 	],
-	#category : #'WodenSceneGraph-Core-Animation'
+	#category : 'WodenSceneGraph-Core-Animation',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Animation'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneAnimationSubtreeNameMap >> addNode: aNode [
 	nodes add: aNode
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneAnimationSubtreeNameMap >> addPose: pose boneIndex: boneIndex [
 	bonePoses add: (WDSceneAnimationSubtreeBonePoseTarget new
 		pose: pose;
@@ -21,28 +23,28 @@ WDSceneAnimationSubtreeNameMap >> addPose: pose boneIndex: boneIndex [
 		yourself)
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneAnimationSubtreeNameMap >> initialize [
 	super initialize.
 	nodes := OrderedCollection new.
 	bonePoses := OrderedCollection new.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneAnimationSubtreeNameMap >> rotation: rotation [
 	bonePoses do: [ :each | each rotation: rotation ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneAnimationSubtreeNameMap >> scale: scale [
 	bonePoses do: [ :each | each scale: scale ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneAnimationSubtreeNameMap >> translation: translation [
 	bonePoses do: [ :each | each translation: translation ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneAnimationSubtreeNameMap >> weights: rotation [
 ]

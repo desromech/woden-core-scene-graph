@@ -4,21 +4,23 @@ I am a directional light source.
 I point towards the front direction, so that my orientation can be adjusted through my parent scene node transformation.
 "
 Class {
-	#name : #WDDirectionalLightSource,
-	#superclass : #WDLightSource,
+	#name : 'WDDirectionalLightSource',
+	#superclass : 'WDLightSource',
 	#instVars : [
 		'shadowCastingRadius',
 		'shadowSnappingQuanta'
 	],
-	#category : #'WodenSceneGraph-Core-Lighting'
+	#category : 'WodenSceneGraph-Core-Lighting',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Lighting'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDDirectionalLightSource >> addToRenderingScene: renderingScene withGlobalTransform: globalTransform [
 	renderingScene addLight: (self asLightStateForRenderingScene: renderingScene withTransform: globalTransform)
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDDirectionalLightSource >> asLightStateForRenderingScene: renderingScene withTransform: renderingTransform [
 	| result direction |
 	direction := renderingTransform matrix thirdColumn.
@@ -36,14 +38,14 @@ WDDirectionalLightSource >> asLightStateForRenderingScene: renderingScene withTr
 	^ result
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDDirectionalLightSource >> initialize [
 	super initialize.
 	shadowCastingRadius := 1000.0.
 	shadowSnappingQuanta := 0.1.
 ]
 
-{ #category : #shadows }
+{ #category : 'shadows' }
 WDDirectionalLightSource >> setupShadowMapCameraStateForRenderingScene: renderingScene frustum: sliceFrustum withTransform: renderingTransform direction: direction [
 	| shadowCastingVolume shadowCastingVolumeWorldBoundingBox shadowTransform localShadowCastingVolume |
 	
@@ -85,7 +87,7 @@ WDDirectionalLightSource >> setupShadowMapCameraStateForRenderingScene: renderin
 		yourself
 ]
 
-{ #category : #shadows }
+{ #category : 'shadows' }
 WDDirectionalLightSource >> setupShadowMapCascadeFor: lightState renderingScene: renderingScene withTransform: renderingTransform direction: direction [
 	| cameraState frustum nearDistance farDistance cascadeSplitDistributionLambda numSlices splitDistributionDistances splitDistributionLambdas |
 	cameraState := renderingScene cameraState.
@@ -127,34 +129,34 @@ WDDirectionalLightSource >> setupShadowMapCascadeFor: lightState renderingScene:
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDirectionalLightSource >> shadowCastingRadius [
 
 	^ shadowCastingRadius
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDirectionalLightSource >> shadowCastingRadius: anObject [
 
 	shadowCastingRadius := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDDirectionalLightSource >> snapShadowVolumeBox: box [
 	^ AABox min: (self snapShadowVolumeMin: box min) max: (self snapShadowVolumeMax: box max)
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDDirectionalLightSource >> snapShadowVolumeCenter: point [
 	^ (point / shadowSnappingQuanta + 0.5) floor * shadowSnappingQuanta
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDDirectionalLightSource >> snapShadowVolumeMax: point [
 	^ (point / shadowSnappingQuanta) ceiling * shadowSnappingQuanta
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDDirectionalLightSource >> snapShadowVolumeMin: point [
 	^ (point / shadowSnappingQuanta) floor * shadowSnappingQuanta
 ]

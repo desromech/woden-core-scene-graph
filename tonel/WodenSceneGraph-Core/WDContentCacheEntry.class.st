@@ -2,8 +2,8 @@
 I am an entry in the content cache.
 "
 Class {
-	#name : #WDContentCacheEntry,
-	#superclass : #Object,
+	#name : 'WDContentCacheEntry',
+	#superclass : 'Object',
 	#instVars : [
 		'type',
 		'name',
@@ -12,39 +12,41 @@ Class {
 	#classVars : [
 		'Default'
 	],
-	#category : #'WodenSceneGraph-Core-ContentCache'
+	#category : 'WodenSceneGraph-Core-ContentCache',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'ContentCache'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDContentCacheEntry >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDContentCacheEntry >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDContentCacheEntry >> type [
 
 	^ type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDContentCacheEntry >> type: anObject [
 
 	type := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDContentCacheEntry >> value [
 	^ value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDContentCacheEntry >> value: anObject [
 
 	value := anObject

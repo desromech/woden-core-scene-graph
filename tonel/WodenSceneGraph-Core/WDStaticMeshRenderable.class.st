@@ -2,48 +2,50 @@
 I am a renderable that holds a static mesh.
 "
 Class {
-	#name : #WDStaticMeshRenderable,
-	#superclass : #WDRenderable,
+	#name : 'WDStaticMeshRenderable',
+	#superclass : 'WDRenderable',
 	#instVars : [
 		'primitives',
 		'boundingBox'
 	],
-	#category : #'WodenSceneGraph-Core-Renderable'
+	#category : 'WodenSceneGraph-Core-Renderable',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Renderable'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDStaticMeshRenderable >> addIntoModelAssetWithDependencies: modelAsset [
 	modelAsset addMesh: self.
 	primitives do: [ :each | each addIntoModelAssetWithDependencies: modelAsset ]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDStaticMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState [
 	primitives do: [ :each |
 		each addToRenderingScene: renderingScene withObjectState: anObjectState
 	].
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDStaticMeshRenderable >> addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState [
 	primitives do: [ :each |
 		each addToRenderingScene: renderingScene withObjectState: anObjectState poseState: poseState
 	].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDStaticMeshRenderable >> boundingBox [
 
 	^ boundingBox
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDStaticMeshRenderable >> boundingBox: anObject [
 
 	boundingBox := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDStaticMeshRenderable >> computeBoundingBoxFromPrimitives [
 	boundingBox := AABox empty.
 	primitives do: [ :each |
@@ -51,34 +53,34 @@ WDStaticMeshRenderable >> computeBoundingBoxFromPrimitives [
 	].
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDStaticMeshRenderable >> copyTransformingMaterialsWith: aBlock [
 	^ self copy
 		primitives: (primitives collect: [:each | each copyTransformingMaterialsWith: aBlock ]);
 		yourself
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDStaticMeshRenderable >> copyWithMaterial: aMaterial [
 	^ self copy
 		primitives: (primitives collect: [:each | each copyWithMaterial: aMaterial ]);
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDStaticMeshRenderable >> initialize [
 	super initialize.
 	primitives := #().
 	boundingBox := AABox empty.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDStaticMeshRenderable >> primitives [
 
 	^ primitives
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDStaticMeshRenderable >> primitives: anObject [
 
 	primitives := anObject

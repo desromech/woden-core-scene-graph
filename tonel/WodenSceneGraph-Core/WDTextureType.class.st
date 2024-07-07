@@ -2,42 +2,44 @@
 I represent a specific texture type.
 "
 Class {
-	#name : #WDTextureType,
-	#superclass : #WDAbstractEnumClass,
-	#category : #'WodenSceneGraph-Core-Texture'
+	#name : 'WDTextureType',
+	#superclass : 'WDAbstractEnumClass',
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDTextureType class >> asTextureType [
 	^ self uniqueInstance
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDTextureType >> asTextureType [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureType >> is1DTextureType [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureType >> is2DTextureType [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureType >> is3DTextureType [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureType >> isCubeTextureType [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureType >> isUnknownTextureType [
 	^ false
 ]

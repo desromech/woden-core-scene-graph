@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRTrackedDeviceDualAnalogUntouchEvent,
-	#superclass : #WDVRTrackedDeviceDualAnalogEvent,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceDualAnalogUntouchEvent',
+	#superclass : 'WDVRTrackedDeviceDualAnalogEvent',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 WDVRTrackedDeviceDualAnalogUntouchEvent >> accept: eventHandler [
 	^ eventHandler onVRTrackedDeviceDualAnalogUntouchEvent: self
 ]

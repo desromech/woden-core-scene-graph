@@ -2,16 +2,18 @@
 I am a context which is used for loading asynchronous content data.
 "
 Class {
-	#name : #WDAbstractAsyncContentContext,
-	#superclass : #Object,
+	#name : 'WDAbstractAsyncContentContext',
+	#superclass : 'Object',
 	#instVars : [
 		'asyncProcessor',
 		'contentCache'
 	],
-	#category : #'WodenSceneGraph-Core-Async'
+	#category : 'WodenSceneGraph-Core-Async',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Async'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDAbstractAsyncContentContext class >> defaultForUri: uri [
 	uri ifNotNil:[
 		((uri beginsWith: 'http:') or: [uri beginsWith: 'https:'])
@@ -23,50 +25,50 @@ WDAbstractAsyncContentContext class >> defaultForUri: uri [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractAsyncContentContext >> asyncProcessor [
 	^ asyncProcessor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractAsyncContentContext >> asyncProcessor: anObject [
 
 	^ asyncProcessor := anObject
 ]
 
-{ #category : #hooks }
+{ #category : 'hooks' }
 WDAbstractAsyncContentContext >> canonicalizeUri: uri [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractAsyncContentContext >> contentCache [
 	^ contentCache
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractAsyncContentContext >> contentCache: anObject [
 
 	contentCache := anObject
 ]
 
-{ #category : #'async loading' }
+{ #category : 'async loading' }
 WDAbstractAsyncContentContext >> enqueueLoadingModelAssetURI: modelAssetURI thenDo: aBlock [
 	^ self validAsyncProcessor enqueueLoadingModelAssetURI: modelAssetURI context: self thenDo: aBlock
 	
 ]
 
-{ #category : #hooks }
+{ #category : 'hooks' }
 WDAbstractAsyncContentContext >> fetchUriToFileReference: canonicalUri [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractAsyncContentContext >> validAsyncProcessor [
 	^ asyncProcessor ifNil: [ asyncProcessor := WDAsyncProcessor default ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAbstractAsyncContentContext >> validContentCache [
 	^ contentCache ifNil: [ contentCache := WDContentCache default ]
 ]

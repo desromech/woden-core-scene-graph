@@ -2,21 +2,23 @@
 I encapsulate the skinning matrices for a specific pose for a skeletal mesh.
 "
 Class {
-	#name : #WDRenderingPoseState,
-	#superclass : #Object,
+	#name : 'WDRenderingPoseState',
+	#superclass : 'Object',
 	#instVars : [
 		'skinningMatrices'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingPoseState >> skinningMatrices [
 
 	^ skinningMatrices
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingPoseState >> skinningMatrices: anObject [
 
 	skinningMatrices := anObject

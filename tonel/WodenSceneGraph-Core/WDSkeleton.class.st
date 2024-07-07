@@ -2,8 +2,8 @@
 I am an a skeleton that is used by a skeletal mesh.
 "
 Class {
-	#name : #WDSkeleton,
-	#superclass : #Object,
+	#name : 'WDSkeleton',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'rootMatrix',
@@ -15,10 +15,12 @@ Class {
 		'skinningOrderTable',
 		'inverseRootMatrix'
 	],
-	#category : #'WodenSceneGraph-Core-Renderable'
+	#category : 'WodenSceneGraph-Core-Renderable',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Renderable'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> boneNameToIndexDictionary [
 	boneNameToIndexDictionary ifNil: [ 
 		boneNameToIndexDictionary := Dictionary new.
@@ -30,19 +32,19 @@ WDSkeleton >> boneNameToIndexDictionary [
 	^ boneNameToIndexDictionary 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> bones [
 
 	^ bones
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> bones: anObject [
 	bones := anObject.
 	boneNameToIndexDictionary := nil.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSkeleton >> computeBoneSkinningOrderFrom: boneIndex into: result set: resultSet [
 	| parentIndex |
 	(resultSet includes: boneIndex) ifTrue: [ ^ self ].
@@ -56,7 +58,7 @@ WDSkeleton >> computeBoneSkinningOrderFrom: boneIndex into: result set: resultSe
 	result add: boneIndex
 ]
 
-{ #category : #'pose matrices' }
+{ #category : 'pose matrices' }
 WDSkeleton >> computeForwardMatricesWithPoseMatrices: poseMatrices [
 	| result matrix |
 	self assert: poseMatrices size = bones size.
@@ -74,14 +76,14 @@ WDSkeleton >> computeForwardMatricesWithPoseMatrices: poseMatrices [
 	^ result
 ]
 
-{ #category : #'pose matrices' }
+{ #category : 'pose matrices' }
 WDSkeleton >> computeRestPoseForwardMatrices [
 	restPoseForwardMatrices := self computeForwardMatricesWithPoseMatrices: (bones collect: [:each | each matrix]).
 	
 	self computeSkinningMatricesWithForwardMatrices: restPoseForwardMatrices.
 ]
 
-{ #category : #'pose matrices' }
+{ #category : 'pose matrices' }
 WDSkeleton >> computeSkinningMatricesWithForwardMatrices: forwardMatrices [
 	| result |
 	self assert: forwardMatrices size = bones size.
@@ -93,7 +95,7 @@ WDSkeleton >> computeSkinningMatricesWithForwardMatrices: forwardMatrices [
 	^ result
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSkeleton >> computeSkinningOrderTable [
 	| result resultSet |
 	result := OrderedCollection new.
@@ -106,7 +108,7 @@ WDSkeleton >> computeSkinningOrderTable [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSkeleton >> constructPerBoneSkeletonTargetingMappingInto: targetSkeleton [
 	| mapping |
 	mapping := WDPerBoneSkeletonTargetingMapping new.
@@ -123,7 +125,7 @@ WDSkeleton >> constructPerBoneSkeletonTargetingMappingInto: targetSkeleton [
 	^ mapping
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSkeleton >> constructScaleRotationSkeletonTargetingMappingInto: targetSkeleton [
 	| mapping |
 	mapping := WDScaleRotationSkeletonTargetingMapping new.
@@ -142,12 +144,12 @@ WDSkeleton >> constructScaleRotationSkeletonTargetingMappingInto: targetSkeleton
 	^ mapping
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSkeleton >> getBoneNamedOrNil: boneName [
 	^ (self mapBoneNameToIndexOrNil: boneName) ifNotNil: [ :boneIndex | bones at: boneIndex ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSkeleton >> initialize [
 	super initialize.
 	name := ''.
@@ -156,35 +158,35 @@ WDSkeleton >> initialize [
 	skinningOrderTable := #().
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> inverseRootMatrix [
 	^ inverseRootMatrix
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSkeleton >> mapBoneNameToIndexOrNil: boneName [
 	^ self boneNameToIndexDictionary at: boneName ifAbsent: [ nil ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #removing }
+{ #category : 'removing' }
 WDSkeleton >> removePrefixFromBoneNames: prefixToRemove [
 	bones do: [ :each | each name: (each name withoutPrefix: prefixToRemove) ].
 	boneNameToIndexDictionary := nil.
 ]
 
-{ #category : #poses }
+{ #category : 'poses' }
 WDSkeleton >> restPose [
 	^ WDSkeletonPose new
 		skeleton: self;
@@ -192,53 +194,53 @@ WDSkeleton >> restPose [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> restPoseForwardMatrices [
 	^ restPoseForwardMatrices
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> restPoseForwardMatrices: anObject [
 
 	restPoseForwardMatrices := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> restPoseInverseMatrices [
 
 	^ restPoseInverseMatrices
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> restPoseInverseMatrices: anObject [
 
 	restPoseInverseMatrices := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> rootBone [
 	^ rootBoneIndex ifNotNil: [ bones at: rootBoneIndex + 1 ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> rootBoneIndex [
 
 	^ rootBoneIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> rootBoneIndex: anObject [
 
 	rootBoneIndex := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> rootMatrix [
 
 	^ rootMatrix
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSkeleton >> rootMatrix: anObject [
 	rootMatrix := anObject.
 	inverseRootMatrix := rootMatrix inverse.

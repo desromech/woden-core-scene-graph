@@ -2,64 +2,66 @@
 I am metallic roughness material that mixes two duplicated versions of itself that are moving with different velocities. I am typically used as a cheap way to simulate moving water bodies.
 "
 Class {
-	#name : #WDDuplicatedMetallicRoughnessLiquidMaterial,
-	#superclass : #WDMetallicRoughnessMaterial,
+	#name : 'WDDuplicatedMetallicRoughnessLiquidMaterial',
+	#superclass : 'WDMetallicRoughnessMaterial',
 	#instVars : [
 		'duplicatedTexcoordScale',
 		'duplicatedTexcoordOffset',
 		'duplicatedTexcoordOffsetVelocity',
 		'mixAlpha'
 	],
-	#category : #'WodenSceneGraph-Core-Material'
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial class >> typeName [
 	^ #DuplicatedMetallicRoughnessLiquid
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> duplicatedTexcoordOffset [
 
 	^ duplicatedTexcoordOffset
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> duplicatedTexcoordOffset: anObject [
 
 	duplicatedTexcoordOffset := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> duplicatedTexcoordOffsetVelocity [
 
 	^ duplicatedTexcoordOffsetVelocity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> duplicatedTexcoordOffsetVelocity: anObject [
 
 	duplicatedTexcoordOffsetVelocity := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> duplicatedTexcoordScale [
 
 	^ duplicatedTexcoordScale
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> duplicatedTexcoordScale: anObject [
 
 	duplicatedTexcoordScale := anObject
 ]
 
-{ #category : #'double dispatch' }
+{ #category : 'double dispatch' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitDuplicatedMetallicRoughnessLiquidMaterialActivationCommands: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> encodeJsonKeyValues [
 	^ super encodeJsonKeyValues , {
 		#mixAlpha . mixAlpha.
@@ -69,7 +71,7 @@ WDDuplicatedMetallicRoughnessLiquidMaterial >> encodeJsonKeyValues [
 	}
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> initialize [
 	super initialize.
 	mixAlpha := 0.5.
@@ -78,7 +80,7 @@ WDDuplicatedMetallicRoughnessLiquidMaterial >> initialize [
 	duplicatedTexcoordOffsetVelocity := Vector2 zeros.
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> loadFromJson: jsonData [
 	super loadFromJson: jsonData.
 	mixAlpha := (jsonData at: #mixAlpha ifAbsent: [nil]) ifNil: [ mixAlpha ].
@@ -88,13 +90,13 @@ WDDuplicatedMetallicRoughnessLiquidMaterial >> loadFromJson: jsonData [
 	jsonData at: #duplicatedTexcoordOffsetVelocity ifPresent: [ :found | duplicatedTexcoordOffsetVelocity := Vector2 loadFromJson: found ].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> mixAlpha [
 
 	^ mixAlpha
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDDuplicatedMetallicRoughnessLiquidMaterial >> mixAlpha: anObject [
 
 	mixAlpha := anObject

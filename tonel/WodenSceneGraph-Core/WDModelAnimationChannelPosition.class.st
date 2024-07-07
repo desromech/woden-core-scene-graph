@@ -2,8 +2,8 @@
 I hold the required state from an animation channel for computing the key frame positions and their interpolated position.
 "
 Class {
-	#name : #WDModelAnimationChannelPosition,
-	#superclass : #Object,
+	#name : 'WDModelAnimationChannelPosition',
+	#superclass : 'Object',
 	#instVars : [
 		'position',
 		'inputSample',
@@ -18,94 +18,96 @@ Class {
 		'nextFrameIndex',
 		'alpha'
 	],
-	#category : #'WodenSceneGraph-Core-Animation'
+	#category : 'WodenSceneGraph-Core-Animation',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Animation'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> actualPosition [
 
 	^ actualPosition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> actualPosition: anObject [
 
 	actualPosition := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> alpha [
 
 	^ alpha
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> alpha: anObject [
 
 	alpha := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputMaxValue [
 
 	^ inputMaxValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputMaxValue: anObject [
 
 	inputMaxValue := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputMinValue [
 
 	^ inputMinValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputMinValue: anObject [
 
 	inputMinValue := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputSample [
 
 	^ inputSample
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputSample: anObject [
 
 	inputSample := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputSamples [
 
 	^ inputSamples
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> inputSamples: anObject [
 
 	inputSamples := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> isLooped [
 
 	^ isLooped
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> isLooped: anObject [
 
 	isLooped := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDModelAnimationChannelPosition >> isValidForPosition: newPosition looped: newIsLooped inputMinValue: newInputMinValue inputMaxValue: newInputMaxValue inputSamples: newInputSamples [
 	^ position = newPosition and: [
 	isLooped = newIsLooped and: [
@@ -114,61 +116,61 @@ WDModelAnimationChannelPosition >> isValidForPosition: newPosition looped: newIs
 	inputSamples == newInputSamples ]]]]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> nextFrameIndex [
 
 	^ nextFrameIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> nextFrameIndex: anObject [
 
 	nextFrameIndex := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> nextFramePosition [
 
 	^ nextFramePosition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> nextFramePosition: anObject [
 
 	nextFramePosition := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> position [
 
 	^ position
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> position: anObject [
 
 	position := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> previousFrameIndex [
 
 	^ previousFrameIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> previousFrameIndex: anObject [
 
 	previousFrameIndex := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> previousFramePosition [
 
 	^ previousFramePosition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannelPosition >> previousFramePosition: anObject [
 
 	previousFramePosition := anObject

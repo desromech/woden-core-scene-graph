@@ -4,8 +4,8 @@ I am a material that has a flat coloring (i.e. no lighting).
 My parameters are taken from the gltf 2.0 spec for model formats.
 "
 Class {
-	#name : #WDUnlitMaterial,
-	#superclass : #WDSurfaceMaterial,
+	#name : 'WDUnlitMaterial',
+	#superclass : 'WDSurfaceMaterial',
 	#instVars : [
 		'colorFactor',
 		'colorTexture',
@@ -13,44 +13,46 @@ Class {
 		'texcoordOffset',
 		'texcoordOffsetVelocity'
 	],
-	#category : #'WodenSceneGraph-Core-Material'
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial class >> typeName [
 	^ #Unlit
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> colorFactor [
 
 	^ colorFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> colorFactor: aColor [
 
 	colorFactor := aColor asVector4 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> colorTexture [
 
 	^ colorTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> colorTexture: anObject [
 
 	colorTexture := anObject
 ]
 
-{ #category : #'double dispatch' }
+{ #category : 'double dispatch' }
 WDUnlitMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitUnlitMaterialActivationCommands: self
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDUnlitMaterial >> encodeJsonKeyValues [
 	^ super encodeJsonKeyValues , {
 		#colorFactor . colorFactor encodeForJSON.
@@ -61,7 +63,7 @@ WDUnlitMaterial >> encodeJsonKeyValues [
 	}
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDUnlitMaterial >> initialize [
 	super initialize.
 	
@@ -72,7 +74,7 @@ WDUnlitMaterial >> initialize [
 	texcoordOffsetVelocity := Vector2 zeros.
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDUnlitMaterial >> loadFromJson: jsonData [
 	super loadFromJson: jsonData.
 	jsonData at: #colorFactor ifPresent: [ :found | colorFactor := Vector4 loadFromJson: found ].
@@ -83,7 +85,7 @@ WDUnlitMaterial >> loadFromJson: jsonData [
 	jsonData at: #texcoordOffsetVelocity ifPresent: [ :found | texcoordOffsetVelocity := Vector2 loadFromJson: found ].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDUnlitMaterial >> makeThumbnail [
 	colorTexture ifNotNil: [ colorTexture makeThumbnail ifNotNil: [ :thumb | ^ thumb ] ].
 	^ (Form extent: 16@16 depth: 32)
@@ -91,37 +93,37 @@ WDUnlitMaterial >> makeThumbnail [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> texcoordOffset [
 
 	^ texcoordOffset
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> texcoordOffset: anObject [
 
 	texcoordOffset := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> texcoordOffsetVelocity [
 
 	^ texcoordOffsetVelocity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> texcoordOffsetVelocity: anObject [
 
 	texcoordOffsetVelocity := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> texcoordScale [
 
 	^ texcoordScale
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDUnlitMaterial >> texcoordScale: anObject [
 
 	texcoordScale := anObject

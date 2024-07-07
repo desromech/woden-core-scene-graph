@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRTrackedDeviceUserInteractionStartedEvent,
-	#superclass : #WDVRTrackedDeviceNotificationEvent,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceUserInteractionStartedEvent',
+	#superclass : 'WDVRTrackedDeviceNotificationEvent',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 WDVRTrackedDeviceUserInteractionStartedEvent >> accept: eventHandler [
 	^ eventHandler onVRTrackedDeviceUserInteractionStartedEvent: self
 ]

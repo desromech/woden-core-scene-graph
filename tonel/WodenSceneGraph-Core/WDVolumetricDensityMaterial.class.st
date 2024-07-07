@@ -2,8 +2,8 @@
 I am a volumetric material that uses 3D texture that holds densities.
 "
 Class {
-	#name : #WDVolumetricDensityMaterial,
-	#superclass : #WDVolumetricMaterial,
+	#name : 'WDVolumetricDensityMaterial',
+	#superclass : 'WDVolumetricMaterial',
 	#instVars : [
 		'densityTexture',
 		'colorMapTexture',
@@ -13,63 +13,65 @@ Class {
 		'densityBias',
 		'minTotalDensity'
 	],
-	#category : #'WodenSceneGraph-Core-Material'
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> colorMapTexture [
 
 	^ colorMapTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> colorMapTexture: anObject [
 
 	colorMapTexture := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> densityBias [
 
 	^ densityBias
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> densityBias: anObject [
 
 	densityBias := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> densityScale [
 
 	^ densityScale
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> densityScale: anObject [
 
 	densityScale := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> densityTexture [
 
 	^ densityTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> densityTexture: anObject [
 
 	densityTexture := anObject
 ]
 
-{ #category : #'double dispatch' }
+{ #category : 'double dispatch' }
 WDVolumetricDensityMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ frameRenderer emitVolumetricDensityMaterialActivationCommands: self
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVolumetricDensityMaterial >> initialize [
 	super initialize.
 	minDensityThreshold := 0.0.
@@ -81,43 +83,43 @@ WDVolumetricDensityMaterial >> initialize [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> maxDensityThreshold [
 
 	^ maxDensityThreshold
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> maxDensityThreshold: anObject [
 
 	maxDensityThreshold := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> minDensityThreshold [
 
 	^ minDensityThreshold
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> minDensityThreshold: anObject [
 
 	minDensityThreshold := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> minTotalDensity [
 
 	^ minTotalDensity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVolumetricDensityMaterial >> minTotalDensity: anObject [
 
 	minTotalDensity := anObject
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDVolumetricDensityMaterial >> renderPriority [
 	^ WDRenderPriority translucent
 ]

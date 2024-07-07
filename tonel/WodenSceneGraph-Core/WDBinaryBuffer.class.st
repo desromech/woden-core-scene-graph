@@ -4,40 +4,42 @@ I am a binary buffer of data.
 I have a direct correspondence to a gltf 2 model binary buffer.
 "
 Class {
-	#name : #WDBinaryBuffer,
-	#superclass : #WDRendererCacheableResource,
+	#name : 'WDBinaryBuffer',
+	#superclass : 'WDRendererCacheableResource',
 	#instVars : [
 		'name',
 		'data'
 	],
-	#category : #'WodenSceneGraph-Core-Resources'
+	#category : 'WodenSceneGraph-Core-Resources',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Resources'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBuffer >> data [
 
 	^ data
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBuffer >> data: anObject [
 
 	data := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBuffer >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBuffer >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDBinaryBuffer >> readStreamFrom: offset withSize: length [
 	^ ReadStream on: data from: offset + 1 to: offset + length
 ]

@@ -2,17 +2,19 @@
 I am the description of how an object is renderer, akin to the material of a solid object.
 "
 Class {
-	#name : #WDMaterial,
-	#superclass : #Object,
+	#name : 'WDMaterial',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'materialDirectory',
 		'renderingStream'
 	],
-	#category : #'WodenSceneGraph-Core-Material'
+	#category : 'WodenSceneGraph-Core-Material',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Material'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDMaterial class >> getClassForTypeName: expectedTypeName [
 	self allSubclassesDo: [ :each |
 		(each isAbstract not and: [ each typeName = expectedTypeName ]) ifTrue: [ ^ each ]
@@ -20,18 +22,18 @@ WDMaterial class >> getClassForTypeName: expectedTypeName [
 	^ nil
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMaterial class >> isAbstract [
 	^ self == WDMaterial
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMaterial class >> loadFromFileNamed: aFileName [
 	^ self loadFromFileReference: aFileName asFileReference
 	
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMaterial class >> loadFromFileReference: aFileReference [
 	| jsonData |
 	jsonData := STONJSON fromString: aFileReference contents.
@@ -39,13 +41,13 @@ WDMaterial class >> loadFromFileReference: aFileReference [
 	
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMaterial class >> loadFromJson: jsonData [
 	^ self loadFromJson: jsonData inDirectory: FileSystem disk workingDirectory
 	
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMaterial class >> loadFromJson: jsonData inDirectory: materialDirectory [
 	^ (self getClassForTypeName: (jsonData at: #type))
 		ifNil: [ nil ]
@@ -53,32 +55,32 @@ WDMaterial class >> loadFromJson: jsonData inDirectory: materialDirectory [
 		
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMaterial class >> typeName [
 	self subclassResponsibility
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDMaterial >> addIntoModelAssetWithDependencies: modelAsset [
 	modelAsset addMaterial: self.
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDMaterial >> asUnlitMaterial [
 	^ self
 ]
 
-{ #category : #'double dispatch' }
+{ #category : 'double dispatch' }
 WDMaterial >> emitActivationCommandsOn: frameRenderer [
 	^ false
 ]
 
-{ #category : #'double dispatch' }
+{ #category : 'double dispatch' }
 WDMaterial >> emitDepthOnlyActivationCommandsOn: frameRenderer [
 	^ false
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMaterial >> encodeJsonKeyValues [
 	^ {
 		#type . self typeName.
@@ -86,77 +88,77 @@ WDMaterial >> encodeJsonKeyValues [
 	}
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMaterial >> hasAlphaBlending [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMaterial >> hasBackgroundRendering [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMaterial >> hasDepthTesting [
 	^ true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMaterial >> hasOpaqueRendering [
 	^ true
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMaterial >> loadFromJson: jsonData [
 	name := jsonData at: #name ifAbsent: [ name ].
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDMaterial >> loadFromJson: jsonData inDirectory: theMaterialDirectory [
 	materialDirectory := theMaterialDirectory.
 	self loadFromJson: jsonData
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDMaterial >> makeThumbnail [
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMaterial >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMaterial >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #rendering }
+{ #category : 'rendering' }
 WDMaterial >> renderPriority [
 	^ WDRenderPriority default
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMaterial >> renderingStream [
 
 	^ renderingStream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMaterial >> renderingStream: anObject [
 
 	renderingStream := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMaterial >> typeName [
 	^ self class typeName
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDMaterial >> writesDepth [
 	^ true
 ]

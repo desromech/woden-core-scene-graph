@@ -2,8 +2,8 @@
 I am a processor which is used for asynchronous tasks.
 "
 Class {
-	#name : #WDAsyncProcessor,
-	#superclass : #Object,
+	#name : 'WDAsyncProcessor',
+	#superclass : 'Object',
 	#instVars : [
 		'taskQueue',
 		'pendingTaskSemaphore',
@@ -12,26 +12,28 @@ Class {
 	#classVars : [
 		'Default'
 	],
-	#category : #'WodenSceneGraph-Core-Async'
+	#category : 'WodenSceneGraph-Core-Async',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Async'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncProcessor class >> default [
 	^ Default ifNil: [ Default := self new ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAsyncProcessor class >> reset [
 	<script>
 	Default := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncProcessor >> asyncProcessorProcess [
 	[ self asyncProcessorProcessIteration ] repeat
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAsyncProcessor >> asyncProcessorProcessIteration [
 	| nextTask |
 	pendingTaskSemaphore consumeAllSignals.
@@ -42,7 +44,7 @@ WDAsyncProcessor >> asyncProcessorProcessIteration [
 	pendingTaskSemaphore wait
 ]
 
-{ #category : #tasks }
+{ #category : 'tasks' }
 WDAsyncProcessor >> enqueueLoadingAssetURI: assetURI type: assetType context: context loadWith: loadingBlock thenDo: thenBlock [
 	^ self enqueueTask: [
 		| canonicalUri loadResult |
@@ -66,14 +68,14 @@ WDAsyncProcessor >> enqueueLoadingAssetURI: assetURI type: assetType context: co
 	]
 ]
 
-{ #category : #tasks }
+{ #category : 'tasks' }
 WDAsyncProcessor >> enqueueLoadingModelAssetURI: modelAssetURI context: context thenDo: aBlock [
 	^ self enqueueLoadingAssetURI: modelAssetURI type: #model context: context loadWith: [ :solvedFileReference |
 		WDModelAssetReadWriter readFileNamed: solvedFileReference
 	] thenDo: aBlock
 ]
 
-{ #category : #tasks }
+{ #category : 'tasks' }
 WDAsyncProcessor >> enqueueTask: aBlock [
 	| futureResult task |
 	futureResult := WDAsyncFuture new.
@@ -87,7 +89,7 @@ WDAsyncProcessor >> enqueueTask: aBlock [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDAsyncProcessor >> initialize [
 	super initialize.
 	taskQueue := SharedQueue new.
@@ -95,7 +97,7 @@ WDAsyncProcessor >> initialize [
 	asyncProcessorProcess := self starkAsyncProcessorProcess.
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDAsyncProcessor >> starkAsyncProcessorProcess [
 	asyncProcessorProcess := [ self asyncProcessorProcess ] forkAt: Processor userBackgroundPriority
 ]

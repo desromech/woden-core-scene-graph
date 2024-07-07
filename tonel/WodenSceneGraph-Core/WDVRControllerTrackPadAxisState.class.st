@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRControllerTrackPadAxisState,
-	#superclass : #WDVRControllerAxisState,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRControllerTrackPadAxisState',
+	#superclass : 'WDVRControllerAxisState',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRControllerTrackPadAxisState >> isTrackPad [
 	^ true
 ]

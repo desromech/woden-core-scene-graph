@@ -2,41 +2,43 @@
 I represent a specific tracked device pose.
 "
 Class {
-	#name : #WDVRTrackedDevicePose,
-	#superclass : #Object,
+	#name : 'WDVRTrackedDevicePose',
+	#superclass : 'Object',
 	#instVars : [
 		'deviceToAbsoluteTransform',
 		'linearVelocity',
 		'angularVelocity'
 	],
-	#category : #'WodenSceneGraph-Core-VR'
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevicePose >> angularVelocity [
 
 	^ angularVelocity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevicePose >> angularVelocity: anObject [
 
 	angularVelocity := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevicePose >> deviceToAbsoluteTransform [
 
 	^ deviceToAbsoluteTransform
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevicePose >> deviceToAbsoluteTransform: anObject [
 
 	deviceToAbsoluteTransform := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVRTrackedDevicePose >> initialize [
 	super initialize.
 	
@@ -45,13 +47,13 @@ WDVRTrackedDevicePose >> initialize [
 	angularVelocity := Vector3 zeros.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevicePose >> linearVelocity [
 
 	^ linearVelocity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevicePose >> linearVelocity: anObject [
 
 	linearVelocity := anObject

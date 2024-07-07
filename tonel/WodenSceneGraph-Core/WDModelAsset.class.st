@@ -7,8 +7,8 @@ I encapsulate the content of particular model asset. I am used for encapsulating
 - Scenes
 "
 Class {
-	#name : #WDModelAsset,
-	#superclass : #Object,
+	#name : 'WDModelAsset',
+	#superclass : 'Object',
 	#instVars : [
 		'scenes',
 		'meshes',
@@ -20,75 +20,77 @@ Class {
 		'animations',
 		'skeletons'
 	],
-	#category : #'WodenSceneGraph-Core-Asset'
+	#category : 'WodenSceneGraph-Core-Asset',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Asset'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addAnimation: anAnimation [
 	(elementSet includes: anAnimation) ifTrue: [ ^ self ].
 	self privateAddElement: anAnimation.
 	animations add: anAnimation
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addElementWithDependencies: anElement [
 	(elementSet includes: anElement) ifTrue: [ ^ self ].
 	anElement addIntoModelAssetWithDependencies: self
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addMaterial: aMaterial [
 	(elementSet includes: aMaterial) ifTrue: [ ^ self ].
 	self privateAddElement: aMaterial.
 	materials add: aMaterial
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addMesh: aMesh [
 	(elementSet includes: aMesh) ifTrue: [ ^ self ].
 	self privateAddElement: aMesh.
 	meshes add: aMesh
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addScene: aScene [
 	(elementSet includes: aScene) ifTrue: [ ^ self ].
 	self privateAddElement: aScene.
 	scenes add: aScene
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addSkeletalMesh: aSkeletalMesh [
 	(elementSet includes: aSkeletalMesh) ifTrue: [ ^ self ].
 	self privateAddElement: aSkeletalMesh.
 	skeletalMeshes add: aSkeletalMesh
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addSkeleton: aSkeleton [
 	(elementSet includes: aSkeleton) ifTrue: [ ^ self ].
 	self privateAddElement: aSkeleton.
 	skeletons add: aSkeleton
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDModelAsset >> addTexture: aTexture [
 	(elementSet includes: aTexture) ifTrue: [ ^ self ].
 	self privateAddElement: aTexture.
 	textures add: aTexture
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAsset >> animations [
 	^ animations
 ]
 
-{ #category : #'lookup elements' }
+{ #category : 'lookup elements' }
 WDModelAsset >> elementNamed: aName [
 	^ nameDictionary at: aName
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDModelAsset >> getCollisionShapeNamed: collisionElementName [
 	| collisionElement boundingBox |
 	collisionElement := self renderableOrSceneElementNamed: collisionElementName.
@@ -100,7 +102,7 @@ WDModelAsset >> getCollisionShapeNamed: collisionElementName [
 	^ WDConvexHullCollisionShape withPoints: boundingBox corners.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDModelAsset >> initialize [
 	super initialize.
 	elementSet := Set new.
@@ -115,7 +117,7 @@ WDModelAsset >> initialize [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDModelAsset >> instanceDefaultSceneNode [
 	scenes isEmpty ifFalse: [
 		^ scenes first instanceAsSceneNode
@@ -128,7 +130,7 @@ WDModelAsset >> instanceDefaultSceneNode [
 	^ nil
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDModelAsset >> instanceSceneNodeForElementNamed: elementName [
 	| element |
 	element := self renderableOrSceneElementNamed: elementName.
@@ -137,19 +139,19 @@ WDModelAsset >> instanceSceneNodeForElementNamed: elementName [
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAsset >> materials [
 
 	^ materials
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAsset >> meshes [
 
 	^ meshes
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDModelAsset >> privateAddElement: anElement [
 	elementSet add: anElement.
 	(anElement name notNil and: [anElement name isEmpty not]) ifTrue: [ 
@@ -157,7 +159,7 @@ WDModelAsset >> privateAddElement: anElement [
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDModelAsset >> renderableOrSceneElementNamed: name [
 	(name isNil or: [name isEmpty]) ifTrue: [ 
 		scenes isEmpty ifFalse: [
@@ -172,24 +174,24 @@ WDModelAsset >> renderableOrSceneElementNamed: name [
 	^ nameDictionary at: name ifAbsent: [ nil ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAsset >> scenes [
 
 	^ scenes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAsset >> skeletalMeshes [
 
 	^ skeletalMeshes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAsset >> skeletons [
 	^ skeletons
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAsset >> textures [
 
 	^ textures

@@ -2,112 +2,114 @@
 I represent an arbitrary element in the logical description of a scene.
 "
 Class {
-	#name : #WDSceneElement,
-	#superclass : #Object,
+	#name : 'WDSceneElement',
+	#superclass : 'Object',
 	#instVars : [
 		'name'
 	],
-	#category : #'WodenSceneGraph-Core-Scene'
+	#category : 'WodenSceneGraph-Core-Scene',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Scene'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement class >> isAbstract [
 	^ self == WDSceneElement
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneElement >> asRenderingSceneWithCameraState: baseCameraState [
 	self subclassResponsibility
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneElement >> asSceneElement [
 	^ self
 ]
 
-{ #category : #hook }
+{ #category : 'hook' }
 WDSceneElement >> childBoundingBoxChanged: aChild [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneElement >> children [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneElement >> globalTransform [
 	^ ReversibleAffineTransform3D identity
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDSceneElement >> instanceAsSceneNode [
 	^ self subclassResponsibility
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement >> isBackgroundSceneLayer [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement >> isForegroundSceneLayer [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement >> isNormalSceneLayer [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement >> isScene [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement >> isSceneLayer [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement >> isSceneNode [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneElement >> isWodenSceneElement [
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneElement >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneElement >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneElement >> parent [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneElement >> scene [
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneElement >> sceneLayer [
 	^ nil
 ]
 
-{ #category : #update }
+{ #category : 'update' }
 WDSceneElement >> updateWithDeltaTime: deltaTime [
 	^ false
 ]

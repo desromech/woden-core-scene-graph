@@ -1,13 +1,15 @@
 Class {
-	#name : #WDCompoundCollisionShape,
-	#superclass : #WDCollisionShape,
+	#name : 'WDCompoundCollisionShape',
+	#superclass : 'WDCollisionShape',
 	#instVars : [
 		'components'
 	],
-	#category : #'WodenSceneGraph-Core-Collision'
+	#category : 'WodenSceneGraph-Core-Collision',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Collision'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDCompoundCollisionShape >> addComponent: aShapeComponent [
 	components add: aShapeComponent.
 	components size = 1 ifTrue: [ 
@@ -18,12 +20,12 @@ WDCompoundCollisionShape >> addComponent: aShapeComponent [
 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDCompoundCollisionShape >> addShape: aShape [
 	self addShape: aShape withTransform: ReversibleAffineTransform3D identity
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDCompoundCollisionShape >> addShape: aShape withTransform: aTransform [
 	| reversibleAffineTransform |
 	reversibleAffineTransform := aTransform asReversibleAffineTransform.
@@ -44,13 +46,13 @@ WDCompoundCollisionShape >> addShape: aShape withTransform: aTransform [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCompoundCollisionShape >> components [
 
 	^ components
 ]
 
-{ #category : #'collision detection' }
+{ #category : 'collision detection' }
 WDCompoundCollisionShape >> componentsIntersectingBox: boundingBoxToTest do: aBlock [
 	components do: [ :each |
 		(each boundingBox hasIntersectionWithBox: boundingBoxToTest) ifTrue: [ 
@@ -59,7 +61,7 @@ WDCompoundCollisionShape >> componentsIntersectingBox: boundingBoxToTest do: aBl
 	].
 ]
 
-{ #category : #'collision detection' }
+{ #category : 'collision detection' }
 WDCompoundCollisionShape >> componentsIntersectingRay: rayToTest do: aBlock [
 	components do: [ :each |
 		(each boundingBox hasIntersectionWithRay: rayToTest) ifTrue: [ 
@@ -68,7 +70,7 @@ WDCompoundCollisionShape >> componentsIntersectingRay: rayToTest do: aBlock [
 	].
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDCompoundCollisionShape >> constructVisualizationSceneNode [
 	| compoundNode |
 	compoundNode := WDSceneNode new.
@@ -81,17 +83,17 @@ WDCompoundCollisionShape >> constructVisualizationSceneNode [
 	^ compoundNode
 ]
 
-{ #category : #'collision detection' }
+{ #category : 'collision detection' }
 WDCompoundCollisionShape >> detectAndComputeCollisionContactPointsAt: transform with: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	^ otherShape detectAndComputeCollisionContactPointsAt: otherTransform withCompoundShape: self at: transform separatingAxisHint: separatingAxisHint
 ]
 
-{ #category : #'collision detection' }
+{ #category : 'collision detection' }
 WDCompoundCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withCompoundShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	^ #()
 ]
 
-{ #category : #'collision detection' }
+{ #category : 'collision detection' }
 WDCompoundCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withConvexShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	| results myReversibleTransform otherLocalBoundingBox |
 	results := OrderedCollection new.
@@ -107,19 +109,19 @@ WDCompoundCollisionShape >> detectAndComputeCollisionContactPointsAt: transform 
 	^ results
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDCompoundCollisionShape >> initialize [
 	super initialize.
 	components := OrderedCollection new.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDCompoundCollisionShape >> isCompoundCollisionShape [
 	^ true
 
 ]
 
-{ #category : #'collision detection' }
+{ #category : 'collision detection' }
 WDCompoundCollisionShape >> rayCast: ray [
 	| result |
 	result := nil.
@@ -136,7 +138,7 @@ WDCompoundCollisionShape >> rayCast: ray [
 	^ result
 ]
 
-{ #category : #transforming }
+{ #category : 'transforming' }
 WDCompoundCollisionShape >> transformedWith: aTransform [
 	| reversibleAffineTransform result |
 	reversibleAffineTransform := aTransform asReversibleAffineTransform3D.

@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRTrackedDeviceHMD,
-	#superclass : #WDVRTrackedDevice,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceHMD',
+	#superclass : 'WDVRTrackedDevice',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceHMD >> isHeadMountedDisplay [
 	^ true
 ]

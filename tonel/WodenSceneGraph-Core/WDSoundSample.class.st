@@ -2,8 +2,8 @@
 I am a buffer that holds a single sound sample.
 "
 Class {
-	#name : #WDSoundSample,
-	#superclass : #WDRendererCacheableResource,
+	#name : 'WDSoundSample',
+	#superclass : 'WDRendererCacheableResource',
 	#instVars : [
 		'name',
 		'channels',
@@ -11,10 +11,12 @@ Class {
 		'sampleRate',
 		'data'
 	],
-	#category : #'WodenSceneGraph-Core-Sound'
+	#category : 'WodenSceneGraph-Core-Sound',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Sound'
 }
 
-{ #category : #'digital filters' }
+{ #category : 'digital filters' }
 WDSoundSample class >> biquadraticFilterWithCoefficient: coefficients [
 	| a0 na1 na2 nb0 nb1 nb2 |
 	a0 := coefficients first.
@@ -29,43 +31,43 @@ WDSoundSample class >> biquadraticFilterWithCoefficient: coefficients [
 	]
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateNoiseSamples: sampleCount withRate: sampleRate amplitude: amplitude seed: randomSeed [
 	| random |
 	random := Random seed: randomSeed.
 	^ self generateSamples: sampleCount withRate: sampleRate with: [(random next*2.0 - 1.0) * amplitude]
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateNoiseSamples: sampleCount withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency [
 	| random |
 	random := Random seed: randomSeed.
 	^ self generateSamples: sampleCount withRate: sampleRate with: [(random next*2.0 - 1.0) * amplitude] thenFilter2: (self lowPassFilterWithSampleRate: sampleRate frequency: cutoffFrequency)
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateNoiseSamples: sampleCount withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency q: q [
 	| random |
 	random := Random seed: randomSeed.
 	^ self generateSamples: sampleCount withRate: sampleRate with: [(random next*2.0 - 1.0) * amplitude] thenFilter2: (self lowPassFilterWithSampleRate: sampleRate frequency: cutoffFrequency q: q)
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateNoiseWithDuration: duration withRate: sampleRate amplitude: amplitude seed: randomSeed [
 	^ self generateNoiseSamples: (duration * sampleRate) rounded withRate: sampleRate amplitude: amplitude seed: randomSeed
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateNoiseWithDuration: duration withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency [
 	^ self generateNoiseSamples: (duration * sampleRate) rounded withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateNoiseWithDuration: duration withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency q: q [
 	^ self generateNoiseSamples: (duration * sampleRate) rounded withRate: sampleRate amplitude: amplitude seed: randomSeed lowPassCutoff: cutoffFrequency q: q
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateSamples: sampleCount withRate: sampleRate with: aBlock [
 	| data destIndex dt |
 	data := ByteArray new: sampleCount * 2.
@@ -87,7 +89,7 @@ WDSoundSample class >> generateSamples: sampleCount withRate: sampleRate with: a
 		yourself
 ]
 
-{ #category : #generation }
+{ #category : 'generation' }
 WDSoundSample class >> generateSamples: sampleCount withRate: sampleRate with: aBlock thenFilter2: aFilterBlock [
 	| data destIndex dt x1 x2 y1 y2 |
 	data := ByteArray new: sampleCount * 2.
@@ -121,7 +123,7 @@ WDSoundSample class >> generateSamples: sampleCount withRate: sampleRate with: a
 		yourself
 ]
 
-{ #category : #'digital filters' }
+{ #category : 'digital filters' }
 WDSoundSample class >> lowPassFilterWithSampleRate: sampleRate frequency: cutoffFrequency [
 	"See https://en.wikipedia.org/wiki/Low-pass_filter"
 	| omega0 alpha |
@@ -132,7 +134,7 @@ WDSoundSample class >> lowPassFilterWithSampleRate: sampleRate frequency: cutoff
 	]
 ]
 
-{ #category : #'digital filters' }
+{ #category : 'digital filters' }
 WDSoundSample class >> lowPassFilterWithSampleRate: sampleRate frequency: cutoffFrequency q: q [
 	"See https://www.w3.org/TR/audio-eq-cookbook/ and https://en.wikipedia.org/wiki/Digital_biquad_filter"
 	| omega0 co so alpha b0 b1 b2 a0 a1 a2 |
@@ -150,48 +152,48 @@ WDSoundSample class >> lowPassFilterWithSampleRate: sampleRate frequency: cutoff
 	^ self biquadraticFilterWithCoefficient: { a0 . a1 . a2 . b0 . b1 . b2 }
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> data [
 
 	^ data
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> data: anObject [
 
 	data := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> format [
 
 	^ format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> format: aSoundSampleFormat [
 	format := aSoundSampleFormat asSoundSampleFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> sampleRate [
 
 	^ sampleRate
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSoundSample >> sampleRate: anObject [
 
 	sampleRate := anObject

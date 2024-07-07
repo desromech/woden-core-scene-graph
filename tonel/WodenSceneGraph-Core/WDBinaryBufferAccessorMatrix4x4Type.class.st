@@ -1,15 +1,17 @@
 Class {
-	#name : #WDBinaryBufferAccessorMatrix4x4Type,
-	#superclass : #WDBinaryBufferAccessorType,
-	#category : #'WodenSceneGraph-Core-Resources'
+	#name : 'WDBinaryBufferAccessorMatrix4x4Type',
+	#superclass : 'WDBinaryBufferAccessorType',
+	#category : 'WodenSceneGraph-Core-Resources',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Resources'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessorMatrix4x4Type >> componentCount [
 	^ 16
 ]
 
-{ #category : #factory }
+{ #category : 'factory' }
 WDBinaryBufferAccessorMatrix4x4Type >> makeWithComponents: components [
 	^ Matrix4x4 basicNew
 		m11: (components at: 1); m21: (components at: 2); m31: (components at: 3); m41: (components at: 4);

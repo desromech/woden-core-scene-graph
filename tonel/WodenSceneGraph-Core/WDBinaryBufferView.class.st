@@ -4,8 +4,8 @@ I am a view for a binary buffer.
 I have a direct correspondence to a gltf 2 model binary buffer view.
 "
 Class {
-	#name : #WDBinaryBufferView,
-	#superclass : #Object,
+	#name : 'WDBinaryBufferView',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'buffer',
@@ -13,58 +13,60 @@ Class {
 		'byteLength',
 		'byteStride'
 	],
-	#category : #'WodenSceneGraph-Core-Resources'
+	#category : 'WodenSceneGraph-Core-Resources',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Resources'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> buffer [
 
 	^ buffer
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> buffer: anObject [
 
 	buffer := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> byteLength [
 
 	^ byteLength
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> byteLength: anObject [
 
 	byteLength := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> byteOffset [
 
 	^ byteOffset
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> byteOffset: anObject [
 
 	byteOffset := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> byteStride [
 
 	^ byteStride
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> byteStride: anObject [
 
 	byteStride := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBinaryBufferView >> initialize [
 	super initialize.
 	name := ''.
@@ -73,19 +75,19 @@ WDBinaryBufferView >> initialize [
 	byteLength := 0.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferView >> readStream [
 	^ buffer readStreamFrom: byteOffset withSize: byteLength
 ]

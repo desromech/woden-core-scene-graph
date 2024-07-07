@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRTrackedDeviceDisplayRedirect,
-	#superclass : #WDVRTrackedDevice,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceDisplayRedirect',
+	#superclass : 'WDVRTrackedDevice',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceDisplayRedirect >> isDisplayRedirect [
 	^ true
 ]

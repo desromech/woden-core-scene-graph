@@ -2,42 +2,44 @@
 I represent a specific texture usage mode.
 "
 Class {
-	#name : #WDTextureUsageMode,
-	#superclass : #WDAbstractEnumClass,
-	#category : #'WodenSceneGraph-Core-Texture'
+	#name : 'WDTextureUsageMode',
+	#superclass : 'WDAbstractEnumClass',
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDTextureUsageMode class >> asTextureUsageMode [
 	^ self uniqueInstance
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDTextureUsageMode >> asTextureUsageMode [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureUsageMode >> isDeviceLocalColorAttachment [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureUsageMode >> isReadedColorAttachment [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureUsageMode >> isSampledColorAttachment [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureUsageMode >> isStaticSampled [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureUsageMode >> isStreamedSampled [
 	^ false
 ]

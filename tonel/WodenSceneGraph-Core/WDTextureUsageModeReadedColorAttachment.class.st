@@ -2,12 +2,14 @@
 I represent the usage mode of textures which are rendered on the device, and then they are transferred into the host. This is typically used for color attachments that are used in the host.
 "
 Class {
-	#name : #WDTextureUsageModeReadedColorAttachment,
-	#superclass : #WDTextureUsageMode,
-	#category : #'WodenSceneGraph-Core-Texture'
+	#name : 'WDTextureUsageModeReadedColorAttachment',
+	#superclass : 'WDTextureUsageMode',
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDTextureUsageModeReadedColorAttachment >> isReadedColorAttachment [
 	^ true
 ]

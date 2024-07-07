@@ -2,54 +2,56 @@
 I encapsulate the scene state for rendering multiple camera layers.
 "
 Class {
-	#name : #WDRenderingScene,
-	#superclass : #Object,
+	#name : 'WDRenderingScene',
+	#superclass : 'Object',
 	#instVars : [
 		'mainCameraState',
 		'cameraLayers',
 		'globalLightingState'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> cameraLayers [
 
 	^ cameraLayers
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> cameraLayers: anObject [
 
 	cameraLayers := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> globalLightingState [
 
 	^ globalLightingState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> globalLightingState: anObject [
 
 	globalLightingState := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> hasReverseDepth [
 	cameraLayers ifEmpty: [ ^ true ].
 	^ cameraLayers first hasReverseDepth
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDRenderingScene >> initialize [
 	super initialize.
 	cameraLayers := #().
 	globalLightingState := WDGlobalLightingState new.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLights [
 	| allLightCount usedLights usedLightCount transformedLightCount |
 	allLightCount := 0.
@@ -85,19 +87,19 @@ WDRenderingScene >> lightingStateInViewSpaceWithMaxNumberOfLights: maxNumberOfLi
 		yourself.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> mainCameraState [
 
 	^ mainCameraState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> mainCameraState: anObject [
 
 	mainCameraState := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingScene >> sampleCount [
 	cameraLayers ifEmpty: [ ^ 1 ].
 	^ cameraLayers first sampleCount

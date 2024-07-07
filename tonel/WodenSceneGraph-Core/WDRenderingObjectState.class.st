@@ -2,51 +2,53 @@
 I encapsulate the state for a generic rendering object.
 "
 Class {
-	#name : #WDRenderingObjectState,
-	#superclass : #Object,
+	#name : 'WDRenderingObjectState',
+	#superclass : 'Object',
 	#instVars : [
 		'transformation',
 		'castShadows'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingObjectState >> castShadows [
 
 	^ castShadows
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingObjectState >> castShadows: anObject [
 
 	castShadows := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDRenderingObjectState >> initialize [
 	super initialize.
 	transformation := ReversibleAffineTransform3D identity.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingObjectState >> inverseTransformationMatrix [
 	^ transformation inverseMatrix4
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingObjectState >> transformation [
 
 	^ transformation
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingObjectState >> transformation: anObject [
 
 	transformation := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDRenderingObjectState >> transformationMatrix [
 	^ transformation matrix4
 ]

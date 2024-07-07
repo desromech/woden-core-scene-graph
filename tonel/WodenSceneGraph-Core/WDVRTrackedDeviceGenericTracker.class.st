@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRTrackedDeviceGenericTracker,
-	#superclass : #WDVRTrackedDevice,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceGenericTracker',
+	#superclass : 'WDVRTrackedDevice',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceGenericTracker >> isGenericTracker [
 	^ true
 ]

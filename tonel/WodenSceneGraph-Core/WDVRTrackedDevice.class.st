@@ -1,6 +1,6 @@
 Class {
-	#name : #WDVRTrackedDevice,
-	#superclass : #Object,
+	#name : 'WDVRTrackedDevice',
+	#superclass : 'Object',
 	#instVars : [
 		'id',
 		'currentPose',
@@ -10,70 +10,72 @@ Class {
 		'renderModel',
 		'controllerState'
 	],
-	#category : #'WodenSceneGraph-Core-VR'
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> controllerState [
 
 	^ controllerState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> controllerState: anObject [
 
 	controllerState := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> currentPose [
 
 	^ currentPose
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> currentPose: anObject [
 
 	currentPose := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> currentRenderPose [
 
 	^ currentRenderPose
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> currentRenderPose: anObject [
 
 	currentRenderPose := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> eventHandler [
 
 	^ eventHandler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> eventHandler: anObject [
 
 	eventHandler := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> id [
 
 	^ id
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> id: anObject [
 
 	id := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVRTrackedDevice >> initialize [
 	super initialize.
 	
@@ -82,65 +84,65 @@ WDVRTrackedDevice >> initialize [
 	self role: WDVRTrackedDeviceRoleInvalid.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDevice >> isController [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDevice >> isDisplayRedirect [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDevice >> isGenericTracker [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDevice >> isHeadMountedDisplay [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDevice >> isInvalid [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDevice >> isTrackingReference [
 	^ false
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDVRTrackedDevice >> processAndDispatchEvent: vrEvent [
 	eventHandler ifNotNil: [eventHandler handleVREvent: vrEvent]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> renderModel [
 
 	^ renderModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> renderModel: anObject [
 
 	renderModel := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVRTrackedDevice >> resetEventHandler [
 	eventHandler := nil.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> role [
 
 	^ role
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDevice >> role: aRole [
 	role := aRole asVRTrackedDeviceRole
 ]

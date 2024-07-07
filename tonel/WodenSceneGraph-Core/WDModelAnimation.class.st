@@ -2,16 +2,18 @@
 I am a model animation that can be attached to a node hierarchy.
 "
 Class {
-	#name : #WDModelAnimation,
-	#superclass : #Object,
+	#name : 'WDModelAnimation',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'channels'
 	],
-	#category : #'WodenSceneGraph-Core-Animation'
+	#category : 'WodenSceneGraph-Core-Animation',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Animation'
 }
 
-{ #category : #animation }
+{ #category : 'animation' }
 WDModelAnimation >> applyPosition: position looped: isLooped toSkeletonPose: skeletonPose withBoneMap: boneMap [
 	| bonePoses inputSampleCache |
 	bonePoses := skeletonPose bonePoses.
@@ -27,7 +29,7 @@ WDModelAnimation >> applyPosition: position looped: isLooped toSkeletonPose: ske
 	]
 ]
 
-{ #category : #animation }
+{ #category : 'animation' }
 WDModelAnimation >> applyPosition: position looped: isLooped toSubtreeChannelMap: subtreeChannelMap [
 	| inputSampleCache |
 	inputSampleCache := nil.
@@ -40,7 +42,7 @@ WDModelAnimation >> applyPosition: position looped: isLooped toSubtreeChannelMap
 	]
 ]
 
-{ #category : #removing }
+{ #category : 'removing' }
 WDModelAnimation >> applySkeletonTargetingMapping: skeletonTargetingMapping [
 	channels do: [ :each |
 		each targetName ifNotNil: [ 
@@ -49,19 +51,19 @@ WDModelAnimation >> applySkeletonTargetingMapping: skeletonTargetingMapping [
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimation >> channels [
 
 	^ channels
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimation >> channels: anObject [
 
 	channels := anObject
 ]
 
-{ #category : #animation }
+{ #category : 'animation' }
 WDModelAnimation >> makeBoneMapForSkeleton: skeleton [
 	^ WDModelAnimationBoneMap new
 		skeleton: skeleton;
@@ -69,7 +71,7 @@ WDModelAnimation >> makeBoneMapForSkeleton: skeleton [
 		yourself
 ]
 
-{ #category : #animation }
+{ #category : 'animation' }
 WDModelAnimation >> makeSubtreeChannelMapFor: subtreeMap [
 	^ WDModelAnimationSubtreeChannelMap new
 		subtreeMap: subtreeMap;
@@ -77,19 +79,19 @@ WDModelAnimation >> makeSubtreeChannelMapFor: subtreeMap [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimation >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimation >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #removing }
+{ #category : 'removing' }
 WDModelAnimation >> removePrefixFromChannelTargets: prefix [
 	channels do: [ :each |
 		each targetName ifNotNil: [ 

@@ -2,45 +2,47 @@
 I am specific task which is used for performing asynchronous content loading.
 "
 Class {
-	#name : #WDAsyncTask,
-	#superclass : #Object,
+	#name : 'WDAsyncTask',
+	#superclass : 'Object',
 	#instVars : [
 		'action',
 		'futureResult'
 	],
-	#category : #'WodenSceneGraph-Core-Async'
+	#category : 'WodenSceneGraph-Core-Async',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Async'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncTask >> action [
 
 	^ action
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncTask >> action: anObject [
 
 	action := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncTask >> futureResult [
 
 	^ futureResult
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDAsyncTask >> futureResult: anObject [
 
 	futureResult := anObject
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 WDAsyncTask >> run [
 	futureResult value: action value
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 WDAsyncTask >> runSafely [
 	[ self run ] on: Error do: [ :error |
 		error freeze.

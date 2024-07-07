@@ -2,8 +2,8 @@
 I am a specification for a camera.
 "
 Class {
-	#name : #WDCamera,
-	#superclass : #Object,
+	#name : 'WDCamera',
+	#superclass : 'Object',
 	#instVars : [
 		'nearDistance',
 		'farDistance',
@@ -20,15 +20,17 @@ Class {
 		'cascadeSplitDistributionLambda',
 		'headFloorTransform'
 	],
-	#category : #'WodenSceneGraph-Core-Camera'
+	#category : 'WodenSceneGraph-Core-Camera',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Camera'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> asCameraFovY [
 	^ fovY
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 	^ WDCameraState new
 		nearDistance: nearDistance;
@@ -47,7 +49,7 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		yourself
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeTransform [
 	^ WDCameraState new
 		nearDistance: nearDistance;
@@ -67,103 +69,103 @@ WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeT
 		yourself
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> asSceneElement [
 	^ self asSceneNode
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> asSceneNode [
 	^ WDSceneNode new
 		cameras: { self };
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> bloomStrength [
 
 	^ bloomStrength
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> bloomStrength: anObject [
 
 	bloomStrength := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> bloomThreshold [
 
 	^ bloomThreshold
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> bloomThreshold: anObject [
 
 	bloomThreshold := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> currentTime [
 
 	^ currentTime
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> currentTime: anObject [
 
 	currentTime := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> exposure [
 
 	^ exposure
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> exposure: anObject [
 
 	exposure := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> farDistance [
 
 	^ farDistance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> farDistance: anObject [
 
 	farDistance := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> focalDistance [
 
 	^ focalDistance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> focalDistance: anObject [
 
 	focalDistance := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> fovY [
 
 	^ fovY
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> fovY: anObject [
 
 	fovY := anObject
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> frustumWithAspect: aspectRatio [
 	^ isPerspective ifTrue: [ 
 		Frustum new makePerspectiveFovY: fovY aspect: aspectRatio near: nearDistance far: farDistance
@@ -175,36 +177,36 @@ WDCamera >> frustumWithAspect: aspectRatio [
 	]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> frustumWithTangents: tangents [
 	^ Frustum new makeWithTangents: tangents near: nearDistance far: farDistance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> hasReverseDepth [
 
 	^ hasReverseDepth
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> hasReverseDepth: anObject [
 
 	hasReverseDepth := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> headFloorTransform [
 
 	^ headFloorTransform
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> headFloorTransform: anObject [
 
 	headFloorTransform := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDCamera >> initialize [
 	super initialize.
 	nearDistance := 0.01.
@@ -223,31 +225,31 @@ WDCamera >> initialize [
 	self viewMode: WDFullShadedViewMode.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> isPerspective [
 
 	^ isPerspective
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> isPerspective: anObject [
 
 	isPerspective := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> nearDistance [
 
 	^ nearDistance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> nearDistance: anObject [
 
 	nearDistance := anObject
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> projectionMatrixWithAspect: aspectRatio [
 	^ isPerspective ifTrue: [ 
 		hasReverseDepth
@@ -264,30 +266,30 @@ WDCamera >> projectionMatrixWithAspect: aspectRatio [
 	]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCamera >> projectionMatrixWithFrustumTangents: frustumTangents [
 	^ hasReverseDepth
 		ifTrue: [ Matrix4x4 reverseDepthFrustumTangents: frustumTangents near: nearDistance far: farDistance ]
 		ifFalse: [ Matrix4x4 frustumTangents: frustumTangents near: nearDistance far: farDistance ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> toneMappingOperator [
 
 	^ toneMappingOperator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> toneMappingOperator: aToneMappingOperator [
 	toneMappingOperator := aToneMappingOperator asToneMappingOperator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> viewMode [
 	^ viewMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCamera >> viewMode: aViewMode [
 	viewMode := aViewMode asViewMode
 ]

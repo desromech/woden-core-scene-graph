@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRTrackedDeviceController,
-	#superclass : #WDVRTrackedDevice,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceController',
+	#superclass : 'WDVRTrackedDevice',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceController >> isController [
 	^ true
 ]

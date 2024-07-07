@@ -3,16 +3,18 @@ I am a punctual light source that directs its light into a cone.
 
 "
 Class {
-	#name : #WDSpotLightSource,
-	#superclass : #WDPointLightSource,
+	#name : 'WDSpotLightSource',
+	#superclass : 'WDPointLightSource',
 	#instVars : [
 		'innerCutoff',
 		'outerCutoff'
 	],
-	#category : #'WodenSceneGraph-Core-Lighting'
+	#category : 'WodenSceneGraph-Core-Lighting',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Lighting'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSpotLightSource >> asLightStateForRenderingScene: renderingScene withTransform: renderingTransform [
 	^ (super asLightStateForRenderingScene: renderingScene withTransform: renderingTransform)
 		spotDirection: renderingTransform matrix thirdColumn normalized;
@@ -26,38 +28,38 @@ WDSpotLightSource >> asLightStateForRenderingScene: renderingScene withTransform
 		yourself.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSpotLightSource >> initialize [
 	super initialize.
 	innerCutoff := 45.0.
 	outerCutoff := 60.0.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpotLightSource >> innerCutoff [
 
 	^ innerCutoff
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpotLightSource >> innerCutoff: anObject [
 
 	innerCutoff := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpotLightSource >> outerCutoff [
 
 	^ outerCutoff
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpotLightSource >> outerCutoff: anObject [
 
 	outerCutoff := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpotLightSource >> shadowMapCameraStatesWithTransform: worldRenderingTransform [
 	| nearDistance farDistance aspect fovy |
 	castShadows ifFalse: [ ^ #() ].

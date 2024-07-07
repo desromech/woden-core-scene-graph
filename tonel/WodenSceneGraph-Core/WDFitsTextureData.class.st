@@ -2,8 +2,8 @@
 I hold texture data which is read from a fits texture.
 "
 Class {
-	#name : #WDFitsTextureData,
-	#superclass : #Object,
+	#name : 'WDFitsTextureData',
+	#superclass : 'Object',
 	#instVars : [
 		'width',
 		'height',
@@ -12,76 +12,78 @@ Class {
 		'slicePitch',
 		'bytes'
 	],
-	#category : #'WodenSceneGraph-Core-Texture'
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> bytes [
 
 	^ bytes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> bytes: anObject [
 
 	bytes := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> depth [
 
 	^ depth
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> depth: anObject [
 
 	depth := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> height [
 
 	^ height
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> height: anObject [
 
 	height := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> pitch [
 
 	^ pitch
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> pitch: anObject [
 
 	pitch := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> slicePitch [
 
 	^ slicePitch
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> slicePitch: anObject [
 
 	slicePitch := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> width [
 
 	^ width
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDFitsTextureData >> width: anObject [
 
 	width := anObject

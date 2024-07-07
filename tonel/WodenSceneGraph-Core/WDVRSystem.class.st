@@ -2,22 +2,24 @@
 I represent a specific virtual reality system.
 "
 Class {
-	#name : #WDVRSystem,
-	#superclass : #Object,
+	#name : 'WDVRSystem',
+	#superclass : 'Object',
 	#instVars : [
 		'yieldSemaphore',
 		'hasRenderedInThisFrame',
 		'vrFrameCount'
 	],
-	#category : #'WodenSceneGraph-Core-VR'
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRSystem >> beginFrameRenderingCycle [
 	hasRenderedInThisFrame := false.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRSystem >> endFrameCycleWaiting: timeToSleep [
 	(self isInStandbyMode and: [timeToSleep > 0]) ifTrue: [
 		^ (Delay forMilliseconds: timeToSleep) wait
@@ -37,91 +39,91 @@ WDVRSystem >> endFrameCycleWaiting: timeToSleep [
 	].
 ]
 
-{ #category : #head }
+{ #category : 'head' }
 WDVRSystem >> headTransform [
 	^ ReversibleAffineTransform3D identity 
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRSystem >> initialize [
 	super initialize.
 	yieldSemaphore := Semaphore new.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRSystem >> isDummyVRSystem [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRSystem >> isInStandbyMode [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRSystem >> isRealVRSystem [
 	^ false
 ]
 
-{ #category : #eyes }
+{ #category : 'eyes' }
 WDVRSystem >> leftEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRatio [
 	^ self subclassResponsibility
 ]
 
-{ #category : #projection }
+{ #category : 'projection' }
 WDVRSystem >> leftEyeLocalTransform [
 	^ ReversibleAffineTransform3D identity
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDVRSystem >> leftEyeTransform [
 	^ self headTransform transformTransform: self leftEyeLocalTransform
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDVRSystem >> perEyeFrameBufferExtentForDisplayWithExtent: displayExtent [
 	^ displayExtent
 ]
 
-{ #category : #'vr system' }
+{ #category : 'vr system' }
 WDVRSystem >> pollEvents [
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVRSystem >> resetTrackedDeviceEventHandlers [
 	self trackedDevicesDo: [ :each | each resetEventHandler ]
 ]
 
-{ #category : #eyes }
+{ #category : 'eyes' }
 WDVRSystem >> rightEyeFrustumTangentsWithFovY: cameraFovY aspect: displayAspectRatio [
 	^ self subclassResponsibility
 ]
 
-{ #category : #projection }
+{ #category : 'projection' }
 WDVRSystem >> rightEyeLocalTransform [
 	^ ReversibleAffineTransform3D identity
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDVRSystem >> rightEyeTransform [
 	^ self headTransform transformTransform: self rightEyeLocalTransform
 ]
 
-{ #category : #'vr system' }
+{ #category : 'vr system' }
 WDVRSystem >> submitLeftEyeFramebuffer: leftEyeFramebuffer texture: leftEyeTexture rightEyeFramebuffer: rightEyeFramebuffer texture: rightEyeTexture [
 	hasRenderedInThisFrame := true.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRSystem >> trackedDevicesDo: aBlock [
 	^ #()
 ]
 
-{ #category : #'vr system' }
+{ #category : 'vr system' }
 WDVRSystem >> waitAndFetchPoses [
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRSystem >> yield [
 	[ yieldSemaphore signal ] forkAt: Processor lowestPriority.
 	yieldSemaphore wait; consumeAllSignals

@@ -2,8 +2,8 @@
 I encapsulate the rendering state for a specific light.
 "
 Class {
-	#name : #WDLightState,
-	#superclass : #Object,
+	#name : 'WDLightState',
+	#superclass : 'Object',
 	#instVars : [
 		'positionOrDirection',
 		'intensity',
@@ -22,39 +22,41 @@ Class {
 		'shadowMapDepthBiasSlope',
 		'shadowMapNormalBiasFactor'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #requirements }
+{ #category : 'requirements' }
 WDLightState class >> empty [
 	^ self new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> castShadows [
 
 	^ castShadows
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> castShadows: anObject [
 
 	castShadows := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> influenceRadius [
 
 	^ influenceRadius
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> influenceRadius: anObject [
 
 	influenceRadius := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDLightState >> initialize [
 	positionOrDirection := Vector4 zeros.
 	intensity := Vector3 zeros.
@@ -76,195 +78,195 @@ WDLightState >> initialize [
 	shadowMapViewportOffsets := #().
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> innerSpotCosCutoff [
 
 	^ innerSpotCosCutoff
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> innerSpotCosCutoff: anObject [
 
 	innerSpotCosCutoff := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> intensity [
 
 	^ intensity
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> intensity: anObject [
 
 	intensity := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> outerSpotCosCutoff [
 
 	^ outerSpotCosCutoff
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> outerSpotCosCutoff: anObject [
 
 	outerSpotCosCutoff := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> positionOrDirection [
 
 	^ positionOrDirection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> positionOrDirection: anObject [
 
 	positionOrDirection := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapCascadeDistanceWorldTransform [
 
 	^ shadowMapCascadeDistanceWorldTransform
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapCascadeDistanceWorldTransform: anObject [
 
 	shadowMapCascadeDistanceWorldTransform := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapCascadeOffsets [
 
 	^ shadowMapCascadeOffsets
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapCascadeOffsets: anObject [
 
 	shadowMapCascadeOffsets := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapDepthBiasConstant [
 
 	^ shadowMapDepthBiasConstant
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapDepthBiasConstant: anObject [
 
 	shadowMapDepthBiasConstant := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapDepthBiasSlope [
 
 	^ shadowMapDepthBiasSlope
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapDepthBiasSlope: anObject [
 
 	shadowMapDepthBiasSlope := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDLightState >> shadowMapInverseTransformationMatrices [
 	^ shadowMappingCameraStates collect: [:each | each inverseTransformationMatrix]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapNormalBiasFactor [
 
 	^ shadowMapNormalBiasFactor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapNormalBiasFactor: anObject [
 
 	shadowMapNormalBiasFactor := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDLightState >> shadowMapProjectionMatrices [
 	^ shadowMapProjectionMatrices ifNil: [shadowMapProjectionMatrices:= shadowMappingCameraStates collect: [ :each | each projectionMatrix  ]
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDLightState >> shadowMapProjectionMatrices: anArray [
 	shadowMapProjectionMatrices := anArray
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDLightState >> shadowMapTransformationMatrices [
 	^ shadowMappingCameraStates collect: [:each | each transformationMatrix]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapViewportOffsets [
 
 	^ shadowMapViewportOffsets
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapViewportOffsets: anObject [
 
 	shadowMapViewportOffsets := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapViewportScale [
 
 	^ shadowMapViewportScale
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMapViewportScale: anObject [
 
 	shadowMapViewportScale := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMappingCameraState [
 	^ shadowMappingCameraStates
 		ifEmpty: [ nil ]
 		ifNotEmpty: [ shadowMappingCameraStates first ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMappingCameraState: aCameraState [
 
 	shadowMappingCameraStates := {aCameraState}
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMappingCameraStates [
 	^ shadowMappingCameraStates
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> shadowMappingCameraStates: anArray [
 	shadowMappingCameraStates := anArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> spotDirection [
 
 	^ spotDirection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDLightState >> spotDirection: anObject [
 
 	spotDirection := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDLightState >> transformedWithMatrix: aMatrix [
 	^ self shallowCopy
 		positionOrDirection: (aMatrix * positionOrDirection);

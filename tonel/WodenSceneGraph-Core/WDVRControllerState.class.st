@@ -1,6 +1,6 @@
 Class {
-	#name : #WDVRControllerState,
-	#superclass : #Object,
+	#name : 'WDVRControllerState',
+	#superclass : 'Object',
 	#instVars : [
 		'touchedButtons',
 		'pressedButtons',
@@ -9,15 +9,17 @@ Class {
 		'trackpads',
 		'triggers'
 	],
-	#category : #'WodenSceneGraph-Core-VR'
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> axes [
 	^ axes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> axes: aListOfAxes [
 	axes := aListOfAxes.
 	joysticks := aListOfAxes select: [:each | each isJoystick ].
@@ -25,7 +27,7 @@ WDVRControllerState >> axes: aListOfAxes [
 	triggers := aListOfAxes select: [:each | each isTrigger ].
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVRControllerState >> initialize [
 	super initialize.
 	axes := #().
@@ -34,43 +36,43 @@ WDVRControllerState >> initialize [
 	triggers := #().
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> joysticks [
 
 	^ joysticks
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> pressedButtons [
 
 	^ pressedButtons
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> pressedButtons: anObject [
 
 	pressedButtons := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> touchedButtons [
 
 	^ touchedButtons
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> touchedButtons: anObject [
 
 	touchedButtons := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> trackpads [
 
 	^ trackpads
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerState >> triggers [
 
 	^ triggers

@@ -1,19 +1,21 @@
 Class {
-	#name : #WDConvexHullCollisionShape,
-	#superclass : #WDConvexCollisionShape,
+	#name : 'WDConvexHullCollisionShape',
+	#superclass : 'WDConvexCollisionShape',
 	#instVars : [
 		'points',
 		'baseInertiaTensor'
 	],
-	#category : #'WodenSceneGraph-Core-Collision'
+	#category : 'WodenSceneGraph-Core-Collision',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Collision'
 }
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDConvexHullCollisionShape class >> withPoints: aListOfPoints [
 	^ self new points: aListOfPoints; yourself
 ]
 
-{ #category : #'mass distribution' }
+{ #category : 'mass distribution' }
 WDConvexHullCollisionShape >> baseInertiaTensor [
 	baseInertiaTensor ifNotNil: [ ^ baseInertiaTensor ].
 	
@@ -23,19 +25,19 @@ WDConvexHullCollisionShape >> baseInertiaTensor [
 		+ (Matrix3x3 inertiaTensorTransport: self localBoundingBox center).
 ]
 
-{ #category : #'mass distribution' }
+{ #category : 'mass distribution' }
 WDConvexHullCollisionShape >> computeInertiaTensorWithMass: mass [
 	^ self baseInertiaTensor * mass
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDConvexHullCollisionShape >> constructVisualizationSceneNode [
 	^ (WDMeshBuilder new
 			addCubeWithBox: self localBoundingBox;
 			mesh) asSceneNode
 ]
 
-{ #category : #'intersection testing' }
+{ #category : 'intersection testing' }
 WDConvexHullCollisionShape >> localSupportInDirection: aDirection [
 	| bestDistance bestFound |
 	bestDistance := Float negativeInfinity.
@@ -52,20 +54,20 @@ WDConvexHullCollisionShape >> localSupportInDirection: aDirection [
 	^ bestFound
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexHullCollisionShape >> points [
 
 	^ points
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDConvexHullCollisionShape >> points: aListOfPoints [
 	points := aListOfPoints.
 	self localBoundingBox: (AABox encompassing: points).
 	baseInertiaTensor := nil.
 ]
 
-{ #category : #transforming }
+{ #category : 'transforming' }
 WDConvexHullCollisionShape >> transformedWith: aTransform [
 	aTransform isIdentity ifTrue: [ ^ self ].
 	

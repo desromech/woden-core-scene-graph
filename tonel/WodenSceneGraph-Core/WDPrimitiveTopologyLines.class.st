@@ -4,12 +4,14 @@ I represent the topology of primitives which are single line segments that are s
 I have a direct correspondence to GL_LINES in OpenGL.
 "
 Class {
-	#name : #WDPrimitiveTopologyLines,
-	#superclass : #WDPrimitiveTopology,
-	#category : #'WodenSceneGraph-Core-Renderable'
+	#name : 'WDPrimitiveTopologyLines',
+	#superclass : 'WDPrimitiveTopology',
+	#category : 'WodenSceneGraph-Core-Renderable',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Renderable'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDPrimitiveTopologyLines >> isLines [
 	^ true
 ]

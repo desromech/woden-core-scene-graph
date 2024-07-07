@@ -2,21 +2,23 @@
 I am an utility class for encoding binary buffer data.
 "
 Class {
-	#name : #WDBufferEncoder,
-	#superclass : #Object,
+	#name : 'WDBufferEncoder',
+	#superclass : 'Object',
 	#instVars : [
 		'segments',
 		'dataSize'
 	],
-	#category : #'WodenSceneGraph-Core-RenderableBuilder'
+	#category : 'WodenSceneGraph-Core-RenderableBuilder',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderableBuilder'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDBufferEncoder >> addByteArray: aSequence [
 	self privateAddByteArray: aSequence asByteArray
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDBufferEncoder >> addFloat32Array: aSequence [
 	| data |
 	data := aSequence asFloatArray shallowCopy.
@@ -24,7 +26,7 @@ WDBufferEncoder >> addFloat32Array: aSequence [
 	self privateAddByteArray: data
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDBufferEncoder >> addInt32Array: aSequence [
 	| data |
 	data := aSequence asIntegerArray shallowCopy.
@@ -32,7 +34,7 @@ WDBufferEncoder >> addInt32Array: aSequence [
 	self privateAddByteArray: data
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDBufferEncoder >> addUInt16Array: aSequence [
 	| data destIndex |
 	data := ByteArray new: aSequence size * 2.
@@ -45,7 +47,7 @@ WDBufferEncoder >> addUInt16Array: aSequence [
 	self privateAddByteArray: data
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDBufferEncoder >> addUInt32Array: aSequence [
 	| data |
 	data := aSequence asWordArray shallowCopy.
@@ -53,7 +55,7 @@ WDBufferEncoder >> addUInt32Array: aSequence [
 	self privateAddByteArray: data
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDBufferEncoder >> alignTo: alignment [
 	| newSize paddingSize |
 	newSize := dataSize alignedTo: alignment.
@@ -63,7 +65,7 @@ WDBufferEncoder >> alignTo: alignment [
 	]
 ]
 
-{ #category : #builder }
+{ #category : 'builder' }
 WDBufferEncoder >> finish [
 	| result destIndex |
 	result := ByteArray new: dataSize.
@@ -77,27 +79,27 @@ WDBufferEncoder >> finish [
 	^ result
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBufferEncoder >> initialize [
 	super initialize.
 	segments := OrderedCollection new.
 	self reset
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDBufferEncoder >> privateAddByteArray: newSegment [
 	newSegment isEmpty ifTrue: [ ^ self ].
 	dataSize := dataSize + newSegment size.
 	segments add: newSegment
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDBufferEncoder >> reset [
 	dataSize := 0.
 	segments removeAll.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBufferEncoder >> size [
 	^ dataSize
 ]

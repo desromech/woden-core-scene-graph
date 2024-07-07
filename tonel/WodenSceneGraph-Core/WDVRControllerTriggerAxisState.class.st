@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRControllerTriggerAxisState,
-	#superclass : #WDVRControllerAxisState,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRControllerTriggerAxisState',
+	#superclass : 'WDVRControllerAxisState',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRControllerTriggerAxisState >> isTrigger [
 	^ true
 ]

@@ -1,11 +1,11 @@
-Extension { #name : #Object }
+Extension { #name : 'Object' }
 
-{ #category : #'*WodenSceneGraph-Core' }
+{ #category : '*WodenSceneGraph-Core' }
 Object >> isWodenRenderable [
 	^ false
 ]
 
-{ #category : #'*WodenSceneGraph-Core' }
+{ #category : '*WodenSceneGraph-Core' }
 Object >> isWodenSceneElement [
 	^ false
 ]

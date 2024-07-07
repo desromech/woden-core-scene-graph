@@ -2,22 +2,24 @@
 I am an abstract texture.
 "
 Class {
-	#name : #WDTexture,
-	#superclass : #WDRendererCacheableResource,
+	#name : 'WDTexture',
+	#superclass : 'WDRendererCacheableResource',
 	#instVars : [
 		'name',
 		'description',
 		'data'
 	],
-	#category : #'WodenSceneGraph-Core-Texture'
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #utility }
+{ #category : 'utility' }
 WDTexture class >> computeMiplevelsForExtent: anExtent [
 	^ self computeMiplevelsForWidth: anExtent x height: anExtent y
 ]
 
-{ #category : #utility }
+{ #category : 'utility' }
 WDTexture class >> computeMiplevelsForWidth: width height: height [
 	| result currentWidth currentHeight |
 	width isPowerOfTwo ifFalse: [ ^ 1 ].
@@ -34,67 +36,67 @@ WDTexture class >> computeMiplevelsForWidth: width height: height [
 	^ result
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDTexture class >> diffuseLightProbeWithSize: size forEnvironmentMap: environmentMap [
 	^ self new setupDiffuseLightProbeWithSize: size forEnvironmentMap: environmentMap; yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDTexture class >> environmentMapWithSize: size forHDRITexture: texture [	
 	^ self new setupEnvironmentMapWithSize: size forHDRITexture: texture; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forColorFileReference: aFileReference [
 	^ self new setupForColorFileReference: aFileReference; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forColorForm: aForm [
 	^ self new setupForColorForm: aForm; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forColorLutTextureData: aColorLutTextureData [
 	^ self new setupForColorLutTextureData: aColorLutTextureData; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forColorLutWith: colors [
 	^ self forColorLutTextureData: (WDColorLutTextureData with: colors)
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forFitsFileReference: aFileReference [
 	^ self new setupForFitsFileReference: aFileReference; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forHDRIFileReference: aFileReference [
 	^ self new setupForHDRIFileReference: aFileReference; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forNonColorFileReference: aFileReference [
 	^ self new setupForNonColorFileReference: aFileReference; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forNonColorForm: aForm [
 	^ self new setupForNonColorForm: aForm; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forNormalMapFileReference: aFileReference [
 	^ self new setupForNormalMapFileReference: aFileReference; yourself
 ]
 
-{ #category : #construction }
+{ #category : 'construction' }
 WDTexture class >> forNormalMapForm: aForm [
 	^ self new setupForNormalMapForm: aForm; yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDTexture class >> forReadedColorBufferWithExtent: anExtent [
 	^ (self forColorForm: (Form extent: anExtent depth: 32))
 		usageMode: WDTextureUsageModeReadedColorAttachment;
@@ -102,7 +104,7 @@ WDTexture class >> forReadedColorBufferWithExtent: anExtent [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDTexture class >> forSampledColorBufferWithExtent: anExtent [
 	^ self new
 		type: WDTextureType2D;
@@ -119,25 +121,25 @@ WDTexture class >> forSampledColorBufferWithExtent: anExtent [
 		yourself
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDTexture class >> loadFromJson: jsonData inDirectory: directory [
 	^ (self solveFileName: jsonData inDirectory: directory)
 		ifNotNil: [ :solved | self forColorFileReference: solved ]
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDTexture class >> loadNonColorFromJson: jsonData inDirectory: directory [
 	^ (self solveFileName: jsonData inDirectory: directory)
 		ifNotNil: [ :solved | self forNonColorFileReference: solved ]
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDTexture class >> loadNormalMapFromJson: jsonData inDirectory: directory [
 	^ (self solveFileName: jsonData inDirectory: directory)
 		ifNotNil: [ :solved | self forNormalMapFileReference: solved ]
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 WDTexture class >> solveFileName: fileName inDirectory: directory [
 	| fileReference |
 	fileName ifNil: [ ^ nil ].
@@ -149,138 +151,138 @@ WDTexture class >> solveFileName: fileName inDirectory: directory [
 	^ fileReference
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDTexture class >> specularLightProbeWithSize: size forEnvironmentMap: environmentMap [
 	^ self new setupSpecularLightProbeWithSize: size forEnvironmentMap: environmentMap; yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> data [
 
 	^ data
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> data: anObject [
 
 	data := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> dataKind [
 	^ description dataKind
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> dataKind: aDataKind [
 	description dataKind: aDataKind
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> depth [
 	^ description depth
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> depth: anInteger [
 	description depth: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> description [
 	^ description shallowCopy
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> description: aDescription [
 	description := aDescription shallowCopy
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> format [
 	^ description format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> format: aTextureFormat [
 	description format: aTextureFormat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> height [
 	^ description height
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> height: anInteger [
 	description height: anInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> initialize [
 	super initialize.
 	description := WDTextureDescription new.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> layers [
 	^ description layers
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> layers: anInteger [
 	description layers: anInteger
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDTexture >> makeThumbnail [
 	data isForm ifTrue: [ ^ data scaledToSize: 16@16 ].
 	^ nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> miplevels [
 	^ description miplevels
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> miplevels: anInteger [
 	description miplevels: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> sampleCount [
 	^ description sampleCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> sampleCount: anInteger [
 	description sampleCount: anInteger
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> sampleQuality [
 	^ description sampleQuality
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> sampleQuality: anInteger [
 	description sampleQuality: anInteger
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupDiffuseLightProbeWithSize: size forEnvironmentMap: texture [
 	self
 		dataKind: WDTextureDataKindDiffuseLightProbe;
@@ -297,7 +299,7 @@ WDTexture >> setupDiffuseLightProbeWithSize: size forEnvironmentMap: texture [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupEnvironmentMapWithSize: size forHDRITexture: texture [
 	self
 		dataKind: WDTextureDataKindCubeEnvironmentMap;
@@ -314,7 +316,7 @@ WDTexture >> setupEnvironmentMapWithSize: size forHDRITexture: texture [
 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForColorFileReference: aFileReference [
 	self
 		dataKind: WDTextureDataKindColor;
@@ -322,7 +324,7 @@ WDTexture >> setupForColorFileReference: aFileReference [
 		setupForFileReferenceCommon: aFileReference
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForColorForm: aForm [
 	self
 		dataKind: WDTextureDataKindColor;
@@ -332,7 +334,7 @@ WDTexture >> setupForColorForm: aForm [
 		setupForFormCommon: aForm
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForColorLutTextureData: colorLutData [
 	self
 		dataKind: WDTextureDataKindColor;
@@ -348,13 +350,13 @@ WDTexture >> setupForColorLutTextureData: colorLutData [
 		changed
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDTexture >> setupForFileReferenceCommon: aFileReference [
 	self flag: 'TODO: Add support for asynchronous loading'.
 	self setupForFormCommon: (ImageReadWriter formFromFileNamed: aFileReference fullName)
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForFitsFileReference: aFileReference [
 	self flag: 'TODO: Add support for asynchronous loading'.
 	
@@ -381,7 +383,7 @@ WDTexture >> setupForFitsFileReference: aFileReference [
 	].
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDTexture >> setupForFormCommon: aForm [
 	self
 		type: WDTextureType2D;
@@ -395,7 +397,7 @@ WDTexture >> setupForFormCommon: aForm [
 		changed
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDTexture >> setupForHDRI: hdri [
 	self
 		type: WDTextureType2D;
@@ -409,7 +411,7 @@ WDTexture >> setupForHDRI: hdri [
 		changed
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForHDRIFileReference: aFileReference [
 	self
 		dataKind: WDTextureDataKindHDRI;
@@ -420,7 +422,7 @@ WDTexture >> setupForHDRIFileReference: aFileReference [
 	self setupForHDRI: (AGPURadianceHDRLoader tryToLoadFromFileReference: aFileReference)
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForNonColorFileReference: aFileReference [
 	self
 		dataKind: WDTextureDataKindNonColor;
@@ -428,7 +430,7 @@ WDTexture >> setupForNonColorFileReference: aFileReference [
 		setupForFileReferenceCommon: aFileReference
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForNonColorForm: aForm [
 	self
 		dataKind: WDTextureDataKindNonColor;
@@ -436,7 +438,7 @@ WDTexture >> setupForNonColorForm: aForm [
 		setupForFormCommon: aForm
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForNormalMapFileReference: aFileReference [
 	self
 		dataKind: WDTextureDataKindNormalMap;
@@ -444,7 +446,7 @@ WDTexture >> setupForNormalMapFileReference: aFileReference [
 		setupForFileReferenceCommon: aFileReference
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupForNormalMapForm: aForm [
 	self
 		dataKind: WDTextureDataKindNormalMap;
@@ -452,7 +454,7 @@ WDTexture >> setupForNormalMapForm: aForm [
 		setupForFormCommon: aForm
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDTexture >> setupSpecularLightProbeWithSize: size forEnvironmentMap: texture [
 	self
 		dataKind: WDTextureDataKindSpecularLightProbe;
@@ -469,32 +471,32 @@ WDTexture >> setupSpecularLightProbeWithSize: size forEnvironmentMap: texture [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> type [
 	^ description type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> type: aTextureType [
 	description type: aTextureType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> usageMode [
 	^ description usageMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> usageMode: aTextureUsageMode [
 	description usageMode: aTextureUsageMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> width [
 	^ description width
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDTexture >> width: anInteger [
 	description width: anInteger
 ]

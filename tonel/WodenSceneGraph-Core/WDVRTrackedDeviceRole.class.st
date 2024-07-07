@@ -2,42 +2,44 @@
 I represent a specific role for a tracked device.
 "
 Class {
-	#name : #WDVRTrackedDeviceRole,
-	#superclass : #WDAbstractEnumClass,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRTrackedDeviceRole',
+	#superclass : 'WDAbstractEnumClass',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDVRTrackedDeviceRole class >> asVRTrackedDeviceRole [
 	^ self uniqueInstance
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDVRTrackedDeviceRole >> asVRTrackedDeviceRole [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceRole >> isInvalid [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceRole >> isLeftHand [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceRole >> isOptOut [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceRole >> isRightHand [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceRole >> isThreadmill [
 	^ false
 ]

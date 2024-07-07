@@ -1,6 +1,6 @@
 Class {
-	#name : #WDVRTrackedDeviceButtonEvent,
-	#superclass : #WDVRTrackedDeviceEvent,
+	#name : 'WDVRTrackedDeviceButtonEvent',
+	#superclass : 'WDVRTrackedDeviceEvent',
 	#instVars : [
 		'button'
 	],
@@ -20,10 +20,12 @@ Class {
 		'TrackedDeviceButtonSystem',
 		'TrackedDeviceProximitySensor'
 	],
-	#category : #'WodenSceneGraph-Core-VR'
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 WDVRTrackedDeviceButtonEvent class >> initialize [
 	TrackedDeviceButtonSystem := 0.
 	TrackedDeviceButtonApplicationMenu := 1.
@@ -43,101 +45,101 @@ WDVRTrackedDeviceButtonEvent class >> initialize [
 
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent class >> isAbstract [
 	^ self == WDVRTrackedDeviceButtonEvent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceButtonEvent >> button [
 
 	^ button
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceButtonEvent >> button: anObject [
 
 	button := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVRTrackedDeviceButtonEvent >> initialize [
 	super initialize.
 	button := 0.
 	
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isAxis0 [
 	^ button = TrackedDeviceAxis0
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isAxis1 [
 	^ button = TrackedDeviceAxis1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isAxis2 [
 	^ button = TrackedDeviceAxis2
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isAxis3 [
 	^ button = TrackedDeviceAxis3
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isAxis4 [
 	^ button = TrackedDeviceAxis4
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonA [
 	^ button = TrackedDeviceButtonA
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonApplicationMenu [
 	^ button = TrackedDeviceButtonApplicationMenu
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonAxis0 [
 	^ button = TrackedDeviceProximitySensor
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonDPadDown [
 	^ button = TrackedDeviceButtonDPadDown
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonDPadLeft [
 	^ button = TrackedDeviceButtonDPadLeft
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonDPadRight [
 	^ button = TrackedDeviceButtonDPadRight
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonDPadUp [
 	^ button = TrackedDeviceButtonDPadUp
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonGrip [
 	^ button = TrackedDeviceButtonGrip
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isButtonSystem [
 	^ button = TrackedDeviceButtonSystem
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceButtonEvent >> isProximitySensor [
 	^ button = TrackedDeviceProximitySensor
 ]

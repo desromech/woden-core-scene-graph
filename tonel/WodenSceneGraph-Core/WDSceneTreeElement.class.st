@@ -2,26 +2,28 @@
 I am a hierarchical scene element that implements methods for manipulating its tree.
 "
 Class {
-	#name : #WDSceneTreeElement,
-	#superclass : #WDSceneElement,
+	#name : 'WDSceneTreeElement',
+	#superclass : 'WDSceneElement',
 	#instVars : [
 		'parent'
 	],
-	#category : #'WodenSceneGraph-Core-Scene'
+	#category : 'WodenSceneGraph-Core-Scene',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Scene'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElement >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
 	self subclassResponsibility
 ]
 
-{ #category : #internal }
+{ #category : 'internal' }
 WDSceneTreeElement >> addedTo: newParent [
 	self assert: parent isNil.
 	parent := newParent.
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneTreeElement >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	| result |
 	result := WDRenderingSceneCameraLayer new
@@ -31,7 +33,7 @@ WDSceneTreeElement >> asRenderingSceneCameraLayerWithCameraState: baseCameraStat
 	^ result
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneTreeElement >> asRenderingSceneWithCameraState: baseCameraState [
 	^ WDRenderingScene new
 		mainCameraState: baseCameraState;
@@ -42,35 +44,35 @@ WDSceneTreeElement >> asRenderingSceneWithCameraState: baseCameraState [
 		yourself.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneTreeElement >> parent [
 
 	^ parent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneTreeElement >> parent: anObject [
 
 	parent := anObject
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneTreeElement >> remove: aNode [
 	self removeSceneElement: aNode
 ]
 
-{ #category : #internal }
+{ #category : 'internal' }
 WDSceneTreeElement >> removedFrom: oldParent [
 	self assert: parent == oldParent.
 	parent := nil.
 ]
 
-{ #category : #internal }
+{ #category : 'internal' }
 WDSceneTreeElement >> scene [
 	^ parent ifNotNil: [ parent scene ]
 ]
 
-{ #category : #internal }
+{ #category : 'internal' }
 WDSceneTreeElement >> sceneLayer [
 	^ parent ifNotNil: [ parent sceneLayer ]
 ]

@@ -1,20 +1,22 @@
 Class {
-	#name : #WDVRTrackedDeviceDualAnalogEvent,
-	#superclass : #WDVRTrackedDeviceEvent,
+	#name : 'WDVRTrackedDeviceDualAnalogEvent',
+	#superclass : 'WDVRTrackedDeviceEvent',
 	#instVars : [
 		'position',
 		'transformedPosition',
 		'which'
 	],
-	#category : #'WodenSceneGraph-Core-VR'
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRTrackedDeviceDualAnalogEvent class >> isAbstract [
 	^ self == WDVRTrackedDeviceDualAnalogEvent
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDVRTrackedDeviceDualAnalogEvent >> initialize [
 	super initialize.
 	position := Vector2 zeros.
@@ -22,37 +24,37 @@ WDVRTrackedDeviceDualAnalogEvent >> initialize [
 	which := 0.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceDualAnalogEvent >> position [
 
 	^ position
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceDualAnalogEvent >> position: anObject [
 
 	position := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceDualAnalogEvent >> transformedPosition [
 
 	^ transformedPosition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceDualAnalogEvent >> transformedPosition: anObject [
 
 	transformedPosition := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceDualAnalogEvent >> which [
 
 	^ which
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRTrackedDeviceDualAnalogEvent >> which: anObject [
 
 	which := anObject

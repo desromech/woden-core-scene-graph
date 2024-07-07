@@ -4,17 +4,19 @@ I represent the topology of primitives which represent a set of triangles which 
 I have a direct correspondence to GL_TRIANGLES in OpenGL.
 "
 Class {
-	#name : #WDPrimitiveTopologyTriangles,
-	#superclass : #WDPrimitiveTopology,
-	#category : #'WodenSceneGraph-Core-Renderable'
+	#name : 'WDPrimitiveTopologyTriangles',
+	#superclass : 'WDPrimitiveTopology',
+	#category : 'WodenSceneGraph-Core-Renderable',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Renderable'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDPrimitiveTopologyTriangles >> isTriangles [
 	^ true
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDPrimitiveTopologyTriangles >> triangleIndicesWithBase: baseIndex count: indexCount do: aBlock [
 	"Iterate through the triangle indices that corresponds to this topology."
 	| triangleCount currentIndex |

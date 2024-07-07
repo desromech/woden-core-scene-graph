@@ -2,12 +2,14 @@
 I am a linear curve interpolation method.
 "
 Class {
-	#name : #WDCurveInterpolationMethodLinear,
-	#superclass : #WDCurveInterpolationMethod,
-	#category : #'WodenSceneGraph-Core-Animation'
+	#name : 'WDCurveInterpolationMethodLinear',
+	#superclass : 'WDCurveInterpolationMethod',
+	#category : 'WodenSceneGraph-Core-Animation',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Animation'
 }
 
-{ #category : #interpolation }
+{ #category : 'interpolation' }
 WDCurveInterpolationMethodLinear >> interpolateQuaternionSamples: samples forChannelPosition: channelPosition [
 	| previousSample nextSample |
 	previousSample := samples at: channelPosition previousFrameIndex.
@@ -18,7 +20,7 @@ WDCurveInterpolationMethodLinear >> interpolateQuaternionSamples: samples forCha
 	^ (previousSample interpolateTo: nextSample at: channelPosition alpha) normalized asQuaternion
 ]
 
-{ #category : #interpolation }
+{ #category : 'interpolation' }
 WDCurveInterpolationMethodLinear >> interpolateVectorSamples: samples forChannelPosition: channelPosition [
 	^ (samples at: channelPosition previousFrameIndex)
 		interpolateTo: (samples at: channelPosition nextFrameIndex)

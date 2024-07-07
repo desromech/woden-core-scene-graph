@@ -1,6 +1,6 @@
-Extension { #name : #Time }
+Extension { #name : 'Time' }
 
-{ #category : #'*WodenSceneGraph-Core' }
+{ #category : '*WodenSceneGraph-Core' }
 Time class >> monotonicMicrosecondClockValue [
 	"A proper primitive here should be added for this."
 	<primitive: 240>

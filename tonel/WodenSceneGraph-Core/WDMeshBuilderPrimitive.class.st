@@ -2,60 +2,62 @@
 I am a mesh primitive that is being built by a mesh builder.
 "
 Class {
-	#name : #WDMeshBuilderPrimitive,
-	#superclass : #Object,
+	#name : 'WDMeshBuilderPrimitive',
+	#superclass : 'Object',
 	#instVars : [
 		'topology',
 		'material',
 		'firstIndex',
 		'indexCount'
 	],
-	#category : #'WodenSceneGraph-Core-RenderableBuilder'
+	#category : 'WodenSceneGraph-Core-RenderableBuilder',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderableBuilder'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> firstIndex [
 
 	^ firstIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> firstIndex: anObject [
 
 	firstIndex := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> indexCount [
 
 	^ indexCount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> indexCount: anObject [
 
 	indexCount := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> material [
 
 	^ material
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> material: anObject [
 
 	material := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> topology [
 
 	^ topology
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDMeshBuilderPrimitive >> topology: aPrimitiveTopology [
 	topology := aPrimitiveTopology asPrimitiveTopology
 ]

@@ -2,27 +2,29 @@
 I represent a different camera plane in a scene.
 "
 Class {
-	#name : #WDSceneLayer,
-	#superclass : #WDSceneTreeElementWithChildren,
+	#name : 'WDSceneLayer',
+	#superclass : 'WDSceneTreeElementWithChildren',
 	#instVars : [
 		'globalLightingState',
 		'boundingBox',
 		'boundingVolumeTree'
 	],
-	#category : #'WodenSceneGraph-Core-Scene'
+	#category : 'WodenSceneGraph-Core-Scene',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Scene'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDSceneLayer class >> for: aScene [
 	^ self basicNew initializeWithScene: aScene
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneLayer class >> isAbstract [
 	^ self == WDSceneLayer
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneLayer >> addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCulling: renderingSceneCameraLayer [
 	| parentGlobalTransform frustum |
 	parentGlobalTransform := ReversibleAffineTransform3D identity.
@@ -39,17 +41,17 @@ WDSceneLayer >> addChildrenRecursivelyIntoRenderingSceneCameraLayerWithFrustumCu
 	].
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneLayer >> addRecursivelyIntoRenderingSceneCameraLayer: renderingSceneCameraLayer parentGlobalTransform: parentGlobalTransform [
 	self shouldNotImplement
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneLayer >> adjustBaseCameraState: aBaseCameraState [
 	^ self subclassResponsibility
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	| adjustedCameraState result |
 	adjustedCameraState := self adjustBaseCameraState: baseCameraState.
@@ -78,7 +80,7 @@ WDSceneLayer >> asRenderingSceneCameraLayerWithCameraState: baseCameraState [
 	^ result
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneLayer >> asRenderingSceneWithCameraState: baseCameraState [
 	^ WDRenderingScene new
 		mainCameraState: baseCameraState;
@@ -91,14 +93,14 @@ WDSceneLayer >> asRenderingSceneWithCameraState: baseCameraState [
 		 
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSceneLayer >> asSceneNode [
 	^ WDSceneNode new
 		addAll: (children collect: [ :each | each copy ]);
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneLayer >> boundingBox [
 	boundingBox ifNil: [ 
 		boundingBox := AABox empty.
@@ -114,7 +116,7 @@ WDSceneLayer >> boundingBox [
 	^ boundingBox
 ]
 
-{ #category : #hook }
+{ #category : 'hook' }
 WDSceneLayer >> childBoundingBoxChanged: aChild [
 	| childBoundingBox |
 	super childBoundingBoxChanged: aChild.
@@ -126,24 +128,24 @@ WDSceneLayer >> childBoundingBoxChanged: aChild [
 	self invalidateBoundingBox.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSceneLayer >> copiedIntoScene: aScene [
 	parent := aScene.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSceneLayer >> initialize [
 	super initialize.
 	boundingVolumeTree := WMDbvt new.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSceneLayer >> initializeWithScene: aScene [
 	parent := aScene.
 	self initialize.
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDSceneLayer >> instanceAsSceneNode [
 	| sceneNode |
 	sceneNode := WDSceneNode new.
@@ -153,24 +155,24 @@ WDSceneLayer >> instanceAsSceneNode [
 	^ sceneNode
 ]
 
-{ #category : #hook }
+{ #category : 'hook' }
 WDSceneLayer >> invalidateBoundingBox [
 	boundingBox := nil.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDSceneLayer >> isSceneLayer [
 	^ true
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 WDSceneLayer >> postCopy [
 	boundingVolumeTree := WMDbvt new.
 	super postCopy.
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneLayer >> privateAddChild: aNode [
 	self assert: aNode boundingVolumeTreeNode isNil.
 	super privateAddChild: aNode.
@@ -178,7 +180,7 @@ WDSceneLayer >> privateAddChild: aNode [
 	aNode boundingVolumeTreeNode: (boundingVolumeTree insertValue: aNode withBoundingBox: aNode boundingBox)
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSceneLayer >> privateRemoveChild: aNode [
 	self assert: aNode boundingVolumeTreeNode notNil.
 	super privateRemoveChild: aNode.
@@ -186,12 +188,12 @@ WDSceneLayer >> privateRemoveChild: aNode [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneLayer >> scene [
 	^ parent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneLayer >> sceneLayer [
 	^ self
 ]

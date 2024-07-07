@@ -1,47 +1,49 @@
 Class {
-	#name : #WDVRControllerAxisState,
-	#superclass : #Object,
+	#name : 'WDVRControllerAxisState',
+	#superclass : 'Object',
 	#instVars : [
 		'x',
 		'y'
 	],
-	#category : #'WodenSceneGraph-Core-VR'
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRControllerAxisState >> isJoystick [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRControllerAxisState >> isTrackPad [
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRControllerAxisState >> isTrigger [
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerAxisState >> x [
 
 	^ x
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerAxisState >> x: anObject [
 
 	x := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerAxisState >> y [
 
 	^ y
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDVRControllerAxisState >> y: anObject [
 
 	y := anObject

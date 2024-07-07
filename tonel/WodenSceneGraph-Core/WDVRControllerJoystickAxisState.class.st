@@ -1,10 +1,12 @@
 Class {
-	#name : #WDVRControllerJoystickAxisState,
-	#superclass : #WDVRControllerAxisState,
-	#category : #'WodenSceneGraph-Core-VR'
+	#name : 'WDVRControllerJoystickAxisState',
+	#superclass : 'WDVRControllerAxisState',
+	#category : 'WodenSceneGraph-Core-VR',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'VR'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 WDVRControllerJoystickAxisState >> isJoystick [
 	^ true
 ]

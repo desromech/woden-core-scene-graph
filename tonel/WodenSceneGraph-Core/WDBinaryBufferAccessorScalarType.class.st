@@ -1,15 +1,17 @@
 Class {
-	#name : #WDBinaryBufferAccessorScalarType,
-	#superclass : #WDBinaryBufferAccessorType,
-	#category : #'WodenSceneGraph-Core-Resources'
+	#name : 'WDBinaryBufferAccessorScalarType',
+	#superclass : 'WDBinaryBufferAccessorType',
+	#category : 'WodenSceneGraph-Core-Resources',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Resources'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessorScalarType >> componentCount [
 	^ 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDBinaryBufferAccessorScalarType >> makeWithComponents: components [
 	^ components first
 ]

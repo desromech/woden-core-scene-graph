@@ -2,8 +2,8 @@
 I am a specific animation channel for a model.
 "
 Class {
-	#name : #WDModelAnimationChannel,
-	#superclass : #Object,
+	#name : 'WDModelAnimationChannel',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'targetName',
@@ -13,20 +13,22 @@ Class {
 		'outputSamples',
 		'interpolationMethod'
 	],
-	#category : #'WodenSceneGraph-Core-Animation'
+	#category : 'WodenSceneGraph-Core-Animation',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Animation'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDModelAnimationChannel >> applyInterpolatedSample: interpolatedSample toSubtreeChannel: subtreeChannel [
 	self subclassResponsibility
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDModelAnimationChannel >> applyInterpolatedSample: interpolatedSample toTransform: transform [
 	self subclassResponsibility
 ]
 
-{ #category : #animation }
+{ #category : 'animation' }
 WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleCache: inputSampleCache toBonePose: bonePose [
 	| channelPosition interpolatedSample |
 	channelPosition := self computeChannelPositionFor: position looped: isLooped inputSampleCache: inputSampleCache.
@@ -35,7 +37,7 @@ WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleC
 	^ channelPosition
 ]
 
-{ #category : #animation }
+{ #category : 'animation' }
 WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleCache: inputSampleCache toSubtreeChannel: subtreeChannel [
 	| channelPosition interpolatedSample |
 	channelPosition := self computeChannelPositionFor: position looped: isLooped inputSampleCache: inputSampleCache.
@@ -44,12 +46,12 @@ WDModelAnimationChannel >> applyPosition: position looped: isLooped inputSampleC
 	^ channelPosition
 ]
 
-{ #category : #removing }
+{ #category : 'removing' }
 WDModelAnimationChannel >> applySkeletonTargetingMapping: skeletonTargetingMapping [
 	self subclassResponsibility
 ]
 
-{ #category : #animation }
+{ #category : 'animation' }
 WDModelAnimationChannel >> computeChannelPositionFor: position looped: isLooped inputSampleCache: inputSampleCache [
 	| result actualPosition nextFrameIndex previousFrameIndex previousFramePosition nextFramePosition alpha |
 	result := inputSampleCache ifNil: [ WDModelAnimationChannelPosition new ].
@@ -95,60 +97,60 @@ WDModelAnimationChannel >> computeChannelPositionFor: position looped: isLooped 
 		yourself
 ]
 
-{ #category : #hooks }
+{ #category : 'hooks' }
 WDModelAnimationChannel >> computeInterpolatedSampleForChannelPosition: channelPosition [
 	^ interpolationMethod interpolateVectorSamples: outputSamples forChannelPosition: channelPosition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> inputMaxValue [
 
 	^ inputMaxValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> inputMaxValue: anObject [
 
 	inputMaxValue := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> inputMinValue [
 
 	^ inputMinValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> inputMinValue: anObject [
 
 	inputMinValue := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> inputSamples [
 
 	^ inputSamples
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> inputSamples: anObject [
 
 	inputSamples := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> interpolationMethod [
 
 	^ interpolationMethod
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> interpolationMethod: anObject [
 
 	interpolationMethod := anObject
 ]
 
-{ #category : #hooks }
+{ #category : 'hooks' }
 WDModelAnimationChannel >> lowerBoundSearchPosition: position [
 	| lowerIndex upperIndex bestFound |
 	lowerIndex := 1.
@@ -183,37 +185,37 @@ WDModelAnimationChannel >> lowerBoundSearchPosition: position [
 	^ inputSamples size"
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> outputSamples [
 
 	^ outputSamples
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> outputSamples: anObject [
 
 	outputSamples := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> targetName [
 
 	^ targetName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDModelAnimationChannel >> targetName: anObject [
 
 	targetName := anObject

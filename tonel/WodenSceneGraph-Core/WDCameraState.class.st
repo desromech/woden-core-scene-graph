@@ -2,8 +2,8 @@
 I encapsulate the rendering state for a camera.
 "
 Class {
-	#name : #WDCameraState,
-	#superclass : #WDRenderingObjectState,
+	#name : 'WDCameraState',
+	#superclass : 'WDRenderingObjectState',
 	#instVars : [
 		'projectionMatrix',
 		'frustum',
@@ -28,10 +28,12 @@ Class {
 		'cascadeSplitDistributionLambda',
 		'isPerspective'
 	],
-	#category : #'WodenSceneGraph-Core-RenderingState'
+	#category : 'WodenSceneGraph-Core-RenderingState',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'RenderingState'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCameraState >> asCameraStateForBackgroundLayer [
 	^ self copy
 		transformation: (transformation copy
@@ -40,180 +42,180 @@ WDCameraState >> asCameraStateForBackgroundLayer [
 		yourself
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDCameraState >> asCameraStateForForegroundLayer [
 	^ self copy
 		transformation: ReversibleAffineTransform3D identity;
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> bloomStrength [
 
 	^ bloomStrength
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> bloomStrength: anObject [
 
 	bloomStrength := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> bloomThreshold [
 
 	^ bloomThreshold
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> bloomThreshold: anObject [
 
 	bloomThreshold := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> cascadeSplitDistributionLambda [
 
 	^ cascadeSplitDistributionLambda
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> cascadeSplitDistributionLambda: anObject [
 
 	cascadeSplitDistributionLambda := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> currentTime [
 
 	^ currentTime
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> currentTime: anObject [
 
 	currentTime := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> exposure [
 
 	^ exposure
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> exposure: anObject [
 
 	exposure := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> farDistance [
 
 	^ farDistance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> farDistance: anObject [
 
 	farDistance := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDCameraState >> framebufferExtent [
 	^ Vector2 x: framebufferWidth y: framebufferHeight
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> framebufferHeight [
 
 	^ framebufferHeight
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> framebufferHeight: anObject [
 
 	framebufferHeight := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDCameraState >> framebufferReciprocalExtent [
 	^ Vector2 x: framebufferWidth reciprocal y: framebufferHeight reciprocal
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> framebufferReciprocalHeight [
 
 	^ framebufferHeight reciprocal
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> framebufferReciprocalWidth [
 
 	^ framebufferWidth reciprocal
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> framebufferWidth [
 
 	^ framebufferWidth
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> framebufferWidth: anObject [
 
 	framebufferWidth := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> frustum [
 
 	^ frustum
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> frustum: aFrustum [
 	frustum := aFrustum.
 	worldFrustum := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> hasBottomLeftTextureCoordinates [
 
 	^ hasBottomLeftTextureCoordinates
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> hasBottomLeftTextureCoordinates: anObject [
 
 	hasBottomLeftTextureCoordinates := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> hasReverseDepth [
 
 	^ hasReverseDepth
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> hasReverseDepth: anObject [
 
 	hasReverseDepth := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> hasTopLeftNDCOrigin [
 
 	^ hasTopLeftNDCOrigin
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> hasTopLeftNDCOrigin: anObject [
 
 	hasTopLeftNDCOrigin := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDCameraState >> initialize [
 	super initialize.
 	projectionMatrix := Matrix4x4 identity.
@@ -234,134 +236,134 @@ WDCameraState >> initialize [
 	self viewMode: WDFullShadedViewMode.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> inverseProjectionMatrix [
 	^ inverseProjectionMatrix ifNil: [inverseProjectionMatrix := projectionMatrix inverse]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> isPerspective [
 
 	^ isPerspective
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> isPerspective: anObject [
 
 	isPerspective := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> lightGridColumns [
 
 	^ lightGridColumns
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> lightGridColumns: anObject [
 
 	lightGridColumns := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDCameraState >> lightGridDepthSliceOffset [
 	"Formula from: http://www.aortiz.me/2018/12/21/CG.html#building-a-cluster-grid [August 2022]"
 	^ lightGridSlices negated * nearDistance ln / (farDistance / nearDistance) ln
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDCameraState >> lightGridDepthSliceScale [
 	"Formula from: http://www.aortiz.me/2018/12/21/CG.html#building-a-cluster-grid [August 2022]"
 	^ lightGridSlices / (farDistance / nearDistance) ln
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDCameraState >> lightGridDepthSliceScaleOffset [
 	^ Vector2 x: self lightGridDepthSliceScale y: self lightGridDepthSliceOffset
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDCameraState >> lightGridExtent [
 	^ Vector3 x: lightGridColumns y: lightGridRows z: lightGridSlices
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> lightGridRows [
 
 	^ lightGridRows
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> lightGridRows: anObject [
 
 	lightGridRows := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> lightGridSlices [
 
 	^ lightGridSlices
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> lightGridSlices: anObject [
 
 	lightGridSlices := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> nearDistance [
 
 	^ nearDistance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> nearDistance: anObject [
 
 	nearDistance := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> projectionMatrix [
 
 	^ projectionMatrix
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> projectionMatrix: anObject [
 	projectionMatrix := anObject.
 	inverseProjectionMatrix := nil.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> toneMappingOperator [
 
 	^ toneMappingOperator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> toneMappingOperator: aToneMapOperator [
 	toneMappingOperator := aToneMapOperator asToneMappingOperator
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> transformation: aTransform [
 	super transformation: aTransform.
 	worldFrustum := nil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> viewMode [
 
 	^ viewMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> viewMode: aViewMode [
 	viewMode := aViewMode asViewMode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDCameraState >> worldFrustum [
 	^ worldFrustum ifNil: [ worldFrustum := frustum transformedWith: transformation ]
 ]

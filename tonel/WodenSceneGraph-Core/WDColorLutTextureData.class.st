@@ -2,20 +2,22 @@
 I hold a linear list of colors used as a lookup table.
 "
 Class {
-	#name : #WDColorLutTextureData,
-	#superclass : #Object,
+	#name : 'WDColorLutTextureData',
+	#superclass : 'Object',
 	#instVars : [
 		'bytes'
 	],
-	#category : #'WodenSceneGraph-Core-Texture'
+	#category : 'WodenSceneGraph-Core-Texture',
+	#package : 'WodenSceneGraph-Core',
+	#tag : 'Texture'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDColorLutTextureData class >> with: colors [
 	^ self new initializeWithColors: colors; yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDColorLutTextureData >> initializeWithColors: colors [
 	| destIndex |
 	bytes := ByteArray new: colors size * 4.
@@ -29,7 +31,7 @@ WDColorLutTextureData >> initializeWithColors: colors [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDColorLutTextureData >> size [
 	^ bytes size // 4
 ]
