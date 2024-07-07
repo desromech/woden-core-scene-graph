@@ -2,7 +2,7 @@
 I am a null collision shape.
 "
 Class {
-	#name : 'WDPNullCollisionShape',
+	#name : 'WDNullCollisionShape',
 	#superclass : 'WDCollisionShape',
 	#classInstVars : [
 		'uniqueInstance'
@@ -13,46 +13,46 @@ Class {
 }
 
 { #category : 'instance creation' }
-WDPNullCollisionShape class >> new [
+WDNullCollisionShape class >> new [
 	self error: 'WDNullCollisionShape is a stateless singleton'
 ]
 
 { #category : 'accessing' }
-WDPNullCollisionShape class >> uniqueInstance [
+WDNullCollisionShape class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self basicNew initialize ]
 ]
 
 { #category : 'adding' }
-WDPNullCollisionShape >> constructVisualizationSceneNode [
+WDNullCollisionShape >> constructVisualizationSceneNode [
 	^ WDSceneNode new
 ]
 
 { #category : 'collision detection' }
-WDPNullCollisionShape >> detectAndComputeCollisionContactPointsAt: transform with: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
+WDNullCollisionShape >> detectAndComputeCollisionContactPointsAt: transform with: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	^ #()
 ]
 
 { #category : 'collision detection' }
-WDPNullCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withConvexShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
+WDNullCollisionShape >> detectAndComputeCollisionContactPointsAt: transform withConvexShape: otherShape at: otherTransform separatingAxisHint: separatingAxisHint [
 	^ #()
 ]
 
 { #category : 'testing' }
-WDPNullCollisionShape >> isEmptyShape [
+WDNullCollisionShape >> isEmptyShape [
 	^ true
 ]
 
 { #category : 'intersection testing' }
-WDPNullCollisionShape >> localSupportInDirection: aDirection [
+WDNullCollisionShape >> localSupportInDirection: aDirection [
 	^ Vector3 zeros
 ]
 
 { #category : 'testing' }
-WDPNullCollisionShape >> rayCast: ray [
+WDNullCollisionShape >> rayCast: ray [
 	^ nil
 ]
 
 { #category : 'transforming' }
-WDPNullCollisionShape >> transformedWith: aTransform [
+WDNullCollisionShape >> transformedWith: aTransform [
 	^ self
 ]
