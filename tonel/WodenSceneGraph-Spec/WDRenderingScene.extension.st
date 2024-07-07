@@ -1,6 +1,6 @@
-Extension { #name : #WDRenderingScene }
+Extension { #name : 'WDRenderingScene' }
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 WDRenderingScene >> inspectionRendererOutput [
 	<inspectorPresentationOrder: 0 title: 'Renderer Output'>
 	

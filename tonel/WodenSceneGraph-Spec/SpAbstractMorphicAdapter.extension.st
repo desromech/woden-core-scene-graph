@@ -1,6 +1,6 @@
-Extension { #name : #SpAbstractMorphicAdapter }
+Extension { #name : 'SpAbstractMorphicAdapter' }
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 SpAbstractMorphicAdapter >> installMouseWheelEvent: anEvent to: aWidget [
 	aWidget 
 		on: #mouseWheel

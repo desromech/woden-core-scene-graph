@@ -2,39 +2,40 @@
 I am a Spec2 presenter for a Woden Rendering Scene State.
 "
 Class {
-	#name : #WDSpRenderingSceneStatePresenter,
-	#superclass : #SpAbstractWidgetPresenter,
+	#name : 'WDSpRenderingSceneStatePresenter',
+	#superclass : 'SpAbstractWidgetPresenter',
 	#instVars : [
 		'#renderingSceneState => ObservableSlot'
 	],
-	#category : #'WodenSceneGraph-Spec'
+	#category : 'WodenSceneGraph-Spec',
+	#package : 'WodenSceneGraph-Spec'
 }
 
-{ #category : #specs }
+{ #category : 'specs' }
 WDSpRenderingSceneStatePresenter class >> adapterName [
 	^ #WodenRenderingSceneStateAdapter
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSpRenderingSceneStatePresenter >> initialize [
 	
 	self class initializeSlots: self.
 	super initialize.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpRenderingSceneStatePresenter >> renderingSceneState [
 
 	^ renderingSceneState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpRenderingSceneStatePresenter >> renderingSceneState: anObject [
 
 	renderingSceneState := anObject
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 WDSpRenderingSceneStatePresenter >> whenRenderingSceneStateChangedDo: aBlock [
 	self property: #renderingSceneState whenChangedDo: aBlock
 ]

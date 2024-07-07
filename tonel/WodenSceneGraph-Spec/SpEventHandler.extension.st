@@ -1,6 +1,6 @@
-Extension { #name : #SpEventHandler }
+Extension { #name : 'SpEventHandler' }
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 SpEventHandler >> whenMouseWheelDo: aBlock [
 	"register a mouse move event. 
 	 aBlock receives 'event' as parameter"

@@ -1,6 +1,6 @@
-Extension { #name : #WDSceneElement }
+Extension { #name : 'WDSceneElement' }
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 WDSceneElement >> inspectionSceneTree [
 	<inspectorPresentationOrder: 1 title: 'Scene Tree'>
 	
@@ -10,7 +10,7 @@ WDSceneElement >> inspectionSceneTree [
 		yourself
 ]
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 WDSceneElement >> inspectionSceneView [
 	<inspectorPresentationOrder: 0 title: 'Scene View'>
 	

@@ -2,17 +2,18 @@
 I am a Spec2 morphic based adapter for presenting for a Woden Scene.
 "
 Class {
-	#name : #WDSpSceneMorphicAdapter,
-	#superclass : #SpAbstractMorphicAdapter,
-	#category : #'WodenSceneGraph-Spec'
+	#name : 'WDSpSceneMorphicAdapter',
+	#superclass : 'SpAbstractMorphicAdapter',
+	#category : 'WodenSceneGraph-Spec',
+	#package : 'WodenSceneGraph-Spec'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpSceneMorphicAdapter class >> adaptingName [
 	^ #WodenSceneAdapter
 ]
 
-{ #category : #factory }
+{ #category : 'factory' }
 WDSpSceneMorphicAdapter >> buildWidget [
 	| newWidget |
 
@@ -31,7 +32,7 @@ WDSpSceneMorphicAdapter >> buildWidget [
 	^ newWidget
 ]
 
-{ #category : #hooks }
+{ #category : 'hooks' }
 WDSpSceneMorphicAdapter >> sceneMorphClass [
 	^ WDSceneMorph
 ]

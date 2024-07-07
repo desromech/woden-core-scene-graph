@@ -1,15 +1,16 @@
 Class {
-	#name : #WDSpInteractiveSceneMorphicAdapter,
-	#superclass : #WDSpSceneMorphicAdapter,
-	#category : #'WodenSceneGraph-Spec'
+	#name : 'WDSpInteractiveSceneMorphicAdapter',
+	#superclass : 'WDSpSceneMorphicAdapter',
+	#category : 'WodenSceneGraph-Spec',
+	#package : 'WodenSceneGraph-Spec'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpInteractiveSceneMorphicAdapter class >> adaptingName [
 	^ #WodenInteractiveSceneAdapter
 ]
 
-{ #category : #hooks }
+{ #category : 'hooks' }
 WDSpInteractiveSceneMorphicAdapter >> sceneMorphClass [
 	^ WDInteractiveSceneMorph
 ]

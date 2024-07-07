@@ -1,6 +1,6 @@
-Extension { #name : #WDSurfaceMaterial }
+Extension { #name : 'WDSurfaceMaterial' }
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 WDSurfaceMaterial >> inspectionMaterialPreview [
 	<inspectorPresentationOrder: 0 title: 'Material Preview'>
 	
@@ -9,7 +9,7 @@ WDSurfaceMaterial >> inspectionMaterialPreview [
 		yourself
 ]
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 WDSurfaceMaterial >> makeMaterialInteractivePreviewScene [
 	^ WDScene new
 		add: (WDMeshBuilder new

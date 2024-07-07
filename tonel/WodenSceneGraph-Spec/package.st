@@ -1,1 +1,1 @@
-Package { #name : #'WodenSceneGraph-Spec' }
+Package { #name : 'WodenSceneGraph-Spec' }

@@ -2,8 +2,8 @@
 I am a Spec2 presenter for Woden surface materials.
 "
 Class {
-	#name : #WDSpSurfaceMaterialPresenter,
-	#superclass : #SpPresenter,
+	#name : 'WDSpSurfaceMaterialPresenter',
+	#superclass : 'SpPresenter',
 	#instVars : [
 		'#scenePresenter',
 		'#toolbar',
@@ -11,11 +11,12 @@ Class {
 		'#materialSceneNode',
 		'#previewBaseMesh'
 	],
-	#category : #'WodenSceneGraph-Spec'
+	#category : 'WodenSceneGraph-Spec',
+	#package : 'WodenSceneGraph-Spec'
 }
 
-{ #category : #specs }
-WDSpSurfaceMaterialPresenter class >> defaultSpec [
+{ #category : 'specs' }
+WDSpSurfaceMaterialPresenter class >> defaultLayout [
 
 	^ SpBoxLayout newTopToBottom 
 		add: #toolbar expand: false;
@@ -23,7 +24,7 @@ WDSpSurfaceMaterialPresenter class >> defaultSpec [
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSpSurfaceMaterialPresenter >> initializePresenters [
 	previewBaseMesh := self previewCubeBaseMesh.
 	toolbar := self newToolbar
@@ -59,19 +60,19 @@ WDSpSurfaceMaterialPresenter >> initializePresenters [
 		yourself)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpSurfaceMaterialPresenter >> material [
 
 	^ material
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpSurfaceMaterialPresenter >> material: anObject [
 	material := anObject.
 	self updatePresenter
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSpSurfaceMaterialPresenter >> previewCubeBaseMesh [
 	^ WDMeshBuilder new
 		addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
@@ -80,7 +81,7 @@ WDSpSurfaceMaterialPresenter >> previewCubeBaseMesh [
 		mesh
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSpSurfaceMaterialPresenter >> previewSphereBaseMesh [
 	^ WDMeshBuilder new
 		addUVSphereWithDiameter: 1.0 segments: 32 slices: 32;
@@ -89,19 +90,19 @@ WDSpSurfaceMaterialPresenter >> previewSphereBaseMesh [
 		mesh
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpSurfaceMaterialPresenter >> scenePresenter [
 
 	^ scenePresenter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpSurfaceMaterialPresenter >> toolbar [
 
 	^ toolbar
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSpSurfaceMaterialPresenter >> updatePresenter [
 	| mesh |
 	material ifNil: [

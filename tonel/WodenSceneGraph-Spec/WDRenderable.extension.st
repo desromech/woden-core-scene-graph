@@ -1,6 +1,6 @@
-Extension { #name : #WDRenderable }
+Extension { #name : 'WDRenderable' }
 
-{ #category : #'*WodenSceneGraph-Spec' }
+{ #category : '*WodenSceneGraph-Spec' }
 WDRenderable >> inspectionSceneView [
 	<inspectorPresentationOrder: 0 title: 'Mesh Preview'>
 	

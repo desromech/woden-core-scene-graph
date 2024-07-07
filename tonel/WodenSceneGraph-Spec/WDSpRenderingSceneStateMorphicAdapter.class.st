@@ -2,17 +2,18 @@
 I am a Spec2 morphic based adapter for presenting for a Woden Rendering Scene State.
 "
 Class {
-	#name : #WDSpRenderingSceneStateMorphicAdapter,
-	#superclass : #SpAbstractMorphicAdapter,
-	#category : #'WodenSceneGraph-Spec'
+	#name : 'WDSpRenderingSceneStateMorphicAdapter',
+	#superclass : 'SpAbstractMorphicAdapter',
+	#category : 'WodenSceneGraph-Spec',
+	#package : 'WodenSceneGraph-Spec'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSpRenderingSceneStateMorphicAdapter class >> adaptingName [
 	^ #WodenRenderingSceneStateAdapter
 ]
 
-{ #category : #factory }
+{ #category : 'factory' }
 WDSpRenderingSceneStateMorphicAdapter >> buildWidget [
 	| newWidget |
 
