@@ -104,7 +104,7 @@ WDConvexCollisionShape >> rayCast: ray [
 	gjkResult := GeometricFunctions gjkRayCast: ray support: [:d | self localSupportInDirectionWithMargin: d].
 	gjkResult ifNil: [ ^ nil ].
 	
-	^ WDPShapeRayCastingResult new
+	^ WDShapeRayCastingResult new
 		shape: self;
 		distance: gjkResult first;
 		normal: gjkResult second normalized;

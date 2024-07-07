@@ -102,6 +102,42 @@ WDHeightfieldCollisionShape >> detectAndComputeCollisionContactPointsAt: transfo
 
 { #category : 'testing' }
 WDHeightfieldCollisionShape >> rayCast: ray [
+	| boxHit entryPoint exitPoint previousPointHeight previousHeightSample |
+	boxHit := self localBoundingBox intersectionsWithRay: ray.
+	boxHit ifNil: [ ^ nil ].
+
+	entryPoint := ray pointAtDistance: boxHit first.
+	exitPoint := ray pointAtDistance: boxHit second.
+
+	previousPointHeight := entryPoint y.
+	previousHeightSample := self sampleHeightAtX: entryPoint x z: entryPoint z.
+	0 to: 1 by: (1 / (width max: depth)) do: [ :alpha |
+		| testPoint heightSample testPointHeight minHeightSample maxHeightSample minPointHeight maxPointHeight |
+		testPoint := entryPoint interpolateTo: exitPoint at: alpha.
+		heightSample := self sampleHeightAtX: testPoint x z: testPoint z.
+		testPointHeight := testPoint y.
+		
+		minHeightSample := previousHeightSample min: heightSample.
+		maxHeightSample := previousHeightSample max: heightSample.
+
+		minPointHeight := previousPointHeight min: testPointHeight.
+		maxPointHeight := previousPointHeight max: testPointHeight.
+		
+		(maxPointHeight < minHeightSample or: [ maxHeightSample < minPointHeight ]) ifFalse: [
+			| hitPoint |
+			hitPoint := boxHit first interpolateTo: boxHit second at: alpha.
+			
+			^ WDShapeRayCastingResult new
+				shape: self;
+				distance: (ray distanceForPoint: hitPoint);
+				normal: (Vector3 y: 1);
+				yourself
+		].
+		
+		previousPointHeight := testPointHeight.
+		previousHeightSample := heightSample.
+	].
+	
 	^ nil
 ]
 
