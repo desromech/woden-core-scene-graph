@@ -1249,7 +1249,7 @@ WDAGPUSceneRendererResourceCache >> initializeWithDevice: aDevice withTextureUpl
 	depthSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT.
 
 	depthStencilFormat := AGPU_TEXTURE_FORMAT_D32_FLOAT_S8X24_UINT.
-	depthStencilTypelessFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT_S8X24_TYPELESS.
+	depthStencilTypelessFormat := AGPU_TEXTURE_FORMAT_R32G8X24_TYPELESS.
 	depthStencilSampledFormat := AGPU_TEXTURE_FORMAT_R32_FLOAT_S8X24_TYPELESS.
 	
 	"Workaround Metal renderpass backend wrong format."
