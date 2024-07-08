@@ -320,6 +320,11 @@ WDAGPUSceneRendererResourceCache >> buildRendererComputePipelineWithShaderSource
 { #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> cameraStateBlockSource [
 	^ '
+#define FOG_MODE_NODE 0
+#define FOG_MODE_LINEAR 1
+#define FOG_MODE_EXP 2
+#define FOG_MODE_EXP2 3
+
 layout(set=1, binding=0, std140) uniform CameraStateBlock	
 {
 	mat4 transformationMatrix;
@@ -346,6 +351,9 @@ layout(set=1, binding=0, std140) uniform CameraStateBlock
 	uvec3 lightGridExtent;
 	bool hasReverseDepth;
 
+	vec4 fogColor;
+	vec2 fogDistancesOrParameters;
+	uint fogMode;
 } CameraState;
 '
 ]
@@ -917,6 +925,50 @@ void main()
 	FragmentOutputColor = vec4(ldrColor, hdrTexel.a);
 }
 '
+]
+
+{ #category : 'as yet unclassified' }
+WDAGPUSceneRendererResourceCache >> fogComputationSource [
+	^ '
+#ifdef IsInFragmentOpaquePass
+	vec4 computeFog(in vec4 color, in vec3 viewPosition)
+	{
+		return color;
+	}
+#else
+	vec4 computeFog(in vec4 color, in vec3 viewPosition)
+	{
+		switch(CameraState.fogMode)
+		{
+		case FOG_MODE_LINEAR:
+			{
+				float distance = length(viewPosition);
+				vec2 startEnd = CameraState.fogDistancesOrParameters.xy;
+				float alpha = clamp((startEnd.y - distance) / (startEnd.y - startEnd.x), 0.0, 1.0);
+				return mix(CameraState.fogColor, color, alpha);
+			}
+		case FOG_MODE_EXP:
+			{
+				float distance = length(viewPosition);
+				float density = CameraState.fogDistancesOrParameters.x;
+				float alpha = clamp(exp(-distance*density), 0.0, 1.0);
+				return mix(CameraState.fogColor, color, alpha);
+			}
+		case FOG_MODE_EXP2:
+			{
+				float distance = length(viewPosition);
+				float density = CameraState.fogDistancesOrParameters.x;
+				float tau = distance*density;
+				float alpha = clamp(exp(-tau*tau), 0.0, 1.0);
+				return mix(CameraState.fogColor, color, alpha);
+			}
+		default:
+			return color;
+		}	
+	}
+#endif
+'
+
 ]
 
 { #category : 'accessing' }
@@ -1779,7 +1831,7 @@ void main()
 
 { #category : 'private shaders' }
 WDAGPUSceneRendererResourceCache >> metallicRoughnessLightingModel [
-^ self lightingStateBlockSource , self shadowMappingSamplingSource , '
+^ self lightingStateBlockSource , self shadowMappingSamplingSource , self fogComputationSource, '
 #line 4
 const float DistanceEpsilon = 0.00001;
 
@@ -1996,7 +2048,7 @@ vec4 performLightingModelComputation(in SurfaceLightingParameters surfaceParamet
 #ifdef IsInFragmentOpaquePass
 	return vec4(lightedColor, surfaceParameters.occlusionFactor);
 #else
-	return vec4(lightedColor, surfaceParameters.baseColor.a);
+	return computeFog(vec4(lightedColor, surfaceParameters.baseColor.a), surfaceParameters.P);
 #endif
 }
 '
@@ -2066,7 +2118,7 @@ WDAGPUSceneRendererResourceCache >> opaqueReflectionCombinationFragmentShader [
 WDAGPUSceneRendererResourceCache >> opaqueReflectionCombinationFragmentShaderSource [
 	^ '
 #version 450
-' , self samplerStateSource, self cameraStateBlockSource , '
+' , self samplerStateSource, self cameraStateBlockSource , self fogComputationSource , '
 #line 6
 
 layout(location=0) in vec2 inTexcoord;
@@ -2092,8 +2144,16 @@ void main()
 
 	vec3 reflection = mix(staticReflection.rgb, screenSpaceReflection.rgb, screenSpaceReflection.a);
 
+	float depth = textureLod(sampler2D(DepthBuffer, ScreenTextureSampler), inTexcoord, 0.0).r;
+	vec4 ndcPosition = vec4(inTexcoord*2.0 - 1.0, depth, 1.0);
+	if(CameraState.hasTopLeftNDCOrigin == CameraState.hasBottomLeftTextureCoordinates)
+		ndcPosition.y = -ndcPosition.y;
+	
+	vec4 clipSpacePosition = CameraState.inverseProjectionMatrix*ndcPosition;
+	vec3 viewPosition = clipSpacePosition.xyz / clipSpacePosition.w;
+
 	vec3 color = opaqueColor + reflection*occlusionFactor;
-	FragmentOutputColor = vec4(color, 1.0);
+	FragmentOutputColor = computeFog(vec4(color, 1.0), viewPosition);
 }
 '
 ]
@@ -2927,7 +2987,7 @@ void main()
 WDAGPUSceneRendererResourceCache >> unlitFragmentShaderSourceForOpaquePass: isOpaquePass [
 	^ '
 #version 450
-' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass), self unlitMaterialStateSource , '
+' , self samplerStateSource, self genericSurfaceMaterialFragmentShaderInputs, self cameraStateBlockSource, (self renderFragmentShaderOutputsForOpaquePass: isOpaquePass), self unlitMaterialStateSource , self fogComputationSource , '
 #line 6
 
 void main()
@@ -2940,7 +3000,7 @@ void main()
 		discard;
 		
 	DefineRenderPassDummyOutputs();
-	FragmentOutputColor = color;
+	FragmentOutputColor = computeFog(color, StageInput.viewPosition);
 	FragmentOutputNormal = vec2(0.0);
 	FragmentOutputSpecularity = vec4(0.0);
 }

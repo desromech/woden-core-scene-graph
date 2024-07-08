@@ -18,7 +18,12 @@ Class {
 		'bloomThreshold',
 		'bloomStrength',
 		'cascadeSplitDistributionLambda',
-		'headFloorTransform'
+		'headFloorTransform',
+		'fogColor',
+		'fogStartDistance',
+		'fogEndDistance',
+		'fogDensity',
+		'fogMode'
 	],
 	#category : 'WodenSceneGraph-Core-Camera',
 	#package : 'WodenSceneGraph-Core',
@@ -46,6 +51,9 @@ WDCamera >> asCameraStateWithAspectRatio: aspectRatio [
 		viewMode: viewMode;
 		hasReverseDepth: hasReverseDepth;
 		cascadeSplitDistributionLambda: cascadeSplitDistributionLambda;
+		fogColor: fogColor;
+		fogDistancesOrParameters: self fogDistancesOrParameters;
+		fogMode: fogMode asModeIndex;
 		yourself
 ]
 
@@ -66,6 +74,9 @@ WDCamera >> asCameraStateWithFrustumTangents: frustumTangents eyeTransform: eyeT
 		hasReverseDepth: hasReverseDepth;
 		transformation: eyeTransform;
 		cascadeSplitDistributionLambda: cascadeSplitDistributionLambda;
+		fogColor: fogColor;
+		fogDistancesOrParameters: self fogDistancesOrParameters;
+		fogMode: fogMode asModeIndex;
 		yourself
 ]
 
@@ -154,6 +165,71 @@ WDCamera >> focalDistance: anObject [
 ]
 
 { #category : 'accessing' }
+WDCamera >> fogColor [
+
+	^ fogColor
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogColor: aFogColor [
+
+	fogColor := aFogColor asVector4
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogDensity [
+
+	^ fogDensity
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogDensity: anObject [
+
+	fogDensity := anObject
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogDistancesOrParameters [
+	^ fogMode usesDensity
+		ifTrue:[ Vector2 x: fogDensity ]
+		ifFalse:[ Vector2 x: fogStartDistance y: fogEndDistance ]
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogEndDistance [
+
+	^ fogEndDistance
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogEndDistance: anObject [
+
+	fogEndDistance := anObject
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogMode [
+	^ fogMode
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogMode: aFogMode [
+	fogMode := aFogMode asFogMode
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogStartDistance [
+
+	^ fogStartDistance
+]
+
+{ #category : 'accessing' }
+WDCamera >> fogStartDistance: anObject [
+
+	fogStartDistance := anObject
+]
+
+{ #category : 'accessing' }
 WDCamera >> fovY [
 
 	^ fovY
@@ -221,6 +297,11 @@ WDCamera >> initialize [
 	bloomStrength := 0.1.
 	cascadeSplitDistributionLambda := 0.99.
 	headFloorTransform := ReversibleAffineTransform3D identity.
+	fogColor := Vector4 zeros.
+	fogStartDistance := 0.0.
+	fogEndDistance := 1.0.
+	fogDensity := 1.0.
+	self fogMode: WDFogNoneMode.
 	self toneMappingOperator: WDLinearToneMappingOperator.
 	self viewMode: WDFullShadedViewMode.
 ]

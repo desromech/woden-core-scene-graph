@@ -26,7 +26,10 @@ Class {
 		'bloomThreshold',
 		'bloomStrength',
 		'cascadeSplitDistributionLambda',
-		'isPerspective'
+		'isPerspective',
+		'fogColor',
+		'fogDistancesOrParameters',
+		'fogMode'
 	],
 	#category : 'WodenSceneGraph-Core-RenderingState',
 	#package : 'WodenSceneGraph-Core',
@@ -119,6 +122,42 @@ WDCameraState >> farDistance [
 WDCameraState >> farDistance: anObject [
 
 	farDistance := anObject
+]
+
+{ #category : 'accessing' }
+WDCameraState >> fogColor [
+
+	^ fogColor
+]
+
+{ #category : 'accessing' }
+WDCameraState >> fogColor: anObject [
+
+	fogColor := anObject
+]
+
+{ #category : 'accessing' }
+WDCameraState >> fogDistancesOrParameters [
+
+	^ fogDistancesOrParameters
+]
+
+{ #category : 'accessing' }
+WDCameraState >> fogDistancesOrParameters: anObject [
+
+	fogDistancesOrParameters := anObject
+]
+
+{ #category : 'accessing' }
+WDCameraState >> fogMode [
+
+	^ fogMode
+]
+
+{ #category : 'accessing' }
+WDCameraState >> fogMode: anObject [
+
+	fogMode := anObject
 ]
 
 { #category : 'as yet unclassified' }
@@ -232,6 +271,9 @@ WDCameraState >> initialize [
 	lightGridRows := 1.
 	lightGridSlices := 1.
 	cascadeSplitDistributionLambda := 0.99.
+	fogColor := Vector4 zeros.
+	fogDistancesOrParameters := Vector2 zeros.
+	fogMode := 0.
 	self toneMappingOperator: WDLinearToneMappingOperator.
 	self viewMode: WDFullShadedViewMode.
 ]

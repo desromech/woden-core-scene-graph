@@ -30,6 +30,10 @@ WDAGPUCameraStateUniformBufferWriter class >> fieldsDesc [
 
 		uvec3 lightGridExtent
 		uint hasReverseDepth
+		
+		vec4 fogColor
+		vec2 fogDistancesOrParameters
+		uint fogMode
 	)
 ]
 
@@ -40,7 +44,7 @@ WDAGPUCameraStateUniformBufferWriter >> instanceAlignment [
 
 { #category : 'accessing' }
 WDAGPUCameraStateUniformBufferWriter >> instanceSize [
-	^ 336
+	^ 368
 ]
 
 { #category : 'writing' }
@@ -62,4 +66,7 @@ WDAGPUCameraStateUniformBufferWriter >> write: data onto: pointer at: offset [
 	self writeUint: data hasBottomLeftTextureCoordinates onto: pointer at: offset + 308.
 	self writeUvec3: data lightGridExtent onto: pointer at: offset + 320.
 	self writeUint: data hasReverseDepth onto: pointer at: offset + 332.
+	self writeVec4: data fogColor onto: pointer at: offset + 336.
+	self writeVec2: data fogDistancesOrParameters onto: pointer at: offset + 352.
+	self writeUint: data fogMode onto: pointer at: offset + 360.
 ]
