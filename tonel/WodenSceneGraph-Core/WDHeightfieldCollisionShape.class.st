@@ -106,8 +106,8 @@ WDHeightfieldCollisionShape >> rayCast: ray [
 	boxHit := self localBoundingBox intersectionsWithRay: ray.
 	boxHit ifNil: [ ^ nil ].
 
-	entryPoint := ray pointAtDistance: boxHit first.
-	exitPoint := ray pointAtDistance: boxHit second.
+	entryPoint := (ray pointAtDistance: boxHit first) / scale.
+	exitPoint := (ray pointAtDistance: boxHit second) / scale.
 
 	previousPointHeight := entryPoint y.
 	previousHeightSample := self sampleHeightAtX: entryPoint x z: entryPoint z.
@@ -125,7 +125,7 @@ WDHeightfieldCollisionShape >> rayCast: ray [
 		
 		(maxPointHeight < minHeightSample or: [ maxHeightSample < minPointHeight ]) ifFalse: [
 			| hitPoint |
-			hitPoint := boxHit first interpolateTo: boxHit second at: alpha.
+			hitPoint := (boxHit first interpolateTo: boxHit second at: alpha) * scale.
 			
 			^ WDShapeRayCastingResult new
 				shape: self;
