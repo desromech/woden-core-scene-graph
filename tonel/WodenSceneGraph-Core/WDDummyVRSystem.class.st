@@ -13,6 +13,11 @@ Class {
 	#tag : 'VR'
 }
 
+{ #category : 'head' }
+WDDummyVRSystem >> headTransform [
+	^ ReversibleAffineTransform3D translation: (Vector3 y: 1.5)
+]
+
 { #category : 'initialization' }
 WDDummyVRSystem >> initialize [
 	super initialize.
