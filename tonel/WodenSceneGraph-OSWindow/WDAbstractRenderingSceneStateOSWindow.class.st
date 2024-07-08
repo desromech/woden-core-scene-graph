@@ -413,8 +413,10 @@ WDAbstractRenderingSceneStateOSWindow >> validateSwapChain [
 	swapChainExtent := requiredExtent.
 	oldSwapChain ifNotNil: [ oldSwapChain release ].
 	isOutOfDate := false.
-	swapChainFramebuffer := WDFramebuffer forSwapChain: swapChain extent: swapChainExtent.
-
+	swapChainFramebuffer := WDFramebuffer forSwapChain: swapChain
+		extent: (swapChain
+				ifNil:[ requiredExtent ]
+				ifNotNil:[ swapChain getWidth @ swapChain getHeight ]).
 	^ swapChain notNil
 ]
 
