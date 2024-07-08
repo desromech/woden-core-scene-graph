@@ -120,6 +120,11 @@ WDAbstractRenderingSceneStateOSWindow >> displayExtent [
 	^ extent
 ]
 
+{ #category : 'as yet unclassified' }
+WDAbstractRenderingSceneStateOSWindow >> displayScaleFactor [
+	^ self displayExtent / self windowExtent
+]
+
 { #category : 'initialize-release' }
 WDAbstractRenderingSceneStateOSWindow >> doDestroySwapChain [
 	device ifNotNil: [ device finishExecution ].
@@ -134,9 +139,14 @@ WDAbstractRenderingSceneStateOSWindow >> doRender [
 	self validateSwapChain ifFalse: [ ^ self ].
 	
 	sgBuilder := self sceneRenderer formSceneGraphBuilder.
-	overlaySceneGraph := (self buildWindowOverlaySceneGraphNodeWith: sgBuilder) , (self buildFPSOverlaySceneGraphNodeWith: sgBuilder).
+	overlaySceneGraph := sgBuilder withClippingBounds: (0@0 extent: self displayExtent) build: [
+		| scaleFactor |
+		scaleFactor := self displayScaleFactor.
+		sgBuilder withTransform: (FormSGAffineTransform scaleX: scaleFactor x Y: scaleFactor y) build: [
+		(self buildWindowOverlaySceneGraphNodeWith: sgBuilder) , (self buildFPSOverlaySceneGraphNodeWith: sgBuilder)
+		]
+	].
 	
-
 	self hasStereoRendering ifTrue: [
 		self validateEyeFramebuffers ifFalse: [ ^ self ].
 		self sceneRenderer

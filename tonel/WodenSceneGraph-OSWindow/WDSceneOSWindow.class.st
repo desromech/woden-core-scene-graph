@@ -18,9 +18,7 @@ Class {
 { #category : 'as yet unclassified' }
 WDSceneOSWindow >> buildWindowOverlaySceneGraphNodeWith: builder [
 	overlays isEmpty ifTrue: [ ^ builder null ].
-	^ builder withClippingBounds: (0@0 extent: self displayExtent) build: [ 
-		builder containerWith: (overlays collect: [:each | each buildFullSceneGraphWith: builder])
-	]
+	^ builder containerWith: (overlays collect: [:each | each buildFullSceneGraphWith: builder])
 ]
 
 { #category : 'accessing' }
