@@ -2153,7 +2153,11 @@ void main()
 	vec3 viewPosition = clipSpacePosition.xyz / clipSpacePosition.w;
 
 	vec3 color = opaqueColor + reflection*occlusionFactor;
-	FragmentOutputColor = computeFog(vec4(color, 1.0), viewPosition);
+	bool isBackground = CameraState.hasReverseDepth ? depth == 0.0 : depth == 1.0;
+	if (isBackground)
+		FragmentOutputColor = vec4(color, 1.0);
+	else
+		FragmentOutputColor = computeFog(vec4(color, 1.0), viewPosition);
 }
 '
 ]
