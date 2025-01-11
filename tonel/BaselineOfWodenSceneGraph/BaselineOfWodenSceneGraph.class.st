@@ -17,7 +17,7 @@ BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 	spec postLoadDoIt: #postLoadActions.
 	spec
 		baseline: #'AbstractGPU' with: [ spec repository: 'github://desromech/abstract-gpu' ];
-		baseline: #'AbstractVideo' with: [ spec repository: 'github://desromech/abstract-video' ];
+		baseline: #'AbstractVideo' with: [ spec repository: 'github://desromech/abstract-video:main' ];
 		baseline: #'WodenMath' with: [ spec repository: 'github://desromech/woden-core-math' ];
 		baseline: #'Toplo' with: [ spec repository: 'github://pharo-graphics/Toplo:master/src' ];
 		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://desromech/form-procedural-library' ];
