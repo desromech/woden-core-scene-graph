@@ -2,22 +2,23 @@
 I hold a collection of different scene examples.
 "
 Class {
-	#name : #WDSceneExamples,
-	#superclass : #Object,
-	#category : #'WodenSceneGraph-Examples'
+	#name : 'WDSceneExamples',
+	#superclass : 'Object',
+	#category : 'WodenSceneGraph-Examples',
+	#package : 'WodenSceneGraph-Examples'
 }
 
-{ #category : #'sample textures' }
+{ #category : 'sample textures' }
 WDSceneExamples class >> checkboardNormalTexture [
 	^ WDSceneExamplesProceduralAssets uniqueInstance checkboardNormalTexture
 ]
 
-{ #category : #'sample textures' }
+{ #category : 'sample textures' }
 WDSceneExamples class >> checkboardTexture [
 	^ WDSceneExamplesProceduralAssets uniqueInstance checkboardTexture
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleAnimatedCube [
 	"
 	self exampleAnimatedCube
@@ -44,7 +45,7 @@ WDSceneExamples class >> exampleAnimatedCube [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleAnimatedShadowCastingDirectionalLight [
 	"
 	self exampleAnimatedShadowCastingDirectionalLight
@@ -137,7 +138,7 @@ WDSceneExamples class >> exampleAnimatedShadowCastingDirectionalLight [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleAnimatedShadowCastingPointLight [
 	"
 	self exampleAnimatedShadowCastingPointLight
@@ -272,7 +273,7 @@ WDSceneExamples class >> exampleAnimatedShadowCastingPointLight [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleAnimatedShadowCastingSpotLight2 [
 	"
 	self exampleShadowCastingSpotLight2
@@ -393,7 +394,7 @@ WDSceneExamples class >> exampleAnimatedShadowCastingSpotLight2 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleCube [
 	"
 	self exampleCube
@@ -412,7 +413,7 @@ WDSceneExamples class >> exampleCube [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleCubeSphere [
 	"
 	self exampleCubeSphere
@@ -431,7 +432,7 @@ WDSceneExamples class >> exampleCubeSphere [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleEmpty [
 	"
 	self exampleEmpty
@@ -439,7 +440,7 @@ WDSceneExamples class >> exampleEmpty [
 	WDScene new openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleManyCubes [
 	"
 	self exampleManyCubes
@@ -476,7 +477,7 @@ WDSceneExamples class >> exampleManyCubes [
 	scene openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleManyCubesAndLights [
 	"
 	self exampleManyCubesAndLights
@@ -519,7 +520,7 @@ WDSceneExamples class >> exampleManyCubesAndLights [
 	scene openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleManyCubesSingleMesh [
 	"
 	self exampleManyCubesSingleMesh
@@ -556,7 +557,7 @@ WDSceneExamples class >> exampleManyCubesSingleMesh [
 	scene openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleManyCubesSingleMeshAndLights [
 	"
 	self exampleManyCubesSingleMeshAndLights
@@ -599,7 +600,7 @@ WDSceneExamples class >> exampleManyCubesSingleMeshAndLights [
 	scene openInWindow
 ]
 
-{ #category : #'sample scenes' }
+{ #category : 'sample scenes' }
 WDSceneExamples class >> exampleOpaquePool [
 	"
 	self exampleOpaquePool
@@ -666,7 +667,7 @@ WDSceneExamples class >> exampleOpaquePool [
 		openInWindow
 ]
 
-{ #category : #'sample scenes' }
+{ #category : 'sample scenes' }
 WDSceneExamples class >> examplePool [
 	"
 	self examplePool
@@ -733,7 +734,7 @@ WDSceneExamples class >> examplePool [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleShadowCastingDirectionalLight [
 	"
 	self exampleShadowCastingDirectionalLight
@@ -810,7 +811,7 @@ WDSceneExamples class >> exampleShadowCastingDirectionalLight [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleShadowCastingPointLight [
 	"
 	self exampleShadowCastingPointLight
@@ -932,7 +933,7 @@ WDSceneExamples class >> exampleShadowCastingPointLight [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleShadowCastingSpotLight [
 	"
 	self exampleShadowCastingSpotLight
@@ -1011,7 +1012,7 @@ WDSceneExamples class >> exampleShadowCastingSpotLight [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 	"
 	self exampleShadowCastingSpotLight2
@@ -1109,7 +1110,7 @@ WDSceneExamples class >> exampleShadowCastingSpotLight2 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedCube [
 	"
 	self exampleTexturedCube
@@ -1134,7 +1135,7 @@ WDSceneExamples class >> exampleTexturedCube [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedCube2 [
 	"
 	self exampleTexturedCube2
@@ -1161,7 +1162,7 @@ WDSceneExamples class >> exampleTexturedCube2 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedCube3 [
 	"
 	self exampleTexturedCube3
@@ -1177,7 +1178,7 @@ WDSceneExamples class >> exampleTexturedCube3 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedCube4 [
 	"
 	self exampleTexturedCube4
@@ -1199,7 +1200,7 @@ WDSceneExamples class >> exampleTexturedCube4 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedCubeSphere [
 	"
 	self exampleCubeSphere
@@ -1224,7 +1225,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedCubeSphere2 [
 	"
 	self exampleTexturedCubeSphere2
@@ -1251,7 +1252,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere2 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedCubeSphere3 [
 	"
 	self exampleTexturedCubeSphere3
@@ -1274,7 +1275,7 @@ WDSceneExamples class >> exampleTexturedCubeSphere3 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedUVSphere [
 	"
 	self exampleTexturedUVSphere
@@ -1299,7 +1300,7 @@ WDSceneExamples class >> exampleTexturedUVSphere [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedUVSphere2 [
 	"
 	self exampleTexturedUVSphere2
@@ -1326,7 +1327,7 @@ WDSceneExamples class >> exampleTexturedUVSphere2 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleTexturedUVSphere3 [
 	"
 	self exampleTexturedUVSphere3
@@ -1349,7 +1350,7 @@ WDSceneExamples class >> exampleTexturedUVSphere3 [
 		openInWindow
 ]
 
-{ #category : #'basic shapes' }
+{ #category : 'basic shapes' }
 WDSceneExamples class >> exampleUVSphere [
 	"
 	self exampleUVSphere
@@ -1368,6 +1369,36 @@ WDSceneExamples class >> exampleUVSphere [
 		openInWindow
 ]
 
-{ #category : #'see class side' }
+{ #category : 'basic shapes' }
+WDSceneExamples class >> exampleVideoPlayback [
+	"
+	self exampleVideoPlayback
+	"
+	| videoPlayer videoMaterial |
+	videoPlayer := WDVideoPlayer new
+		openWithUrl: 'bunny_1080p_60fps.mp4';
+		yourself.
+
+	videoMaterial := WDUnlitMaterial new
+		colorTexture: videoPlayer playbackTexture.
+ 
+	WDScene new
+		add: (WDMeshBuilder new
+			currentMaterial: videoMaterial;
+			addCubeWithWidth: 1.0 height: 1.0 depth: 1.0;
+			generateTexcoords0ForScreenProjection;
+			mesh);
+		add: ((WDPointLightSource new
+			color: (Vector3 x: 0.8 y: 0.8 z: 0.2);
+			intensity: 5.0;
+			influenceRadius: 4.0;
+			asSceneNode)
+				position: (Vector3 x: -1.5 y: 1.5 z: 1.6);
+				yourself);
+		updateBlock: [ :delta | ];
+		openInWindow
+]
+
+{ #category : 'see class side' }
 WDSceneExamples >> seeClassSide [
 ]

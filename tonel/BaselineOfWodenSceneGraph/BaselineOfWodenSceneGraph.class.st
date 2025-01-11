@@ -1,21 +1,23 @@
 Class {
-	#name : #BaselineOfWodenSceneGraph,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfWodenSceneGraph
+	#name : 'BaselineOfWodenSceneGraph',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfWodenSceneGraph',
+	#package : 'BaselineOfWodenSceneGraph'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfWodenSceneGraph >> baseline: spec [
     <baseline>
 	spec for: #pharo do: [ self baselineForPharo: spec ].
 	spec for: #squeak do: [ self baselineForSqueak: spec ].
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 	spec postLoadDoIt: #postLoadActions.
 	spec
 		baseline: #'AbstractGPU' with: [ spec repository: 'github://desromech/abstract-gpu' ];
+		baseline: #'AbstractVideo' with: [ spec repository: 'github://desromech/abstract-video' ];
 		baseline: #'WodenMath' with: [ spec repository: 'github://desromech/woden-core-math' ];
 		baseline: #'Toplo' with: [ spec repository: 'github://pharo-graphics/Toplo:master/src' ];
 		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://desromech/form-procedural-library' ];
@@ -60,7 +62,7 @@ BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 		]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfWodenSceneGraph >> baselineForSqueak: spec [
 	spec
 		baseline: #'AbstractGPU' with: [ spec repository: 'github://desromech/abstract-gpu' ];
@@ -96,12 +98,12 @@ BaselineOfWodenSceneGraph >> baselineForSqueak: spec [
 		]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BaselineOfWodenSceneGraph >> postLoadActions [
 	self resetSpec2Bindings
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 BaselineOfWodenSceneGraph >> resetSpec2Bindings [
 	(Smalltalk at: #SpMorphicAdapterBindings ifAbsent: [ nil ]) ifNotNil: [ :cls |
 		cls allInstancesDo: [ :each | each initializeBindings ]

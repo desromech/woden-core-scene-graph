@@ -2,8 +2,8 @@
 I hold a collection of procedurally generated assets.
 "
 Class {
-	#name : #WDSceneExamplesProceduralAssets,
-	#superclass : #Object,
+	#name : 'WDSceneExamplesProceduralAssets',
+	#superclass : 'Object',
 	#instVars : [
 		'tileMaterial',
 		'checkboardMaterial',
@@ -15,15 +15,16 @@ Class {
 	#classInstVars : [
 		'uniqueInstance'
 	],
-	#category : #'WodenSceneGraph-Examples'
+	#category : 'WodenSceneGraph-Examples',
+	#package : 'WodenSceneGraph-Examples'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDSceneExamplesProceduralAssets class >> new [
 	self shouldNotImplement
 ]
 
-{ #category : #compiling }
+{ #category : 'compiling' }
 WDSceneExamplesProceduralAssets class >> noteCompilationOf: aSelector meta: isMeta [
 	isMeta ifFalse: [ 
 		(uniqueInstance notNil and: [ self hasInstVarNamed: aSelector ]) ifTrue: [
@@ -34,18 +35,18 @@ WDSceneExamplesProceduralAssets class >> noteCompilationOf: aSelector meta: isMe
 	super noteCompilationOf: aSelector meta: isMeta
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets class >> reset [
 	<script>
 	uniqueInstance := nil.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self basicNew ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets >> checkboardMaterial [
 	<script: 'self uniqueInstance checkboardMaterial inspect'>
 	checkboardMaterial ifNotNil: [ ^ checkboardMaterial ].
@@ -57,7 +58,7 @@ WDSceneExamplesProceduralAssets >> checkboardMaterial [
 		yourself.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets >> checkboardNormalTexture [
 	<script: 'self uniqueInstance checkboardNormalTexture inspect'>
 	| form |
@@ -75,7 +76,7 @@ WDSceneExamplesProceduralAssets >> checkboardNormalTexture [
 	^ checkboardNormalTexture := WDTexture forNormalMapForm: form
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets >> checkboardTexture [
 	<script: 'self uniqueInstance checkboardTexture inspect'>
 	| form |
@@ -92,7 +93,7 @@ WDSceneExamplesProceduralAssets >> checkboardTexture [
 	^ checkboardTexture := WDTexture forColorForm: form
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets >> poolWaterMaterial [
 	<script: 'self uniqueInstance poolWaterMaterial inspect'>
 	| extent height normalMapForm |
@@ -124,7 +125,7 @@ WDSceneExamplesProceduralAssets >> poolWaterMaterial [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets >> poolWaterOpaqueMaterial [
 	<script: 'self uniqueInstance poolWaterMaterial inspect'>
 	| extent height normalMapForm |
@@ -155,7 +156,7 @@ WDSceneExamplesProceduralAssets >> poolWaterOpaqueMaterial [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSceneExamplesProceduralAssets >> tileMaterial [
 	<script: 'self uniqueInstance tileMaterial inspect'>
 	| cutoff cutoffStart tileColor infillColor darkerTileColor extent interior inside height baseColorForm normalMapForm |

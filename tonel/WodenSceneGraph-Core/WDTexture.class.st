@@ -7,7 +7,8 @@ Class {
 	#instVars : [
 		'name',
 		'description',
-		'data'
+		'data',
+		'streamDataSource'
 	],
 	#category : 'WodenSceneGraph-Core-Texture',
 	#package : 'WodenSceneGraph-Core',
@@ -469,6 +470,18 @@ WDTexture >> setupSpecularLightProbeWithSize: size forEnvironmentMap: texture [
 		data: texture;
 		changed
 
+]
+
+{ #category : 'accessing' }
+WDTexture >> streamDataSource [
+
+	^ streamDataSource
+]
+
+{ #category : 'accessing' }
+WDTexture >> streamDataSource: anObject [
+
+	streamDataSource := anObject
 ]
 
 { #category : 'accessing' }

@@ -3157,6 +3157,8 @@ WDAGPUSceneRendererResourceCache >> validIntermediateFramebuffersFor: aWDFramebu
 { #category : 'handles' }
 WDAGPUSceneRendererResourceCache >> validTextureHandleFor: aWDTexture [
 	| cachedTexture |
+	aWDTexture streamDataSource ifNotNil: [ :stream | stream updateTextureData ].
+
 	cachedTexture := textures at: aWDTexture ifAbsentPut: [ WDAGPUSceneRendererCachedResource new ].
 	cachedTexture modificationCount == aWDTexture modificationCount ifTrue: [ ^ cachedTexture handle ].
 	
@@ -3167,7 +3169,7 @@ WDAGPUSceneRendererResourceCache >> validTextureHandleFor: aWDTexture [
 		cachedTexture description: newDescription
 	].
 
-	aWDTexture data ifNotNil: [ :dataToUpload |
+	aWDTexture data ifNotNil: [ :dataToUpload |		
 		aWDTexture usageMode isStaticSampled ifTrue: [ 
 			dataToUpload uploadIntoWodenTexture: aWDTexture agpuHandle: cachedTexture handle withWodenSceneRendererResourceCache: self
 		]

@@ -1,1 +1,1 @@
-Package { #name : #BaselineOfWodenSceneGraph }
+Package { #name : 'BaselineOfWodenSceneGraph' }
