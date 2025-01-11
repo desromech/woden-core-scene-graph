@@ -28,7 +28,7 @@ BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 		];
 	
 		package: #'WodenSceneGraph-Core' with: [
-			spec requires: #( #'WodenMath' #'FormSceneGraph').				
+			spec requires: #( #'WodenMath' #'FormSceneGraph' #'AbstractVideo').				
 		];
 		package: #'WodenSceneGraph-Core-Tests' with: [
 			spec requires: #( #'WodenSceneGraph-Core' ).
