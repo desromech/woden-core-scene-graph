@@ -1376,7 +1376,7 @@ WDSceneExamples class >> exampleVideoPlayback [
 	"
 	| videoPlayer videoMaterial |
 	videoPlayer := WDVideoPlayer new
-		openWithUrl: 'bunny_1080p_60fps.mp4';
+		openWithUrl: 'bbb_sunflower_1080p_60fps_normal.mp4';
 		yourself.
 
 	videoMaterial := WDUnlitMaterial new

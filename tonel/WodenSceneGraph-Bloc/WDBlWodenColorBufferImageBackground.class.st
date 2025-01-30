@@ -53,21 +53,6 @@ WDBlWodenColorBufferImageBackground >> isTransparent [
 WDBlWodenColorBufferImageBackground >> matchExtent: anExtent [
 	| minimalExtent |
 	minimalExtent := anExtent ceiling max: 1@1.
-	(frameBuffer isNil or: [ frameBuffer extent ~= minimalExtent ]) ifTrue: [
-		colorBuffer := WDTexture new
-			type: WDTextureType2D;
-			dataKind: WDTextureDataKindColor;
-			format: WDTextureFormatB8G8R8A8UNormSRGB;
-			usageMode: WDTextureUsageModeReadedColorAttachment;
-			width: minimalExtent x asInteger;
-			height: minimalExtent y asInteger;
-			depth: 1;
-			layers: 1;
-			miplevels: 1;
-			sampleCount: 1;
-			yourself.
-		frameBuffer := WDFramebuffer forColorAttachment: colorBuffer.
-	].
 ]
 
 { #category : 'accessing' }
