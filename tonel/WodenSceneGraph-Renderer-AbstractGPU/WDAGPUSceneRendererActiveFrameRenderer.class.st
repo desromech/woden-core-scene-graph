@@ -397,6 +397,10 @@ WDAGPUSceneRendererActiveFrameRenderer >> emitEnvironmentMapMaterialActivationCo
 { #category : 'material' }
 WDAGPUSceneRendererActiveFrameRenderer >> emitMetallicRoughnessMaterialActivationCommands: material [
 	| locationMask |
+	self isDrawingLines ifTrue: [ 
+		^ material asUnlitMaterial emitActivationCommandsOn: self
+	].
+
 	(isInDepthOnlyPass and: [material hasAlphaMasking not]) ifTrue: [ ^ self emitDepthOnlyOpaqueSurfaceMaterialActivationCommandsFor: material ].
 	
 	locationMask := currentObjectVertexBinding locationMask.
@@ -549,6 +553,11 @@ WDAGPUSceneRendererActiveFrameRenderer >> getOrCreateLightingStateBinding: light
 		activeSlabResource add: binding.
 		binding
 	]
+]
+
+{ #category : 'testing' }
+WDAGPUSceneRendererActiveFrameRenderer >> isDrawingLines [
+	^ currentObjectPrimitiveTopology isLines
 ]
 
 { #category : 'accessing' }

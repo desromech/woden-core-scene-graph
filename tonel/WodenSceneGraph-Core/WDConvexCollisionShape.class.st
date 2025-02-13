@@ -60,7 +60,7 @@ WDConvexCollisionShape >> detectAndComputeCollisionContactPointsAt: transform wi
 		| distanceAndNormal |
 		distanceAndNormal := GeometricFunctions samplePenetrationContactForSupport: firstSupportFunction with: secondSupportFunction margin: totalMargin separatingAxisHint: separatingAxisHint.
 		distanceAndNormal ifNil: [ ^ #() ].
-		
+		Transcript show: 'Deep normal '; show: distanceAndNormal second;cr.
 		^ {WDContactPoint new
 				normal: distanceAndNormal second;
 				requiredSeparation: totalMargin;
