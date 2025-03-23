@@ -67,6 +67,13 @@ WDStaticMeshRenderable >> copyWithMaterial: aMaterial [
 		yourself
 ]
 
+{ #category : 'as yet unclassified' }
+WDStaticMeshRenderable >> exportToGltfWith: builder [
+	^ builder forMesh: self exportWith: [ :mesh |
+		mesh primitives: (primitives collect: [:each | each exportToGltfWith: builder])
+	]
+]
+
 { #category : 'initialization' }
 WDStaticMeshRenderable >> initialize [
 	super initialize.

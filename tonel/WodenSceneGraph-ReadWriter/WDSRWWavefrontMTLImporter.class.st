@@ -2,8 +2,8 @@
 I am an importer for wavefront obj .mtl material library files.
 "
 Class {
-	#name : #WDSRWWavefrontMTLImporter,
-	#superclass : #Object,
+	#name : 'WDSRWWavefrontMTLImporter',
+	#superclass : 'Object',
 	#instVars : [
 		'currentDirectory',
 		'currentMaterial',
@@ -12,10 +12,12 @@ Class {
 	#classVars : [
 		'CommandDictionary'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-OBJ'
+	#category : 'WodenSceneGraph-ReadWriter-OBJ',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'OBJ'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSRWWavefrontMTLImporter class >> initialize [
 	super initialize.
 	CommandDictionary := Dictionary newFromPairs: {
@@ -33,18 +35,18 @@ WDSRWWavefrontMTLImporter class >> initialize [
 	}
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSRWWavefrontMTLImporter class >> loadFromFile: aFileName [
 	^ self new loadFromFile: aFileName
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWWavefrontMTLImporter >> beginMaterial: materialName [
 	currentMaterial := WDMetallicRoughnessMaterial new.
 	materialLibrary at: materialName put: currentMaterial
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWWavefrontMTLImporter >> loadFromFile: aFileName [
 	| fileRef |
 	fileRef := aFileName asFileReference.
@@ -54,17 +56,17 @@ WDSRWWavefrontMTLImporter >> loadFromFile: aFileName [
 	]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseAmbientColor: parameters [
 	"Ignored"
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseAmbientMap: textureName [
 	"Ignored"
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseDiffuseColor: parameters [
 	| r g b color |
 	currentMaterial ifNil: [ ^ self ].
@@ -75,17 +77,17 @@ WDSRWWavefrontMTLImporter >> parseDiffuseColor: parameters [
 	currentMaterial baseColorFactor: color
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseDiffuseMap: textureName [
 	currentMaterial baseColorTexture: (WDTexture forColorFileReference: (currentDirectory resolve: textureName))
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseIlluminationMode: parameters [
 	"Ignored"
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseLine: line [
 	| components command |
 	line ifEmpty: [ ^ self ].
@@ -96,7 +98,7 @@ WDSRWWavefrontMTLImporter >> parseLine: line [
 	(CommandDictionary at: command ifAbsent: [ ^ self ]) value: self value: components
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseLinesWith: lineReader [
 	materialLibrary := Dictionary new.
 	[lineReader atEnd] whileFalse: [ 
@@ -106,12 +108,12 @@ WDSRWWavefrontMTLImporter >> parseLinesWith: lineReader [
 	^ materialLibrary
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseSpecularColor: parameters [
 	"Ignored because of PBR"
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontMTLImporter >> parseSpecularMap: textureName [
 	"Ignored because of PBR"
 ]

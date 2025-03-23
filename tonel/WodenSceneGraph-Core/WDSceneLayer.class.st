@@ -133,6 +133,14 @@ WDSceneLayer >> copiedIntoScene: aScene [
 	parent := aScene.
 ]
 
+{ #category : 'as yet unclassified' }
+WDSceneLayer >> exportToGltfWith: builder [
+	| node |
+	node := builder newNode: self name.
+	node children: (children collect: [ :each | each exportToGltfWith: builder ]).
+	^ node
+]
+
 { #category : 'initialization' }
 WDSceneLayer >> initialize [
 	super initialize.

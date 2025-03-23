@@ -5,8 +5,8 @@ https://en.wikipedia.org/wiki/PLY_(file_format)
 
 "
 Class {
-	#name : #WDSRWStanfordPLYImporter,
-	#superclass : #Object,
+	#name : 'WDSRWStanfordPLYImporter',
+	#superclass : 'Object',
 	#instVars : [
 		'elements',
 		'elementDictionary',
@@ -18,15 +18,17 @@ Class {
 	#pools : [
 		'AGPUConstants'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-PLY'
+	#category : 'WodenSceneGraph-ReadWriter-PLY',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'PLY'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYImporter class >> extension [
 	^ 'ply'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSRWStanfordPLYImporter class >> initialize [
 	super initialize.
 	
@@ -41,12 +43,12 @@ WDSRWStanfordPLYImporter class >> initialize [
 	]
 ]
 
-{ #category : #documentation }
+{ #category : 'documentation' }
 WDSRWStanfordPLYImporter class >> readFromFileReference: aFileReference [
 	^ self new readFromFileReference: aFileReference
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> addTriangleI1: i1 i2: i2 i3: i3 into: indices [
 	indices
 		add: i1;
@@ -54,7 +56,7 @@ WDSRWStanfordPLYImporter >> addTriangleI1: i1 i2: i2 i3: i3 into: indices [
 		add: i3
 ]
 
-{ #category : #'header parsing' }
+{ #category : 'header parsing' }
 WDSRWStanfordPLYImporter >> beginElement: arguments [
 	| name count |
 	name := arguments second.
@@ -68,7 +70,7 @@ WDSRWStanfordPLYImporter >> beginElement: arguments [
 	elementDictionary at: name put: currentElement
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> extractIndices [
 	| faceElement indexOfFaceIndices indexList indices |
 	indices := OrderedCollection new.
@@ -83,7 +85,7 @@ WDSRWStanfordPLYImporter >> extractIndices [
 	^ indices
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> extractPositions [
 	| vertexElement positions values xi yi zi x y z vertexValue |
 	vertexElement := elementDictionary at: 'vertex'.
@@ -105,7 +107,7 @@ WDSRWStanfordPLYImporter >> extractPositions [
 	^ positions
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> finishLoading [
 	| positions indices boundingBox primitive vertexCount encoder buffer vertexBufferView vertexBinding positionsAccessor indexBufferView indicesAccessor mesh |
 	positions := self extractPositions.
@@ -182,18 +184,18 @@ WDSRWStanfordPLYImporter >> finishLoading [
 		yourself
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> initializeLoading [
 	elements := OrderedCollection new.
 	elementDictionary := Dictionary new.
 ]
 
-{ #category : #'content parsing' }
+{ #category : 'content parsing' }
 WDSRWStanfordPLYImporter >> parseContentWith: tokenReader [
 	elements do: [ :element | self parseElementContent: element with: tokenReader ]
 ]
 
-{ #category : #'content parsing' }
+{ #category : 'content parsing' }
 WDSRWStanfordPLYImporter >> parseElementContent: element with: tokenReader [
 	| values properties |
 	properties := element properties asArray.
@@ -204,7 +206,7 @@ WDSRWStanfordPLYImporter >> parseElementContent: element with: tokenReader [
 	element values: values
 ]
 
-{ #category : #'header parsing' }
+{ #category : 'header parsing' }
 WDSRWStanfordPLYImporter >> parseHeaderWith: lineReader [
 	| line arguments |
 	lineReader nextLine ~= 'ply' ifTrue: [ self error: 'Expected ply header' ].
@@ -220,14 +222,14 @@ WDSRWStanfordPLYImporter >> parseHeaderWith: lineReader [
 
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> parseLinesWith: lineReader [
 	self
 		parseHeaderWith: lineReader;
 		parseContentWith: lineReader asSpaceTokenReader
 ]
 
-{ #category : #'header parsing' }
+{ #category : 'header parsing' }
 WDSRWStanfordPLYImporter >> parseProperty: arguments [
 	| type name property |
 	type := arguments second.
@@ -239,7 +241,7 @@ WDSRWStanfordPLYImporter >> parseProperty: arguments [
 	
 ]
 
-{ #category : #'header parsing' }
+{ #category : 'header parsing' }
 WDSRWStanfordPLYImporter >> parsePropertyList: arguments [
 	| countType elementType name property |
 	countType := WDSRWStanfordPLYProperty findPropertyClassFromType: arguments third.
@@ -253,7 +255,7 @@ WDSRWStanfordPLYImporter >> parsePropertyList: arguments [
 	currentElement addProperty: property
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> readFromFileReference: fileRef [
 	^ fileRef readStreamDo: [ :fin |
 		self initializeLoading;
@@ -262,7 +264,7 @@ WDSRWStanfordPLYImporter >> readFromFileReference: fileRef [
 	]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWStanfordPLYImporter >> triangulateFace: faceIndices into: indices [
 	3 to: faceIndices size do: [ :i |
 		self addTriangleI1: faceIndices first i2: (faceIndices at: i - 1) i3: (faceIndices at: i) into: indices

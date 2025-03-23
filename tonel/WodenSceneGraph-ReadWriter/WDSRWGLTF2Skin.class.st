@@ -2,8 +2,8 @@
 I am a specific skin in a glTF 2 model.
 "
 Class {
-	#name : #WDSRWGLTF2Skin,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2Skin',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'inverseBindMatrices',
@@ -17,72 +17,74 @@ Class {
 	#pools : [
 		'WDSRWGLTF2Constants'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Skin >> fetchInverseBindMatrices [
 	^ inverseBindMatricesAccessor decodeContentAsArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> inverseBindMatrices [
 	^ inverseBindMatrices ifNil: [ inverseBindMatrices := self fetchInverseBindMatrices ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> inverseBindMatricesAccessor [
 	^ inverseBindMatricesAccessor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> inverseBindMatricesAccessor: anObject [
 	inverseBindMatricesAccessor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> jointIndices [
 	^ jointIndices
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> jointIndices: anObject [
 	jointIndices := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> name: anObject [
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> rootNode [
 
 	^ rootNode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> rootNode: anObject [
 
 	rootNode := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> rootNodeIndex [
 	^ rootNodeIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> rootNodeIndex: anObject [
 	rootNodeIndex := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Skin >> skeleton [
 	^ skeleton ifNil: [ skeleton := WDSkeleton new name: name ]
 ]

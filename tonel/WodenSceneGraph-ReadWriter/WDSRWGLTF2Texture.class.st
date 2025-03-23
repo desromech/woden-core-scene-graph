@@ -2,8 +2,8 @@
 I am a specific texture in a glTF 2 model.
 "
 Class {
-	#name : #WDSRWGLTF2Texture,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2Texture',
+	#superclass : 'Object',
 	#instVars : [
 		'image',
 		'sampler',
@@ -14,10 +14,12 @@ Class {
 	#pools : [
 		'WDSRWGLTF2Constants'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSRWGLTF2Texture >> addOntoModelAsset: modelAsset [
 	colorTexture ifNotNil: [
 		modelAsset addTexture: colorTexture
@@ -30,37 +32,37 @@ WDSRWGLTF2Texture >> addOntoModelAsset: modelAsset [
 	].
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Texture >> asColorTexture [
 	^ colorTexture ifNil: [ colorTexture := image asColorTexture ]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Texture >> asNonColorTexture [
 	^ nonColorTexture ifNil: [ nonColorTexture := image asNonColorTexture ]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Texture >> asNormalTexture [
 	^ normalTexture ifNil: [ normalTexture := image asNormalTexture ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Texture >> image [
 	^ image
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Texture >> image: anObject [
 	image := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Texture >> sampler [
 	^ sampler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Texture >> sampler: anObject [
 	sampler := anObject
 ]

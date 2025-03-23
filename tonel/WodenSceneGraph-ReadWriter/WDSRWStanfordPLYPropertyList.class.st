@@ -2,41 +2,43 @@
 I am a list property. I am used for holding the vertex indices of the faces.
 "
 Class {
-	#name : #WDSRWStanfordPLYPropertyList,
-	#superclass : #WDSRWStanfordPLYProperty,
+	#name : 'WDSRWStanfordPLYPropertyList',
+	#superclass : 'WDSRWStanfordPLYProperty',
 	#instVars : [
 		'countType',
 		'elementType'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-PLY'
+	#category : 'WodenSceneGraph-ReadWriter-PLY',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'PLY'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWStanfordPLYPropertyList class >> typeName [
 	^ #list
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYPropertyList >> countType [
 	^ countType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYPropertyList >> countType: anObject [
 	countType := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYPropertyList >> elementType [
 	^ elementType
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYPropertyList >> elementType: anObject [
 	elementType := anObject
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDSRWStanfordPLYPropertyList >> readFrom: inputStream [
 	| count |
 	count := countType readFrom: inputStream.

@@ -2,42 +2,44 @@
 I am a stream for reading lines of text.
 "
 Class {
-	#name : #WDSRWLineReader,
-	#superclass : #Object,
+	#name : 'WDSRWLineReader',
+	#superclass : 'Object',
 	#instVars : [
 		'decoratedStream'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-OBJ'
+	#category : 'WodenSceneGraph-ReadWriter-OBJ',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'OBJ'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 WDSRWLineReader class >> on: decoratedStream [
 	^ self new decoratedStream: decoratedStream; yourself
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWLineReader >> asSpaceTokenReader [
 	^ WDSRWSpaceTokenReader on: decoratedStream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWLineReader >> atEnd [
 	^ decoratedStream atEnd
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWLineReader >> decoratedStream [
 
 	^ decoratedStream
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWLineReader >> decoratedStream: anObject [
 
 	decoratedStream := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWLineReader >> next [
 	^ ByteString streamContents: [ :out |
 		[ decoratedStream atEnd not and: [ decoratedStream peek ~= Character cr and: [decoratedStream peek ~= Character lf]]] whileTrue: [ 
@@ -49,7 +51,7 @@ WDSRWLineReader >> next [
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWLineReader >> nextLine [
 	^ self next
 ]

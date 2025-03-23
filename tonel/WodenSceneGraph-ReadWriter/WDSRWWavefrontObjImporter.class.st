@@ -2,8 +2,8 @@
 I am an importer for wavefront .obj 3d models.
 "
 Class {
-	#name : #WDSRWWavefrontObjImporter,
-	#superclass : #Object,
+	#name : 'WDSRWWavefrontObjImporter',
+	#superclass : 'Object',
 	#instVars : [
 		'currentDirectory',
 		'materialLibrary',
@@ -24,10 +24,12 @@ Class {
 	#classVars : [
 		'CommandDictionary'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-OBJ'
+	#category : 'WodenSceneGraph-ReadWriter-OBJ',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'OBJ'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSRWWavefrontObjImporter class >> initialize [
 	super initialize.
 	CommandDictionary := Dictionary newFromPairs: {
@@ -42,12 +44,12 @@ WDSRWWavefrontObjImporter class >> initialize [
 	}
 ]
 
-{ #category : #documentation }
+{ #category : 'documentation' }
 WDSRWWavefrontObjImporter class >> readFromFileReference: aFileReference [
 	^ self new readFromFileReference: aFileReference
 ]
 
-{ #category : #'submesh building' }
+{ #category : 'submesh building' }
 WDSRWWavefrontObjImporter >> addTriangleI1: i1 i2: i2 i3: i3 [
 	self beginTriangles.
 	indices
@@ -56,17 +58,17 @@ WDSRWWavefrontObjImporter >> addTriangleI1: i1 i2: i2 i3: i3 [
 		add: i3
 ]
 
-{ #category : #'submesh building' }
+{ #category : 'submesh building' }
 WDSRWWavefrontObjImporter >> beginLines [
 	self beginSubmesh: WDPrimitiveTopologyLines
 ]
 
-{ #category : #'submesh building' }
+{ #category : 'submesh building' }
 WDSRWWavefrontObjImporter >> beginObject: objectName [
 	currentObjectName := objectName
 ]
 
-{ #category : #'submesh building' }
+{ #category : 'submesh building' }
 WDSRWWavefrontObjImporter >> beginSubmesh: topology [
 	| submesh |
 	submeshes ifNotEmpty: [
@@ -87,19 +89,19 @@ WDSRWWavefrontObjImporter >> beginSubmesh: topology [
 	
 ]
 
-{ #category : #'submesh building' }
+{ #category : 'submesh building' }
 WDSRWWavefrontObjImporter >> beginTriangles [
 	self beginSubmesh: WDPrimitiveTopologyTriangles
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> buildFaceWithIndices: faceIndices [
 	3 to: faceIndices size do: [ :i |
 		self addTriangleI1: faceIndices first i2: (faceIndices at: i - 1) i3: (faceIndices at: i)
 	]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> concretizeVertex: vertexTopology faceNormal: faceNormal [
 	| position texcoord normal nextIndex |
 	position := self fetchRawPosition: vertexTopology first.
@@ -119,7 +121,7 @@ WDSRWWavefrontObjImporter >> concretizeVertex: vertexTopology faceNormal: faceNo
 	]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWWavefrontObjImporter >> encodeBuffers [
 	| vertexCount encoder encodedAttributes buffer vertexBinding |
 	self assert: (positions size // 3) = (texcoords size // 2).
@@ -169,7 +171,7 @@ WDSRWWavefrontObjImporter >> encodeBuffers [
 	]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 WDSRWWavefrontObjImporter >> encodeWith: encoder float32Array: array type: type location: location into: encodedAttributes [
 	| accessor |
 	array isEmpty ifTrue: [ ^ self ].
@@ -186,27 +188,27 @@ WDSRWWavefrontObjImporter >> encodeWith: encoder float32Array: array type: type 
 		yourself)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWWavefrontObjImporter >> fetchPosition: index [
 	^ Vector3 x: (positions at: index*3 - 2) y: (positions at: index*3 - 1) z: (positions at: index*3)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWWavefrontObjImporter >> fetchRawNormals: index [
 	^ Vector3 x: (rawNormals at: index*3 - 2) y: (rawNormals at: index*3 - 1) z: (rawNormals at: index*3)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWWavefrontObjImporter >> fetchRawPosition: index [
 	^ Vector3 x: (rawPositions at: index*3 - 2) y: (rawPositions at: index*3 - 1) z: (rawPositions at: index*3)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWWavefrontObjImporter >> fetchRawTexcoord: index [
 	^ Vector2 x: (rawTexcoords at: index*2 - 1) y: (rawTexcoords at: index*2)
 ]
 
-{ #category : #'submesh building' }
+{ #category : 'submesh building' }
 WDSRWWavefrontObjImporter >> finishCurrentSubmesh [
 	| submesh boundingBox firstIndex count |
 	submeshes ifEmpty: [ ^ self ].
@@ -221,7 +223,7 @@ WDSRWWavefrontObjImporter >> finishCurrentSubmesh [
 	submesh boundingBox: boundingBox
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> finishLoading [
 	| boundingBox mesh |
 	self finishCurrentSubmesh.
@@ -241,7 +243,7 @@ WDSRWWavefrontObjImporter >> finishLoading [
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSRWWavefrontObjImporter >> initializeLoading [
 	rawPositions := OrderedCollection new.
 	rawNormals := OrderedCollection new.
@@ -257,7 +259,7 @@ WDSRWWavefrontObjImporter >> initializeLoading [
 	submeshes := OrderedCollection new.
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parseFace: components [
 	| topologies p1 p2 p3 u v n |
 	topologies := components allButFirst collect: [ :vertex |
@@ -275,12 +277,12 @@ WDSRWWavefrontObjImporter >> parseFace: components [
 	self buildFaceWithIndices: (topologies collect: [ :topo | self concretizeVertex: topo faceNormal: n])
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parseFaceElement: faceElement [
 	^ faceElement ifEmpty: [ nil ] ifNotEmpty: [ faceElement asInteger ]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parseFaceVertex: encodedFace [
 	| parts |
 	parts := (encodedFace splitOn: '/') collect: [ :part | self parseFaceElement: part ].
@@ -290,7 +292,7 @@ WDSRWWavefrontObjImporter >> parseFaceVertex: encodedFace [
 	
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parseLine: line [
 	| components command |
 	line ifEmpty: [ ^ self ].
@@ -301,7 +303,7 @@ WDSRWWavefrontObjImporter >> parseLine: line [
 	(CommandDictionary at: command ifAbsent: [ ^ self ]) value: self value: components
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parseLinesWith: lineReader [
 	[lineReader atEnd] whileFalse: [
 		self parseLine: lineReader nextLine
@@ -309,7 +311,7 @@ WDSRWWavefrontObjImporter >> parseLinesWith: lineReader [
 
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parseNormal: components [
 	rawNormals
 		add: components second asNumber;
@@ -317,7 +319,7 @@ WDSRWWavefrontObjImporter >> parseNormal: components [
 		add: components fourth asNumber
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parsePosition: components [
 	rawPositions
 		add: components second asNumber;
@@ -325,14 +327,14 @@ WDSRWWavefrontObjImporter >> parsePosition: components [
 		add: components fourth asNumber.
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> parseTexcoord: components [
 	rawTexcoords
 		add: components second asNumber;
 		add: 1.0 - components third asNumber
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWWavefrontObjImporter >> readFromFileReference: fileRef [
 	currentDirectory := fileRef parent.
 	^ fileRef readStreamDo: [ :fin |
@@ -342,7 +344,7 @@ WDSRWWavefrontObjImporter >> readFromFileReference: fileRef [
 	]
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> useMaterial: materialName [
 	| newMaterial |
 	newMaterial := materialLibrary ifNotNil: [ :lib | materialLibrary at: materialName ifAbsent: [ nil ] ].
@@ -353,7 +355,7 @@ WDSRWWavefrontObjImporter >> useMaterial: materialName [
 	
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWavefrontObjImporter >> useMaterialLibrary: fileName [
 	materialLibrary := WDSRWWavefrontMTLImporter loadFromFile: (currentDirectory resolve: fileName asFileReference)
 ]

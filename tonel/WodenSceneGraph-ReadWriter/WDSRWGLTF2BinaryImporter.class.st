@@ -2,20 +2,22 @@
 I am importer for glTF 2 binary models.
 "
 Class {
-	#name : #WDSRWGLTF2BinaryImporter,
-	#superclass : #WDSRWGLTF2Importer,
+	#name : 'WDSRWGLTF2BinaryImporter',
+	#superclass : 'WDSRWGLTF2Importer',
 	#instVars : [
 		'chunks'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #documentation }
+{ #category : 'documentation' }
 WDSRWGLTF2BinaryImporter class >> readFromFileReference: aFileReference [
 	^ self new readFromFileReference: aFileReference
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2BinaryImporter >> getBinaryDataChunkWithIndex: binaryChunkIndex [
 	| chunk |
 	chunk := (chunks at: binaryChunkIndex + 1).
@@ -26,7 +28,7 @@ WDSRWGLTF2BinaryImporter >> getBinaryDataChunkWithIndex: binaryChunkIndex [
 	^ chunk content
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2BinaryImporter >> readFromFileReference: fileReference [
 	| version length gltfJson |
 	chunks := OrderedCollection new.
@@ -54,7 +56,7 @@ WDSRWGLTF2BinaryImporter >> readFromFileReference: fileReference [
 		processGLTFJson: gltfJson
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2BinaryImporter >> readGLTFChunkFrom: in [
 	| chunkLength chunkType chunkPayload |
 	chunkLength := in nextLittleEndianNumber: 4.
@@ -67,7 +69,7 @@ WDSRWGLTF2BinaryImporter >> readGLTFChunkFrom: in [
 	)
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2BinaryImporter >> readGLTFChunksFrom: in until: targetPosition [
 	[in position < targetPosition] whileTrue: [ 
 		self readGLTFChunkFrom: in

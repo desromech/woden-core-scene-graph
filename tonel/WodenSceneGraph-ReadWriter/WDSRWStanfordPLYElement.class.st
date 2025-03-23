@@ -2,8 +2,8 @@
 I represent an element int PLY 3D model format.
 "
 Class {
-	#name : #WDSRWStanfordPLYElement,
-	#superclass : #Object,
+	#name : 'WDSRWStanfordPLYElement',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'count',
@@ -11,10 +11,12 @@ Class {
 		'propertyDictionary',
 		'values'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-PLY'
+	#category : 'WodenSceneGraph-ReadWriter-PLY',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'PLY'
 }
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSRWStanfordPLYElement >> addProperty: aProperty [
 	propertyDictionary at: aProperty name put: aProperty.
 	properties add: aProperty.
@@ -22,59 +24,59 @@ WDSRWStanfordPLYElement >> addProperty: aProperty [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> count [
 	^ count
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> count: anObject [
 	count := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> indexOfProperty: propertyName [
 	^ (propertyDictionary at: propertyName) index
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSRWStanfordPLYElement >> initialize [
 	super initialize.
 	properties := OrderedCollection new.
 	propertyDictionary := Dictionary new.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> name: anObject [
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> properties [
 	^ properties
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> properties: anObject [
 	properties := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> propertyDictionary [
 	^ propertyDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> values [
 	^ values
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWStanfordPLYElement >> values: anObject [
 	values := anObject
 ]

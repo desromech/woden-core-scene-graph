@@ -2,8 +2,8 @@
 I am a reader for wav files.
 "
 Class {
-	#name : #WDSRWWaveFileReader,
-	#superclass : #Object,
+	#name : 'WDSRWWaveFileReader',
+	#superclass : 'Object',
 	#classVars : [
 		'SoundSampleFormatDictionary',
 		'WaveFormatALaw',
@@ -11,10 +11,12 @@ Class {
 		'WaveFormatMuLaw',
 		'WaveFormatPCM'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-WAV'
+	#category : 'WodenSceneGraph-ReadWriter-WAV',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'WAV'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 WDSRWWaveFileReader class >> initialize [
 	WaveFormatPCM := 1.
 	WaveFormatIEEEFloat := 3.
@@ -30,12 +32,12 @@ WDSRWWaveFileReader class >> initialize [
 	}
 ]
 
-{ #category : #documentation }
+{ #category : 'documentation' }
 WDSRWWaveFileReader class >> readFromFileReference: aFileReference [
 	^ self new readFromFileReference: aFileReference
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 WDSRWWaveFileReader >> parseWaveData: contents [
 	"See https://www.mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html for a spec."
 	| chunkID waveFileChunkSize waveID fmtChunkSize readIndex fmtChunkEndOffset formatTag numberOfChannels sampleRate dataRate dataBlockSize bitsPerSample sampleFormat dataChunkSize samples |
@@ -82,7 +84,7 @@ WDSRWWaveFileReader >> parseWaveData: contents [
 		yourself
 ]
 
-{ #category : #documentation }
+{ #category : 'documentation' }
 WDSRWWaveFileReader >> readFromFileReference: fileRef [
 	^ fileRef binaryReadStreamDo: [ :fin |
 		self parseWaveData: fin contents

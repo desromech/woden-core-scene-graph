@@ -765,6 +765,7 @@ WDMeshBuilder >> encodeWith: encoder float32Array: array type: type location: lo
 		bufferView: vertexBufferView;
 		byteOffset: encoder size;
 		type: type;
+		count: vertexCount;
 		componentType: WDBinaryBufferAccessorFloat32ComponentType;
 		yourself.
 	encoder addFloat32Array: array.
@@ -780,6 +781,7 @@ WDMeshBuilder >> encodeWith: encoder uint16Array: array type: type location: loc
 	array isEmpty ifTrue: [ ^ self ].
 	accessor := WDBinaryBufferAccessor new
 		byteOffset: encoder size;
+		count: vertexCount;
 		type: type;
 		componentType: WDBinaryBufferAccessorUInt16ComponentType;
 		yourself.

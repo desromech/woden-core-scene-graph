@@ -2,17 +2,19 @@
 I am a read-writer for the models in the standford .ply format.
 "
 Class {
-	#name : #WDSRWStandfordPLYReadWriter,
-	#superclass : #WDModelAssetReadWriter,
-	#category : #'WodenSceneGraph-ReadWriter-PLY'
+	#name : 'WDSRWStandfordPLYReadWriter',
+	#superclass : 'WDModelAssetReadWriter',
+	#category : 'WodenSceneGraph-ReadWriter-PLY',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'PLY'
 }
 
-{ #category : #documentation }
+{ #category : 'documentation' }
 WDSRWStandfordPLYReadWriter class >> extensions [
 	^ #(ply)
 ]
 
-{ #category : #documentation }
+{ #category : 'documentation' }
 WDSRWStandfordPLYReadWriter class >> readFromFileReference: aFileReference [
 	^ WDSRWStanfordPLYImporter readFromFileReference: aFileReference
 ]

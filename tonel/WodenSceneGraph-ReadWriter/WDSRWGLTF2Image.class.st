@@ -2,8 +2,8 @@
 I am a specific image in a glTF 2 model.
 "
 Class {
-	#name : #WDSRWGLTF2Image,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2Image',
+	#superclass : 'Object',
 	#instVars : [
 		'imageData',
 		'form',
@@ -12,56 +12,58 @@ Class {
 	#pools : [
 		'WDSRWGLTF2Constants'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Image >> asColorTexture [
 	^ WDTexture forColorForm: self form
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Image >> asNonColorTexture [
 	^ WDTexture forNonColorForm: self form
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Image >> asNormalTexture [
 	^ WDTexture forNormalMapForm: self form
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Image >> extent [
 	^ self form extent
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Image >> form [
 	^ form ifNil: [form := ImageReadWriter formFromStream: imageData readStream ].
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Image >> imageData [
 	^ imageData
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Image >> imageData: anObject [
 	imageData := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 WDSRWGLTF2Image >> initialize [
 	super initialize.
 	name := ''.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Image >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Image >> name: anObject [
 	name := anObject
 ]

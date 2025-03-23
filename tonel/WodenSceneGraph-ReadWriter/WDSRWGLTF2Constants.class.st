@@ -2,8 +2,8 @@
 I hold common constants used by a glTF 2 model.
 "
 Class {
-	#name : #WDSRWGLTF2Constants,
-	#superclass : #SharedPool,
+	#name : 'WDSRWGLTF2Constants',
+	#superclass : 'SharedPool',
 	#classVars : [
 		'GL_2_BYTES',
 		'GL_3_BYTES',
@@ -27,10 +27,12 @@ Class {
 		'GL_UNSIGNED_INT',
 		'GL_UNSIGNED_SHORT'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 WDSRWGLTF2Constants class >> initialize [
 	"Data types"
 	GL_BYTE					:= 16r1400.

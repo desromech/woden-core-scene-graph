@@ -2,8 +2,8 @@
 I am an animation sampler in a glTF 2 model asset. 
 "
 Class {
-	#name : #WDSRWGLTF2AnimationSampler,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2AnimationSampler',
+	#superclass : 'Object',
 	#instVars : [
 		'inputAccessor',
 		'outputAccessor',
@@ -12,10 +12,12 @@ Class {
 	#classVars : [
 		'InterpolationAlgorithmToInterpolationMethodMap'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 WDSRWGLTF2AnimationSampler class >> initialize [
 	InterpolationAlgorithmToInterpolationMethodMap := Dictionary newFromPairs: { 
 		'LINEAR' . WDCurveInterpolationMethodLinear asCurveInterpolationMethod.
@@ -25,57 +27,57 @@ WDSRWGLTF2AnimationSampler class >> initialize [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2AnimationSampler >> animationInterpolationMethod [
 	^ InterpolationAlgorithmToInterpolationMethodMap at: interpolationAlgorithm ifAbsent: [ WDCurveInterpolationMethodStep uniqueInstance ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> inputAccessor [
 	^ inputAccessor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> inputAccessor: anObject [
 	inputAccessor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> inputMaxValue [
 	^ inputAccessor max
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> inputMinValue [
 	^ inputAccessor min
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> inputValues [
 	^ inputAccessor decodeContentAsArray
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> interpolationAlgorithm [
 	^ interpolationAlgorithm
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> interpolationAlgorithm: anObject [
 	interpolationAlgorithm := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> outputAccessor [
 	^ outputAccessor
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> outputAccessor: anObject [
 	outputAccessor := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationSampler >> outputValues [
 	^ outputAccessor decodeContentAsArray
 ]

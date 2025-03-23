@@ -80,6 +80,17 @@ WDScene >> children [
 ]
 
 { #category : 'accessing' }
+WDScene >> exportToGltf: aFileReference [
+	| builder rootNode json |
+	builder := WDSRWGLTF2Builder new.
+	rootNode := normalLayer exportToGltfWith: builder.
+	(builder newScene: name) nodes: { rootNode }.
+	json := builder buildJson.
+
+	aFileReference writeStreamDo: [ :out | out truncate; nextPutAll: json ]
+]
+
+{ #category : 'accessing' }
 WDScene >> foregroundLayer [
 
 	^ foregroundLayer

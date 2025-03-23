@@ -2,8 +2,8 @@
 I am importer for glTF 2 models.
 "
 Class {
-	#name : #WDSRWGLTF2Importer,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2Importer',
+	#superclass : 'Object',
 	#instVars : [
 		'loadingDirectory',
 		'buffers',
@@ -43,10 +43,12 @@ Class {
 		'AGPUConstants',
 		'WDSRWGLTF2Constants'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 WDSRWGLTF2Importer class >> initialize [
 	WDSRWGLTF2Constants initialize.
 	TypeMap := Dictionary newFromPairs: {
@@ -90,7 +92,7 @@ WDSRWGLTF2Importer class >> initialize [
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 WDSRWGLTF2Importer >> addNodeIndicesFrom: startingNodeIndex to: stopNodeIndex into: nodeIndices set: nodeIndicesSet [
 	| nextNodeIndex |
 	(nodeIndicesSet includes: startingNodeIndex) ifTrue: [ 
@@ -107,7 +109,7 @@ WDSRWGLTF2Importer >> addNodeIndicesFrom: startingNodeIndex to: stopNodeIndex in
 	self addNodeIndicesFrom: nextNodeIndex to: stopNodeIndex into: nodeIndices set: nodeIndicesSet
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> computeNodeGlobalTransform: nodeIndex [
 	| parentTransform result |
 	(nodeGlobalTransforms at: nodeIndex + 1) ifNotNil: [ :cachedResult | ^ cachedResult ].
@@ -122,7 +124,7 @@ WDSRWGLTF2Importer >> computeNodeGlobalTransform: nodeIndex [
 	^ result
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> computeNodesTopologies [
 	rootNodes := OrderedCollection new.
 	nodeParents doWithIndex: [ :parentIndex :index |
@@ -140,12 +142,12 @@ WDSRWGLTF2Importer >> computeNodesTopologies [
 
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> getBinaryDataChunkWithIndex: binaryChunkIndex [
 	self error: 'Missing required binary data specification.'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> lcaForNodeIndices: nodeIndices [
 	| rangeStopIndex rangeStartIndex lcaDepth lcaResult |
 	rangeStartIndex := rangeStopIndex := nodeToLcaQueryIndex at: nodeIndices first + 1.
@@ -171,7 +173,7 @@ WDSRWGLTF2Importer >> lcaForNodeIndices: nodeIndices [
 	^ lcaResult
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> lcaTreeWalk: nodeIndex depth: nodeDepth [
 	nodeToLcaQueryIndex at: nodeIndex + 1 put: lcaTreeWalkIndices size.
 	lcaTreeWalkIndices add: nodeIndex.
@@ -186,7 +188,7 @@ WDSRWGLTF2Importer >> lcaTreeWalk: nodeIndex depth: nodeDepth [
 
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadAccessorFrom: accessorDescription [
 	| bufferView componentType type count pixelFormatName byteOffset minValues maxValues max min |
 	bufferView := bufferViews at: (accessorDescription at: 'bufferView') + 1.
@@ -233,13 +235,13 @@ WDSRWGLTF2Importer >> loadAccessorFrom: accessorDescription [
 		yourself)
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadAccessorsFrom: elements [
 	accessors := OrderedCollection new.
 	elements do: [ :el | self loadAccessorFrom: el ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> loadAnimationChannelFrom: channelDescription withSamplers: animationSamplers [
 	| channel targetDescription |
 	channel := WDSRWGLTF2AnimationChannel new.
@@ -252,7 +254,7 @@ WDSRWGLTF2Importer >> loadAnimationChannelFrom: channelDescription withSamplers:
 	^ channel
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> loadAnimationFrom: animationDescription [
 	| animationSamplers animationChannels |
 	animationSamplers := OrderedCollection new.
@@ -277,7 +279,7 @@ WDSRWGLTF2Importer >> loadAnimationFrom: animationDescription [
 	)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> loadAnimationSampler: samplerDescription [
 	^ WDSRWGLTF2AnimationSampler new
 		inputAccessor: (accessors at: (samplerDescription at: 'input') + 1);
@@ -286,7 +288,7 @@ WDSRWGLTF2Importer >> loadAnimationSampler: samplerDescription [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> loadAnimationsFrom: elements [
 	animations := OrderedCollection new.
 	elements do: [ :each |
@@ -295,7 +297,7 @@ WDSRWGLTF2Importer >> loadAnimationsFrom: elements [
 
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadBinaryDataFromURI: uri [
 	| absolutePath |
 	(uri beginsWith: 'data:') ifTrue: [ ^ self parseDataURI: uri ].
@@ -303,7 +305,7 @@ WDSRWGLTF2Importer >> loadBinaryDataFromURI: uri [
 	^ absolutePath binaryReadStreamDo: [ :in | in contents ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadBuffer: bufferIndex from: bufferDescription [
 	| byteLength description data |
 	data := bufferDescription at: 'uri'
@@ -317,7 +319,7 @@ WDSRWGLTF2Importer >> loadBuffer: bufferIndex from: bufferDescription [
 		yourself)
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadBufferViewFrom: viewDescription [
 	bufferViews add: (WDBinaryBufferView new
 		name: (viewDescription at: 'name' ifAbsent: ['']);
@@ -328,19 +330,19 @@ WDSRWGLTF2Importer >> loadBufferViewFrom: viewDescription [
 		yourself)
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadBufferViewsFrom: elements [
 	bufferViews := OrderedCollection new.
 	elements do: [ :el | self loadBufferViewFrom: el ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadBuffersFrom: elements [
 	buffers := OrderedCollection new.
 	elements doWithIndex: [ :el :index | self loadBuffer: index from: el ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadImageFrom: imageDescription [
 	| imageData imageReader imageName image |
 	imageData := nil.
@@ -362,13 +364,13 @@ WDSRWGLTF2Importer >> loadImageFrom: imageDescription [
 	images add: image
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadImagesFrom: elements [
 	images := OrderedCollection new.
 	elements do: [ :element | self loadImageFrom: element ].
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadMaterialFrom: materialDescription [
 	| material |
 	material := nil.
@@ -382,13 +384,13 @@ WDSRWGLTF2Importer >> loadMaterialFrom: materialDescription [
 	materials add: material
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadMaterialsFrom: elements [
 	materials := OrderedCollection new.
 	elements do: [ :el | self loadMaterialFrom: el ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadMeshFrom: meshDescription [
 	| name mesh |
 	name := meshDescription at: 'name' ifAbsent: [nil].
@@ -402,7 +404,7 @@ WDSRWGLTF2Importer >> loadMeshFrom: meshDescription [
 	meshes add: mesh
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
 	| primitive attributes vertexAttributes |
 	primitive := WDMeshPrimitive new
@@ -448,13 +450,13 @@ WDSRWGLTF2Importer >> loadMeshPrimitive: primitiveDescription [
 
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadMeshesFrom: elements [
 	meshes := OrderedCollection new.
 	elements do: [ :el | self loadMeshFrom: el ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadMetallicRoughnessMaterial: description commonDescription: commonDescription [
 	| material occlusionTexture metallicRoughnessTexture |
 	material := WDMetallicRoughnessMaterial new.
@@ -504,7 +506,7 @@ WDSRWGLTF2Importer >> loadMetallicRoughnessMaterial: description commonDescripti
 	^ material
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadNode: node index: index childrenFrom: nodeDescription [
 	| childrenList |
 	childrenList := (nodeDescription at: 'children' ifAbsent: [#()]).
@@ -519,7 +521,7 @@ WDSRWGLTF2Importer >> loadNode: node index: index childrenFrom: nodeDescription 
 	
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadNodeFrom: nodeDescription [
 	| node cameraDescription perspective transform |
 	node := WDSceneNode new.
@@ -580,7 +582,7 @@ WDSRWGLTF2Importer >> loadNodeFrom: nodeDescription [
 	nodeBoneStates add: transform
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadNodesFrom: elements [
 	nodes := OrderedCollection new.
 	nodeBoneStates := OrderedCollection new.
@@ -598,7 +600,7 @@ WDSRWGLTF2Importer >> loadNodesFrom: elements [
 	]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadSamplerFrom: samplerDescription [
 	| sampler |
 	sampler := WDSRWGLTF2Sampler new.
@@ -606,13 +608,13 @@ WDSRWGLTF2Importer >> loadSamplerFrom: samplerDescription [
 	samplers add: sampler
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadSamplersFrom: elements [
 	samplers := OrderedCollection new.
 	elements do: [ :el | self loadSamplerFrom: el ].
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadSceneFrom: sceneDescription [
 	| scene |
 	scene := WDScene new.
@@ -626,13 +628,13 @@ WDSRWGLTF2Importer >> loadSceneFrom: sceneDescription [
 	scenes add: scene
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadScenesFrom: elements [
 	scenes := OrderedCollection new.
 	elements do: [ :el | self loadSceneFrom: el ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadSkinFrom: skinDescription [
 	| skin |
 	skin := WDSRWGLTF2Skin new.
@@ -647,7 +649,7 @@ WDSRWGLTF2Importer >> loadSkinFrom: skinDescription [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> loadSkinTopology: skin [
 	| declaredJointIndices lcaRootNodeIndex lcaRootNode nodeToBoneIndexTable bones allJointIndices allJointIndicesSet |
 	
@@ -703,14 +705,14 @@ WDSRWGLTF2Importer >> loadSkinTopology: skin [
 		computeRestPoseForwardMatrices.
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadSkinsFrom: elements [
 	skins := OrderedCollection new.
 	elements do: [ :el | self loadSkinFrom: el ].
 
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadTextureFrom: textureDescription [
 	| texture |
 	texture := WDSRWGLTF2Texture new.
@@ -725,23 +727,23 @@ WDSRWGLTF2Importer >> loadTextureFrom: textureDescription [
 	textures add: texture	
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadTexturesFrom: elements [
 	textures := OrderedCollection new.
 	elements do: [ :el | self loadTextureFrom: el ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Importer >> loadingDirectory [
 	^ loadingDirectory
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Importer >> loadingDirectory: anObject [
 	loadingDirectory := anObject
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> parseDataURI: uri [
 	| dataStartIndex metadata data mediaTypeAndEncoding mediaType encoding |
 	dataStartIndex := uri indexOf: $,.
@@ -756,7 +758,7 @@ WDSRWGLTF2Importer >> parseDataURI: uri [
 	^ data base64Decoded
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> processGLTFJson: json [
 	| asset |
 	currentGLTFJson := json.
@@ -803,7 +805,7 @@ WDSRWGLTF2Importer >> processGLTFJson: json [
 	^ asset
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Importer >> validNodeNameForIndex: nodeIndex [
 	| name |
 	name := (nodes at: nodeIndex + 1) name.

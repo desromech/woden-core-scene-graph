@@ -80,6 +80,22 @@ WDMeshPrimitive >> emitRenderingCommandsWithRenderer: renderer [
 	renderer emitRenderingCommandsForMeshPrimitive: self
 ]
 
+{ #category : 'as yet unclassified' }
+WDMeshPrimitive >> exportToGltfWith: builder [
+	| primitive |
+	primitive := builder newPrimitive.
+	vertexBinding attributes do: [:each |
+		| attribute |
+		attribute := builder mapVertexLocationToAttribute: each location.
+		primitive attributes at: attribute put: (builder convertAccessor: each accessor)
+	].
+
+	indices ifNotNil: [ 
+		primitive indices: (builder convertAccessor: indices)
+	].
+	^ primitive
+]
+
 { #category : 'accessing' }
 WDMeshPrimitive >> indices [
 

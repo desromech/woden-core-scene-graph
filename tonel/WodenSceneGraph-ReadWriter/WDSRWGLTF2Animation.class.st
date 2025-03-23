@@ -2,17 +2,19 @@
 I am a specific animation in a glTF 2 model.
 "
 Class {
-	#name : #WDSRWGLTF2Animation,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2Animation',
+	#superclass : 'Object',
 	#instVars : [
 		'samplers',
 		'channels',
 		'name'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2Animation >> asModelAnimation [
 	^ WDModelAnimation new
 		name: name;
@@ -20,32 +22,32 @@ WDSRWGLTF2Animation >> asModelAnimation [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Animation >> channels [
 	^ channels
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Animation >> channels: anObject [
 	channels := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Animation >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Animation >> name: anObject [
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Animation >> samplers [
 	^ samplers
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Animation >> samplers: anObject [
 	samplers := anObject
 ]

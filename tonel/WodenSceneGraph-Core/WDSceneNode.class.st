@@ -147,6 +147,17 @@ WDSceneNode >> childBoundingBoxChanged: aChild [
 	self invalidateLocalBoundingBox
 ]
 
+{ #category : 'as yet unclassified' }
+WDSceneNode >> exportToGltfWith: builder [
+	| node |
+	node := builder newNode: self name.
+	node children: (children collect: [ :each | each exportToGltfWith: builder ]).
+	self renderables size = 1 ifTrue: [ 
+		node mesh: (self renderables first exportToGltfWith: builder)
+	].
+	^ node
+]
+
 { #category : 'accessing' }
 WDSceneNode >> globalTransform [
 	^ parent

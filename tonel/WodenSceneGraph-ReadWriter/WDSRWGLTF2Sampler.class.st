@@ -2,8 +2,8 @@
 I specify a texture sampler in a glTF 2 model.
 "
 Class {
-	#name : #WDSRWGLTF2Sampler,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2Sampler',
+	#superclass : 'Object',
 	#instVars : [
 		'minFilter',
 		'magFilter',
@@ -13,45 +13,47 @@ Class {
 	#pools : [
 		'WDSRWGLTF2Constants'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> magFilter [
 	^ magFilter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> magFilter: anObject [
 	magFilter := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> minFilter [
 	^ minFilter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> minFilter: anObject [
 	minFilter := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> wrapS [
 	^ wrapS
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> wrapS: anObject [
 	wrapS := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> wrapT [
 	^ wrapT
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2Sampler >> wrapT: anObject [
 	wrapT := anObject
 ]

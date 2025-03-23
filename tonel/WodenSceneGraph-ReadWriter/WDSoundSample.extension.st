@@ -1,6 +1,6 @@
-Extension { #name : #WDSoundSample }
+Extension { #name : 'WDSoundSample' }
 
-{ #category : #'*WodenSceneGraph-ReadWriter' }
+{ #category : '*WodenSceneGraph-ReadWriter' }
 WDSoundSample class >> forFileRereference: aFileReference [
 	^ WDSRWWaveFileReader readFromFileReference: aFileReference
 ]

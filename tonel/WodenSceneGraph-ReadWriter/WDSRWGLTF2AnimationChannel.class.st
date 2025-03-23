@@ -2,8 +2,8 @@
 I am an animation channel in a glTF 2 model asset. 
 "
 Class {
-	#name : #WDSRWGLTF2AnimationChannel,
-	#superclass : #Object,
+	#name : 'WDSRWGLTF2AnimationChannel',
+	#superclass : 'Object',
 	#instVars : [
 		'sampler',
 		'targetProperty',
@@ -12,10 +12,12 @@ Class {
 	#classVars : [
 		'TargetPropertyToClassMap'
 	],
-	#category : #'WodenSceneGraph-ReadWriter-GLTF2'
+	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
+	#package : 'WodenSceneGraph-ReadWriter',
+	#tag : 'GLTF2'
 }
 
-{ #category : #'class initialization' }
+{ #category : 'class initialization' }
 WDSRWGLTF2AnimationChannel class >> initialize [
 	TargetPropertyToClassMap := Dictionary newFromPairs: { 
 		#translation . WDModelAnimationTranslationChannel.
@@ -25,7 +27,7 @@ WDSRWGLTF2AnimationChannel class >> initialize [
 	}.
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 WDSRWGLTF2AnimationChannel >> asModelAnimationChannel [
 	^ self modelAnimationChannelClass new
 		targetName: targetName;
@@ -37,39 +39,39 @@ WDSRWGLTF2AnimationChannel >> asModelAnimationChannel [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2AnimationChannel >> modelAnimationChannelClass [
 	^ TargetPropertyToClassMap at: targetProperty
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationChannel >> sampler [
 	^ sampler
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationChannel >> sampler: anObject [
 	sampler := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationChannel >> targetName [
 
 	^ targetName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationChannel >> targetName: anObject [
 
 	targetName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationChannel >> targetProperty [
 	^ targetProperty
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 WDSRWGLTF2AnimationChannel >> targetProperty: anObject [
 	targetProperty := anObject
 ]

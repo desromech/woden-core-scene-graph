@@ -1,1 +1,1 @@
-Package { #name : #'WodenSceneGraph-ReadWriter' }
+Package { #name : 'WodenSceneGraph-ReadWriter' }
