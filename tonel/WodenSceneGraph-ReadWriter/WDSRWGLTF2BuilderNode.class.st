@@ -5,7 +5,8 @@ Class {
 		'index',
 		'name',
 		'children',
-		'mesh'
+		'mesh',
+		'transform'
 	],
 	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
 	#package : 'WodenSceneGraph-ReadWriter',
@@ -34,6 +35,13 @@ WDSRWGLTF2BuilderNode >> encodeForJson [
 	mesh ifNotNil: [ 
 		nodeDict at: 'mesh' put: mesh index.
 	].
+
+	transform ifNotNil: [
+		nodeDict at: 'scale' put: {transform scale x. transform scale y. transform scale z}.
+		nodeDict at: 'rotation' put: {transform rotation x. transform rotation y. transform rotation z. transform rotation w}.
+		nodeDict at: 'translation' put: {transform translation x. transform translation y. transform translation z}.
+	].
+
 	children ifNotEmpty: [ 
 		nodeDict at: 'children' put: (children collect: [:each | each index] as: Array )
 	].
@@ -82,4 +90,16 @@ WDSRWGLTF2BuilderNode >> name [
 WDSRWGLTF2BuilderNode >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderNode >> transform [
+
+	^ transform
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderNode >> transform: aTransform [
+
+	transform := aTransform asTRSTransform3D
 ]

@@ -7,7 +7,9 @@ Class {
 		'byteOffset',
 		'componentType',
 		'type',
-		'count'
+		'count',
+		'min',
+		'max'
 	],
 	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
 	#package : 'WodenSceneGraph-ReadWriter',
@@ -71,6 +73,13 @@ WDSRWGLTF2BuilderAccessor >> encodeForJson [
 	accessorDict at: 'count' put: count.
 	accessorDict at: 'componentType' put: componentType.
 	accessorDict at: 'type' put: type.
+	min ifNotNil: [ 
+		accessorDict at: 'min' put: min.
+	].
+	max ifNotNil: [ 
+		accessorDict at: 'max' put: max.
+	].
+
 	^ accessorDict
 	
 ]
@@ -85,6 +94,30 @@ WDSRWGLTF2BuilderAccessor >> index [
 WDSRWGLTF2BuilderAccessor >> index: anObject [
 
 	index := anObject
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderAccessor >> max [
+
+	^ max
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderAccessor >> max: anObject [
+
+	max := anObject
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderAccessor >> min [
+
+	^ min
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderAccessor >> min: anObject [
+
+	min := anObject
 ]
 
 { #category : 'accessing' }

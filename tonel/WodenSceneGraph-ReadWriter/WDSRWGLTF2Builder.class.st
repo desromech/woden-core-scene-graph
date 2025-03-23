@@ -96,12 +96,15 @@ WDSRWGLTF2Builder >> convertAccessor: anAccessor [
 		accessor := WDSRWGLTF2BuilderAccessor new.
 		accessor index: accessors size.
 		accessors add: accessor.
-		
 		accessor bufferView: (self convertBufferView: anAccessor bufferView).
 		accessor byteOffset: anAccessor byteOffset.
 		accessor count: anAccessor count.
 		accessor componentType: (ComponentTypeMap at: anAccessor componentType).
 		accessor type: (TypeMap at: anAccessor type).
+		((anAccessor min ~= (Array new: 16 withAll: 0)) or: [anAccessor max ~= (Array new: 16 withAll: 0)]) ifTrue: [ 
+			accessor min: anAccessor min.
+			accessor max: anAccessor max.
+		].
 		accessor
 	]
 ]

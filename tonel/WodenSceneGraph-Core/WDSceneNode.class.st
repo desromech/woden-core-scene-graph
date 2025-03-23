@@ -151,6 +151,7 @@ WDSceneNode >> childBoundingBoxChanged: aChild [
 WDSceneNode >> exportToGltfWith: builder [
 	| node |
 	node := builder newNode: self name.
+	node transform: transform.
 	node children: (children collect: [ :each | each exportToGltfWith: builder ]).
 	self renderables size = 1 ifTrue: [ 
 		node mesh: (self renderables first exportToGltfWith: builder)

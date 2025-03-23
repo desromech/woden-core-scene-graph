@@ -768,6 +768,40 @@ WDMeshBuilder >> encodeWith: encoder float32Array: array type: type location: lo
 		count: vertexCount;
 		componentType: WDBinaryBufferAccessorFloat32ComponentType;
 		yourself.
+		
+	location = WDVertexBufferAttribute positionLocation ifTrue: [
+		| minValues maxValues |
+		self assert: vertexCount * 3 = array size .
+		minValues := Array new: 3 .
+		maxValues := Array new: 3.
+		
+		1 to: vertexCount do: [ :vi |
+			| vx vy vz |
+			vx := array at: vi*3 - 2.
+			vy := array at: vi*3 - 1.
+			vz := array at: vi*3.
+			
+			vi = 1 ifTrue: [
+				minValues at: 1 put: vx.
+				minValues at: 2 put: vy.
+				minValues at: 3 put: vz.
+
+				maxValues at: 1 put: vx.
+				maxValues at: 2 put: vy.
+				maxValues at: 3 put: vz.
+			] ifFalse: [ 
+				minValues at: 1 put: ((minValues at: 1) min: vx).
+				minValues at: 2 put: ((minValues at: 2) min: vy).
+				minValues at: 3 put: ((minValues at: 3) min: vz).
+
+				maxValues at: 1 put: ((maxValues at: 1) max: vx).
+				maxValues at: 2 put: ((maxValues at: 2) max: vy).
+				maxValues at: 3 put: ((maxValues at: 3) max: vz).
+			]			
+		].
+		
+		accessor min: minValues; max: maxValues
+	].
 	encoder addFloat32Array: array.
 	encodedAttributes add: (WDVertexBufferAttribute new
 		location: location;
