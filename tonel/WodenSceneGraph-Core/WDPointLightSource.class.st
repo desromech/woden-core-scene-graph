@@ -40,6 +40,14 @@ WDPointLightSource >> boundingBox [
 	^ AABox halfExtent: influenceRadius asVector3
 ]
 
+{ #category : 'as yet unclassified' }
+WDPointLightSource >> exportToGltfWith: builder [
+	^ (super exportToGltfWith: builder)
+		type: 'point';
+		range: influenceRadius;
+		yourself
+]
+
 { #category : 'accessing' }
 WDPointLightSource >> influenceRadius [
 

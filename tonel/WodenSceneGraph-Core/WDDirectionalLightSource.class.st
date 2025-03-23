@@ -38,6 +38,13 @@ WDDirectionalLightSource >> asLightStateForRenderingScene: renderingScene withTr
 	^ result
 ]
 
+{ #category : 'as yet unclassified' }
+WDDirectionalLightSource >> exportToGltfWith: builder [
+	^ (super exportToGltfWith: builder)
+		type: 'directional';
+		yourself
+]
+
 { #category : 'initialization' }
 WDDirectionalLightSource >> initialize [
 	super initialize.

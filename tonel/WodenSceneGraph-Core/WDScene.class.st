@@ -81,10 +81,10 @@ WDScene >> children [
 
 { #category : 'accessing' }
 WDScene >> exportToGltf: aFileReference [
-	| builder rootNode json |
+	| builder json rootNodes |
 	builder := WDSRWGLTF2Builder new.
-	rootNode := normalLayer exportToGltfWith: builder.
-	(builder newScene: name) nodes: { rootNode }.
+	rootNodes := normalLayer children collect: [ :each | each exportToGltfWith: builder] as: Array.
+	(builder newScene: name) nodes: rootNodes.
 	json := builder buildJson.
 
 	aFileReference writeStreamDo: [ :out | out truncate; nextPutAll: json ]

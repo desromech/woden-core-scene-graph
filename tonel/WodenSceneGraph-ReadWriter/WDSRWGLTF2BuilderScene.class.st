@@ -18,7 +18,7 @@ WDSRWGLTF2BuilderScene >> encodeForJson [
 	name ifNotNil: [ 
 		json at: 'name' put: name
 	].
-	json at: 'nodes' put: (nodes collect: [:each | each index] as: Array).
+	json at: 'nodes' put: (nodes collect: [:each | each index ] as: Array).
 	^ json
 ]
 

@@ -156,6 +156,9 @@ WDSceneNode >> exportToGltfWith: builder [
 	self renderables size = 1 ifTrue: [ 
 		node mesh: (self renderables first exportToGltfWith: builder)
 	].
+	self lights size = 1 ifTrue: [ 
+		node light: (self lights first exportToGltfWith: builder)
+	].
 	^ node
 ]
 

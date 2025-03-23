@@ -19,7 +19,8 @@ Class {
 		'materials',
 		'textures',
 		'images',
-		'convertedTextures'
+		'convertedTextures',
+		'lights'
 	],
 	#classVars : [
 		'ComponentTypeMap',
@@ -71,20 +72,60 @@ WDSRWGLTF2Builder class >> initialize [
 
 { #category : 'initialization' }
 WDSRWGLTF2Builder >> buildJson [
-	| jsonDictionary |
+	| jsonDictionary extensionList |
 	jsonDictionary := OrderedDictionary new.
 	jsonDictionary at: 'asset' put: (OrderedDictionary new
 		at: 'version' put: '2.0';
 		yourself).
-	jsonDictionary at: 'buffers' put: (buffers collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'bufferViews' put: (bufferViews collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'accessors' put: (accessors collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'images' put: (images collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'materials' put: (materials collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'meshes' put: (meshes collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'nodes' put: (nodes collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'scenes' put: (scenes collect: [:each | each encodeForJson] as: Array).
-	jsonDictionary at: 'textures' put: (textures collect: [:each | each encodeForJson] as: Array).
+	buffers ifNotEmpty: [ 
+		jsonDictionary at: 'buffers' put: (buffers collect: [:each | each encodeForJson] as: Array)
+	].
+	bufferViews ifNotEmpty: [ 
+		jsonDictionary at: 'bufferViews' put: (bufferViews collect: [:each | each encodeForJson] as: Array)
+	].
+
+	accessors ifNotEmpty: [
+		jsonDictionary at: 'accessors' put: (accessors collect: [:each | each encodeForJson] as: Array).
+	].
+
+	images ifNotEmpty: [
+		jsonDictionary at: 'images' put: (images collect: [:each | each encodeForJson] as: Array).
+	].
+
+	materials ifNotEmpty: [
+		jsonDictionary at: 'materials' put: (materials collect: [:each | each encodeForJson] as: Array)
+	].
+
+	meshes ifNotEmpty: [
+		jsonDictionary at: 'meshes' put: (meshes collect: [:each | each encodeForJson] as: Array).
+	].
+
+	nodes ifNotEmpty: [ 
+		jsonDictionary at: 'nodes' put: (nodes collect: [:each | each encodeForJson] as: Array).
+	].
+
+	scenes ifNotEmpty: [
+		jsonDictionary at: 'scenes' put: (scenes collect: [:each | each encodeForJson] as: Array).
+	].
+
+	textures ifNotEmpty: [
+		jsonDictionary at: 'textures' put: (textures collect: [:each | each encodeForJson] as: Array).
+	].
+
+	extensionList := #().
+	
+	lights ifNotEmpty: [ 
+		extensionList := extensionList copyWith: 'KHR_lights_punctual'.
+		(jsonDictionary at: 'extensions' ifAbsentPut: [OrderedDictionary new])
+			at: 'KHR_lights_punctual' put: (OrderedDictionary new
+				at: 'lights' put: (lights collect: [:each | each encodeForJson] as: Array);
+				yourself)
+	].
+
+	extensionList ifNotEmpty: [
+		jsonDictionary at: 'extensionsRequired' put: extensionList copy.
+		jsonDictionary at: 'extensionsUsed' put: extensionList copy.
+	].
 
 	^ STONJSON toStringPretty: jsonDictionary
 ]
@@ -152,6 +193,7 @@ WDSRWGLTF2Builder >> convertBufferView: aBufferView [
 
 { #category : 'as yet unclassified' }
 WDSRWGLTF2Builder >> convertMaterial: aMaterial [
+	aMaterial ifNil: [ ^ nil ].
 	^ convertedMaterialDictionary at: aMaterial ifAbsentPut: [
 		| material |
 		material := aMaterial asGltf2MaterialWithBuilder: self.
@@ -206,6 +248,7 @@ WDSRWGLTF2Builder >> initialize [
 	nodes := OrderedCollection new.
 	scenes := OrderedCollection new.
 	textures := OrderedCollection new.
+	lights := OrderedCollection new.
 	
 	convertedMaterialDictionary := Dictionary new.
 	convertedMeshDictionary := Dictionary new.
@@ -223,9 +266,17 @@ WDSRWGLTF2Builder >> mapVertexLocationToAttribute: location [
 ]
 
 { #category : 'as yet unclassified' }
+WDSRWGLTF2Builder >> newLight [
+	| light |
+	light := WDSRWGLTF2BuilderLight new index: lights size; yourself.
+	lights add: light.
+	^ light
+]
+
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Builder >> newNode: name [
 	| node |
-	node := WDSRWGLTF2BuilderNode new name: name; index: nodes size yourself.
+	node := WDSRWGLTF2BuilderNode new name: name; index: nodes size; yourself.
 	nodes add: node.
 	^ node
 ]

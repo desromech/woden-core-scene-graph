@@ -6,7 +6,8 @@ Class {
 		'name',
 		'children',
 		'mesh',
-		'transform'
+		'transform',
+		'light'
 	],
 	#category : 'WodenSceneGraph-ReadWriter-GLTF2',
 	#package : 'WodenSceneGraph-ReadWriter',
@@ -34,6 +35,13 @@ WDSRWGLTF2BuilderNode >> encodeForJson [
 	].
 	mesh ifNotNil: [ 
 		nodeDict at: 'mesh' put: mesh index.
+	].
+
+	light ifNotNil: [
+		(nodeDict at: 'extensions' ifAbsentPut: [OrderedDictionary new])
+			at: 'KHR_lights_punctual' put: (OrderedDictionary new
+				at: 'light' put: light index;
+				yourself)
 	].
 
 	transform ifNotNil: [
@@ -66,6 +74,18 @@ WDSRWGLTF2BuilderNode >> index: anObject [
 WDSRWGLTF2BuilderNode >> initialize [
 	children := #().
 	
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderNode >> light [
+
+	^ light
+]
+
+{ #category : 'accessing' }
+WDSRWGLTF2BuilderNode >> light: anObject [
+
+	light := anObject
 ]
 
 { #category : 'accessing' }

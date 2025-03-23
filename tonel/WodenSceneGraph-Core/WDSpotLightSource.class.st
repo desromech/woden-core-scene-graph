@@ -28,6 +28,16 @@ WDSpotLightSource >> asLightStateForRenderingScene: renderingScene withTransform
 		yourself.
 ]
 
+{ #category : 'as yet unclassified' }
+WDSpotLightSource >> exportToGltfWith: builder [
+	^ (super exportToGltfWith: builder)
+		type: 'spot';
+		range: influenceRadius;
+		innerConeAngle: innerCutoff degreesToRadians;
+		outerConeAngle: outerCutoff degreesToRadians;
+		yourself
+]
+
 { #category : 'initialization' }
 WDSpotLightSource >> initialize [
 	super initialize.

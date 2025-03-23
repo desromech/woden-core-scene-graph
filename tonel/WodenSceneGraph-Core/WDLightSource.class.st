@@ -71,6 +71,16 @@ WDLightSource >> color: aColorOrVector3 [
 	color := aColorOrVector3 asVector3
 ]
 
+{ #category : 'as yet unclassified' }
+WDLightSource >> exportToGltfWith: builder [
+	| lightSource |
+	lightSource := builder newLight.
+	lightSource
+		color: {color x . color y. color z};
+		intensity: intensity.
+	^ lightSource
+]
+
 { #category : 'initialization' }
 WDLightSource >> initialize [
 	super initialize.
