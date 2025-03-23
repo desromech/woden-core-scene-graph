@@ -33,6 +33,9 @@ WDSRWGLTF2BuilderPrimitive >> encodeForJson [
 	indices  ifNotNil: [ 
 		result at: 'indices' put: indices index.
 	].
+	material ifNotNil: [ 
+		result at: 'material' put: material index.
+	].
 	^ result
 ]
 

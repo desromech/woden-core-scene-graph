@@ -89,6 +89,7 @@ WDMeshPrimitive >> exportToGltfWith: builder [
 		attribute := builder mapVertexLocationToAttribute: each location.
 		primitive attributes at: attribute put: (builder convertAccessor: each accessor)
 	].
+	primitive material: (builder convertMaterial: material).
 
 	indices ifNotNil: [ 
 		primitive indices: (builder convertAccessor: indices)

@@ -14,7 +14,9 @@ Class {
 		'convertedAccessorDictionary',
 		'convertedBufferViews',
 		'convertedBuffers',
-		'scenes'
+		'scenes',
+		'convertedMaterialDictionary',
+		'materials'
 	],
 	#classVars : [
 		'ComponentTypeMap',
@@ -74,6 +76,7 @@ WDSRWGLTF2Builder >> buildJson [
 	jsonDictionary at: 'buffers' put: (buffers collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'bufferViews' put: (bufferViews collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'accessors' put: (accessors collect: [:each | each encodeForJson] as: Array).
+	jsonDictionary at: 'materials' put: (materials collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'meshes' put: (meshes collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'nodes' put: (nodes collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'scenes' put: (scenes collect: [:each | each encodeForJson] as: Array).
@@ -142,6 +145,17 @@ WDSRWGLTF2Builder >> convertBufferView: aBufferView [
 ]
 
 { #category : 'as yet unclassified' }
+WDSRWGLTF2Builder >> convertMaterial: aMaterial [
+	^ convertedMaterialDictionary at: aMaterial ifAbsentPut: [
+		| material |
+		material := aMaterial asGltf2Material.
+		material index: materials size.
+		materials add: material.
+		material
+	]
+]
+
+{ #category : 'as yet unclassified' }
 WDSRWGLTF2Builder >> forMesh: aMesh exportWith: aBlock [
 	^ convertedMeshDictionary at: aMesh ifAbsentPut: [ 
 		| mesh |
@@ -159,10 +173,12 @@ WDSRWGLTF2Builder >> initialize [
 	accessors := OrderedCollection new.
 	buffers := OrderedCollection new.
 	bufferViews := OrderedCollection new.
+	materials := OrderedCollection new.
 	meshes := OrderedCollection new.
 	nodes := OrderedCollection new.
 	scenes := OrderedCollection new.
 	
+	convertedMaterialDictionary := Dictionary new.
 	convertedMeshDictionary := Dictionary new.
 	convertedAccessorDictionary := Dictionary new.
 	convertedBufferViews := Dictionary new.
