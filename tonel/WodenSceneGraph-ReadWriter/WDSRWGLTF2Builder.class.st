@@ -16,7 +16,10 @@ Class {
 		'convertedBuffers',
 		'scenes',
 		'convertedMaterialDictionary',
-		'materials'
+		'materials',
+		'textures',
+		'images',
+		'convertedTextures'
 	],
 	#classVars : [
 		'ComponentTypeMap',
@@ -76,10 +79,13 @@ WDSRWGLTF2Builder >> buildJson [
 	jsonDictionary at: 'buffers' put: (buffers collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'bufferViews' put: (bufferViews collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'accessors' put: (accessors collect: [:each | each encodeForJson] as: Array).
+	jsonDictionary at: 'images' put: (images collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'materials' put: (materials collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'meshes' put: (meshes collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'nodes' put: (nodes collect: [:each | each encodeForJson] as: Array).
 	jsonDictionary at: 'scenes' put: (scenes collect: [:each | each encodeForJson] as: Array).
+	jsonDictionary at: 'textures' put: (textures collect: [:each | each encodeForJson] as: Array).
+
 	^ STONJSON toStringPretty: jsonDictionary
 ]
 
@@ -148,10 +154,31 @@ WDSRWGLTF2Builder >> convertBufferView: aBufferView [
 WDSRWGLTF2Builder >> convertMaterial: aMaterial [
 	^ convertedMaterialDictionary at: aMaterial ifAbsentPut: [
 		| material |
-		material := aMaterial asGltf2Material.
+		material := aMaterial asGltf2MaterialWithBuilder: self.
 		material index: materials size.
 		materials add: material.
 		material
+	]
+]
+
+{ #category : 'as yet unclassified' }
+WDSRWGLTF2Builder >> convertTexture: aTexture [
+	aTexture ifNil: [ ^ nil ].
+	^ convertedTextures at: aTexture ifAbsentPut: [
+		| textureImageData image texture |
+		textureImageData := ByteArray streamContents: [ :out | PNGReadWriter putForm: aTexture data onStream: out].
+		image := WDSRWGLTF2BuilderImage new
+			index: images size;
+			data: textureImageData;
+			yourself.
+		images add: image.
+		
+		texture := WDSRWGLTF2BuilderTexture new
+			index: textures size;
+			source: image;
+			yourself.
+		textures add: texture.
+		texture
 	]
 ]
 
@@ -173,16 +200,19 @@ WDSRWGLTF2Builder >> initialize [
 	accessors := OrderedCollection new.
 	buffers := OrderedCollection new.
 	bufferViews := OrderedCollection new.
+	images := OrderedCollection new.
 	materials := OrderedCollection new.
 	meshes := OrderedCollection new.
 	nodes := OrderedCollection new.
 	scenes := OrderedCollection new.
+	textures := OrderedCollection new.
 	
 	convertedMaterialDictionary := Dictionary new.
 	convertedMeshDictionary := Dictionary new.
 	convertedAccessorDictionary := Dictionary new.
 	convertedBufferViews := Dictionary new.
 	convertedBuffers := Dictionary new.
+	convertedTextures := Dictionary new.
 	
 ]
 
