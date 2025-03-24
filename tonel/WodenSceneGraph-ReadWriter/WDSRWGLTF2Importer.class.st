@@ -31,7 +31,8 @@ Class {
 		'lcaTreeWalkIndices',
 		'lcaTreeWalkDepths',
 		'nodeToLcaQueryIndex',
-		'nodeGlobalTransforms'
+		'nodeGlobalTransforms',
+		'lights'
 	],
 	#classVars : [
 		'ComponentTypeMap',
@@ -371,6 +372,39 @@ WDSRWGLTF2Importer >> loadImagesFrom: elements [
 ]
 
 { #category : 'loading' }
+WDSRWGLTF2Importer >> loadLightFrom: lightDescription [
+	| type light |
+	type := lightDescription at: 'type'.
+	type = 'directional' ifTrue: [ 
+		light := WDDirectionalLightSource new.
+	].
+	type = 'point' ifTrue: [ 
+		light := WDPointLightSource new.
+	].
+	type = 'spot' ifTrue: [
+		| spotData | 
+		light := WDSpotLightSource new.
+		spotData := lightDescription at: 'spot'.
+		light innerCutoff: (spotData at: 'innerConeAngle' ifAbsent: [0.0]) radiansToDegrees.
+		light outerCutoff: (spotData at: 'outerConeAngle' ifAbsent: [Float pi * 0.25]) radiansToDegrees.
+	].
+
+	lightDescription at: 'color' ifPresent: [ :color |
+		light color: (Vector3 x: color first y: color second z: color third)
+	].
+	light intensity: (lightDescription at: 'intensity' ifAbsent: [1.0]).
+	light influenceRadius: (lightDescription at: 'range' ifAbsent: [1e6]).
+	lights add: light
+
+]
+
+{ #category : 'loading' }
+WDSRWGLTF2Importer >> loadLightsFrom: elements [
+	lights := OrderedCollection new.
+	elements do: [ :el | self loadLightFrom: el ]
+]
+
+{ #category : 'loading' }
 WDSRWGLTF2Importer >> loadMaterialFrom: materialDescription [
 	| material |
 	material := nil.
@@ -546,6 +580,13 @@ WDSRWGLTF2Importer >> loadNodeFrom: nodeDescription [
 		]
 	].
 
+	nodeDescription at: 'extensions' ifPresent: [ :extensions |
+		extensions at: 'KHR_lights_punctual' ifPresent: [ :lightsPunctual |
+			| lightIndex |
+			lightIndex := lightsPunctual at: 'light'.
+			node lights: { lights at: lightIndex + 1 }
+		]
+	].
 	nodeDescription at: 'camera' ifPresent: [ :cameraIndex |
 		| camera |
 		camera := WDCamera new.
@@ -772,9 +813,15 @@ WDSRWGLTF2Importer >> processGLTFJson: json [
 	json at: 'materials' ifPresent: [ :elements | self loadMaterialsFrom: elements ].
 	json at: 'skins' ifPresent: [ :elements | self loadSkinsFrom: elements ].
 	json at: 'meshes' ifPresent: [ :elements | self loadMeshesFrom: elements ].
+	json at: 'extensions' ifPresent: [ :extensions |
+		extensions at: 'KHR_lights_punctual' ifPresent: [ :lightsExtension |
+			self loadLightsFrom: (lightsExtension at: 'lights')
+		]
+	].
 	json at: 'nodes' ifPresent: [ :elements | self loadNodesFrom: elements ].
 	json at: 'animations' ifPresent: [ :elements | self loadAnimationsFrom: elements ].	
 	json at: 'scenes' ifPresent: [ :elements | self loadScenesFrom: elements ].
+
 	skins ifNotNil: [ 
 		skins do: [ :each | each rootNode removeFromScene ].
 	].
