@@ -19,7 +19,7 @@ BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 		baseline: #'AbstractGPU' with: [ spec repository: 'github://desromech/abstract-gpu' ];
 		baseline: #'AbstractVideo' with: [ spec repository: 'github://desromech/abstract-video:main' ];
 		baseline: #'WodenMath' with: [ spec repository: 'github://desromech/woden-core-math' ];
-		baseline: #'Toplo' with: [ spec repository: 'github://pharo-graphics/Toplo:master/src' ];
+		"baseline: #'Toplo' with: [ spec repository: 'github://pharo-graphics/Toplo:master/src' ];"
 		baseline: #'FormProceduralLibrary' with: [ spec repository: 'github://desromech/form-procedural-library' ];
 		baseline: #'FormSceneGraph' with: [
 			spec
@@ -42,9 +42,9 @@ BaselineOfWodenSceneGraph >> baselineForPharo: spec [
 		package: #'WodenSceneGraph-Spec' with: [
 			spec requires: #( #'WodenSceneGraph-Morphic').
 		];
-		package: #'WodenSceneGraph-Bloc' with: [
+		"package: #'WodenSceneGraph-Bloc' with: [
 			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core' #'AbstractGPU' #'WodenSceneGraph-Renderer-AbstractGPU' #'Toplo').
-		];
+		];"
 		package: #'WodenSceneGraph-OSWindow' with: [
 			spec requires: #( #'WodenSceneGraph-Renderer-Core' #'WodenSceneGraph-Core' #'AbstractGPU' #'WodenSceneGraph-Renderer-AbstractGPU').
 		];
