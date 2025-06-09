@@ -10,6 +10,6 @@ WDSceneElement >> openInMorphicWindow [
 
 { #category : '*WodenSceneGraph-Morphic' }
 WDSceneElement >> openInWindow [
-	(self respondsTo: #inspectionSceneView) ifTrue: [ ^ self inspect ].
+	(self respondsTo: #inspectionSceneView:) ifTrue: [ ^ self inspect ].
 	^ self openInMorphicWindow
 ]
